@@ -26,7 +26,7 @@ class Guest(ORM):
         self.uuid = None
         self.name = None
         self.password = None
-        self.remark = None
+        self.remark = ''
         self.os_template_id = None
         self.create_time = ji.Common.tus()
         self.status = GuestStatus.shutdown.value

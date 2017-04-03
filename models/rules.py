@@ -41,12 +41,12 @@ class Rules(Enum):
 
     CPU = (int, 'cpu')
     MEMORY = (int, 'memory')
-    OS_TEMPLATE_ID = (basestring, 'os_template_id')
+    OS_TEMPLATE_ID = (int, 'os_template_id')
     DISKS = (list, 'disks')
     QUANTITY = (int, 'quantity')
     NAME = (basestring, 'name')
     PASSWORD = (basestring, 'password')
-    LEASE_TERM = (basestring, 'lease_term')
+    LEASE_TERM = (int, 'lease_term')
 
     REMARK = (basestring, 'remark')
     LABEL = (basestring, 'label')

@@ -51,14 +51,14 @@ class GuestXML(object):
     </domain>
     """
 
-    def __init__(self, guest=None, disks=None, g_config=None):
+    def __init__(self, guest=None, disks=None, config=None):
         assert isinstance(guest, Guest)
         assert isinstance(disks, list)
-        assert isinstance(g_config, Config)
+        assert isinstance(config, Config)
 
         self.guest = guest
         self.disks = disks
-        self.g_config = g_config
+        self.config = config
 
     def get_domain(self):
         return """
@@ -125,7 +125,7 @@ class GuestXML(object):
         disks = []
         dev_table = ['vda', 'vdb', 'vdc', 'vdd']
 
-        for i, disk in self.disks:
+        for i, disk in enumerate(self.disks):
             disks.append("""
                 <disk type='network' device='disk'>
                     <driver name='qemu' type='qcow2' cache='none'/>
@@ -134,7 +134,7 @@ class GuestXML(object):
                     </source>
                     <target dev='{4}' bus='virtio'/>
                 </disk>
-            """.format(self.g_config.glusterfs_volume, self.guest.name, disk['label'], disk['format'], dev_table[i]))
+            """.format(self.config.glusterfs_volume, self.guest.name, disk['label'], disk['format'], dev_table[i]))
 
         return ''.join(disks)
 

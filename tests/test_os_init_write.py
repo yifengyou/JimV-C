@@ -45,7 +45,7 @@ class TestOSInitWrite(unittest.TestCase):
         payload = {
             "os_init_id": TestOSInitWrite.os_init_id,
             "path": "/etc/resolv.conf",
-            "content": "".join([
+            "content": "\n".join([
                 "nameserver {DNS1}",
                 "nameserver {DNS2}"
             ])
@@ -90,7 +90,7 @@ class TestOSInitWrite(unittest.TestCase):
         payload = {
             "os_init_id": TestOSInitWrite.os_init_id,
             "path": "/etc/hostname",
-            "content": "{HOSTNAME}"
+            "content": "hostname"
         }
 
         url = TestOSInitWrite.base_url + '/os_init_write'
@@ -128,7 +128,7 @@ class TestOSInitWrite(unittest.TestCase):
         payload = {
             "os_init_id": TestOSInitWrite.os_init_id,
             "path": "/etc/hostname",
-            "content": "hostname"
+            "content": "{HOSTNAME}"
         }
 
         url = TestOSInitWrite.base_url + '/os_init_write/' + TestOSInitWrite.os_init_write_id.__str__()
@@ -138,6 +138,7 @@ class TestOSInitWrite(unittest.TestCase):
         print json.dumps(j_r, ensure_ascii=False)
         self.assertEqual('200', j_r['state']['code'])
 
+    @unittest.skip('skip delete os init write!')
     def test_27_delete(self):
         url = TestOSInitWrite.base_url + '/os_init_write/' + TestOSInitWrite.os_init_write_id.__str__()
         headers = {'content-type': 'application/json'}
@@ -146,6 +147,7 @@ class TestOSInitWrite(unittest.TestCase):
         print json.dumps(j_r, ensure_ascii=False)
         self.assertEqual('200', j_r['state']['code'])
 
+    @unittest.skip('skip delete os init!')
     # 删除系统初始化组列表更新结果
     def test_31_delete(self):
         url = TestOSInitWrite.base_url + '/os_init/' + TestOSInitWrite.os_init_id.__str__()

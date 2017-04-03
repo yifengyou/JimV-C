@@ -72,6 +72,7 @@ class TestOSTemplate(unittest.TestCase):
         self.assertEqual('200', j_r['state']['code'])
         self.assertEqual('CentOS-72', j_r['data'][0]['label'])
 
+    @unittest.skip('skip delete os template!')
     # 删除系统模板
     def test_15_delete(self):
         url = TestOSTemplate.base_url + '/os_template/' + TestOSTemplate.os_template_id.__str__()

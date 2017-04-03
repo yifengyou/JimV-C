@@ -4,13 +4,14 @@
 
 import copy
 from flask import Blueprint
-from flask import request, g
+from flask import request
 import json
 from uuid import uuid4
 import jimit as ji
 
 from models import OSInitWrite
 from models.initialize import app
+from models import Database as db
 from models import Config
 from models import GuestDisk
 from models import Rules
@@ -53,13 +54,9 @@ def r_create():
 
         ji.Check.previewing(args_rules, request.json)
 
-        if g.config is None:
-            config = Config()
-            config.id = 1
-            config.get()
-            g.config = config
-
-        assert isinstance(g.config, Config)
+        config = Config()
+        config.id = 1
+        config.get()
 
         os_template = OSTemplate()
         os_template.id = request.json.get('os_template_id')
@@ -70,10 +67,10 @@ def r_create():
 
         os_template.get()
 
-        os_init_writes = OSInitWrite.get_by_filter(
+        os_init_writes, os_init_writes_count = OSInitWrite.get_by_filter(
             filter_str='os_init_id:in:' + os_template.os_init_id.__str__())
 
-        if g.r.scard(app.config['ip_available_set']) < 1:
+        if db.r.scard(app.config['ip_available_set']) < 1:
             ret['state'] = ji.Common.exchange_state(50350)
             return ret
 
@@ -84,8 +81,8 @@ def r_create():
             guest = Guest()
             guest.uuid = uuid4().__str__()
             guest.cpu = request.json.get('cpu')
-            # 虚拟机内存单位默认KiB，所以这个乘1024的平方，使得用户填入的单位变为GiB
-            guest.memory = request.json.get('memory') * 1024 * 1024
+            # 虚拟机内存单位，模板生成方法中已置其为GiB
+            guest.memory = request.json.get('memory')
             guest.os_template_id = request.json.get('os_template_id')
             guest.name = request.json.get('name')
 
@@ -96,19 +93,19 @@ def r_create():
             while guest.name.__len__() < 1 or guest.exist_by('name'):
                 guest.name = ji.Common.generate_random_code(length=8)
 
-            guest.ip = g.r.spop(app.config['ip_available_set'])
-            g.r.sadd(app.config['ip_used_set'], guest.ip)
+            guest.ip = db.r.spop(app.config['ip_available_set'])
+            db.r.sadd(app.config['ip_used_set'], guest.ip)
 
-            guest.network = g.config.vm_network
-            guest.manage_network = g.config.vm_manage_network
+            guest.network = config.vm_network
+            guest.manage_network = config.vm_manage_network
 
-            guest.vnc_port = g.r.spop(app.config['vnc_port_available_set'])
-            g.r.sadd(app.config['vnc_port_used_set'], guest.vnc_port)
+            guest.vnc_port = db.r.spop(app.config['vnc_port_available_set'])
+            db.r.sadd(app.config['vnc_port_used_set'], guest.vnc_port)
 
             guest.vnc_password = ji.Common.generate_random_code(length=16)
 
             guest_disks = list()
-            guest_disks.append({'label': uuid4(), 'size': -1, 'format': 'qcow2'})
+            guest_disks.append({'label': uuid4().__str__(), 'size': -1, 'format': 'qcow2'})
 
             for i, disk in enumerate(request.json.get('disks')):
                 guest_disk = GuestDisk()
@@ -119,37 +116,37 @@ def r_create():
                     continue
 
                 guest_disk.guest_uuid = guest.uuid
-                guest_disk.label = uuid4()
+                guest_disk.label = uuid4().__str__()
                 guest_disk.sequence = i + 1
                 guest_disk.format = 'qcow2'
                 guest_disk.create()
 
                 guest_disks.append({'label': guest_disk.label, 'size': guest_disk.size, 'format': guest_disk.format})
 
+            guest_xml = GuestXML(guest=guest, disks=guest_disks, config=config)
+            guest.xml = guest_xml.get_domain()
             guest.create()
-            guest_xml = GuestXML(guest=guest, disks=guest_disks, g_config=g.config)
-            guest_xml.get_domain()
 
             # 替换占位符为有效内容
             _os_init_writes = copy.deepcopy(os_init_writes)
-            for k, v in _os_init_writes:
-                _os_init_writes[k] = v.replace('{IP}', guest.ip).\
+            for k, v in enumerate(_os_init_writes):
+                _os_init_writes[k] = v['content'].replace('{IP}', guest.ip).\
                     replace('{HOSTNAME}', guest.name).\
-                    replace('{NETMASK}', g.config.netmask).\
-                    replace('{GATEWAY}', g.config.gateway).\
-                    replace('{DNS1}', g.config.dns1).\
-                    replace('{DNS2}', g.config.dns2)
+                    replace('{NETMASK}', config.netmask).\
+                    replace('{GATEWAY}', config.gateway).\
+                    replace('{DNS1}', config.dns1).\
+                    replace('{DNS2}', config.dns2)
 
             create_vm_msg = {
                 'uuid': guest.uuid,
-                'glusterfs_volume': g.config.glusterfs_volume,
+                'glusterfs_volume': config.glusterfs_volume,
                 'template_path': 'template_pool/' + os_template.name,
                 'guest_disks': guest_disks,
                 'writes': _os_init_writes,
                 'password': guest.password,
                 'xml': guest_xml.get_domain()
             }
-            g.r.rpush(app.config['vm_create_queue'], json.dumps(create_vm_msg, ensure_ascii=False))
+            db.r.rpush(app.config['vm_create_queue'], json.dumps(create_vm_msg, ensure_ascii=False))
 
         return ret
 
