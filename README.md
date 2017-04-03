@@ -26,7 +26,7 @@ su - www
 mkdir ~/sites
 ```
 
-### 克隆JimID项目
+### 克隆JimV-C项目
 ``` bash
 git clone https://github.com/jamesiter/JimV-C.git ~/sites/JimV-C
 ```
@@ -37,7 +37,7 @@ git clone https://github.com/jamesiter/JimV-C.git ~/sites/JimV-C
 virtualenv --system-site-packages venv
 # 导入 python 虚拟环境
 source ~/venv/bin/activate
-# 安装JimID所需扩展库
+# 安装JimV-C所需扩展库
 pip install -r ~/sites/JimV-C/requirements.txt
 # 安装Python连接MySQL的适配器
 git clone https://github.com/mysql/mysql-connector-python.git; cd ~/mysql-connector-python; python setup.py install; cd ..; rm -rf mysql-connector-python
@@ -65,7 +65,7 @@ mysql -u jimv -pyour_jimv_db_password -e 'show databases'
 |db_host|localhost|数据库地址|
 |db_port|3306|数据库端口|
 |db_user|jimv|连接数控的用户名|
-|**`db_password`**|jimid.pswd.com|连接数控的密码|
+|**`db_password`**|jimv.pswd.com|连接数控的密码|
 |db_pool_size|10|连接池|
 |db_charset|utf8|默认字符集|
 |redis_host|localhost|redis数据库地址|
