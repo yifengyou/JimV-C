@@ -1,0 +1,10 @@
+Flask==0.10.1
+# mysql-connector-python
+enum34==1.1.2
+jimit==0.62
+requests==2.9.1
+PyJWT==1.4.1
+Flask-Session==0.3.0
+gunicorn
+eventlet
+redis
