@@ -40,7 +40,7 @@ class TestOSInit(unittest.TestCase):
 
     # 获取系统初始化组列表
     def test_12_get(self):
-        url = TestOSInit.base_url + '/os_init'
+        url = TestOSInit.base_url + '/os_inits'
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)
@@ -63,7 +63,7 @@ class TestOSInit(unittest.TestCase):
 
     # 校验系统初始化组列表更新结果
     def test_14_get(self):
-        url = TestOSInit.base_url + '/os_init'
+        url = TestOSInit.base_url + '/os_inits'
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)

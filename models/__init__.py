@@ -51,6 +51,10 @@ from status import (
     GuestStatus
 )
 
+from log import (
+    Log
+)
+
 
 __author__ = 'James Iter'
 __date__ = '2017/3/21'
@@ -60,6 +64,6 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'GuestStatus', 'ORM', 'Config',
-    'Guest', 'GuestDisk', 'OSInit', 'OSInitWrite', 'OSTemplate', 'GuestXML'
+    'Guest', 'GuestDisk', 'OSInit', 'OSInitWrite', 'OSTemplate', 'GuestXML', 'Log'
 ]
 

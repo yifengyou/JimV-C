@@ -42,7 +42,7 @@ class TestOSTemplate(unittest.TestCase):
 
     # 获取系统模板列表
     def test_12_get(self):
-        url = TestOSTemplate.base_url + '/os_template'
+        url = TestOSTemplate.base_url + '/os_templates'
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)
@@ -64,7 +64,7 @@ class TestOSTemplate(unittest.TestCase):
 
     # 校验系统模板更新结果
     def test_14_get(self):
-        url = TestOSTemplate.base_url + '/os_template'
+        url = TestOSTemplate.base_url + '/os_templates'
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)

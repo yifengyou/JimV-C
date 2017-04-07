@@ -3,6 +3,7 @@
 
 from functools import wraps
 
+import commands
 from flask import make_response, g, request
 from flask.wrappers import Response
 from werkzeug.utils import import_string, cached_property
@@ -12,12 +13,29 @@ from models.initialize import *
 
 
 __author__ = 'James Iter'
-__date__ = '16/06/08'
+__date__ = '2017/03/01'
 __contact__ = 'james.iter.cn@gmail.com'
-__copyright__ = '(c) 2016 by James Iter.'
+__copyright__ = '(c) 2017 by James Iter.'
 
 
 class Utils(object):
+
+    exit_flag = False
+    thread_counter = 0
+
+    @staticmethod
+    def shell_cmd(cmd):
+        try:
+            exit_status, output = commands.getstatusoutput(cmd)
+
+            return exit_status, str(output)
+
+        except Exception as e:
+            return -1, e.message
+
+    @classmethod
+    def signal_handle(cls, signum=0, frame=None):
+        cls.exit_flag = True
 
     @staticmethod
     def dumps2response(func):

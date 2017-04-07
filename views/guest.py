@@ -130,7 +130,7 @@ def r_create():
             # 替换占位符为有效内容
             _os_init_writes = copy.deepcopy(os_init_writes)
             for k, v in enumerate(_os_init_writes):
-                _os_init_writes[k] = v['content'].replace('{IP}', guest.ip).\
+                _os_init_writes[k]['content'] = v['content'].replace('{IP}', guest.ip).\
                     replace('{HOSTNAME}', guest.name).\
                     replace('{NETMASK}', config.netmask).\
                     replace('{GATEWAY}', config.gateway).\
@@ -139,6 +139,7 @@ def r_create():
 
             create_vm_msg = {
                 'uuid': guest.uuid,
+                'name': guest.name,
                 'glusterfs_volume': config.glusterfs_volume,
                 'template_path': 'template_pool/' + os_template.name,
                 'guest_disks': guest_disks,

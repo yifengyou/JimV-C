@@ -117,7 +117,7 @@ class TestOSInitWrite(unittest.TestCase):
         self.assertEqual('40901', j_r['state']['sub']['code'])
 
     def test_25_get(self):
-        url = TestOSInitWrite.base_url + '/os_init_write'
+        url = TestOSInitWrite.base_url + '/os_init_writes'
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)

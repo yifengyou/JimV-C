@@ -61,8 +61,7 @@ class GuestXML(object):
         self.config = config
 
     def get_domain(self):
-        return """
-            <?xml version="1.0" encoding="utf-8"?>
+        return """<?xml version="1.0" encoding="utf-8"?>
             <domain type="kvm">
             {0}
             {1}
@@ -70,9 +69,10 @@ class GuestXML(object):
             {3}
             {4}
             {5}
+            {6}
             </domain>
-        """.format(self.get_features(), self.get_name(), self.get_vcpu(), self.get_memory(), self.get_os(),
-                   self.get_devices())
+        """.format(self.get_features(), self.get_name(), self.get_uuid(), self.get_vcpu(), self.get_memory(),
+                   self.get_os(), self.get_devices())
 
     @staticmethod
     def get_features():
@@ -85,6 +85,9 @@ class GuestXML(object):
 
     def get_name(self):
         return """<name>{0}</name>""".format(self.guest.name)
+
+    def get_uuid(self):
+        return """<uuid>{0}</uuid>""".format(self.guest.uuid)
 
     def get_vcpu(self):
         return """<vcpu>{0}</vcpu>""".format(self.guest.cpu.__str__())

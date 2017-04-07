@@ -16,4 +16,14 @@ class GuestStatus(IntEnum):
     booting = 1
     running = 2
     rebooting = 3
+    suspend = 4
+    resuming = 5
+
+
+class LogLevel(IntEnum):
+    critical = 0
+    error = 1
+    warn = 2
+    info = 3
+    debug = 4
 

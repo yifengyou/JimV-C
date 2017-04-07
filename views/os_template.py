@@ -24,6 +24,12 @@ blueprint = Blueprint(
     url_prefix='/api/os_template'
 )
 
+blueprints = Blueprint(
+    'os_templates',
+    __name__,
+    url_prefix='/api/os_templates'
+)
+
 
 @Utils.dumps2response
 def r_create():
@@ -194,23 +200,23 @@ def r_get_by_filter():
         last_pagination = (ret['paging']['total'] + page_size - 1) / page_size
 
         if page <= 1:
-            ret['paging']['prev'] = host_url + blueprint.url_prefix + '?page=1&page_size=' + page_size.__str__() + \
+            ret['paging']['prev'] = host_url + blueprints.url_prefix + '?page=1&page_size=' + page_size.__str__() + \
                                     other_str
         else:
-            ret['paging']['prev'] = host_url + blueprint.url_prefix + '?page=' + str(page-1) + '&page_size=' + \
+            ret['paging']['prev'] = host_url + blueprints.url_prefix + '?page=' + str(page-1) + '&page_size=' + \
                                     page_size.__str__() + other_str
 
         if page >= last_pagination:
-            ret['paging']['next'] = host_url + blueprint.url_prefix + '?page=' + last_pagination.__str__() + \
+            ret['paging']['next'] = host_url + blueprints.url_prefix + '?page=' + last_pagination.__str__() + \
                                     '&page_size=' + page_size.__str__() + other_str
         else:
-            ret['paging']['next'] = host_url + blueprint.url_prefix + '?page=' + str(page+1) + '&page_size=' + \
+            ret['paging']['next'] = host_url + blueprints.url_prefix + '?page=' + str(page+1) + '&page_size=' + \
                                     page_size.__str__() + other_str
 
-        ret['paging']['first'] = host_url + blueprint.url_prefix + '?page=1&page_size=' + \
+        ret['paging']['first'] = host_url + blueprints.url_prefix + '?page=1&page_size=' + \
             page_size.__str__() + other_str
         ret['paging']['last'] = \
-            host_url + blueprint.url_prefix + '?page=' + last_pagination.__str__() + '&page_size=' + \
+            host_url + blueprints.url_prefix + '?page=' + last_pagination.__str__() + '&page_size=' + \
             page_size.__str__() + other_str
 
         return ret
