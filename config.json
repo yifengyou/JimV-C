@@ -29,6 +29,7 @@
   "PERMANENT_SESSION_LIFETIME": 604800,
   "vm_create_queue": "Q:VMCreate",
   "host_event_report_queue": "Q:HostEvent",
+  "instruction_channel": "C:Instruction",
   "ip_available_set": "S:IP:Available",
   "ip_used_set": "S:IP:Used",
   "vnc_port_available_set": "S:VNCPort:Available",

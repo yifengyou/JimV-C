@@ -109,7 +109,6 @@ def r_get_by_filter():
 
 
 @Utils.dumps2response
-@Utils.superuser
 def r_content_search():
     page = str(request.args.get('page', 1))
     page_size = str(request.args.get('page_size', 50))

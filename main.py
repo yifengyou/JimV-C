@@ -10,10 +10,10 @@ import signal
 import time
 
 from models import Utils
+from models.event_processor import EventProcessor
 from models.initialize import app, logger
 import route_table
 from models import Database as db
-from models import Log
 from views.os_init import blueprint as os_init_blueprint
 from views.os_init import blueprints as os_init_blueprints
 from views.os_init_write import blueprint as os_init_write_blueprint
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         signal.signal(signal.SIGTERM, Utils.signal_handle)
         signal.signal(signal.SIGINT, Utils.signal_handle)
 
-        thread.start_new_thread(Log.launch, ())
+        thread.start_new_thread(EventProcessor.launch, ())
         Utils.thread_counter += 1
 
         app.run(host=app.config['jimv_listen'], port=app.config['jimv_port'], use_reloader=False, threaded=True)

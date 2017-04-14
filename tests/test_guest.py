@@ -30,7 +30,7 @@ class TestGuest(unittest.TestCase):
             "cpu": 4,
             "memory": 4,
             "os_template_id": 5,
-            "disks": [{"size": 200}],
+            "disks": [],
             "quantity": 2,
             "name": "",
             "password": "pswd.com",

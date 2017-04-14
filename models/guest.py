@@ -6,7 +6,7 @@ import jimit as ji
 
 from filter import FilterFieldType
 from orm import ORM
-from status import GuestStatus
+from status import GuestEvent
 
 
 __author__ = 'James Iter'
@@ -29,7 +29,7 @@ class Guest(ORM):
         self.remark = ''
         self.os_template_id = None
         self.create_time = ji.Common.tus()
-        self.status = GuestStatus.shutdown.value
+        self.status = GuestEvent.shutdown.value
         self.cpu = None
         self.memory = None
         self.ip = None

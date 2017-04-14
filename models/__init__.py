@@ -48,11 +48,17 @@ from os_template import (
 )
 
 from status import (
-    GuestStatus
+    EmitKind,
+    GuestEvent,
+    LogLevel
 )
 
 from log import (
     Log
+)
+
+from event_processor import (
+    EventProcessor
 )
 
 
@@ -63,7 +69,8 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 __all__ = [
-    'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'GuestStatus', 'ORM', 'Config',
-    'Guest', 'GuestDisk', 'OSInit', 'OSInitWrite', 'OSTemplate', 'GuestXML', 'Log'
+    'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestEvent', 'LogLevel', 'ORM',
+    'Config', 'Guest', 'GuestDisk', 'OSInit', 'OSInitWrite', 'OSTemplate', 'GuestXML', 'Log', 'EventProcessor'
 ]
+
 
