@@ -7,6 +7,8 @@ import jimit as ji
 from filter import FilterFieldType
 from orm import ORM
 from status import GuestState
+from database import Database as db
+from initialize import app
 
 
 __author__ = 'James Iter'
@@ -56,6 +58,10 @@ class Guest(ORM):
     @staticmethod
     def get_allow_content_search_keywords():
         return ['name', 'remark', 'on_host', 'ip']
+
+    @staticmethod
+    def emit_instruction(message):
+        db.r.publish(app.config['instruction_channel'], message=message)
 
 
 class GuestDisk(ORM):

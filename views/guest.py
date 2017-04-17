@@ -154,3 +154,304 @@ def r_create():
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
+
+@Utils.dumps2response
+def r_reboot(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'reboot', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_force_reboot(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'force_reboot', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_shutdown(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'shutdown', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_force_shutdown(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'force_shutdown', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_boot(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'boot', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_suspend(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'suspend', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_resume(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'resume', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_delete(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'delete', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_disk_resize(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'disk-resize', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_attach_disk(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'attach-disk', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_detach_disk(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'detach-disk', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_migrate(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        message = {'action': 'migrate', 'uuid': uuid}
+        Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+

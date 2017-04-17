@@ -39,6 +39,7 @@ class Rules(Enum):
     RSA_PRIVATE = (basestring, 'rsa_private')
     RSA_PUBLIC = (basestring, 'rsa_public')
 
+    UUID = (basestring, 'uuid', (36, 36))
     CPU = (int, 'cpu')
     MEMORY = (int, 'memory')
     OS_TEMPLATE_ID = (int, 'os_template_id')
