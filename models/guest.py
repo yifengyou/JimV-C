@@ -6,7 +6,7 @@ import jimit as ji
 
 from filter import FilterFieldType
 from orm import ORM
-from status import GuestEvent
+from status import GuestState
 
 
 __author__ = 'James Iter'
@@ -29,7 +29,8 @@ class Guest(ORM):
         self.remark = ''
         self.os_template_id = None
         self.create_time = ji.Common.tus()
-        self.status = GuestEvent.shutdown.value
+        self.status = GuestState.shutdown.value
+        self.on_host = ''
         self.cpu = None
         self.memory = None
         self.ip = None
@@ -43,8 +44,9 @@ class Guest(ORM):
     def get_filter_keywords():
         return {
             'name': FilterFieldType.STR.value,
-            'remark': FilterFieldType.INT.value,
-            'ip': FilterFieldType.INT.value
+            'remark': FilterFieldType.STR.value,
+            'on_host': FilterFieldType.STR.value,
+            'ip': FilterFieldType.STR.value
         }
 
     @staticmethod
@@ -53,7 +55,7 @@ class Guest(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['name', 'remark', 'ip']
+        return ['name', 'remark', 'on_host', 'ip']
 
 
 class GuestDisk(ORM):
@@ -75,7 +77,7 @@ class GuestDisk(ORM):
         return {
             'label': FilterFieldType.STR.value,
             'size': FilterFieldType.INT.value,
-            'guest_id': FilterFieldType.INT.value
+            'guest_uuid': FilterFieldType.STR.value
         }
 
     @staticmethod

@@ -49,7 +49,7 @@ from os_template import (
 
 from status import (
     EmitKind,
-    GuestEvent,
+    GuestState,
     LogLevel
 )
 
@@ -69,7 +69,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 __all__ = [
-    'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestEvent', 'LogLevel', 'ORM',
+    'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'LogLevel', 'ORM',
     'Config', 'Guest', 'GuestDisk', 'OSInit', 'OSInitWrite', 'OSTemplate', 'GuestXML', 'Log', 'EventProcessor'
 ]
 

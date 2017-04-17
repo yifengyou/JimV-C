@@ -6,6 +6,7 @@ import json
 import time
 
 from models import Database as db
+from models import Guest
 from models import Log
 from models import Utils
 from models import EmitKind
@@ -21,6 +22,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 class EventProcessor(object):
     message = None
     log = Log()
+    guest = Guest()
 
     @classmethod
     def log_processor(cls):
@@ -28,6 +30,14 @@ class EventProcessor(object):
                     message=cls.message['message'])
 
         cls.log.create()
+
+    @classmethod
+    def event_processor(cls):
+        cls.guest.uuid = cls.message['message']['uuid']
+        cls.guest.get_by('uuid')
+        cls.guest.status = cls.message['type']
+        cls.guest.on_host = cls.message['host']
+        cls.guest.update()
 
     @classmethod
     def launch(cls):
@@ -49,7 +59,10 @@ class EventProcessor(object):
                 if cls.message['kind'] == EmitKind.log.value:
                     cls.log_processor()
 
-                if cls.message['kind'] == EmitKind.event.value:
+                elif cls.message['kind'] == EmitKind.event.value:
+                    cls.event_processor()
+
+                else:
                     pass
 
             except Exception as e:
