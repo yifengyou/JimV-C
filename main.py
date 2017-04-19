@@ -21,6 +21,7 @@ from views.os_init_write import blueprints as os_init_write_blueprints
 from views.os_template import blueprint as os_template_blueprint
 from views.os_template import blueprints as os_template_blueprints
 from views.guest import blueprint as guest_blueprint
+from views.guest import blueprints as guest_blueprints
 from views.config import blueprint as config_blueprint
 from views.log import blueprint as log_blueprint
 from views.log import blueprints as log_blueprints
@@ -45,6 +46,7 @@ try:
     app.register_blueprint(os_template_blueprint)
     app.register_blueprint(os_template_blueprints)
     app.register_blueprint(guest_blueprint)
+    app.register_blueprint(guest_blueprints)
     app.register_blueprint(config_blueprint)
     app.register_blueprint(log_blueprint)
     app.register_blueprint(log_blueprints)

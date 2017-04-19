@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+
 from models import Config
 from models import Guest
 
@@ -125,8 +127,9 @@ class GuestXML(object):
 
     def get_disks(self):
 
+        from initialize import dev_table
+
         disks = []
-        dev_table = ['vda', 'vdb', 'vdc', 'vdd']
 
         for i, disk in enumerate(self.disks):
             disks.append("""

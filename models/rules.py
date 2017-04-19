@@ -40,6 +40,7 @@ class Rules(Enum):
     RSA_PUBLIC = (basestring, 'rsa_public')
 
     UUID = (basestring, 'uuid', (36, 36))
+    UUIDS = ('regex:^([\w-]{36})(,[\w-]{36})*$', 'uuids')
     CPU = (int, 'cpu')
     MEMORY = (int, 'memory')
     OS_TEMPLATE_ID = (int, 'os_template_id')
@@ -48,6 +49,9 @@ class Rules(Enum):
     NAME = (basestring, 'name')
     PASSWORD = (basestring, 'password')
     LEASE_TERM = (int, 'lease_term')
+    DESTINATION_HOST = (basestring, 'destination_host', (5, 64))
+    DEVICE_NODE_UUID = (basestring, 'device_node_uuid', (36, 36))
+    DISK_SIZE = ('regex:^\d{1,7}$', 'size')
 
     REMARK = (basestring, 'remark')
     LABEL = (basestring, 'label')

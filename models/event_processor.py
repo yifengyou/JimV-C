@@ -48,7 +48,7 @@ class EventProcessor(object):
                 return
 
             try:
-                host_log = db.r.lpop(app.config['host_event_report_queue'])
+                host_log = db.r.lpop(app.config['upstream_queue'])
 
                 if host_log is None:
                     time.sleep(1)

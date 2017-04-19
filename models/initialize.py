@@ -103,3 +103,5 @@ app.config = dict(app.config, **config)
 
 ji.index_state['branch'] = dict(ji.index_state['branch'], **own_state_branch)
 
+# sequence_device_node_mapping = ['vda', 'vdb', 'vdc', 'vdd']
+dev_table = ['vda', 'vdb', 'vdc', 'vdd']

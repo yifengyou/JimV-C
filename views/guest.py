@@ -10,7 +10,7 @@ from uuid import uuid4
 import jimit as ji
 
 from models import OSInitWrite
-from models.initialize import app
+from models.initialize import app, dev_table
 from models import Database as db
 from models import Config
 from models import GuestDisk
@@ -31,6 +31,12 @@ blueprint = Blueprint(
     'guest',
     __name__,
     url_prefix='/api/guest'
+)
+
+blueprints = Blueprint(
+    'guests',
+    __name__,
+    url_prefix='/api/guests'
 )
 
 
@@ -138,6 +144,7 @@ def r_create():
                     replace('{DNS2}', config.dns2)
 
             create_vm_msg = {
+                'action': 'create_vm',
                 'uuid': guest.uuid,
                 'name': guest.name,
                 'glusterfs_volume': config.glusterfs_volume,
@@ -147,7 +154,7 @@ def r_create():
                 'password': guest.password,
                 'xml': guest_xml.get_domain()
             }
-            db.r.rpush(app.config['vm_create_queue'], json.dumps(create_vm_msg, ensure_ascii=False))
+            db.r.rpush(app.config['downstream_queue'], json.dumps(create_vm_msg, ensure_ascii=False))
 
         return ret
 
@@ -156,20 +163,238 @@ def r_create():
 
 
 @Utils.dumps2response
-def r_reboot(uuid):
+def r_reboot(uuids):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUIDS.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
+        ji.Check.previewing(args_rules, {'uuids': uuids})
 
         guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
 
-        message = {'action': 'reboot', 'uuid': uuid}
+        for uuid in uuids.split(','):
+            message = {'action': 'reboot', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_force_reboot(uuids):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            message = {'action': 'force_reboot', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_shutdown(uuids):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            message = {'action': 'shutdown', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_force_shutdown(uuids):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            message = {'action': 'force_shutdown', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_boot(uuids):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            message = {'action': 'boot', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_suspend(uuids):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            message = {'action': 'suspend', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_resume(uuids):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            message = {'action': 'resume', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_delete(uuids):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            message = {'action': 'delete', 'uuid': uuid}
+            Guest.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_disk_resize(device_node_uuid, size):
+
+    args_rules = [
+        Rules.DEVICE_NODE_UUID.value,
+        Rules.DISK_SIZE.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'device_node_uuid': device_node_uuid, 'size': size})
+
+        guest_disk = GuestDisk()
+        guest_disk.label = device_node_uuid
+        guest_disk.get_by('label')
+
+        message = {'action': 'disk-resize', 'uuid': guest_disk.guest_uuid,
+                   'device_node': dev_table[guest_disk.sequence], 'size': size}
         Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -181,24 +406,43 @@ def r_reboot(uuid):
 
 
 @Utils.dumps2response
-def r_force_reboot(uuid):
+def r_create_disk(size):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.DISK_SIZE.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'force_reboot', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
+        ji.Check.previewing(args_rules, {'size': size})
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
+
+        size = int(size)
+
+        if not isinstance(size, int) or size < 1:
+            ret['state'] = ji.Common.exchange_state(41255)
+            return ret
+
+        guest_disk = GuestDisk()
+        guest_disk.guest_uuid = ''
+        guest_disk.size = size
+        guest_disk.label = uuid4().__str__()
+        guest_disk.sequence = -1
+        guest_disk.format = 'qcow2'
+        guest_disk.create()
+
+        config = Config()
+        config.id = 1
+        config.get()
+
+        image_path = '/'.join(['DiskPool', guest_disk.label + '.' + guest_disk.format])
+
+        message = {'action': 'create_disk', 'glusterfs_volume': config.glusterfs_volume,
+                   'image_path': image_path, 'size': guest_disk.size}
+
+        db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
+
         return ret
 
     except ji.PreviewingError, e:
@@ -206,199 +450,57 @@ def r_force_reboot(uuid):
 
 
 @Utils.dumps2response
-def r_shutdown(uuid):
+def r_attach_disk(uuid, size):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUID.value,
+        Rules.DISK_SIZE.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
+        ji.Check.previewing(args_rules, {'uuid': uuid, 'size': size})
 
         guest = Guest()
         guest.uuid = uuid
         guest.get_by('uuid')
 
-        message = {'action': 'shutdown', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
+        guest_disk = GuestDisk()
+        guest_disk.guest_uuid = guest.uuid
+        disks, count = guest_disk.get_all()
+
+        guest_disk.size = int(size)
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
-        return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+        if not isinstance(guest_disk.size, int) or guest_disk.size < 1:
+            ret['state'] = ji.Common.exchange_state(41255)
+            return ret
 
+        config = Config()
+        config.id = 1
+        config.get()
 
-@Utils.dumps2response
-def r_force_shutdown(uuid):
+        guest_disk.label = uuid4().__str__()
+        guest_disk.sequence = count + 1
+        guest_disk.format = 'qcow2'
+        guest_disk.create()
 
-    args_rules = [
-        Rules.UUID.value
-    ]
+        xml = """
+            <disk type='network' device='disk'>
+                <driver name='qemu' type='qcow2' cache='none'/>
+                <source protocol='gluster' name='{0}/VMs/{1}/{2}.{3}'>
+                    <host name='127.0.0.1' port='24007'/>
+                </source>
+                <target dev='{4}' bus='virtio'/>
+            </disk>
+        """.format(config.glusterfs_volume, guest.name, guest_disk.label, guest_disk.format,
+                   dev_table[guest_disk.sequence])
 
-    try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'force_shutdown', 'uuid': uuid}
+        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml,
+                   'disk': {'label': guest_disk.label, 'size': guest_disk.size, 'format': guest_disk.format}}
         Guest.emit_instruction(message=json.dumps(message))
 
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_boot(uuid):
-
-    args_rules = [
-        Rules.UUID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'boot', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_suspend(uuid):
-
-    args_rules = [
-        Rules.UUID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'suspend', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_resume(uuid):
-
-    args_rules = [
-        Rules.UUID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'resume', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_delete(uuid):
-
-    args_rules = [
-        Rules.UUID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'delete', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_disk_resize(uuid):
-
-    args_rules = [
-        Rules.UUID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'disk-resize', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_attach_disk(uuid):
-
-    args_rules = [
-        Rules.UUID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'attach-disk', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
     except ji.PreviewingError, e:
@@ -419,7 +521,7 @@ def r_detach_disk(uuid):
         guest.uuid = uuid
         guest.get_by('uuid')
 
-        message = {'action': 'detach-disk', 'uuid': uuid}
+        message = {'action': 'detach_disk', 'uuid': uuid}
         Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -431,21 +533,24 @@ def r_detach_disk(uuid):
 
 
 @Utils.dumps2response
-def r_migrate(uuid):
+def r_migrate(uuids, destination_host):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUIDS.value,
+        Rules.DESTINATION_HOST.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'destination_host': destination_host})
 
         guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
 
-        message = {'action': 'migrate', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
+        for uuid in uuids.split(','):
+            message = {'action': 'migrate', 'uuid': uuid, 'duri': 'qemu+ssh://' + destination_host + '/system'}
+            Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -453,5 +558,4 @@ def r_migrate(uuid):
 
     except ji.PreviewingError, e:
         return json.loads(e.message)
-
 
