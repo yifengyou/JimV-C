@@ -72,6 +72,7 @@ class GuestDisk(ORM):
     def __init__(self):
         super(GuestDisk, self).__init__()
         self.id = 0
+        self.uuid = None
         self.label = None
         self.size = None
         self.sequence = None
@@ -81,6 +82,7 @@ class GuestDisk(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'uuid': FilterFieldType.STR.value,
             'label': FilterFieldType.STR.value,
             'size': FilterFieldType.INT.value,
             'guest_uuid': FilterFieldType.STR.value

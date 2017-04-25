@@ -53,13 +53,13 @@ class GuestXML(object):
     </domain>
     """
 
-    def __init__(self, guest=None, disks=None, config=None):
+    def __init__(self, guest=None, disk=None, config=None):
         assert isinstance(guest, Guest)
-        assert isinstance(disks, list)
+        assert isinstance(disk, dict)
         assert isinstance(config, Config)
 
         self.guest = guest
-        self.disks = disks
+        self.disk = disk
         self.config = config
 
     def get_domain(self):
@@ -115,7 +115,7 @@ class GuestXML(object):
                 {2}
                 {3}
             </devices>
-        """.format(self.get_interface(), self.get_disks(), self.get_graphics(), self.get_console())
+        """.format(self.get_interface(), self.get_disk(), self.get_graphics(), self.get_console())
 
     def get_interface(self):
         return """
@@ -125,14 +125,11 @@ class GuestXML(object):
             </interface>
         """.format(self.guest.network)
 
-    def get_disks(self):
+    def get_disk(self):
 
         from initialize import dev_table
 
-        disks = []
-
-        for i, disk in enumerate(self.disks):
-            disks.append("""
+        return """
                 <disk type='network' device='disk'>
                     <driver name='qemu' type='qcow2' cache='none'/>
                     <source protocol='gluster' name='{0}/VMs/{1}/{2}.{3}'>
@@ -140,9 +137,8 @@ class GuestXML(object):
                     </source>
                     <target dev='{4}' bus='virtio'/>
                 </disk>
-            """.format(self.config.glusterfs_volume, self.guest.name, disk['label'], disk['format'], dev_table[i]))
-
-        return ''.join(disks)
+        """.format(self.config.glusterfs_volume, self.guest.name, self.disk['uuid'], self.disk['format'],
+                   dev_table[self.disk['sequence']])
 
     def get_graphics(self):
         return """

@@ -50,7 +50,7 @@ class Rules(Enum):
     PASSWORD = (basestring, 'password')
     LEASE_TERM = (int, 'lease_term')
     DESTINATION_HOST = (basestring, 'destination_host', (5, 64))
-    DEVICE_NODE_UUID = (basestring, 'device_node_uuid', (36, 36))
+    DISK_UUID = (basestring, 'disk_uuid', (36, 36))
     DISK_SIZE = ('regex:^\d{1,7}$', 'size')
 
     REMARK = (basestring, 'remark')

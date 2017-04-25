@@ -110,26 +110,9 @@ def r_create():
 
             guest.vnc_password = ji.Common.generate_random_code(length=16)
 
-            guest_disks = list()
-            guest_disks.append({'label': uuid4().__str__(), 'size': -1, 'format': 'qcow2'})
+            guest_disk = {'uuid': uuid4().__str__(), 'size': -1, 'format': 'qcow2', 'sequence': 0}
 
-            for i, disk in enumerate(request.json.get('disks')):
-                guest_disk = GuestDisk()
-
-                guest_disk.size = disk.get('size')
-                # TODO: 设定磁盘最大大小
-                if not isinstance(guest_disk.size, int) or guest_disk.size < 1:
-                    continue
-
-                guest_disk.guest_uuid = guest.uuid
-                guest_disk.label = uuid4().__str__()
-                guest_disk.sequence = i + 1
-                guest_disk.format = 'qcow2'
-                guest_disk.create()
-
-                guest_disks.append({'label': guest_disk.label, 'size': guest_disk.size, 'format': guest_disk.format})
-
-            guest_xml = GuestXML(guest=guest, disks=guest_disks, config=config)
+            guest_xml = GuestXML(guest=guest, disk=guest_disk, config=config)
             guest.xml = guest_xml.get_domain()
             guest.create()
 
@@ -149,7 +132,7 @@ def r_create():
                 'name': guest.name,
                 'glusterfs_volume': config.glusterfs_volume,
                 'template_path': 'template_pool/' + os_template.name,
-                'guest_disks': guest_disks,
+                'guest_disk': guest_disk,
                 'writes': _os_init_writes,
                 'password': guest.password,
                 'xml': guest_xml.get_domain()
@@ -358,6 +341,7 @@ def r_delete(uuids):
         Rules.UUIDS.value
     ]
 
+    # TODO: 加入是否删除使用的数据磁盘开关
     try:
         ji.Check.previewing(args_rules, {'uuids': uuids})
 
@@ -379,126 +363,55 @@ def r_delete(uuids):
 
 
 @Utils.dumps2response
-def r_disk_resize(device_node_uuid, size):
-
-    args_rules = [
-        Rules.DEVICE_NODE_UUID.value,
-        Rules.DISK_SIZE.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'device_node_uuid': device_node_uuid, 'size': size})
-
-        guest_disk = GuestDisk()
-        guest_disk.label = device_node_uuid
-        guest_disk.get_by('label')
-
-        message = {'action': 'disk-resize', 'uuid': guest_disk.guest_uuid,
-                   'device_node': dev_table[guest_disk.sequence], 'size': size}
-        Guest.emit_instruction(message=json.dumps(message))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_create_disk(size):
-
-    args_rules = [
-        Rules.DISK_SIZE.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'size': size})
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-
-        size = int(size)
-
-        if not isinstance(size, int) or size < 1:
-            ret['state'] = ji.Common.exchange_state(41255)
-            return ret
-
-        guest_disk = GuestDisk()
-        guest_disk.guest_uuid = ''
-        guest_disk.size = size
-        guest_disk.label = uuid4().__str__()
-        guest_disk.sequence = -1
-        guest_disk.format = 'qcow2'
-        guest_disk.create()
-
-        config = Config()
-        config.id = 1
-        config.get()
-
-        image_path = '/'.join(['DiskPool', guest_disk.label + '.' + guest_disk.format])
-
-        message = {'action': 'create_disk', 'glusterfs_volume': config.glusterfs_volume,
-                   'image_path': image_path, 'size': guest_disk.size}
-
-        db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
-
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_attach_disk(uuid, size):
+def r_attach_disk(uuid, disk_uuid):
 
     args_rules = [
         Rules.UUID.value,
-        Rules.DISK_SIZE.value
+        Rules.DISK_UUID.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid, 'size': size})
+        ji.Check.previewing(args_rules, {'uuid': uuid, 'disk_uuid': disk_uuid})
 
         guest = Guest()
         guest.uuid = uuid
         guest.get_by('uuid')
 
         guest_disk = GuestDisk()
-        guest_disk.guest_uuid = guest.uuid
-        disks, count = guest_disk.get_all()
-
-        guest_disk.size = int(size)
+        guest_disk.uuid = disk_uuid
+        guest_disk.get_by('uuid')
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        if not isinstance(guest_disk.size, int) or guest_disk.size < 1:
-            ret['state'] = ji.Common.exchange_state(41255)
+        # 判断欲挂载的磁盘是否空闲
+        if guest_disk.guest_uuid.__len__() > 0:
+            ret['state'] = ji.Common.exchange_state(41258)
             return ret
+
+        # 取出该 guest 已挂载的磁盘，来做出决定，确定该磁盘的序列
+        guest_disk.guest_uuid = guest.uuid
+        disks, count = guest_disk.get_all()
+        guest_disk.sequence = count + 1
 
         config = Config()
         config.id = 1
         config.get()
 
-        guest_disk.label = uuid4().__str__()
-        guest_disk.sequence = count + 1
-        guest_disk.format = 'qcow2'
-        guest_disk.create()
+        guest_disk.update()
 
         xml = """
             <disk type='network' device='disk'>
                 <driver name='qemu' type='qcow2' cache='none'/>
-                <source protocol='gluster' name='{0}/VMs/{1}/{2}.{3}'>
+                <source protocol='gluster' name='{0}/DiskPool/{1}.{2}'>
                     <host name='127.0.0.1' port='24007'/>
                 </source>
-                <target dev='{4}' bus='virtio'/>
+                <target dev='{3}' bus='virtio'/>
             </disk>
-        """.format(config.glusterfs_volume, guest.name, guest_disk.label, guest_disk.format,
+        """.format(config.glusterfs_volume, guest_disk.uuid, guest_disk.format,
                    dev_table[guest_disk.sequence])
 
-        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml,
-                   'disk': {'label': guest_disk.label, 'size': guest_disk.size, 'format': guest_disk.format}}
+        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml}
         Guest.emit_instruction(message=json.dumps(message))
 
         return ret
@@ -508,24 +421,50 @@ def r_attach_disk(uuid, size):
 
 
 @Utils.dumps2response
-def r_detach_disk(uuid):
+def r_detach_disk(disk_uuid):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.DISK_UUID.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
+        ji.Check.previewing(args_rules, {'disk_uuid': disk_uuid})
 
-        guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
-
-        message = {'action': 'detach_disk', 'uuid': uuid}
-        Guest.emit_instruction(message=json.dumps(message))
+        guest_disk = GuestDisk()
+        guest_disk.uuid = disk_uuid
+        guest_disk.get_by('uuid')
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
+
+        if guest_disk.guest_uuid.__len__() != 36 and guest_disk.sequence < 1:
+            # 表示未被任何实例使用，已被分离
+            # 序列为 0 的表示实例系统盘，系统盘不可以被分离
+            return ret
+
+        guest_disk.guest_uuid = ''
+        guest_disk.sequence = -1
+
+        config = Config()
+        config.id = 1
+        config.get()
+
+        guest_disk.update()
+
+        xml = """
+            <disk type='network' device='disk'>
+                <driver name='qemu' type='qcow2' cache='none'/>
+                <source protocol='gluster' name='{0}/DiskPool/{1}.{2}'>
+                    <host name='127.0.0.1' port='24007'/>
+                </source>
+                <target dev='{3}' bus='virtio'/>
+            </disk>
+        """.format(config.glusterfs_volume, guest_disk.uuid, guest_disk.format,
+                   dev_table[guest_disk.sequence])
+
+        message = {'action': 'detach_disk', 'uuid': guest_disk.guest_uuid, 'xml': xml}
+        Guest.emit_instruction(message=json.dumps(message))
+
         return ret
 
     except ji.PreviewingError, e:

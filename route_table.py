@@ -5,6 +5,7 @@
 from models.utils import add_rule
 from views import config
 from views import guest
+from views import disk
 from views import os_init
 from views import os_init_write
 from views import os_template
@@ -51,10 +52,14 @@ add_rule(guest.blueprints, '/_boot/<uuids>', view_func='guest.r_boot', methods=[
 add_rule(guest.blueprints, '/_suspend/<uuids>', view_func='guest.r_suspend', methods=['PUT'])
 add_rule(guest.blueprints, '/_resume/<uuids>', view_func='guest.r_resume', methods=['PUT'])
 add_rule(guest.blueprints, '/_delete/<uuids>', view_func='guest.r_delete', methods=['PUT'])
-add_rule(guest.blueprint, '/_disk_resize/<device_node_uuid>/<size>', view_func='guest.r_disk_resize', methods=['PUT'])
-add_rule(guest.blueprint, '/_attach_disk/<uuid>', view_func='guest.r_attach_disk', methods=['PUT'])
-add_rule(guest.blueprint, '/_detach_disk/<uuid>', view_func='guest.r_detach_disk', methods=['PUT'])
+add_rule(guest.blueprint, '/_attach_disk/<uuid>/<disk_uuid>', view_func='guest.r_attach_disk', methods=['PUT'])
+add_rule(guest.blueprint, '/_detach_disk/<disk_uuid>', view_func='guest.r_detach_disk', methods=['PUT'])
 add_rule(guest.blueprint, '/_migrate/<uuids>/<destination_host>', view_func='guest.r_migrate', methods=['PUT'])
+
+# Disk操作
+add_rule(disk.blueprint, '/<size>', view_func='disk.r_create', methods=['POST'])
+add_rule(disk.blueprint, '/_disk_resize/<uuid>/<size>', view_func='disk.r_resize', methods=['PUT'])
+add_rule(disk.blueprint, '/<uuid>', view_func='disk.r_delete', methods=['DELETE'])
 
 # 日志查询
 # 系统模板操作
