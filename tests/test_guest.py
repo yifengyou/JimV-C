@@ -16,7 +16,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 class TestGuest(unittest.TestCase):
 
     base_url = 'http://127.0.0.1:8008/api'
-    os_init_id = 0
+    uuid = ''
 
     def setUp(self):
         pass
@@ -25,6 +25,7 @@ class TestGuest(unittest.TestCase):
         pass
 
     # 创建Guest
+    @unittest.skip('skip create guest')
     def test_11_create(self):
         payload = {
             "cpu": 4,
@@ -45,19 +46,46 @@ class TestGuest(unittest.TestCase):
 
     # 获取Guest列表
     def test_12_get(self):
-        pass
+        url = TestGuest.base_url + '/guests'
+        headers = {'content-type': 'application/json'}
+        r = requests.get(url, headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        TestGuest.uuid = j_r['data'][0]['uuid']
+        self.assertEqual('200', j_r['state']['code'])
 
     # 更新Guest属性
     def test_13_update(self):
-        pass
+        payload = {
+            "remark": "zabbix",
+        }
+
+        url = TestGuest.base_url + '/guest/' + TestGuest.uuid
+        headers = {'content-type': 'application/json'}
+        r = requests.patch(url, data=json.dumps(payload), headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
 
     # 校验更新结果
     def test_14_get(self):
-        pass
+        url = TestGuest.base_url + '/guests'
+        headers = {'content-type': 'application/json'}
+        r = requests.get(url, headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
+        self.assertEqual('zabbix', j_r['data'][0]['remark'])
 
     # 删除Guest
+    # @unittest.skip('skip delete guest')
     def test_15_delete(self):
-        pass
+        url = TestGuest.base_url + '/guests/' + TestGuest.uuid
+        headers = {'content-type': 'application/json'}
+        r = requests.delete(url, headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
 
 
 if __name__ == '__main__':

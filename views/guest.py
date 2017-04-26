@@ -345,11 +345,17 @@ def r_delete(uuids):
         ji.Check.previewing(args_rules, {'uuids': uuids})
 
         guest = Guest()
+        # 检测所指定的 UUDIs 实例都存在
         for uuid in uuids.split(','):
             guest.uuid = uuid
             guest.get_by('uuid')
 
+        # 执行删除操作
         for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+            # TODO: 删除数据库记录，考虑由 JimV-N 通知执行成功之后再删除
+            guest.delete()
             message = {'action': 'delete', 'uuid': uuid}
             Guest.emit_instruction(message=json.dumps(message))
 
@@ -497,3 +503,195 @@ def r_migrate(uuids, destination_host):
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
+
+@Utils.dumps2response
+def r_get_by_filter():
+    page = str(request.args.get('page', 1))
+    page_size = str(request.args.get('page_size', 50))
+
+    args_rules = [
+        Rules.PAGE.value,
+        Rules.PAGE_SIZE.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'page': page, 'page_size': page_size})
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+    page = int(page)
+    page_size = int(page_size)
+
+    # 把page和page_size换算成offset和limit
+    offset = (page - 1) * page_size
+    # offset, limit将覆盖page及page_size的影响
+    offset = str(request.args.get('offset', offset))
+    limit = str(request.args.get('limit', page_size))
+
+    order_by = request.args.get('order_by', 'id')
+    order = request.args.get('order', 'asc')
+    filter_str = request.args.get('filter', '')
+
+    args_rules = [
+        Rules.OFFSET.value,
+        Rules.LIMIT.value,
+        Rules.ORDER_BY.value,
+        Rules.ORDER.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'offset': offset, 'limit': limit, 'order_by': order_by, 'order': order})
+        offset = int(offset)
+        limit = int(limit)
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = list()
+        ret['paging'] = {'total': 0, 'offset': offset, 'limit': limit, 'page': page, 'page_size': page_size,
+                         'next': '', 'prev': '', 'first': '', 'last': ''}
+
+        ret['data'], ret['paging']['total'] = Guest.get_by_filter(offset=offset, limit=limit, order_by=order_by,
+                                                                  order=order, filter_str=filter_str)
+
+        host_url = request.host_url.rstrip('/')
+        other_str = '&filter=' + filter_str + '&order=' + order + '&order_by=' + order_by
+        last_pagination = (ret['paging']['total'] + page_size - 1) / page_size
+
+        if page <= 1:
+            ret['paging']['prev'] = host_url + blueprints.url_prefix + '?page=1&page_size=' + page_size.__str__() + \
+                                    other_str
+        else:
+            ret['paging']['prev'] = host_url + blueprints.url_prefix + '?page=' + str(page-1) + '&page_size=' + \
+                                    page_size.__str__() + other_str
+
+        if page >= last_pagination:
+            ret['paging']['next'] = host_url + blueprints.url_prefix + '?page=' + last_pagination.__str__() + \
+                                    '&page_size=' + page_size.__str__() + other_str
+        else:
+            ret['paging']['next'] = host_url + blueprints.url_prefix + '?page=' + str(page+1) + '&page_size=' + \
+                                    page_size.__str__() + other_str
+
+        ret['paging']['first'] = host_url + blueprints.url_prefix + '?page=1&page_size=' + \
+            page_size.__str__() + other_str
+        ret['paging']['last'] = \
+            host_url + blueprints.url_prefix + '?page=' + last_pagination.__str__() + '&page_size=' + \
+            page_size.__str__() + other_str
+
+        return ret
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_content_search():
+    page = str(request.args.get('page', 1))
+    page_size = str(request.args.get('page_size', 50))
+
+    args_rules = [
+        Rules.PAGE.value,
+        Rules.PAGE_SIZE.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'page': page, 'page_size': page_size})
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+    page = int(page)
+    page_size = int(page_size)
+
+    # 把page和page_size换算成offset和limit
+    offset = (page - 1) * page_size
+    # offset, limit将覆盖page及page_size的影响
+    offset = str(request.args.get('offset', offset))
+    limit = str(request.args.get('limit', page_size))
+
+    order_by = request.args.get('order_by', 'id')
+    order = request.args.get('order', 'asc')
+    keyword = request.args.get('keyword', '')
+
+    args_rules = [
+        Rules.OFFSET.value,
+        Rules.LIMIT.value,
+        Rules.ORDER_BY.value,
+        Rules.ORDER.value,
+        Rules.KEYWORD.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'offset': offset, 'limit': limit, 'order_by': order_by, 'order': order,
+                                         'keyword': keyword})
+        offset = int(offset)
+        limit = int(limit)
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = list()
+        ret['paging'] = {'total': 0, 'offset': offset, 'limit': limit, 'page': page, 'page_size': page_size}
+
+        ret['data'], ret['paging']['total'] = Guest.content_search(offset=offset, limit=limit, order_by=order_by,
+                                                                   order=order, keyword=keyword)
+
+        host_url = request.host_url.rstrip('/')
+        other_str = '&keyword=' + keyword + '&order=' + order + '&order_by=' + order_by
+        last_pagination = (ret['paging']['total'] + page_size - 1) / page_size
+
+        if page <= 1:
+            ret['paging']['prev'] = host_url + blueprints.url_prefix + '/_search?page=1&page_size=' + \
+                                    page_size.__str__() + other_str
+        else:
+            ret['paging']['prev'] = host_url + blueprints.url_prefix + '/_search?page=' + str(page-1) + \
+                                    '&page_size=' + page_size.__str__() + other_str
+
+        if page >= last_pagination:
+            ret['paging']['next'] = host_url + blueprints.url_prefix + '/_search?page=' + last_pagination.__str__() + \
+                                    '&page_size=' + page_size.__str__() + other_str
+        else:
+            ret['paging']['next'] = host_url + blueprints.url_prefix + '/_search?page=' + str(page+1) + \
+                                    '&page_size=' + page_size.__str__() + other_str
+
+        ret['paging']['first'] = host_url + blueprints.url_prefix + '/_search?page=1&page_size=' + \
+            page_size.__str__() + other_str
+        ret['paging']['last'] = \
+            host_url + blueprints.url_prefix + '/_search?page=' + last_pagination.__str__() + '&page_size=' + \
+            page_size.__str__() + other_str
+
+        return ret
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_update(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    if 'remark' in request.json:
+        args_rules.append(
+            Rules.REMARK.value,
+        )
+
+    if args_rules.__len__() < 2:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    request.json['uuid'] = uuid
+
+    try:
+        ji.Check.previewing(args_rules, request.json)
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        guest.remark = request.json.get('remark', guest.name)
+
+        guest.update()
+        guest.get()
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = guest.__dict__
+        return ret
+    except ji.PreviewingError, e:
+        return json.loads(e.message)

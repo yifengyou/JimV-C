@@ -51,10 +51,13 @@ add_rule(guest.blueprints, '/_force_shutdown/<uuids>', view_func='guest.r_force_
 add_rule(guest.blueprints, '/_boot/<uuids>', view_func='guest.r_boot', methods=['PUT'])
 add_rule(guest.blueprints, '/_suspend/<uuids>', view_func='guest.r_suspend', methods=['PUT'])
 add_rule(guest.blueprints, '/_resume/<uuids>', view_func='guest.r_resume', methods=['PUT'])
-add_rule(guest.blueprints, '/_delete/<uuids>', view_func='guest.r_delete', methods=['PUT'])
 add_rule(guest.blueprint, '/_attach_disk/<uuid>/<disk_uuid>', view_func='guest.r_attach_disk', methods=['PUT'])
 add_rule(guest.blueprint, '/_detach_disk/<disk_uuid>', view_func='guest.r_detach_disk', methods=['PUT'])
 add_rule(guest.blueprint, '/_migrate/<uuids>/<destination_host>', view_func='guest.r_migrate', methods=['PUT'])
+add_rule(guest.blueprints, '', view_func='guest.r_get_by_filter', methods=['GET'])
+add_rule(guest.blueprints, '/_search', view_func='guest.r_content_search', methods=['GET'])
+add_rule(guest.blueprint, '/<uuid>', view_func='guest.r_update', methods=['PATCH'])
+add_rule(guest.blueprints, '/<uuids>', view_func='guest.r_delete', methods=['DELETE'])
 
 # Disk操作
 add_rule(disk.blueprint, '/<size>', view_func='disk.r_create', methods=['POST'])
