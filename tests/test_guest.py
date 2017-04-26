@@ -29,8 +29,7 @@ class TestGuest(unittest.TestCase):
         payload = {
             "cpu": 4,
             "memory": 4,
-            "os_template_id": 5,
-            "disks": [],
+            "os_template_id": 1,
             "quantity": 2,
             "name": "",
             "password": "pswd.com",

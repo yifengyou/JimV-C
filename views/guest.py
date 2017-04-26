@@ -47,7 +47,6 @@ def r_create():
         Rules.CPU.value,
         Rules.MEMORY.value,
         Rules.OS_TEMPLATE_ID.value,
-        Rules.DISKS.value,
         Rules.QUANTITY.value,
         Rules.NAME.value,
         Rules.PASSWORD.value,
@@ -68,7 +67,7 @@ def r_create():
         os_template.id = request.json.get('os_template_id')
         if not os_template.exist():
             ret['state'] = ji.Common.exchange_state(40450)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_template.id])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_template.id.__str__()])
             return ret
 
         os_template.get()

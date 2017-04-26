@@ -31,7 +31,7 @@ class Guest(ORM):
         self.remark = ''
         self.os_template_id = None
         self.create_time = ji.Common.tus()
-        self.status = GuestState.shutdown.value
+        self.status = GuestState.no_state.value
         self.on_host = ''
         self.cpu = None
         self.memory = None

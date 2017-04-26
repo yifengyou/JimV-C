@@ -44,7 +44,6 @@ class Rules(Enum):
     CPU = (int, 'cpu')
     MEMORY = (int, 'memory')
     OS_TEMPLATE_ID = (int, 'os_template_id')
-    DISKS = (list, 'disks')
     QUANTITY = (int, 'quantity')
     NAME = (basestring, 'name')
     PASSWORD = (basestring, 'password')
