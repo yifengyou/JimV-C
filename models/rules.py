@@ -51,6 +51,7 @@ class Rules(Enum):
     DESTINATION_HOST = (basestring, 'destination_host', (5, 64))
     DISK_UUID = (basestring, 'disk_uuid', (36, 36))
     DISK_SIZE = (int, 'size')
+    DISK_SIZE_STR = ('regex:^\d{1,17}$', 'size')
 
     REMARK = (basestring, 'remark')
     LABEL = (basestring, 'label')
