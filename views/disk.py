@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import Blueprint
+from flask import Blueprint, request
 import json
 from uuid import uuid4
 import jimit as ji
@@ -36,21 +36,21 @@ blueprints = Blueprint(
 
 
 @Utils.dumps2response
-def r_create(size):
+def r_create():
 
     args_rules = [
         Rules.DISK_SIZE.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'size': size})
+        ji.Check.previewing(args_rules, request.json)
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        size = int(size)
+        size = request.json['size']
 
-        if not isinstance(size, int) or size < 1:
+        if size < 1:
             ret['state'] = ji.Common.exchange_state(41255)
             return ret
 
@@ -61,7 +61,6 @@ def r_create(size):
         guest_disk.label = ji.Common.generate_random_code(length=8)
         guest_disk.sequence = -1
         guest_disk.format = 'qcow2'
-        guest_disk.create()
 
         config = Config()
         config.id = 1
@@ -73,6 +72,8 @@ def r_create(size):
                    'image_path': image_path, 'size': guest_disk.size}
 
         db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
+
+        guest_disk.create()
 
         return ret
 

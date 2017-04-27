@@ -60,7 +60,7 @@ add_rule(guest.blueprint, '/<uuid>', view_func='guest.r_update', methods=['PATCH
 add_rule(guest.blueprints, '/<uuids>', view_func='guest.r_delete', methods=['DELETE'])
 
 # Disk操作
-add_rule(disk.blueprint, '/<size>', view_func='disk.r_create', methods=['POST'])
+add_rule(disk.blueprint, '', view_func='disk.r_create', methods=['POST'])
 add_rule(disk.blueprint, '/_disk_resize/<uuid>/<size>', view_func='disk.r_resize', methods=['PUT'])
 add_rule(disk.blueprint, '/<uuid>', view_func='disk.r_delete', methods=['DELETE'])
 
