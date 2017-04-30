@@ -19,6 +19,7 @@ from models import Utils
 from models import Guest
 from models import OSTemplate
 from models import GuestXML
+from models import status
 
 
 __author__ = 'James Iter'
@@ -394,6 +395,11 @@ def r_attach_disk(uuid, disk_uuid):
             ret['state'] = ji.Common.exchange_state(41258)
             return ret
 
+        # 判断 Guest 是否处于可用状态
+        if guest.status == status.GuestState.no_state.value:
+            ret['state'] = ji.Common.exchange_state(41259)
+            return ret
+
         # 取出该 guest 已挂载的磁盘，来做出决定，确定该磁盘的序列
         guest_disk.guest_uuid = guest.uuid
         disks, count = guest_disk.get_by_filter(filter_str='guest_uuid:in:' + guest.uuid)
@@ -449,6 +455,15 @@ def r_detach_disk(disk_uuid):
 
         guest_disk.guest_uuid = ''
         guest_disk.sequence = -1
+
+        guest = Guest()
+        guest.uuid = guest_disk.guest_uuid
+        guest.get_by('uuid')
+
+        # 判断 Guest 是否处于可用状态
+        if guest.status == status.GuestState.no_state.value:
+            ret['state'] = ji.Common.exchange_state(41259)
+            return ret
 
         config = Config()
         config.id = 1
