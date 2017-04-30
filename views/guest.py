@@ -396,7 +396,7 @@ def r_attach_disk(uuid, disk_uuid):
 
         # 取出该 guest 已挂载的磁盘，来做出决定，确定该磁盘的序列
         guest_disk.guest_uuid = guest.uuid
-        disks, count = guest_disk.get_all()
+        disks, count = guest_disk.get_by_filter(filter_str='guest_uuid:in:' + guest.uuid)
         guest_disk.sequence = count + 1
 
         config = Config()
