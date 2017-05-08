@@ -55,6 +55,15 @@ class EventProcessor(object):
                 cls.guest.status = GuestState.dirty.value
                 cls.guest.update()
 
+        elif action == 'migrate':
+            pass
+
+        elif action == 'delete':
+            if state == ResponseState.success.value:
+                cls.guest.uuid = uuid
+                cls.guest.get_by('uuid')
+                cls.guest.delete()
+
         elif action == 'create_disk':
             cls.disk.uuid = uuid
             cls.disk.get_by('uuid')
@@ -65,6 +74,34 @@ class EventProcessor(object):
                 cls.disk.state = DiskState.dirty.value
 
             cls.disk.update()
+
+        elif action == 'resize_disk':
+            if state == ResponseState.success.value:
+                cls.disk.uuid = uuid
+                cls.disk.get_by('uuid')
+                cls.disk.size = cls.message['message']['passback_parameters']['size']
+                cls.disk.update()
+
+        elif action == 'attach_disk':
+            cls.disk.uuid = cls.message['message']['passback_parameters']['disk_uuid']
+            cls.disk.get_by('uuid')
+            if state == ResponseState.success.value:
+                cls.disk.guest_uuid = uuid
+                cls.disk.sequence = cls.message['message']['passback_parameters']['sequence']
+                cls.disk.state = DiskState.mounted.value
+                cls.disk.update()
+
+        elif action == 'detach_disk':
+            cls.disk.uuid = cls.message['message']['passback_parameters']['disk_uuid']
+            cls.disk.get_by('uuid')
+            if state == ResponseState.success.value:
+                cls.disk.guest_uuid = ''
+                cls.disk.sequence = -1
+                cls.disk.state = DiskState.idle.value
+                cls.disk.update()
+
+        elif action == 'delete_disk':
+            pass
 
         else:
             pass

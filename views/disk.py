@@ -108,11 +108,8 @@ def r_resize(uuid, size):
             ret['state'] = ji.Common.exchange_state(41257)
             return ret
 
-        guest_disk.size = size
-        guest_disk.update()
-
         message = {'action': 'resize_disk', 'size': size, 'guest_uuid': guest_disk.guest_uuid,
-                   'disk_uuid': guest_disk.uuid}
+                   'disk_uuid': guest_disk.uuid, 'passback_parameters': {'size': size}}
 
         if used:
             message['device_node'] = dev_table[guest_disk.sequence]

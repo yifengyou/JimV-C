@@ -9,6 +9,7 @@ import json
 from uuid import uuid4
 import jimit as ji
 
+from models import DiskState
 from models import OSInitWrite
 from models.initialize import app, dev_table
 from models import Database as db
@@ -353,10 +354,6 @@ def r_delete(uuids):
 
         # 执行删除操作
         for uuid in uuids.split(','):
-            guest.uuid = uuid
-            guest.get_by('uuid')
-            # TODO: 删除数据库记录，考虑由 JimV-N 通知执行成功之后再删除
-            guest.delete()
             message = {'action': 'delete', 'uuid': uuid}
             Guest.emit_instruction(message=json.dumps(message))
 
@@ -409,8 +406,6 @@ def r_attach_disk(uuid, disk_uuid):
         config.id = 1
         config.get()
 
-        guest_disk.update()
-
         xml = """
             <disk type='network' device='disk'>
                 <driver name='qemu' type='qcow2' cache='none'/>
@@ -422,7 +417,8 @@ def r_attach_disk(uuid, disk_uuid):
         """.format(config.glusterfs_volume, guest_disk.uuid, guest_disk.format,
                    dev_table[guest_disk.sequence])
 
-        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml}
+        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml,
+                   'passback_parameters': {'disk_uuid': guest_disk.uuid, 'sequence': guest_disk.sequence}}
         Guest.emit_instruction(message=json.dumps(message))
 
         return ret
@@ -448,28 +444,24 @@ def r_detach_disk(disk_uuid):
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        if guest_disk.guest_uuid.__len__() != 36 and guest_disk.sequence < 1:
+        if guest_disk.state != DiskState.mounted.value or guest_disk.sequence == 0:
             # 表示未被任何实例使用，已被分离
             # 序列为 0 的表示实例系统盘，系统盘不可以被分离
+            # TODO: 系统盘单独范围其它状态
             return ret
-
-        guest_disk.guest_uuid = ''
-        guest_disk.sequence = -1
 
         guest = Guest()
         guest.uuid = guest_disk.guest_uuid
         guest.get_by('uuid')
 
         # 判断 Guest 是否处于可用状态
-        if guest.status == status.GuestState.no_state.value:
+        if guest.status in (status.GuestState.no_state.value, status.GuestState.dirty.value):
             ret['state'] = ji.Common.exchange_state(41259)
             return ret
 
         config = Config()
         config.id = 1
         config.get()
-
-        guest_disk.update()
 
         xml = """
             <disk type='network' device='disk'>
@@ -482,7 +474,8 @@ def r_detach_disk(disk_uuid):
         """.format(config.glusterfs_volume, guest_disk.uuid, guest_disk.format,
                    dev_table[guest_disk.sequence])
 
-        message = {'action': 'detach_disk', 'uuid': guest_disk.guest_uuid, 'xml': xml}
+        message = {'action': 'detach_disk', 'uuid': guest_disk.guest_uuid, 'xml': xml,
+                   'passback_parameters': {'disk_uuid': guest_disk.uuid}}
         Guest.emit_instruction(message=json.dumps(message))
 
         return ret
