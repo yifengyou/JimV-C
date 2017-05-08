@@ -7,9 +7,11 @@ import time
 
 from models import Database as db
 from models import Guest
+from models import GuestDisk
 from models import Log
 from models import Utils
 from models import EmitKind
+from models import ResponseState, GuestState, DiskState
 from models.initialize import app, logger
 
 
@@ -23,6 +25,7 @@ class EventProcessor(object):
     message = None
     log = Log()
     guest = Guest()
+    disk = GuestDisk()
 
     @classmethod
     def log_processor(cls):
@@ -40,6 +43,33 @@ class EventProcessor(object):
         cls.guest.update()
 
     @classmethod
+    def response_processor(cls):
+        action = cls.message['message']['action']
+        uuid = cls.message['message']['uuid']
+        state = cls.message['type']
+
+        if action == 'create_vm':
+            if state != ResponseState.success.value:
+                cls.guest.uuid = uuid
+                cls.guest.get_by('uuid')
+                cls.guest.status = GuestState.dirty.value
+                cls.guest.update()
+
+        elif action == 'create_disk':
+            cls.disk.uuid = uuid
+            cls.disk.get_by('uuid')
+            if state == ResponseState.success.value:
+                cls.disk.state = DiskState.idle.value
+
+            else:
+                cls.disk.state = DiskState.dirty.value
+
+            cls.disk.update()
+
+        else:
+            pass
+
+    @classmethod
     def launch(cls):
         while True:
             if Utils.exit_flag:
@@ -48,19 +78,22 @@ class EventProcessor(object):
                 return
 
             try:
-                host_log = db.r.lpop(app.config['upstream_queue'])
+                report = db.r.lpop(app.config['upstream_queue'])
 
-                if host_log is None:
+                if report is None:
                     time.sleep(1)
                     continue
 
-                cls.message = json.loads(host_log)
+                cls.message = json.loads(report)
 
                 if cls.message['kind'] == EmitKind.log.value:
                     cls.log_processor()
 
                 elif cls.message['kind'] == EmitKind.event.value:
                     cls.event_processor()
+
+                elif cls.message['kind'] == EmitKind.response.value:
+                    cls.response_processor()
 
                 else:
                     pass

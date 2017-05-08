@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS guest(
     remark VARCHAR(255) NOT NULL DEFAULT '',
     os_template_id BIGINT UNSIGNED NOT NULL,
     create_time BIGINT UNSIGNED NOT NULL,
+    -- 运行时的状态用 status;
     status TINYINT UNSIGNED NOT NULL DEFAULT 0,
     on_host VARCHAR(128) NOT NULL DEFAULT '',
     cpu TINYINT UNSIGNED NOT NULL,
@@ -38,6 +39,8 @@ CREATE TABLE IF NOT EXISTS guest_disk(
     size INT UNSIGNED NOT NULL,
     sequence TINYINT NOT NULL,
     format CHAR(16) NOT NULL DEFAULT 'qcow2',
+    -- 实例固有的状态用 state;
+    state TINYINT UNSIGNED NOT NULL DEFAULT 0,
     guest_uuid CHAR(36) NOT NULL,
     PRIMARY KEY (id))
     ENGINE=InnoDB

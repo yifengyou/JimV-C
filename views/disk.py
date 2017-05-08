@@ -69,7 +69,7 @@ def r_create():
         image_path = '/'.join(['DiskPool', guest_disk.uuid + '.' + guest_disk.format])
 
         message = {'action': 'create_disk', 'glusterfs_volume': config.glusterfs_volume,
-                   'image_path': image_path, 'size': guest_disk.size}
+                   'image_path': image_path, 'size': guest_disk.size, 'uuid': guest_disk.uuid}
 
         db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
 
@@ -111,10 +111,10 @@ def r_resize(uuid, size):
         guest_disk.size = size
         guest_disk.update()
 
-        message = {'action': 'resize_disk', 'size': size}
+        message = {'action': 'resize_disk', 'size': size, 'guest_uuid': guest_disk.guest_uuid,
+                   'disk_uuid': guest_disk.uuid}
 
         if used:
-            message['uuid'] = guest_disk.guest_uuid
             message['device_node'] = dev_table[guest_disk.sequence]
             Guest.emit_instruction(message=json.dumps(message))
         else:

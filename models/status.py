@@ -14,6 +14,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 class EmitKind(IntEnum):
     log = 0
     event = 1
+    response = 2
 
 
 class GuestState(IntEnum):
@@ -28,6 +29,7 @@ class GuestState(IntEnum):
     shutoff = 5
     crashed = 6
     pm_suspended = 7
+    dirty = 255
 
 
 class LogLevel(IntEnum):
@@ -36,4 +38,16 @@ class LogLevel(IntEnum):
     warn = 2
     info = 3
     debug = 4
+
+
+class ResponseState(IntEnum):
+    success = True
+    failure = False
+
+
+class DiskState(IntEnum):
+    pending = 0
+    idle = 1
+    mounted = 2
+    dirty = 255
 

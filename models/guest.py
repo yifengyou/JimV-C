@@ -6,7 +6,7 @@ import jimit as ji
 
 from filter import FilterFieldType
 from orm import ORM
-from status import GuestState
+from status import GuestState, DiskState
 from database import Database as db
 from initialize import app
 
@@ -76,6 +76,7 @@ class GuestDisk(ORM):
         self.label = None
         self.size = None
         self.sequence = None
+        self.state = DiskState.pending.value
         self.format = 'qcow2'
         self.guest_uuid = None
 
@@ -85,6 +86,7 @@ class GuestDisk(ORM):
             'uuid': FilterFieldType.STR.value,
             'label': FilterFieldType.STR.value,
             'size': FilterFieldType.INT.value,
+            'state': FilterFieldType.INT.value,
             'guest_uuid': FilterFieldType.STR.value
         }
 
