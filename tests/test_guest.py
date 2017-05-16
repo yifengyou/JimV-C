@@ -52,7 +52,7 @@ class TestGuest(unittest.TestCase):
         r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)
         print json.dumps(j_r, ensure_ascii=False)
-        TestGuest.uuid = j_r['data'][0]['uuid']
+        TestGuest.uuid = j_r['data'][-1]['uuid']
         self.assertEqual('200', j_r['state']['code'])
 
     # 更新Guest属性
@@ -76,7 +76,7 @@ class TestGuest(unittest.TestCase):
         j_r = json.loads(r.content)
         print json.dumps(j_r, ensure_ascii=False)
         self.assertEqual('200', j_r['state']['code'])
-        self.assertEqual('zabbix', j_r['data'][0]['remark'])
+        self.assertEqual('zabbix', j_r['data'][-1]['remark'])
 
     # 创建 Disk
     def test_21_create_disk(self):
@@ -110,6 +110,8 @@ class TestGuest(unittest.TestCase):
         self.assertEqual('200', j_r['state']['code'])
 
     def test_31_attach_disk(self):
+        # TestGuest.uuid = '97eb8d05-0939-4b0e-afa9-21dc77a9ba89'
+        # TestGuest.disk_uuid = '88b1dd46-621a-4b29-8eab-1024a94c4653'
         url = TestGuest.base_url + '/guest/_attach_disk/' + TestGuest.uuid + '/' + TestGuest.disk_uuid
         headers = {'content-type': 'application/json'}
         r = requests.put(url, headers=headers)

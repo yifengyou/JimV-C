@@ -393,7 +393,7 @@ def r_attach_disk(uuid, disk_uuid):
             return ret
 
         # 判断 Guest 是否处于可用状态
-        if guest.status == status.GuestState.no_state.value:
+        if guest.status in (status.GuestState.no_state.value, status.GuestState.dirty.value):
             ret['state'] = ji.Common.exchange_state(41259)
             return ret
 
