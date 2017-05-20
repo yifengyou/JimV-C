@@ -29,7 +29,7 @@ POST https://$domain
 |lease_term|Y|Long|租期。过期后，实例将被置于悬挂状态，并在一周后自动删除。单位`到期的时间戳`。|
 
 
-## 获取 Guest 信息
+## 获取Guest信息
 > 获取指定 UUID 的 Guest 信息
 
 ``` http
@@ -75,7 +75,7 @@ GET https://$domain
 |remark|Y|String|实例备注|
 |os_template_id|Y|Long|实例被衍生出来的模板 ID|
 |create_time|Y|Long|创建时间，单位`微秒`|
-|status|Y|Long|Guest 当前的运行状态。可用状态值请参考 [Guest 状态](enum.md#Guest 状态)|
+|status|Y|Long|Guest 当前的运行状态。可用状态值请参考 [Guest状态](enum.md#Guest状态)|
 |on_host|Y|String|实例所在的宿主机|
 |cpu|Y|Long|CPU 个数|
 |memory|Y|Long|内存大小，单位`GB`|
@@ -87,7 +87,7 @@ GET https://$domain
 |xml|Y|String|创建实例时的 xml 描述文档|
 
 
-## 获取 Guest 列表
+## 获取Guest列表
 > 获取 Guest 列表
 
 ``` http
@@ -175,7 +175,7 @@ GET https://$domain
 |page|Y|Number|透传客户端请求的该参数, 如果没有传递, 则返回默认值1|
 |page_size|Y|Number|透传客户端请求的该参数, 如果没有传递, 则返回默认值 50|
 
-Guest 信息字段描述参见 [获取 Guest 信息](guest.md#获取 Guest 信息)
+Guest 信息字段描述参见 [获取Guest信息](guest.md#获取Guest信息)
 
 
 [返回上一级](../README.md)

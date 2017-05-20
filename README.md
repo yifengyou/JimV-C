@@ -165,6 +165,8 @@ gunicorn -c gunicorn_config.py main:app
 
 ### [状态码参考列表](docs/state_code.md)
 ### [过滤器操作符原语](docs/filter_primitive.md)
+### [Guest](docs/guest.md)
+### [状态列表](docs/enum.md)
 
 
 ## 流程图
