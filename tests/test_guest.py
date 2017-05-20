@@ -227,6 +227,23 @@ class TestGuest(unittest.TestCase):
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
 
+    # def test_60_delete(self):
+    #     url = TestGuest.base_url + '/guests/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.delete(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    def test_61_migrate(self):
+        url = TestGuest.base_url + '/guests/_migrate/' + TestGuest.uuid + '/10k02.jkser.com'
+        headers = {'content-type': 'application/json'}
+        r = requests.put(url, headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
+
+
 if __name__ == '__main__':
     unittest.main()
 

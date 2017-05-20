@@ -20,7 +20,7 @@ Body:
 ```
 
 |参数名称|必须|类型|说明|
-|:--:|:--:|:--:|:--:|
+|:--:|:--:|:--:|:--|
 |cpu|Y|Long|CPU 个数|
 |memory|Y|Long|内存大小，单位`MB`|
 |os_template_id|Y|Long|模板ID|
@@ -99,7 +99,7 @@ GET https://$domain
 ```
 
 |参数名称|必须|类型|说明|
-|:--:|:--:|:--:|:--:|
+|:--:|:--:|:--:|:--|
 |offset|N|Number|偏移量, 默认值0|
 |limit|N|Number|返回条目数量, 默认值50|
 |page|N|Number|页号, 与offset同时存在时, 以offset为准, 默认值1|
@@ -408,6 +408,55 @@ PUT https://$domain
 |参数名称|必须|类型|说明|
 |:--|:--:|:--:|:--|
 |disk_uuid|Y|String|将被分离的磁盘uuid|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 迁移 Guest
+> 迁移指定 uuid 的 Guest 到目标 host
+
+``` http
+PUT https://$domain
+  /api/guests/{uuids}/{destination_host}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
+|destination_host|Y|String|目标Host主机名。|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 删除 Guest
+> 删除指定 uuid 的 Guest
+
+``` http
+DELETE https://$domain
+  /api/guests/{uuids}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
 
 响应示例
 ``` json
