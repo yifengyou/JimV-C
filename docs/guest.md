@@ -372,5 +372,54 @@ PUT https://$domain
 ```
 
 
+## 添加磁盘
+> 为 Guest 添加磁盘
+
+``` http
+PUT https://$domain
+  /api/guest/_attach_disk/{uuid}/{disk_uuid}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuid|Y|String|欲添加磁盘的Guest的uuid|
+|disk_uuid|Y|String|将添加至Guest的磁盘uuid|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 分离磁盘
+> 从 Guest 分离磁盘。系统通过磁盘的uuid，可得到具体Guest的uuid。
+
+``` http
+PUT https://$domain
+  /api/guest/_detach_disk/{disk_uuid}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|disk_uuid|Y|String|将被分离的磁盘uuid|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
 [返回上一级](../README.md)
 ===

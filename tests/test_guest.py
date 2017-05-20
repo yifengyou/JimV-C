@@ -209,6 +209,23 @@ class TestGuest(unittest.TestCase):
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
 
+    # def test_58_attach_disk(self):
+    #     TestGuest.disk_uuid = '234670cb-3ce4-4ef9-ba23-12bed636184c'
+    #     url = TestGuest.base_url + '/guest/_attach_disk/' + TestGuest.uuid + '/' + TestGuest.disk_uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    # def test_59_detach_disk(self):
+    #     TestGuest.disk_uuid = '234670cb-3ce4-4ef9-ba23-12bed636184c'
+    #     url = TestGuest.base_url + '/guest/_detach_disk/' + TestGuest.disk_uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
 
 if __name__ == '__main__':
     unittest.main()
