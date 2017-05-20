@@ -92,6 +92,8 @@ def r_create():
             guest.memory = request.json.get('memory')
             guest.os_template_id = request.json.get('os_template_id')
             guest.name = request.json.get('name')
+            if quantity > 0:
+                '-'.join([guest.name, quantity.__str__()])
 
             guest.password = request.json.get('password')
             if guest.password is None or guest.password.__len__() < 1:
@@ -508,6 +510,26 @@ def r_migrate(uuids, destination_host):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_get(uuid):
+    guest = Guest()
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+    guest.uuid = uuid
+
+    try:
+        ji.Check.previewing(args_rules, guest.__dict__)
+        guest.get_by('uuid')
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = guest.__dict__
+        return ret
     except ji.PreviewingError, e:
         return json.loads(e.message)
 

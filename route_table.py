@@ -54,6 +54,7 @@ add_rule(guest.blueprints, '/_resume/<uuids>', view_func='guest.r_resume', metho
 add_rule(guest.blueprint, '/_attach_disk/<uuid>/<disk_uuid>', view_func='guest.r_attach_disk', methods=['PUT'])
 add_rule(guest.blueprint, '/_detach_disk/<disk_uuid>', view_func='guest.r_detach_disk', methods=['PUT'])
 add_rule(guest.blueprint, '/_migrate/<uuids>/<destination_host>', view_func='guest.r_migrate', methods=['PUT'])
+add_rule(guest.blueprint, '/<uuid>', view_func='guest.r_get', methods=['GET'])
 add_rule(guest.blueprints, '', view_func='guest.r_get_by_filter', methods=['GET'])
 add_rule(guest.blueprints, '/_search', view_func='guest.r_content_search', methods=['GET'])
 add_rule(guest.blueprint, '/<uuid>', view_func='guest.r_update', methods=['PATCH'])
