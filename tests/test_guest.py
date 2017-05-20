@@ -27,26 +27,26 @@ class TestGuest(unittest.TestCase):
 
     # 创建Guest
     # @unittest.skip('skip create guest')
-    def test_11_create(self):
-        payload = {
-            "cpu": 4,
-            "memory": 4,
-            "os_template_id": 1,
-            "quantity": 1,
-            "name": "",
-            "password": "pswd.com",
-            "lease_term": 100
-        }
+    # def test_11_create(self):
+    #     payload = {
+    #         "cpu": 4,
+    #         "memory": 4,
+    #         "os_template_id": 1,
+    #         "quantity": 1,
+    #         "name": "",
+    #         "password": "pswd.com",
+    #         "lease_term": 100
+    #     }
+    #
+    #     url = TestGuest.base_url + '/guest'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.post(url, data=json.dumps(payload), headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
 
-        url = TestGuest.base_url + '/guest'
-        headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
-
-    # 获取Guest列表
-    def test_12_get(self):
+    # 获取 Guest 列表
+    def test_12_get_list(self):
         url = TestGuest.base_url + '/guests'
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
@@ -55,69 +55,78 @@ class TestGuest(unittest.TestCase):
         TestGuest.uuid = j_r['data'][-1]['uuid']
         self.assertEqual('200', j_r['state']['code'])
 
-    # 更新Guest属性
-    def test_13_update(self):
-        payload = {
-            "remark": "zabbix",
-        }
+    # # 获取指定 Guest
+    # def test_13_get(self):
+    #     url = TestGuest.base_url + '/guest/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.get(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
+    # # 更新Guest属性
+    # def test_14_update(self):
+    #     payload = {
+    #         "remark": "zabbix",
+    #     }
+    #
+    #     url = TestGuest.base_url + '/guest/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.patch(url, data=json.dumps(payload), headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
+    # # 校验更新结果
+    # def test_15_get(self):
+    #     url = TestGuest.base_url + '/guest/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.get(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #     self.assertEqual('zabbix', j_r['data']['remark'])
 
-        url = TestGuest.base_url + '/guest/' + TestGuest.uuid
-        headers = {'content-type': 'application/json'}
-        r = requests.patch(url, data=json.dumps(payload), headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
-
-    # 校验更新结果
-    def test_14_get(self):
-        url = TestGuest.base_url + '/guests'
-        headers = {'content-type': 'application/json'}
-        r = requests.get(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
-        self.assertEqual('zabbix', j_r['data'][-1]['remark'])
-
-    # 创建 Disk
-    def test_21_create_disk(self):
-        payload = {
-            "size": 10
-        }
-
-        url = TestGuest.base_url + '/disk'
-        headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
-
-    def test_22_get_disks(self):
-        url = TestGuest.base_url + '/disks'
-        headers = {'content-type': 'application/json'}
-        r = requests.get(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        TestGuest.disk_uuid = j_r['data'][-1]['uuid']
-        self.assertEqual('200', j_r['state']['code'])
-
-    # @unittest.skip('skip resize disk')
-    def test_23_disk_resize(self):
-        url = TestGuest.base_url + '/disk/_disk_resize/' + TestGuest.disk_uuid + '/2000'
-        headers = {'content-type': 'application/json'}
-        r = requests.put(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
-
-    def test_31_attach_disk(self):
-        # TestGuest.uuid = '97eb8d05-0939-4b0e-afa9-21dc77a9ba89'
-        # TestGuest.disk_uuid = '88b1dd46-621a-4b29-8eab-1024a94c4653'
-        url = TestGuest.base_url + '/guest/_attach_disk/' + TestGuest.uuid + '/' + TestGuest.disk_uuid
-        headers = {'content-type': 'application/json'}
-        r = requests.put(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
+    # # 创建 Disk
+    # def test_21_create_disk(self):
+    #     payload = {
+    #         "size": 10
+    #     }
+    #
+    #     url = TestGuest.base_url + '/disk'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.post(url, data=json.dumps(payload), headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
+    # def test_22_get_disks(self):
+    #     url = TestGuest.base_url + '/disks'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.get(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     TestGuest.disk_uuid = j_r['data'][-1]['uuid']
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
+    # # @unittest.skip('skip resize disk')
+    # def test_23_disk_resize(self):
+    #     url = TestGuest.base_url + '/disk/_disk_resize/' + TestGuest.disk_uuid + '/2000'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
+    # def test_31_attach_disk(self):
+    #     TestGuest.uuid = 'ba102b41-4e7a-4d5b-a9e0-43d162695e4a'
+    #     TestGuest.disk_uuid = 'c5881400-4f98-49a8-b5cf-afb5956a5a4b'
+    #     url = TestGuest.base_url + '/guest/_attach_disk/' + TestGuest.uuid + '/' + TestGuest.disk_uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
 
     # def test_32_detach_disk(self):
     #     url = TestGuest.base_url + '/guest/_detach_disk/' + TestGuest.disk_uuid
@@ -144,6 +153,61 @@ class TestGuest(unittest.TestCase):
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
+    #
+    # def test_51_reboot(self):
+    #     url = TestGuest.base_url + '/guests/_reboot/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
+    # def test_52_force_reboot(self):
+    #     url = TestGuest.base_url + '/guests/_force_reboot/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    # def test_53_shutdown(self):
+    #     url = TestGuest.base_url + '/guests/_shutdown/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    # def test_54_force_shutdown(self):
+    #     url = TestGuest.base_url + '/guests/_force_shutdown/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    # def test_55_boot(self):
+    #     url = TestGuest.base_url + '/guests/_boot/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    # def test_56_suspend(self):
+    #     url = TestGuest.base_url + '/guests/_suspend/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    # def test_57_resume(self):
+    #     url = TestGuest.base_url + '/guests/_resume/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
 
 
 if __name__ == '__main__':

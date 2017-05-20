@@ -1,12 +1,13 @@
 # Guest
 
 
-## 创建
-### 创建 Guest
+## 创建 Guest
+> 创建 Guest
 
 ``` http
 POST https://$domain
   /api/guest
+Body:
 {
     "cpu": 4,
     "memory": 4,
@@ -176,6 +177,199 @@ GET https://$domain
 |page_size|Y|Number|透传客户端请求的该参数, 如果没有传递, 则返回默认值 50|
 
 Guest 信息字段描述参见 [获取 Guest 信息](guest.md#获取-guest-信息)
+
+
+## 更改 Guest 信息
+> 更改指定 uuid 的 Guest 信息
+
+``` http
+PATCH https://$domain
+  /api/guest/{uuid}
+Body:
+{
+    "remark": "desc"
+}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|remark|N|String|备注|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    },
+    "data": {
+        "status": 1,
+        "xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n            <domain type=\"kvm\">\n            \n            <features>\n                <acpi/>\n                <apic/>\n            </features>\n        \n            <name>4hd3Dop4</name>\n            <uuid>01ee4d15-7165-4859-b8d4-d2c3c0ea22c3</uuid>\n            <vcpu>4</vcpu>\n            <memory unit=\"GiB\">4</memory>\n            \n            <os>\n                <boot dev=\"hd\"/>\n                <type arch=\"x86_64\">hvm</type>\n                <bootmenu timeout=\"3000\" enable=\"yes\"/>\n            </os>\n        \n            \n            <devices>\n                \n            <interface type='network'>\n                <source network='net-br0'/>\n                <model type='virtio'/>\n            </interface>\n        \n                \n                <disk type='network' device='disk'>\n                    <driver name='qemu' type='qcow2' cache='none'/>\n                    <source protocol='gluster' name='gv0/VMs/4hd3Dop4/f0f76139-d909-4270-a9fa-678b34aa01f7.qcow2'>\n                        <host name='127.0.0.1' port='24007'/>\n                    </source>\n                    <target dev='vda' bus='virtio'/>\n                </disk>\n        \n                \n            <graphics passwd=\"eg9nEWNanoPMBdFz\" keymap=\"en-us\" port=\"16004\" type=\"vnc\">\n                <listen network=\"net-br0\" type=\"network\"/>\n            </graphics>\n        \n                \n            <serial type='pty'>\n                <target port='0'/>\n            </serial>\n            <console type='pty'>\n                <target type='serial' port='0'/>\n            </console>\n        \n            </devices>\n        \n            </domain>\n        ",
+        "remark": "zabbix",
+        "name": "4hd3Dop4",
+        "os_template_id": 1,
+        "ip": "10.10.6.78",
+        "vnc_port": 16004,
+        "uuid": "01ee4d15-7165-4859-b8d4-d2c3c0ea22c3",
+        "id": 19,
+        "cpu": 4,
+        "create_time": 1495005882742821,
+        "manage_network": "net-br0",
+        "memory": 4,
+        "password": "pswd.com",
+        "on_host": "10k01.jkser.com",
+        "vnc_password": "eg9nEWNanoPMBdFz",
+        "network": "net-br0"
+    }
+}
+```
+
+Guest 信息字段描述参见 [获取 Guest 信息](guest.md#获取-guest-信息)
+
+
+## 重启 Guest
+> 重启 Guest，uuids以逗号间隔
+
+``` http
+PUT https://$domain
+  /api/guests/_reboot/{uuids}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 关闭 Guest
+> 关闭 Guest，uuids以逗号间隔
+
+``` http
+PUT https://$domain
+  /api/guests/_shutdown/{uuids}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 强制关闭 Guest
+> 强制关闭 Guest，uuids以逗号间隔
+
+``` http
+PUT https://$domain
+  /api/guests/_force_shutdown/{uuids}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 启动 Guest
+> 启动 Guest，uuids以逗号间隔
+
+``` http
+PUT https://$domain
+  /api/guests/_boot/{uuids}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 暂停 Guest
+> 暂停 Guest，uuids以逗号间隔
+
+``` http
+PUT https://$domain
+  /api/guests/_suspend/{uuids}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
+
+
+## 恢复 Guest
+> 恢复被暂停的 Guest，uuids以逗号间隔
+
+``` http
+PUT https://$domain
+  /api/guests/_resume/{uuids}
+```
+
+|参数名称|必须|类型|说明|
+|:--|:--:|:--:|:--|
+|uuids|Y|String|uuids可为多个或单个uuid。多个实例的uuid以逗号间隔。|
+
+响应示例
+``` json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    }
+}
+```
 
 
 [返回上一级](../README.md)

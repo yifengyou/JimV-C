@@ -258,6 +258,7 @@ def r_force_shutdown(uuids):
 
 @Utils.dumps2response
 def r_boot(uuids):
+    # TODO: 做好关系依赖判断，比如boot不可以对suspend的实例操作。
 
     args_rules = [
         Rules.UUIDS.value
@@ -344,7 +345,7 @@ def r_delete(uuids):
         Rules.UUIDS.value
     ]
 
-    # TODO: 加入是否删除使用的数据磁盘开关
+    # TODO: 加入是否删除使用的数据磁盘开关，如果为True，则顺便删除使用的磁盘。否则解除该磁盘被使用的状态。
     try:
         ji.Check.previewing(args_rules, {'uuids': uuids})
 
