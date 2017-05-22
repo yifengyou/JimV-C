@@ -22,6 +22,7 @@
     - [[状态码参考列表](docs/state_code.md)](#状态码参考列表)
     - [[过滤器操作符原语](docs/filter_primitive.md)](#过滤器操作符原语)
     - [[状态列表](docs/enum.md)](#状态列表)
+    - [[配置](docs/config.md)](#配置)
     - [[Guest](docs/guest.md)](#guest)
     - [[磁盘](docs/disk.md)](#磁盘)
 - [流程图](#流程图)
@@ -205,6 +206,8 @@ gunicorn -c gunicorn_config.py main:app
 ### [过滤器操作符原语](docs/filter_primitive.md)
 
 ### [状态列表](docs/enum.md)
+
+### [配置](docs/config.md)
 
 ### [Guest](docs/guest.md)
 

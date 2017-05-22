@@ -1,11 +1,12 @@
 # Guest
 
-[TOC levels=2]: # " 目录"
+[TOC levels=2]: # "目录"
 
 # 目录
 - [创建 Guest](#创建-guest)
 - [获取 Guest 信息](#获取-guest-信息)
 - [获取 Guest 列表](#获取-guest-列表)
+- [Guest 全文检索](#guest-全文检索)
 - [更改 Guest 信息](#更改-guest-信息)
 - [重启 Guest](#重启-guest)
 - [关闭 Guest](#关闭-guest)

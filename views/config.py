@@ -173,7 +173,6 @@ def r_update():
         config.generate_available_ip2set()
         config.generate_available_vnc_port()
         config.update()
-        g.config = None
 
         config.get()
 
