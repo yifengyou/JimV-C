@@ -101,7 +101,9 @@ class EventProcessor(object):
                 cls.disk.update()
 
         elif action == 'delete_disk':
-            pass
+            cls.disk.uuid = uuid
+            cls.disk.get_by('uuid')
+            cls.disk.delete()
 
         else:
             pass

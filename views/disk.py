@@ -7,7 +7,7 @@ import json
 from uuid import uuid4
 import jimit as ji
 
-from models import Guest
+from models import Guest, DiskState
 from models.initialize import app, dev_table
 from models import Database as db
 from models import Config
@@ -132,39 +132,66 @@ def r_resize(uuid, size):
 
 
 @Utils.dumps2response
-def r_delete(uuid):
+def r_delete(uuids):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUIDS.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-
-        guest_disk = GuestDisk()
-        guest_disk.uuid = uuid
-        guest_disk.get_by('uuid')
+        ji.Check.previewing(args_rules, {'uuids': uuids})
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        if guest_disk.guest_uuid.__len__() > 0:
-            ret['state'] = ji.Common.exchange_state(41256)
-            return ret
+        guest_disk = GuestDisk()
+
+        # 检测所指定的 UUDIs 磁盘都存在
+        for uuid in uuids.split(','):
+            guest_disk.uuid = uuid
+            guest_disk.get_by('uuid')
+
+            if guest_disk.state != DiskState.idle.value:
+                ret['state'] = ji.Common.exchange_state(41256)
+                return ret
 
         config = Config()
         config.id = 1
         config.get()
 
-        image_path = '/'.join(['DiskPool', guest_disk.uuid + '.' + guest_disk.format])
+        # 执行删除操作
+        for uuid in uuids.split(','):
+            guest_disk.uuid = uuid
+            guest_disk.get_by('uuid')
 
-        message = {'action': 'delete_disk', 'glusterfs_volume': config.glusterfs_volume, 'image_path': image_path}
-        db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
+            image_path = '/'.join(['DiskPool', guest_disk.uuid + '.' + guest_disk.format])
 
-        guest_disk.delete()
+            message = {'action': 'delete_disk', 'uuid': guest_disk.uuid,
+                       'glusterfs_volume': config.glusterfs_volume, 'image_path': image_path}
+            db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
 
         return ret
 
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_get(uuid):
+    guest_disk = GuestDisk()
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+    guest_disk.uuid = uuid
+
+    try:
+        ji.Check.previewing(args_rules, guest_disk.__dict__)
+        guest_disk.get_by('uuid')
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = guest_disk.__dict__
+        return ret
     except ji.PreviewingError, e:
         return json.loads(e.message)
 

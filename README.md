@@ -21,8 +21,9 @@
 - [API](#api)
     - [[状态码参考列表](docs/state_code.md)](#状态码参考列表)
     - [[过滤器操作符原语](docs/filter_primitive.md)](#过滤器操作符原语)
-    - [[Guest](docs/guest.md)](#guest)
     - [[状态列表](docs/enum.md)](#状态列表)
+    - [[Guest](docs/guest.md)](#guest)
+    - [[磁盘](docs/disk.md)](#磁盘)
 - [流程图](#流程图)
 - [Web端](#web端)
 - [问题反馈](#问题反馈)
@@ -123,7 +124,7 @@ mysql -u jimv -pyour_jimv_db_password -e 'show databases'
 | SESSION_FILE_THRESHOLD     | 1000                 | 存放的session超过该数量，之前的将被删除           |
 | SESSION_COOKIE_NAME        | sid                  | session id在客户端cookie中的存放名称            |
 | SESSION_COOKIE_SECURE      | false                | cookie的传输是否只在https的环境中进行            |
-| **`SECRET_KEY`**                                 || session安全码                                 |
+| **`SECRET_KEY`**           |                      | session安全码                                 |
 | PERMANENT_SESSION_LIFETIME | 604800               | cookie在客户端的持久化时间。该值需与token_ttl相同 |
 | vm_create_queue            | Q:VMCreate           | 创建虚拟机的队列                               |
 | host_event_report_queue    | Q:HostEvent          | 宿主机事件上抛队列                              |
@@ -203,9 +204,12 @@ gunicorn -c gunicorn_config.py main:app
 
 ### [过滤器操作符原语](docs/filter_primitive.md)
 
+### [状态列表](docs/enum.md)
+
 ### [Guest](docs/guest.md)
 
-### [状态列表](docs/enum.md)
+### [磁盘](docs/disk.md)
+
 
 
 ## 流程图

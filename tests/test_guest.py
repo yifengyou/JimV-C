@@ -46,14 +46,14 @@ class TestGuest(unittest.TestCase):
     #     self.assertEqual('200', j_r['state']['code'])
 
     # 获取 Guest 列表
-    def test_12_get_list(self):
-        url = TestGuest.base_url + '/guests'
-        headers = {'content-type': 'application/json'}
-        r = requests.get(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        TestGuest.uuid = j_r['data'][-1]['uuid']
-        self.assertEqual('200', j_r['state']['code'])
+    # def test_12_get_list(self):
+    #     url = TestGuest.base_url + '/guests'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.get(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     TestGuest.uuid = j_r['data'][-1]['uuid']
+    #     self.assertEqual('200', j_r['state']['code'])
 
     # # 获取指定 Guest
     # def test_13_get(self):
@@ -235,10 +235,18 @@ class TestGuest(unittest.TestCase):
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
 
-    def test_61_migrate(self):
-        url = TestGuest.base_url + '/guests/_migrate/' + TestGuest.uuid + '/10k02.jkser.com'
+    # def test_61_migrate(self):
+    #     url = TestGuest.base_url + '/guests/_migrate/' + TestGuest.uuid + '/10k02.jkser.com'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.put(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+
+    def test_62_content_search(self):
+        url = TestGuest.base_url + '/guests/_search?keyword=10.10.4'
         headers = {'content-type': 'application/json'}
-        r = requests.put(url, headers=headers)
+        r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)
         print json.dumps(j_r, ensure_ascii=False)
         self.assertEqual('200', j_r['state']['code'])

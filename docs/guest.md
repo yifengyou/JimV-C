@@ -203,6 +203,80 @@ GET https://$domain
 Guest 信息字段描述参见 [获取 Guest 信息](#获取-guest-信息)
 
 
+## Guest 全文检索
+
+> 根据关键字查找 Guest
+
+```http
+GET https://$domain
+  /api/guests/_search?offset={number}&limit={number}&keyword=10.10.4
+  or
+  /api/guests/_search?page={number}&page_size={number}&keyword=10.10.4
+```
+
+| 参数名称   | 必须 |  类型  | 说明                                        |
+|:----------|:---:|:------:|:--------------------------------------------|
+| offset    |  N  | Number | 偏移量, 默认值0                              |
+| limit     |  N  | Number | 返回条目数量, 默认值50                        |
+| page      |  N  | Number | 页号, 与offset同时存在时, 以offset为准, 默认值1 |
+| page_size |  N  | Number | 页大小, 默认值50                             |
+| order_by  |  N  | String | 所依据的字段                                 |
+| order     |  N  |  Enum  | 排序策略，`asc`\|`desc`                      |
+| keyword   |  N  | String | 全文检索的关键字                              |
+
+响应示例
+
+```json
+{
+    "state": {
+        "en-us": "OK",
+        "zh-cn": "成功",
+        "code": "200"
+    },
+    "data": [{
+        "status": 1,
+        "xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n            <domain type=\"kvm\">\n            \n            <features>\n                <acpi/>\n                <apic/>\n            </features>\n        \n            <name>wCbjmsDZ</name>\n            <uuid>ba102b41-4e7a-4d5b-a9e0-43d162695e4a</uuid>\n            <vcpu>4</vcpu>\n            <memory unit=\"GiB\">4</memory>\n            \n            <os>\n                <boot dev=\"hd\"/>\n                <type arch=\"x86_64\">hvm</type>\n                <bootmenu timeout=\"3000\" enable=\"yes\"/>\n            </os>\n        \n            \n            <devices>\n                \n            <interface type='network'>\n                <source network='net-br0'/>\n                <model type='virtio'/>\n            </interface>\n        \n                \n                <disk type='network' device='disk'>\n                    <driver name='qemu' type='qcow2' cache='none'/>\n                    <source protocol='gluster' name='gv0/VMs/wCbjmsDZ/f279a8d4-dc3c-42b7-8f57-54ddcd0bd361.qcow2'>\n                        <host name='127.0.0.1' port='24007'/>\n                    </source>\n                    <target dev='vda' bus='virtio'/>\n                </disk>\n        \n                \n            <graphics passwd=\"VDFsVLMLR9yvM5fS\" keymap=\"en-us\" port=\"16347\" type=\"vnc\">\n                <listen network=\"net-br0\" type=\"network\"/>\n            </graphics>\n        \n                \n            <serial type='pty'>\n                <target port='0'/>\n            </serial>\n            <console type='pty'>\n                <target type='serial' port='0'/>\n            </console>\n        \n            </devices>\n        \n            </domain>\n        ",
+        "remark": "zabbix",
+        "name": "wCbjmsDZ",
+        "os_template_id": 1,
+        "ip": "10.10.4.31",
+        "vnc_port": 16347,
+        "uuid": "ba102b41-4e7a-4d5b-a9e0-43d162695e4a",
+        "cpu": 4,
+        "create_time": 1494950937330417,
+        "manage_network": "net-br0",
+        "memory": 4,
+        "id": 18,
+        "password": "pswd.com",
+        "on_host": "10k01.jkser.com",
+        "vnc_password": "VDFsVLMLR9yvM5fS",
+        "network": "net-br0"
+    }],
+    "paging": {
+        "prev": "http://127.0.0.1:8008/api/guests/_search?page=1&page_size=50&keyword=10.10.4&order=asc&order_by=id",
+        "last": "http://127.0.0.1:8008/api/guests/_search?page=1&page_size=50&keyword=10.10.4&order=asc&order_by=id",
+        "page_size": 50,
+        "next": "http://127.0.0.1:8008/api/guests/_search?page=1&page_size=50&keyword=10.10.4&order=asc&order_by=id",
+        "limit": 50,
+        "offset": 0,
+        "total": 1,
+        "page": 1,
+        "first": "http://127.0.0.1:8008/api/guests/_search?page=1&page_size=50&keyword=10.10.4&order=asc&order_by=id"
+    }
+}
+```
+
+| 参数名称   | 必须 |  类型  | 说明                                            |
+|:----------|:---:|:------:|:------------------------------------------------|
+| total     |  Y  | Number | 用户总量                                         |
+| offset    |  Y  | Number | 当前偏移量                                       |
+| limit     |  Y  | Number | 返回条目数量                                     |
+| page      |  Y  | Number | 透传客户端请求的该参数, 如果没有传递, 则返回默认值1   |
+| page_size |  Y  | Number | 透传客户端请求的该参数, 如果没有传递, 则返回默认值 50 |
+
+Guest 信息字段描述参见 [获取 Guest 信息](#获取-guest-信息)
+
+
 ## 更改 Guest 信息
 
 > 更改指定 uuid 的 Guest 信息
