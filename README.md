@@ -209,6 +209,8 @@ gunicorn -c gunicorn_config.py main:app
 
 ### [配置](docs/config.md)
 
+### [实例初始化操作簇](docs/os_init.md)
+
 ### [Guest](docs/guest.md)
 
 ### [磁盘](docs/disk.md)
