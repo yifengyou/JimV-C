@@ -195,9 +195,7 @@ Body:
 {
     "os_init_id": 3,
     "path": "/etc/resolv.conf",
-    "content": "\n".join([
-        "nameserver {DNS1}",
-        "nameserver {DNS2}"
+    "content": "nameserver {DNS1}\nnameserver {DNS2}" 
     ])
 }
 ```
