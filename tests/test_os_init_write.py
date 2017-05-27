@@ -16,7 +16,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 class TestOSInitWrite(unittest.TestCase):
 
     base_url = 'http://127.0.0.1:8008/api'
-    os_init_id = 0
+    os_init_id = 3
     os_init_write_id = 0
 
     def setUp(self):
@@ -101,22 +101,7 @@ class TestOSInitWrite(unittest.TestCase):
         TestOSInitWrite.os_init_write_id = j_r['data']['id']
         self.assertEqual('200', j_r['state']['code'])
 
-    # 添加系统初始化操作
-    def test_24_create(self):
-        payload = {
-            "os_init_id": TestOSInitWrite.os_init_id,
-            "path": "/etc/hostname",
-            "content": "{HOSTNAME}"
-        }
-
-        url = TestOSInitWrite.base_url + '/os_init_write'
-        headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('40901', j_r['state']['sub']['code'])
-
-    def test_25_get(self):
+    def test_25_get_list(self):
         url = TestOSInitWrite.base_url + '/os_init_writes'
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
@@ -126,7 +111,6 @@ class TestOSInitWrite(unittest.TestCase):
 
     def test_26_update(self):
         payload = {
-            "os_init_id": TestOSInitWrite.os_init_id,
             "path": "/etc/hostname",
             "content": "{HOSTNAME}"
         }
