@@ -27,23 +27,23 @@ class TestGuest(unittest.TestCase):
 
     # 创建Guest
     # @unittest.skip('skip create guest')
-    # def test_11_create(self):
-    #     payload = {
-    #         "cpu": 4,
-    #         "memory": 4,
-    #         "os_template_id": 1,
-    #         "quantity": 1,
-    #         "name": "",
-    #         "password": "pswd.com",
-    #         "lease_term": 100
-    #     }
-    #
-    #     url = TestGuest.base_url + '/guest'
-    #     headers = {'content-type': 'application/json'}
-    #     r = requests.post(url, data=json.dumps(payload), headers=headers)
-    #     j_r = json.loads(r.content)
-    #     print json.dumps(j_r, ensure_ascii=False)
-    #     self.assertEqual('200', j_r['state']['code'])
+    def test_11_create(self):
+        payload = {
+            "cpu": 4,
+            "memory": 4,
+            "os_template_id": 2,
+            "quantity": 3,
+            "name": "",
+            "password": "pswd.com",
+            "lease_term": 100
+        }
+
+        url = TestGuest.base_url + '/guest'
+        headers = {'content-type': 'application/json'}
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
 
     # 获取 Guest 列表
     # def test_12_get_list(self):
@@ -243,13 +243,13 @@ class TestGuest(unittest.TestCase):
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
 
-    def test_62_content_search(self):
-        url = TestGuest.base_url + '/guests/_search?keyword=10.10.4'
-        headers = {'content-type': 'application/json'}
-        r = requests.get(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
+    # def test_62_content_search(self):
+    #     url = TestGuest.base_url + '/guests/_search?keyword=10.10.4'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.get(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
 
 
 if __name__ == '__main__':
