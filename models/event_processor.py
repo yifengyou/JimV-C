@@ -7,7 +7,7 @@ import time
 
 from models import Database as db
 from models import Guest
-from models import GuestDisk
+from models import Disk
 from models import Log
 from models import Utils
 from models import EmitKind
@@ -25,7 +25,7 @@ class EventProcessor(object):
     message = None
     log = Log()
     guest = Guest()
-    disk = GuestDisk()
+    disk = Disk()
 
     @classmethod
     def log_processor(cls):

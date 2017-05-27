@@ -32,10 +32,11 @@ ALTER TABLE guest ADD INDEX (on_host);
 ALTER TABLE guest ADD INDEX (ip);
 
 
-CREATE TABLE IF NOT EXISTS guest_disk(
+CREATE TABLE IF NOT EXISTS disk(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     uuid CHAR(36) NOT NULL,
     label VARCHAR(255) NOT NULL,
+    path VARCHAR(255) NOT NULL,
     size INT UNSIGNED NOT NULL,
     sequence TINYINT NOT NULL,
     format CHAR(16) NOT NULL DEFAULT 'qcow2',
@@ -46,14 +47,14 @@ CREATE TABLE IF NOT EXISTS guest_disk(
     ENGINE=InnoDB
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE guest_disk ADD INDEX (size);
-ALTER TABLE guest_disk ADD INDEX (guest_uuid);
+ALTER TABLE disk ADD INDEX (size);
+ALTER TABLE disk ADD INDEX (guest_uuid);
 
 
 CREATE TABLE IF NOT EXISTS os_template(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     label VARCHAR(255) NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    path VARCHAR(255) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
     os_init_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (id))
@@ -83,6 +84,7 @@ CREATE TABLE IF NOT EXISTS os_init_write(
 CREATE TABLE IF NOT EXISTS config(
     id BIGINT UNSIGNED NOT NULL DEFAULT 1,
     glusterfs_volume VARCHAR(255) NOT NULL,
+    storage_path VARCHAR(255) NOT NULL,
     vm_network VARCHAR(255) NOT NULL,
     vm_manage_network VARCHAR(255) NOT NULL,
     start_ip CHAR(15) NOT NULL,

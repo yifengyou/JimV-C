@@ -27,23 +27,23 @@ class TestGuest(unittest.TestCase):
 
     # 创建Guest
     # @unittest.skip('skip create guest')
-    def test_11_create(self):
-        payload = {
-            "cpu": 4,
-            "memory": 4,
-            "os_template_id": 2,
-            "quantity": 3,
-            "name": "",
-            "password": "pswd.com",
-            "lease_term": 100
-        }
-
-        url = TestGuest.base_url + '/guest'
-        headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
+    # def test_11_create(self):
+    #     payload = {
+    #         "cpu": 4,
+    #         "memory": 4,
+    #         "os_template_id": 1,
+    #         "quantity": 1,
+    #         "name": "",
+    #         "password": "pswd.com",
+    #         "lease_term": 100
+    #     }
+    #
+    #     url = TestGuest.base_url + '/guest'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.post(url, data=json.dumps(payload), headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
 
     # 获取 Guest 列表
     # def test_12_get_list(self):
@@ -210,7 +210,6 @@ class TestGuest(unittest.TestCase):
     #     print json.dumps(j_r, ensure_ascii=False)
 
     # def test_58_attach_disk(self):
-    #     TestGuest.disk_uuid = '234670cb-3ce4-4ef9-ba23-12bed636184c'
     #     url = TestGuest.base_url + '/guest/_attach_disk/' + TestGuest.uuid + '/' + TestGuest.disk_uuid
     #     headers = {'content-type': 'application/json'}
     #     r = requests.put(url, headers=headers)

@@ -14,7 +14,7 @@ from models import OSInitWrite
 from models.initialize import app, dev_table
 from models import Database as db
 from models import Config
-from models import GuestDisk
+from models import Disk
 from models import Rules
 from models import Utils
 from models import Guest
@@ -383,7 +383,7 @@ def r_attach_disk(uuid, disk_uuid):
         guest.uuid = uuid
         guest.get_by('uuid')
 
-        guest_disk = GuestDisk()
+        guest_disk = Disk()
         guest_disk.uuid = disk_uuid
         guest_disk.get_by('uuid')
 
@@ -440,7 +440,7 @@ def r_detach_disk(disk_uuid):
     try:
         ji.Check.previewing(args_rules, {'disk_uuid': disk_uuid})
 
-        guest_disk = GuestDisk()
+        guest_disk = Disk()
         guest_disk.uuid = disk_uuid
         guest_disk.get_by('uuid')
 

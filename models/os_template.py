@@ -21,14 +21,15 @@ class OSTemplate(ORM):
         super(OSTemplate, self).__init__()
         self.id = 0
         self.label = None
-        self.name = None
+        self.path = None
         self.active = None
         self.os_init_id = None
 
     @staticmethod
     def get_filter_keywords():
         return {
-            'name': FilterFieldType.STR.value,
+            'label': FilterFieldType.STR.value,
+            'path': FilterFieldType.STR.value,
             'active': FilterFieldType.BOOL.value,
             'os_init_id': FilterFieldType.INT.value
         }
@@ -39,5 +40,5 @@ class OSTemplate(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['name']
+        return ['label', 'path']
 

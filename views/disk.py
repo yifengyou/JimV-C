@@ -11,7 +11,7 @@ from models import Guest, DiskState
 from models.initialize import app, dev_table
 from models import Database as db
 from models import Config
-from models import GuestDisk
+from models import Disk
 from models import Rules
 from models import Utils
 
@@ -54,26 +54,26 @@ def r_create():
             ret['state'] = ji.Common.exchange_state(41255)
             return ret
 
-        guest_disk = GuestDisk()
-        guest_disk.guest_uuid = ''
-        guest_disk.size = size
-        guest_disk.uuid = uuid4().__str__()
-        guest_disk.label = ji.Common.generate_random_code(length=8)
-        guest_disk.sequence = -1
-        guest_disk.format = 'qcow2'
+        disk = Disk()
+        disk.guest_uuid = ''
+        disk.size = size
+        disk.uuid = uuid4().__str__()
+        disk.label = ji.Common.generate_random_code(length=8)
+        disk.sequence = -1
+        disk.format = 'qcow2'
 
         config = Config()
         config.id = 1
         config.get()
 
-        image_path = '/'.join(['DiskPool', guest_disk.uuid + '.' + guest_disk.format])
+        disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
 
         message = {'action': 'create_disk', 'glusterfs_volume': config.glusterfs_volume,
-                   'image_path': image_path, 'size': guest_disk.size, 'uuid': guest_disk.uuid}
+                   'image_path': disk.path, 'size': disk.size, 'uuid': disk.uuid}
 
         db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
 
-        guest_disk.create()
+        disk.create()
 
         return ret
 
@@ -92,36 +92,35 @@ def r_resize(uuid, size):
     try:
         ji.Check.previewing(args_rules, {'uuid': uuid, 'size': size})
 
-        guest_disk = GuestDisk()
-        guest_disk.uuid = uuid
-        guest_disk.get_by('uuid')
+        disk = Disk()
+        disk.uuid = uuid
+        disk.get_by('uuid')
 
         used = True
 
-        if guest_disk.guest_uuid.__len__() != 36:
+        if disk.guest_uuid.__len__() != 36:
             used = False
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        if guest_disk.size >= size:
+        if disk.size >= size:
             ret['state'] = ji.Common.exchange_state(41257)
             return ret
 
-        message = {'action': 'resize_disk', 'size': size, 'guest_uuid': guest_disk.guest_uuid,
-                   'disk_uuid': guest_disk.uuid, 'passback_parameters': {'size': size}}
+        message = {'action': 'resize_disk', 'size': size, 'guest_uuid': disk.guest_uuid,
+                   'disk_uuid': disk.uuid, 'passback_parameters': {'size': size}}
 
         if used:
-            message['device_node'] = dev_table[guest_disk.sequence]
+            message['device_node'] = dev_table[disk.sequence]
             Guest.emit_instruction(message=json.dumps(message))
         else:
             config = Config()
             config.id = 1
             config.get()
 
-            image_path = '/'.join(['DiskPool', guest_disk.uuid + '.' + guest_disk.format])
             message['glusterfs_volume'] = config.glusterfs_volume
-            message['image_path'] = image_path
+            message['image_path'] = disk.path
 
             db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
 
@@ -144,14 +143,14 @@ def r_delete(uuids):
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        guest_disk = GuestDisk()
+        disk = Disk()
 
         # 检测所指定的 UUDIs 磁盘都存在
         for uuid in uuids.split(','):
-            guest_disk.uuid = uuid
-            guest_disk.get_by('uuid')
+            disk.uuid = uuid
+            disk.get_by('uuid')
 
-            if guest_disk.state != DiskState.idle.value:
+            if disk.state != DiskState.idle.value:
                 ret['state'] = ji.Common.exchange_state(41256)
                 return ret
 
@@ -161,13 +160,11 @@ def r_delete(uuids):
 
         # 执行删除操作
         for uuid in uuids.split(','):
-            guest_disk.uuid = uuid
-            guest_disk.get_by('uuid')
+            disk.uuid = uuid
+            disk.get_by('uuid')
 
-            image_path = '/'.join(['DiskPool', guest_disk.uuid + '.' + guest_disk.format])
-
-            message = {'action': 'delete_disk', 'uuid': guest_disk.uuid,
-                       'glusterfs_volume': config.glusterfs_volume, 'image_path': image_path}
+            message = {'action': 'delete_disk', 'uuid': disk.uuid,
+                       'glusterfs_volume': config.glusterfs_volume, 'image_path': disk.path}
             db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
 
         return ret
@@ -178,19 +175,19 @@ def r_delete(uuids):
 
 @Utils.dumps2response
 def r_get(uuid):
-    guest_disk = GuestDisk()
+    disk = Disk()
 
     args_rules = [
         Rules.UUID.value
     ]
-    guest_disk.uuid = uuid
+    disk.uuid = uuid
 
     try:
-        ji.Check.previewing(args_rules, guest_disk.__dict__)
-        guest_disk.get_by('uuid')
+        ji.Check.previewing(args_rules, disk.__dict__)
+        disk.get_by('uuid')
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = guest_disk.__dict__
+        ret['data'] = disk.__dict__
         return ret
     except ji.PreviewingError, e:
         return json.loads(e.message)
@@ -241,8 +238,8 @@ def r_get_by_filter():
         ret['paging'] = {'total': 0, 'offset': offset, 'limit': limit, 'page': page, 'page_size': page_size,
                          'next': '', 'prev': '', 'first': '', 'last': ''}
 
-        ret['data'], ret['paging']['total'] = GuestDisk.get_by_filter(offset=offset, limit=limit, order_by=order_by,
-                                                                      order=order, filter_str=filter_str)
+        ret['data'], ret['paging']['total'] = Disk.get_by_filter(offset=offset, limit=limit, order_by=order_by,
+                                                                 order=order, filter_str=filter_str)
 
         host_url = request.host_url.rstrip('/')
         other_str = '&filter=' + filter_str + '&order=' + order + '&order_by=' + order_by
@@ -319,8 +316,8 @@ def r_content_search():
         ret['data'] = list()
         ret['paging'] = {'total': 0, 'offset': offset, 'limit': limit, 'page': page, 'page_size': page_size}
 
-        ret['data'], ret['paging']['total'] = GuestDisk.content_search(offset=offset, limit=limit, order_by=order_by,
-                                                                       order=order, keyword=keyword)
+        ret['data'], ret['paging']['total'] = Disk.content_search(offset=offset, limit=limit, order_by=order_by,
+                                                                  order=order, keyword=keyword)
 
         host_url = request.host_url.rstrip('/')
         other_str = '&keyword=' + keyword + '&order=' + order + '&order_by=' + order_by
@@ -372,18 +369,18 @@ def r_update(uuid):
 
     try:
         ji.Check.previewing(args_rules, request.json)
-        guest_disk = GuestDisk()
-        guest_disk.uuid = uuid
-        guest_disk.get_by('uuid')
+        disk = Disk()
+        disk.uuid = uuid
+        disk.get_by('uuid')
 
-        guest_disk.label = request.json.get('label', guest_disk.label)
+        disk.label = request.json.get('label', disk.label)
 
-        guest_disk.update()
-        guest_disk.get()
+        disk.update()
+        disk.get()
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = guest_disk.__dict__
+        ret['data'] = disk.__dict__
         return ret
     except ji.PreviewingError, e:
         return json.loads(e.message)

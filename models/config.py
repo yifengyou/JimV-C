@@ -27,6 +27,7 @@ class Config(ORM):
         # 配置条目的 id 只会是 1
         self.id = 1
         self.glusterfs_volume = ''
+        self.storage_path = ''
         self.vm_network = ''
         self.vm_manage_network = ''
         self.start_ip = ''

@@ -27,6 +27,7 @@ class Rules(Enum):
 
     CONFIG_ID = (int, 'id')
     GLUSTERFS_VOLUME = (basestring, 'glusterfs_volume')
+    STORAGE_PATH = (basestring, 'storage_path')
     VM_NETWORK = (basestring, 'vm_network')
     VM_MANAGE_NETWORK = (basestring, 'vm_manage_network')
     START_IP = (IP, 'start_ip')
@@ -46,6 +47,7 @@ class Rules(Enum):
     OS_TEMPLATE_ID = (int, 'os_template_id')
     QUANTITY = (int, 'quantity')
     NAME = (basestring, 'name')
+    PATH = (basestring, 'path')
     PASSWORD = (basestring, 'password')
     LEASE_TERM = (int, 'lease_term')
     DESTINATION_HOST = (basestring, 'destination_host', (5, 64))

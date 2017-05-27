@@ -32,6 +32,7 @@ def r_create():
 
     args_rules = [
         Rules.GLUSTERFS_VOLUME.value,
+        Rules.STORAGE_PATH.value,
         Rules.VM_NETWORK.value,
         Rules.VM_MANAGE_NETWORK.value,
         Rules.START_IP.value,
@@ -47,6 +48,7 @@ def r_create():
 
     config.id = 1
     config.glusterfs_volume = request.json.get('glusterfs_volume')
+    config.storage_path = request.json.get('storage_path')
     config.vm_network = request.json.get('vm_network')
     config.vm_manage_network = request.json.get('vm_manage_network')
     config.start_ip = request.json.get('start_ip')
@@ -89,6 +91,11 @@ def r_update():
     if 'glusterfs_volume' in request.json:
         args_rules.append(
             Rules.GLUSTERFS_VOLUME.value,
+        )
+
+    if 'storage_path' in request.json:
+        args_rules.append(
+            Rules.STORAGE_PATH.value,
         )
 
     if 'vm_network' in request.json:
@@ -157,6 +164,7 @@ def r_update():
         config.get()
 
         config.glusterfs_volume = request.json.get('glusterfs_volume', config.glusterfs_volume)
+        config.storage_path = request.json.get('storage_path', config.storage_path)
         config.vm_network = request.json.get('vm_network', config.vm_network)
         config.vm_manage_network = request.json.get('vm_manage_network', config.vm_manage_network)
         config.start_ip = request.json.get('start_ip', config.start_ip)

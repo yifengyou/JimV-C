@@ -97,6 +97,7 @@ GET https://$domain
         "sequence": -1,
         "format": "qcow2",
         "label": "Hello-disk",
+        "path": "Images/fff8aead-3206-4820-8c98-146178a91cce.qcow2",
         "state": 1,
         "id": 42,
         "size": 200
@@ -109,6 +110,7 @@ GET https://$domain
 | id         |  Y  |  Long  | 磁盘 ID                                               |
 | uuid       |  Y  | String | 磁盘 UUID                                             |
 | label      |  Y  | String | 磁盘标注信息                                           |
+| path       |  Y  | String | 磁盘存放路径                                           |
 | size       |  Y  |  Long  | 磁盘大小                                               |
 | sequence   |  Y  |  Long  | 磁盘在某个 Guest 实例中的序列                            |
 | format     |  Y  | String | 磁盘镜像格式，默认 qcow2                                |
@@ -148,6 +150,7 @@ Body:
         "format": "qcow2",
         "sequence": -1,
         "label": "Hello-disk",
+        "path": "Images/fff8aead-3206-4820-8c98-146178a91cce.qcow2",
         "state": 0,
         "id": 42,
         "size": 10
@@ -193,6 +196,7 @@ GET https://$domain
         "sequence": -1,
         "format": "qcow2",
         "label": "82QUZJGJ",
+        "path": "Images/5844e2cb-56c5-4b02-98b5-ee606bfbe3b3.qcow2",
         "state": 0,
         "id": 22,
         "size": 10
@@ -204,6 +208,7 @@ GET https://$domain
         "sequence": -1,
         "format": "qcow2",
         "label": "qhDCp3E8",
+        "path": "Images/fff8aead-3206-4820-8c98-146178a91cce.qcow2",
         "state": 0,
         "id": 42,
         "size": 10
@@ -269,6 +274,7 @@ GET https://$domain
         "sequence": -1,
         "format": "qcow2",
         "label": "Hello-disk",
+        "path": "Images/fff8aead-3206-4820-8c98-146178a91cce.qcow2",
         "state": 1,
         "id": 42,
         "size": 200

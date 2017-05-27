@@ -64,16 +64,17 @@ class Guest(ORM):
         db.r.publish(app.config['instruction_channel'], message=message)
 
 
-class GuestDisk(ORM):
+class Disk(ORM):
 
-    _table_name = 'guest_disk'
+    _table_name = 'disk'
     _primary_key = 'id'
 
     def __init__(self):
-        super(GuestDisk, self).__init__()
+        super(Disk, self).__init__()
         self.id = 0
         self.uuid = None
         self.label = None
+        self.path = None
         self.size = None
         self.sequence = None
         self.state = DiskState.pending.value

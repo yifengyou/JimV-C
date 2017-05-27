@@ -38,13 +38,13 @@ def r_create():
 
     args_rules = [
         Rules.LABEL.value,
-        Rules.NAME.value,
+        Rules.PATH.value,
         Rules.ACTIVE.value,
         Rules.OS_INIT_ID_EXT.value
     ]
 
     os_template.label = request.json.get('label')
-    os_template.name = request.json.get('name')
+    os_template.path = request.json.get('path')
     os_template.active = request.json.get('active')
     os_template.os_init_id = request.json.get('os_init_id', 0)
 
@@ -54,13 +54,13 @@ def r_create():
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        if os_template.exist_by('name'):
+        if os_template.exist_by('path'):
             ret['state'] = ji.Common.exchange_state(40901)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_template.name])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_template.path])
             return ret
 
         os_template.create()
-        os_template.get_by('name')
+        os_template.get_by('path')
         ret['data'] = os_template.__dict__
         return ret
     except ji.PreviewingError, e:
@@ -81,9 +81,9 @@ def r_update(_id):
             Rules.LABEL.value,
         )
 
-    if 'name' in request.json:
+    if 'path' in request.json:
         args_rules.append(
-            Rules.NAME.value,
+            Rules.PATH.value,
         )
 
     if 'active' in request.json:
@@ -109,7 +109,7 @@ def r_update(_id):
 
         os_template.get()
         os_template.label = request.json.get('label', os_template.label)
-        os_template.name = request.json.get('name', os_template.name)
+        os_template.path = request.json.get('path', os_template.path)
         os_template.active = request.json.get('active', os_template.active)
         os_template.os_init_id = request.json.get('os_init_id', os_template.os_init_id)
 

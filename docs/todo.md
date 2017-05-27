@@ -9,9 +9,11 @@
 - [ ] os_init_write 的更新方法里，是否需要支持 os_init_id 参数
 - [ ] 增加模板镜像上传功能
 - [ ] 抽象出视图层的父类，尤其是 get、get_list、delete 这些方法基本相同
-- [ ] guest_disk 表中加入 path 字段，具体磁盘位置由 path 指明
-- [ ] guest 的系统磁盘，也需记录到 guest_disk 表中
+- [x] guest_disk 表中加入 path 字段，具体磁盘位置由 path 指明
+- [x] guest 的系统磁盘，也需记录到 guest_disk 表中
 - [x] 将 Guest 的系统镜像合并到单独的磁盘镜像目录中。即不再为 Guest 的系统镜像单独分配目录
-- [ ] os_template 表中 name 改为 path 字段。又 path 指明完整路径
+- [x] os_template 表中 name 改为 path 字段。用 path 指明完整路径
 - [ ] 统计活着的宿主机，并提供获取列表的接口，供迁移时选择
 - [ ] 加入被动更新 Guest xml 的功能，由宿主机主动推送。具体时机待定
+- [x] 统一 guest_disk 称谓为 disk
+- [ ] 分离出 API 与 views 出入口，涉及 add_rule 与 route_table
