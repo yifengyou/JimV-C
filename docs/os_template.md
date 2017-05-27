@@ -19,7 +19,7 @@ POST https://$domain
 Body:
 {
     "label": "CentOS-7.2",
-    "name": "centos72_multi-user_2016-09-15_128G.qcow2",
+    "path": "template_pool/centos72_multi-user_2016-09-15_128G.qcow2",
     "active": true,
     "os_init_id": 3
 }
@@ -28,7 +28,7 @@ Body:
 |  参数名称   | 必须 |  类型   | 说明              |
 |:----------:|:---:|:-------:|:------------------|
 |   label    |  Y  | String  | 标识              |
-|    name    |  Y  | String  | 路径中的模板名称    |
+|    path    |  Y  | String  | 模板路径    |
 |   active   |  Y  | Boolean | 是否可用           |
 | os_init_id |  N  |  Long   | 实例初始化操作簇 ID |
 
@@ -45,7 +45,7 @@ Body:
         "active": 1,
         "os_init_id": 3,
         "id": 1,
-        "name": "centos72_multi-user_2016-09-15_128G.qcow2",
+        "name": "template_pool/centos72_multi-user_2016-09-15_128G.qcow2",
         "label": "CentOS-7.2"
     }
 }
@@ -84,7 +84,7 @@ GET https://$domain
         "active": 1,
         "label": "CentOS-7.2",
         "id": 1,
-        "name": "centos72_multi-user_2016-09-15_128G.qcow2",
+        "path": "template_pool/centos72_multi-user_2016-09-15_128G.qcow2",
         "os_init_id": 3
     },{
         "more" : "more"
@@ -107,7 +107,7 @@ GET https://$domain
 |:-----------|:---:|:-------:|:------------------|
 | id         |  Y  |  Long   | 模板 ID           |
 | label      |  Y  | String  | 标识              |
-| name       |  Y  | String  | 路径中的模板名称    |
+| path       |  Y  | String  | 模板路径           |
 | active     |  Y  | Boolean | 是否可用           |
 | os_init_id |  N  |  Long   | 实例初始化操作簇 ID |
 
@@ -140,7 +140,7 @@ Body:
         "active": 1,
         "label": "CentOS-72",
         "id": 1,
-        "name": "centos72_multi-user_2016-09-15_128G.qcow2",
+        "path": "template_pool/centos72_multi-user_2016-09-15_128G.qcow2",
         "os_init_id": 3
     }
 }
