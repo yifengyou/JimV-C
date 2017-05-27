@@ -57,7 +57,7 @@ def r_create():
         os_init.id = os_init_write.os_init_id
         if not os_init.exist():
             ret['state'] = ji.Common.exchange_state(40401)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_init.id])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_init.id.__str__()])
             return ret
 
         if os_init_write.exist_by('path'):
