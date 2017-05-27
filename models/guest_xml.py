@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from models import Config
+from models import Config, Disk
 from models import Guest
 
 
@@ -55,7 +55,7 @@ class GuestXML(object):
 
     def __init__(self, guest=None, disk=None, config=None):
         assert isinstance(guest, Guest)
-        assert isinstance(disk, dict)
+        assert isinstance(disk, Disk)
         assert isinstance(config, Config)
 
         self.guest = guest
@@ -131,14 +131,13 @@ class GuestXML(object):
 
         return """
                 <disk type='network' device='disk'>
-                    <driver name='qemu' type='qcow2' cache='none'/>
-                    <source protocol='gluster' name='{0}/VMs/{1}/{2}.{3}'>
+                    <driver name='qemu' type='{0}' cache='none'/>
+                    <source protocol='gluster' name='{1}/{2}'>
                         <host name='127.0.0.1' port='24007'/>
                     </source>
-                    <target dev='{4}' bus='virtio'/>
+                    <target dev='{3}' bus='virtio'/>
                 </disk>
-        """.format(self.config.glusterfs_volume, self.guest.name, self.disk['uuid'], self.disk['format'],
-                   dev_table[self.disk['sequence']])
+        """.format(self.disk.format, self.config.glusterfs_volume, self.disk.path, dev_table[self.disk.sequence])
 
     def get_graphics(self):
         return """

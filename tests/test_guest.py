@@ -136,16 +136,17 @@ class TestGuest(unittest.TestCase):
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
     #
-    # # 删除Guest
-    # # @unittest.skip('skip delete guest')
-    # def test_41_delete(self):
-    #     url = TestGuest.base_url + '/guests/' + TestGuest.uuid
-    #     headers = {'content-type': 'application/json'}
-    #     r = requests.delete(url, headers=headers)
-    #     j_r = json.loads(r.content)
-    #     print json.dumps(j_r, ensure_ascii=False)
-    #     self.assertEqual('200', j_r['state']['code'])
-    #
+    # 删除Guest
+    # @unittest.skip('skip delete guest')
+    def test_41_delete(self):
+        TestGuest.uuid = '8ed82dca-e956-469b-a6c1-c16a89763ab1'
+        url = TestGuest.base_url + '/guests/' + TestGuest.uuid
+        headers = {'content-type': 'application/json'}
+        r = requests.delete(url, headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
+
     # def test_42_delete_disk(self):
     #     url = TestGuest.base_url + '/disk/' + TestGuest.disk_uuid
     #     headers = {'content-type': 'application/json'}

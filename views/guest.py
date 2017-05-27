@@ -113,9 +113,17 @@ def r_create():
 
             guest.vnc_password = ji.Common.generate_random_code(length=16)
 
-            guest_disk = {'uuid': uuid4().__str__(), 'size': -1, 'format': 'qcow2', 'sequence': 0}
+            disk = Disk()
+            disk.uuid = guest.uuid
+            disk.label = guest.name + '_SystemImage'
+            disk.format = 'qcow2'
+            disk.sequence = 0
+            disk.size = 0
+            disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
+            disk.guest_uuid = ''
+            disk.create()
 
-            guest_xml = GuestXML(guest=guest, disk=guest_disk, config=config)
+            guest_xml = GuestXML(guest=guest, disk=disk, config=config)
             guest.xml = guest_xml.get_domain()
             guest.create()
 
@@ -130,12 +138,12 @@ def r_create():
                     replace('{DNS2}', config.dns2)
 
             create_vm_msg = {
-                'action': 'create_vm',
+                'action': 'create_guest',
                 'uuid': guest.uuid,
                 'name': guest.name,
                 'glusterfs_volume': config.glusterfs_volume,
-                'template_path': 'template_pool/' + os_template.name,
-                'guest_disk': guest_disk,
+                'template_path': os_template.path,
+                'disk': disk.__dict__,
                 'writes': _os_init_writes,
                 'password': guest.password,
                 'xml': guest_xml.get_domain()
@@ -357,7 +365,7 @@ def r_delete(uuids):
 
         # 执行删除操作
         for uuid in uuids.split(','):
-            message = {'action': 'delete', 'uuid': uuid}
+            message = {'action': 'delete_guest', 'uuid': uuid}
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -383,15 +391,15 @@ def r_attach_disk(uuid, disk_uuid):
         guest.uuid = uuid
         guest.get_by('uuid')
 
-        guest_disk = Disk()
-        guest_disk.uuid = disk_uuid
-        guest_disk.get_by('uuid')
+        disk = Disk()
+        disk.uuid = disk_uuid
+        disk.get_by('uuid')
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
         # 判断欲挂载的磁盘是否空闲
-        if guest_disk.guest_uuid.__len__() > 0:
+        if disk.guest_uuid.__len__() > 0:
             ret['state'] = ji.Common.exchange_state(41258)
             return ret
 
@@ -401,9 +409,9 @@ def r_attach_disk(uuid, disk_uuid):
             return ret
 
         # 取出该 guest 已挂载的磁盘，来做出决定，确定该磁盘的序列
-        guest_disk.guest_uuid = guest.uuid
-        disks, count = guest_disk.get_by_filter(filter_str='guest_uuid:in:' + guest.uuid)
-        guest_disk.sequence = count + 1
+        disk.guest_uuid = guest.uuid
+        disks, count = disk.get_by_filter(filter_str='guest_uuid:in:' + guest.uuid)
+        disk.sequence = count + 1
 
         config = Config()
         config.id = 1
@@ -417,11 +425,11 @@ def r_attach_disk(uuid, disk_uuid):
                 </source>
                 <target dev='{3}' bus='virtio'/>
             </disk>
-        """.format(config.glusterfs_volume, guest_disk.uuid, guest_disk.format,
-                   dev_table[guest_disk.sequence])
+        """.format(config.glusterfs_volume, disk.uuid, disk.format,
+                   dev_table[disk.sequence])
 
         message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml,
-                   'passback_parameters': {'disk_uuid': guest_disk.uuid, 'sequence': guest_disk.sequence}}
+                   'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence}}
         Guest.emit_instruction(message=json.dumps(message))
 
         return ret
@@ -440,21 +448,21 @@ def r_detach_disk(disk_uuid):
     try:
         ji.Check.previewing(args_rules, {'disk_uuid': disk_uuid})
 
-        guest_disk = Disk()
-        guest_disk.uuid = disk_uuid
-        guest_disk.get_by('uuid')
+        disk = Disk()
+        disk.uuid = disk_uuid
+        disk.get_by('uuid')
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        if guest_disk.state != DiskState.mounted.value or guest_disk.sequence == 0:
+        if disk.state != DiskState.mounted.value or disk.sequence == 0:
             # 表示未被任何实例使用，已被分离
             # 序列为 0 的表示实例系统盘，系统盘不可以被分离
             # TODO: 系统盘单独范围其它状态
             return ret
 
         guest = Guest()
-        guest.uuid = guest_disk.guest_uuid
+        guest.uuid = disk.guest_uuid
         guest.get_by('uuid')
 
         # 判断 Guest 是否处于可用状态
@@ -474,11 +482,11 @@ def r_detach_disk(disk_uuid):
                 </source>
                 <target dev='{3}' bus='virtio'/>
             </disk>
-        """.format(config.glusterfs_volume, guest_disk.uuid, guest_disk.format,
-                   dev_table[guest_disk.sequence])
+        """.format(config.glusterfs_volume, disk.uuid, disk.format,
+                   dev_table[disk.sequence])
 
-        message = {'action': 'detach_disk', 'uuid': guest_disk.guest_uuid, 'xml': xml,
-                   'passback_parameters': {'disk_uuid': guest_disk.uuid}}
+        message = {'action': 'detach_disk', 'uuid': disk.guest_uuid, 'xml': xml,
+                   'passback_parameters': {'disk_uuid': disk.uuid}}
         Guest.emit_instruction(message=json.dumps(message))
 
         return ret

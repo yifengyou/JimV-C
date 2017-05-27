@@ -47,9 +47,19 @@ class EventProcessor(object):
         action = cls.message['message']['action']
         uuid = cls.message['message']['uuid']
         state = cls.message['type']
+        data = cls.message['message']['data']
 
-        if action == 'create_vm':
-            if state != ResponseState.success.value:
+        if action == 'create_guest':
+            if state == ResponseState.success.value:
+                cls.disk.uuid = uuid
+                cls.disk.get_by('uuid')
+                cls.disk.guest_uuid = uuid
+                cls.disk.state = DiskState.mounted.value
+                # disk_info['virtual-size'] 的单位为Byte，需要除以 1024 的 3 次方，换算成单位为 GB 的值
+                cls.disk.size = data['disk_info']['virtual-size'] / (1024 ** 3)
+                cls.disk.update()
+
+            else:
                 cls.guest.uuid = uuid
                 cls.guest.get_by('uuid')
                 cls.guest.status = GuestState.dirty.value
@@ -58,11 +68,15 @@ class EventProcessor(object):
         elif action == 'migrate':
             pass
 
-        elif action == 'delete':
+        elif action == 'delete_guest':
             if state == ResponseState.success.value:
                 cls.guest.uuid = uuid
                 cls.guest.get_by('uuid')
                 cls.guest.delete()
+
+                cls.disk.uuid = uuid
+                cls.disk.get_by('uuid')
+                cls.disk.delete()
 
         elif action == 'create_disk':
             cls.disk.uuid = uuid
