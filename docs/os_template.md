@@ -20,7 +20,7 @@ Body:
 {
     "label": "CentOS-7.2",
     "name": "centos72_multi-user_2016-09-15_128G.qcow2",
-    "active": True,
+    "active": true,
     "os_init_id": 3
 }
 ```
@@ -121,7 +121,7 @@ PATCH https://$domain
   /api/os_template/{id}
 Body:
 {
-    "label": 'CentOS-72'
+    "label": "CentOS-72"
 }
 ```
 
