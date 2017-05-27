@@ -196,7 +196,6 @@ Body:
     "os_init_id": 3,
     "path": "/etc/resolv.conf",
     "content": "nameserver {DNS1}\nnameserver {DNS2}" 
-    ])
 }
 ```
 
