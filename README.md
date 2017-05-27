@@ -24,6 +24,7 @@
     - [[状态列表](docs/enum.md)](#状态列表)
     - [[配置](docs/config.md)](#配置)
     - [[实例初始化操作簇](docs/os_init.md)](#实例初始化操作簇)
+    - [[系统模板](docs/os_template.md)](#系统模板)
     - [[Guest](docs/guest.md)](#guest)
     - [[磁盘](docs/disk.md)](#磁盘)
 - [流程图](#流程图)
@@ -211,6 +212,8 @@ gunicorn -c gunicorn_config.py main:app
 ### [配置](docs/config.md)
 
 ### [实例初始化操作簇](docs/os_init.md)
+
+### [系统模板](docs/os_template.md)
 
 ### [Guest](docs/guest.md)
 

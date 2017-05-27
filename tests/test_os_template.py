@@ -29,7 +29,8 @@ class TestOSTemplate(unittest.TestCase):
         payload = {
             "label": "CentOS-7.2",
             "name": "centos72_multi-user_2016-09-15_128G.qcow2",
-            "active": True
+            "active": True,
+            "os_init_id": 3
         }
 
         url = TestOSTemplate.base_url + '/os_template'
