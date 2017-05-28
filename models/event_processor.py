@@ -4,8 +4,9 @@
 
 import json
 import time
+from IPy import IP
 
-from models import Database as db
+from models import Database as db, Config
 from models import Guest
 from models import Disk
 from models import Log
@@ -26,6 +27,7 @@ class EventProcessor(object):
     log = Log()
     guest = Guest()
     disk = Disk()
+    config = Config()
 
     @classmethod
     def log_processor(cls):
@@ -70,8 +72,20 @@ class EventProcessor(object):
 
         elif action == 'delete_guest':
             if state == ResponseState.success.value:
+                cls.config.id = 1
+                cls.config.get()
                 cls.guest.uuid = uuid
                 cls.guest.get_by('uuid')
+
+                if IP(cls.config.start_ip).int() <= IP(cls.guest.ip).int() <= IP(cls.config.end_ip).int():
+                    if db.r.srem(app.config['ip_used_set'], cls.guest.ip):
+                        db.r.sadd(app.config['ip_available_set'], cls.guest.ip)
+
+                if (cls.guest.vnc_port - cls.config.start_vnc_port) <= \
+                        (IP(cls.config.end_ip).int() - IP(cls.config.start_ip).int()):
+                    if db.r.srem(app.config['vnc_port_used_set'], cls.guest.vnc_port):
+                        db.r.sadd(app.config['vnc_port_available_set'], cls.guest.vnc_port)
+
                 cls.guest.delete()
 
                 cls.disk.uuid = uuid

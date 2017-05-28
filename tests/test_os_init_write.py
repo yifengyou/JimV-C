@@ -185,8 +185,11 @@ class TestOSInitWrite(unittest.TestCase):
     # def test_53_create(self):
     #     payload = {
     #         "os_init_id": 8,
-    #         "path": "/etc/hostname",
-    #         "content": "hostname=\"{HOSTNAME}\""
+    #         "path": "/etc/sysconfig/network",
+    #         "content": "\n".join([
+    #             "NETWORKING=yes",
+    #             "HOSTNAME=\"{HOSTNAME}\""
+    #         ])
     #     }
     #
     #     url = TestOSInitWrite.base_url + '/os_init_write'
@@ -235,7 +238,7 @@ class TestOSInitWrite(unittest.TestCase):
     #     payload = {
     #         "os_init_id": 7,
     #         "path": "/etc/conf.d/hostname",
-    #         "content": "{HOSTNAME}"
+    #         "content": "hostname=\"{HOSTNAME}\""
     #     }
     #
     #     url = TestOSInitWrite.base_url + '/os_init_write'
