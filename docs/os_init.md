@@ -287,9 +287,10 @@ GET https://$domain
 
 ```http
 PATCH https://$domain
-  /api/os_init_write/{os_init_id}
+  /api/os_init_write/{id}
 Body:
 {
+    "os_init_id": 3,
     "path": "/etc/hostname",
     "content": "{HOSTNAME}"
 }
@@ -297,7 +298,8 @@ Body:
 
 |  参数名称   | 必须 |  类型  | 说明               |
 |:----------:|:---:|:------:|:-------------------|
-| os_init_id |  Y  | Number | 初始化操作 ID       |
+|     id     |  Y  | Number | 初始化操作 ID       |
+| os_init_id |  N  |  Long  | 初始化操作簇 ID     |
 |    path    |  N  | String | 初始化操作的文件路径 |
 |  content   |  N  | String | 初始化操作的文件内容 |
 

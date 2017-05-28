@@ -93,6 +93,11 @@ def r_update(_id):
         Rules.ID.value
     ]
 
+    if 'os_init_id' in request.json:
+        args_rules.append(
+            Rules.OS_INIT_ID_EXT.value,
+        )
+
     if 'path' in request.json:
         args_rules.append(
             Rules.OS_INIT_WRITE_PATH.value,
@@ -114,6 +119,7 @@ def r_update(_id):
         ji.Check.previewing(args_rules, request.json)
         os_init_write.id = request.json.get('id')
         os_init_write.get()
+        os_init_write.os_init_id = request.json.get('os_init_id', os_init_write.os_init_id)
         os_init_write.path = request.json.get('path', os_init_write.path)
         os_init_write.content = request.json.get('content', os_init_write.content)
 
