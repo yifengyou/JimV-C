@@ -64,14 +64,21 @@ def r_create():
             ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_init.id.__str__()])
             return ret
 
-        if os_init_write.exist_by('path'):
+        data, total = os_init_write.get_by_filter(
+            filter_str=':'.join(['os_init_id','eq',os_init_write.os_init_id.__str__()]) + ';' +
+                       ':'.join(['path', 'eq', os_init_write.path]))
+
+        if data.__len__() > 0:
             ret['state'] = ji.Common.exchange_state(40901)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_init_write.path])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ', path: ', os_init_write.path,
+                                                    ', os_init_id: ', os_init_write.os_init_id.__str__()])
             return ret
 
         os_init_write.create()
-        os_init_write.get_by('path')
-        ret['data'] = os_init_write.__dict__
+        data, total = os_init_write.get_by_filter(
+            filter_str=':'.join(['os_init_id','eq',os_init_write.os_init_id.__str__()]) + ';' +
+                       ':'.join(['path', 'eq', os_init_write.path]))
+        ret['data'] = data[0]
         return ret
     except ji.PreviewingError, e:
         return json.loads(e.message)
@@ -122,26 +129,8 @@ def r_update(_id):
 
 
 @Utils.dumps2response
-def r_delete(_id):
-    os_init_write = OSInitWrite()
-
-    args_rules = [
-        Rules.ID.value
-    ]
-    os_init_write.id = _id
-
-    try:
-        ji.Check.previewing(args_rules, os_init_write.__dict__)
-
-        if os_init_write.exist():
-            os_init_write.delete()
-        else:
-            ret = dict()
-            ret['state'] = ji.Common.exchange_state(40401)
-            return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+def r_delete(ids):
+    return os_init_write_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 
 @Utils.dumps2response

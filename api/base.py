@@ -199,3 +199,23 @@ class Base(object):
             return ret
         except ji.PreviewingError, e:
             return json.loads(e.message)
+
+    def delete(self, ids=None, ids_rule=None, by_field=None):
+        the_instance = self.the_class()
+
+        args_rules = [
+            ids_rule
+        ]
+
+        try:
+            ji.Check.previewing(args_rules, {ids_rule[1]: ids})
+
+            ret = dict()
+            ret['state'] = ji.Common.exchange_state(20000)
+
+            the_instance.delete_by_filter(filter_str=':'.join([by_field, 'in', ids]))
+
+            return ret
+        except ji.PreviewingError, e:
+            return json.loads(e.message)
+

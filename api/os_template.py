@@ -129,26 +129,8 @@ def r_update(_id):
 
 
 @Utils.dumps2response
-def r_delete(_id):
-    os_template = OSTemplate()
-
-    args_rules = [
-        Rules.ID.value
-    ]
-    os_template.id = _id
-
-    try:
-        ji.Check.previewing(args_rules, os_template.__dict__)
-
-        if os_template.exist():
-            os_template.delete()
-        else:
-            ret = dict()
-            ret['state'] = ji.Common.exchange_state(40401)
-            return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+def r_delete(ids):
+    return os_template_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 
 @Utils.dumps2response

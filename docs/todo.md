@@ -8,7 +8,7 @@
 
 - [ ] os_init_write 的更新方法里，是否需要支持 os_init_id 参数
 - [ ] 增加模板镜像上传功能
-- [ ] 抽象出视图层的父类，尤其是 get、get_list、delete 这些方法基本相同
+- [x] 抽象出视图层的父类，尤其是 get、get_list、delete 这些方法基本相同
 - [x] guest_disk 表中加入 path 字段，具体磁盘位置由 path 指明
 - [x] guest 的系统磁盘，也需记录到 guest_disk 表中
 - [x] 将 Guest 的系统镜像合并到单独的磁盘镜像目录中。即不再为 Guest 的系统镜像单独分配目录

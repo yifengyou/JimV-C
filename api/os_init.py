@@ -115,27 +115,11 @@ def r_update(_id):
 
 
 @Utils.dumps2response
-def r_delete(_id):
-    os_init = OSInit()
+def r_delete(ids):
+    os_init_write_base = Base(the_class=OSInitWrite)
+    os_init_write_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='os_init_id')
 
-    args_rules = [
-        Rules.ID.value
-    ]
-    os_init.id = _id
-
-    try:
-        ji.Check.previewing(args_rules, os_init.__dict__)
-
-        if os_init.exist():
-            os_init.delete()
-            OSInitWrite.delete_by_filter(filter_str='os_init_id:in:' + os_init.id.__str__())
-        else:
-            ret = dict()
-            ret['state'] = ji.Common.exchange_state(40401)
-            return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    return os_init_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 
 @Utils.dumps2response
