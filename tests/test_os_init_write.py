@@ -186,7 +186,7 @@ class TestOSInitWrite(unittest.TestCase):
     #     payload = {
     #         "os_init_id": 8,
     #         "path": "/etc/hostname",
-    #         "content": "{HOSTNAME}"
+    #         "content": "hostname=\"{HOSTNAME}\""
     #     }
     #
     #     url = TestOSInitWrite.base_url + '/os_init_write'
