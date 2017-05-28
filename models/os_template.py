@@ -28,6 +28,7 @@ class OSTemplate(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'id': FilterFieldType.INT.value,
             'label': FilterFieldType.STR.value,
             'path': FilterFieldType.STR.value,
             'active': FilterFieldType.BOOL.value,

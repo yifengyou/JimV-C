@@ -179,23 +179,8 @@ def r_delete(uuids):
 
 
 @Utils.dumps2response
-def r_get(uuid):
-    disk = Disk()
-
-    args_rules = [
-        Rules.UUID.value
-    ]
-    disk.uuid = uuid
-
-    try:
-        ji.Check.previewing(args_rules, disk.__dict__)
-        disk.get_by('uuid')
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = disk.__dict__
-        return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+def r_get(uuids):
+    return disk_base.get(ids=uuids, ids_rule=Rules.UUIDS.value, by_field='uuid')
 
 
 @Utils.dumps2response

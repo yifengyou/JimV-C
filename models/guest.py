@@ -45,6 +45,8 @@ class Guest(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'id': FilterFieldType.INT.value,
+            'uuid': FilterFieldType.STR.value,
             'name': FilterFieldType.STR.value,
             'remark': FilterFieldType.STR.value,
             'on_host': FilterFieldType.STR.value,
@@ -84,6 +86,7 @@ class Disk(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'id': FilterFieldType.INT.value,
             'uuid': FilterFieldType.STR.value,
             'label': FilterFieldType.STR.value,
             'size': FilterFieldType.INT.value,

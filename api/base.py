@@ -22,6 +22,32 @@ class Base(object):
         self.the_blueprint = the_blueprint
         self.the_blueprints = the_blueprints
 
+    def get(self, ids=None, ids_rule=None, by_field=None):
+        the_instance = self.the_class()
+
+        args_rules = [
+            ids_rule
+        ]
+
+        try:
+            ji.Check.previewing(args_rules, {ids_rule[1]: ids})
+
+            ret = dict()
+            ret['state'] = ji.Common.exchange_state(20000)
+
+            if -1 == ids.find(','):
+                setattr(the_instance, by_field, ids)
+                the_instance.get_by(by_field)
+                ret['data'] = the_instance.__dict__
+
+            else:
+                ret['data'], ret['total'] = self.the_class.get_by_filter(
+                    limit=100, order_by=by_field, filter_str=':'.join([by_field, 'in', ids]))
+
+            return ret
+        except ji.PreviewingError, e:
+            return json.loads(e.message)
+
     def get_by_filter(self):
         page = str(request.args.get('page', 1))
         page_size = str(request.args.get('page_size', 50))
@@ -67,7 +93,7 @@ class Base(object):
                              'next': '', 'prev': '', 'first': '', 'last': ''}
 
             ret['data'], ret['paging']['total'] = self.the_class.get_by_filter(
-                offset=offset, limit=limit,order_by=order_by, order=order, filter_str=filter_str)
+                offset=offset, limit=limit, order_by=order_by, order=order, filter_str=filter_str)
 
             host_url = request.host_url.rstrip('/')
             other_str = '&filter=' + filter_str + '&order=' + order + '&order_by=' + order_by

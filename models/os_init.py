@@ -26,6 +26,7 @@ class OSInit(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'id': FilterFieldType.INT.value,
             'name': FilterFieldType.STR.value,
             'remark': FilterFieldType.STR.value
         }
@@ -54,6 +55,7 @@ class OSInitWrite(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'id': FilterFieldType.INT.value,
             'os_init_id': FilterFieldType.STR.value,
             'path': FilterFieldType.STR.value
         }

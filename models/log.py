@@ -34,6 +34,7 @@ class Log(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'id': FilterFieldType.INT.value,
             'type': FilterFieldType.INT.value,
             'timestamp': FilterFieldType.INT.value,
             'host': FilterFieldType.STR.value
@@ -45,5 +46,5 @@ class Log(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['host']
+        return ['host', 'message']
 
