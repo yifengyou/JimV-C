@@ -27,23 +27,23 @@ class TestGuest(unittest.TestCase):
 
     # 创建Guest
     # @unittest.skip('skip create guest')
-    # def test_11_create(self):
-    #     payload = {
-    #         "cpu": 4,
-    #         "memory": 4,
-    #         "os_template_id": 1,
-    #         "quantity": 1,
-    #         "name": "",
-    #         "password": "pswd.com",
-    #         "lease_term": 100
-    #     }
-    #
-    #     url = TestGuest.base_url + '/guest'
-    #     headers = {'content-type': 'application/json'}
-    #     r = requests.post(url, data=json.dumps(payload), headers=headers)
-    #     j_r = json.loads(r.content)
-    #     print json.dumps(j_r, ensure_ascii=False)
-    #     self.assertEqual('200', j_r['state']['code'])
+    def test_11_create(self):
+        payload = {
+            "cpu": 4,
+            "memory": 4,
+            "os_template_id": 1,
+            "quantity": 1,
+            "name": "",
+            "password": "pswd.com",
+            "lease_term": 100
+        }
+
+        url = TestGuest.base_url + '/guest'
+        headers = {'content-type': 'application/json'}
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
 
     # 获取 Guest 列表
     # def test_12_get_list(self):
@@ -136,17 +136,16 @@ class TestGuest(unittest.TestCase):
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
     #
-    # 删除Guest
-    # @unittest.skip('skip delete guest')
-    def test_41_delete(self):
-        TestGuest.uuid = '8ed82dca-e956-469b-a6c1-c16a89763ab1'
-        url = TestGuest.base_url + '/guests/' + TestGuest.uuid
-        headers = {'content-type': 'application/json'}
-        r = requests.delete(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
-
+    # # 删除Guest
+    # # @unittest.skip('skip delete guest')
+    # def test_41_delete(self):
+    #     url = TestGuest.base_url + '/guests/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.delete(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
     # def test_42_delete_disk(self):
     #     url = TestGuest.base_url + '/disk/' + TestGuest.disk_uuid
     #     headers = {'content-type': 'application/json'}

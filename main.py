@@ -12,21 +12,21 @@ import time
 from models import Utils
 from models.event_processor import EventProcessor
 from models.initialize import app, logger
-import route_table
+import api_route_table
 from models import Database as db
-from views.os_init import blueprint as os_init_blueprint
-from views.os_init import blueprints as os_init_blueprints
-from views.os_init_write import blueprint as os_init_write_blueprint
-from views.os_init_write import blueprints as os_init_write_blueprints
-from views.os_template import blueprint as os_template_blueprint
-from views.os_template import blueprints as os_template_blueprints
-from views.guest import blueprint as guest_blueprint
-from views.guest import blueprints as guest_blueprints
-from views.disk import blueprint as disk_blueprint
-from views.disk import blueprints as disk_blueprints
-from views.config import blueprint as config_blueprint
-from views.log import blueprint as log_blueprint
-from views.log import blueprints as log_blueprints
+from api.os_init import blueprint as os_init_blueprint
+from api.os_init import blueprints as os_init_blueprints
+from api.os_init_write import blueprint as os_init_write_blueprint
+from api.os_init_write import blueprints as os_init_write_blueprints
+from api.os_template import blueprint as os_template_blueprint
+from api.os_template import blueprints as os_template_blueprints
+from api.guest import blueprint as guest_blueprint
+from api.guest import blueprints as guest_blueprints
+from api.disk import blueprint as disk_blueprint
+from api.disk import blueprints as disk_blueprints
+from api.config import blueprint as config_blueprint
+from api.log import blueprint as log_blueprint
+from api.log import blueprints as log_blueprints
 
 
 __author__ = 'James Iter'

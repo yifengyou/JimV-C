@@ -123,5 +123,9 @@ class LazyView(object):
         return self.view(*args, **kwargs)
 
 
-def add_rule(blueprint, rule, view_func=None, **options):
-    blueprint.add_url_rule(rule=rule, view_func=LazyView(''.join(['views.', view_func])), **options)
+def add_rule_api(blueprint, rule, api_func=None, **options):
+    blueprint.add_url_rule(rule=rule, view_func=LazyView(''.join(['api.', api_func])), **options)
+
+
+def add_rule_views(blueprint, rule, views_func=None, **options):
+    blueprint.add_url_rule(rule=rule, view_func=LazyView(''.join(['views.', views_func])), **options)
