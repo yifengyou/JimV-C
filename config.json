@@ -33,5 +33,6 @@
   "vnc_port_available_set": "S:VNCPort:Available",
   "vnc_port_used_set": "S:VNCPort:Used",
   "downstream_queue": "Q:Downstream",
-  "upstream_queue": "Q:Upstream"
+  "upstream_queue": "Q:Upstream",
+  "hosts_info": "H:HostsInfo"
 }

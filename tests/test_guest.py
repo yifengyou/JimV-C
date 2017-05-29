@@ -5,6 +5,7 @@
 import requests
 import json
 import unittest
+import uuid
 
 
 __author__ = 'James Iter'

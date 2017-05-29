@@ -27,6 +27,8 @@ from api.disk import blueprints as disk_blueprints
 from api.config import blueprint as config_blueprint
 from api.log import blueprint as log_blueprint
 from api.log import blueprints as log_blueprints
+from api.host import blueprint as host_blueprint
+from api.host import blueprints as host_blueprints
 
 
 __author__ = 'James Iter'
@@ -54,6 +56,9 @@ try:
     app.register_blueprint(config_blueprint)
     app.register_blueprint(log_blueprint)
     app.register_blueprint(log_blueprints)
+    app.register_blueprint(host_blueprint)
+    app.register_blueprint(host_blueprints)
+
 except:
     logger.error(traceback.format_exc())
 

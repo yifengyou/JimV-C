@@ -37,12 +37,23 @@ class EventProcessor(object):
         cls.log.create()
 
     @classmethod
-    def event_processor(cls):
+    def guest_event_processor(cls):
         cls.guest.uuid = cls.message['message']['uuid']
         cls.guest.get_by('uuid')
         cls.guest.status = cls.message['type']
         cls.guest.on_host = cls.message['host']
         cls.guest.update()
+
+    @classmethod
+    def host_event_processor(cls):
+        key = cls.message['message']['node_id']
+        value = {
+            'hostname': cls.message['host'],
+            'timestamp': cls.message['timestamp']
+        }
+
+        db.r.hset(app.config['hosts_info'], key=key, value=json.dumps(value, ensure_ascii=False))
+        db.r.expire(app.config['hosts_info'], 10)
 
     @classmethod
     def response_processor(cls):
@@ -156,8 +167,11 @@ class EventProcessor(object):
                 if cls.message['kind'] == EmitKind.log.value:
                     cls.log_processor()
 
-                elif cls.message['kind'] == EmitKind.event.value:
-                    cls.event_processor()
+                elif cls.message['kind'] == EmitKind.guest_event.value:
+                    cls.guest_event_processor()
+
+                elif cls.message['kind'] == EmitKind.host_event.value:
+                    cls.host_event_processor()
 
                 elif cls.message['kind'] == EmitKind.response.value:
                     cls.response_processor()

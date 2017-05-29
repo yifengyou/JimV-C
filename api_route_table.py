@@ -10,6 +10,7 @@ from api import os_init
 from api import os_init_write
 from api import os_template
 from api import log
+from api import host
 
 
 __author__ = 'James Iter'
@@ -81,3 +82,7 @@ add_rule_api(log.blueprints, '/<ids>', api_func='log.r_get', methods=['GET'])
 add_rule_api(log.blueprints, '', api_func='log.r_get_by_filter', methods=['GET'])
 add_rule_api(log.blueprints, '/_search', api_func='log.r_content_search', methods=['GET'])
 
+# 宿主机查询
+add_rule_api(host.blueprints, '/<ids>', api_func='host.r_get', methods=['GET'])
+add_rule_api(host.blueprints, '', api_func='host.r_get_by_filter', methods=['GET'])
+add_rule_api(host.blueprints, '/_search', api_func='host.r_content_search', methods=['GET'])

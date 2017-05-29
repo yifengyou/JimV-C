@@ -13,8 +13,9 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 class EmitKind(IntEnum):
     log = 0
-    event = 1
-    response = 2
+    guest_event = 1
+    host_event = 2
+    response = 3
 
 
 class GuestState(IntEnum):
@@ -30,6 +31,10 @@ class GuestState(IntEnum):
     crashed = 6
     pm_suspended = 7
     dirty = 255
+
+
+class HostEvent(IntEnum):
+    heartbeat = 0
 
 
 class LogLevel(IntEnum):
