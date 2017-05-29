@@ -3,7 +3,7 @@
 
 
 import json
-from flask import Blueprint, request
+from flask import Blueprint, request, g
 import jimit as ji
 
 from models import Database as db
@@ -30,6 +30,21 @@ blueprints = Blueprint(
 )
 
 
+def alive_check(v):
+    """
+    JimV-C 2 秒更新一次宿主机信息，这里以 5 秒内没收到更新，作为判断宿主机是否在线的标准
+    """
+
+    if 'timestamp' not in v:
+        return v
+
+    v['alive'] = False
+    if v['timestamp'] + 5 >= g.ts:
+        v['alive'] = True
+
+    return v
+
+
 @Utils.dumps2response
 def r_get(ids):
 
@@ -47,12 +62,16 @@ def r_get(ids):
         if -1 == ids.find(','):
             _id = ids
             if db.r.hexists(app.config['hosts_info'], _id):
-                ret['data'] = {_id: json.loads(db.r.hget(app.config['hosts_info'], _id))}
+                v = json.loads(db.r.hget(app.config['hosts_info'], _id))
+                v = alive_check(v)
+                ret['data'] = {_id: v}
 
         else:
             for _id in ids.split(','):
                 if db.r.hexists(app.config['hosts_info'], _id):
-                    ret['data'].append({_id: json.loads(db.r.hget(app.config['hosts_info'], _id))})
+                    v = json.loads(db.r.hget(app.config['hosts_info'], _id))
+                    v = alive_check(v)
+                    ret['data'].append({_id: v})
 
         return ret
 
@@ -68,7 +87,9 @@ def r_get_by_filter():
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = list()
         for k, v in db.r.hgetall(app.config['hosts_info']).items():
-            ret['data'].append({k: json.loads(v)})
+            v = json.loads(v)
+            v = alive_check(v)
+            ret['data'].append({k: v})
 
         return ret
 
@@ -94,6 +115,7 @@ def r_content_search():
         for k, v in db.r.hgetall(app.config['hosts_info']).items():
             v = json.loads(v)
             if -1 != v['hostname'].find(keyword):
+                v = alive_check(v)
                 ret['data'].append({k: v})
 
         return ret

@@ -8,6 +8,10 @@ import thread
 import signal
 
 import time
+import jimit as ji
+import json
+
+from flask import g
 
 from models import Utils
 from models.event_processor import EventProcessor
@@ -35,6 +39,17 @@ __author__ = 'James Iter'
 __date__ = '2017/3/31'
 __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
+
+
+@app.before_request
+@Utils.dumps2response
+def r_before_request():
+    try:
+        g.ts = ji.Common.ts()
+
+    except ji.JITError, e:
+        ret = json.loads(e.message)
+        return ret
 
 
 # noinspection PyBroadException

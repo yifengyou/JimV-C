@@ -5,6 +5,7 @@
 import json
 import time
 from IPy import IP
+import jimit as ji
 
 from models import Database as db, Config
 from models import Guest
@@ -49,7 +50,7 @@ class EventProcessor(object):
         key = cls.message['message']['node_id']
         value = {
             'hostname': cls.message['host'],
-            'timestamp': cls.message['timestamp']
+            'timestamp': ji.Common.ts()
         }
 
         db.r.hset(app.config['hosts_info'], key=key, value=json.dumps(value, ensure_ascii=False))
