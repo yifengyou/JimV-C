@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    {% block head %}
+
+    <style>
+        /* Loading Spinner */
+        .spinner{margin:0;width:70px;height:18px;margin:-35px 0 0 -9px;position:absolute;top:50%;left:50%;text-align:center}.spinner > div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:bouncedelay 1.4s infinite ease-in-out;animation:bouncedelay 1.4s infinite ease-in-out;-webkit-animation-fill-mode:both;animation-fill-mode:both}.spinner .bounce1{-webkit-animation-delay:-.32s;animation-delay:-.32s}.spinner .bounce2{-webkit-animation-delay:-.16s;animation-delay:-.16s}@-webkit-keyframes bouncedelay{0%,80%,100%{-webkit-transform:scale(0.0)}40%{-webkit-transform:scale(1.0)}}@keyframes bouncedelay{0%,80%,100%{transform:scale(0.0);-webkit-transform:scale(0.0)}40%{transform:scale(1.0);-webkit-transform:scale(1.0)}}
+    </style>
+
+
+    <meta charset="UTF-8">
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <title>{% block title %}{% endblock %} - JimV </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+
+    <!-- Favicons -->
+
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ url_for('static', filename='images/icons/JimV-icon_144X144.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ url_for('static', filename='images/icons/JimV-icon_114X114.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ url_for('static', filename='images/icons/JimV-icon_72X72.png') }}">
+    <link rel="apple-touch-icon-precomposed" href="{{ url_for('static', filename='images/icons/JimV-icon_57X57.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/icons/JimV-icon_32X32.png') }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+
+    <!-- HELPERS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/animate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/backgrounds.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/boilerplate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/border-radius.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/grid.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/page-transitions.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/spacing.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/typography.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/utils.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/colors.css') }}">
+
+    <!-- ELEMENTS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/badges.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/buttons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/content-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/dashboard-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/forms.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/images.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/info-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/invoice.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/loading-indicators.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/menus.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/panel-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/response-messages.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/responsive-tables.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/ribbon.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/social-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/tables.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/tile-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='elements/timeline.css') }}">
+
+    <!-- ICONS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='icons-min/fontawesome/fontawesome.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='icons-min/linecons/linecons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='icons-min/spinnericon/spinnericon.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='icons/iconic/iconic.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='icons/elusive/elusive.css') }}">
+
+    <!-- WIDGETS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/accordion-ui/accordion.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/calendar/calendar.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/carousel/carousel.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/charts/justgage/justgage.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/charts/morris/morris.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/charts/piegage/piegage.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/charts/xcharts/xcharts.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/chosen/chosen.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/colorpicker/colorpicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/datatable/datatable.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/datepicker/datepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/datepicker-ui/datepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/daterangepicker/daterangepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/dialog/dialog.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/dropdown/dropdown.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/dropzone/dropzone.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/file-input/fileinput.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/input-switch/inputswitch.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/input-switch/inputswitch-alt.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/ionrangeslider/ionrangeslider.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/jcrop/jcrop.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/jgrowl-notifications/jgrowl.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/loading-bar/loadingbar.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/maps/vector-maps/vectormaps.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/markdown/markdown.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/modal/modal.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/multi-select/multiselect.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/multi-upload/fileupload.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/nestable/nestable.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/noty-notifications/noty.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/popover/popover.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/pretty-photo/prettyphoto.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/progressbar/progressbar.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/range-slider/rangeslider.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/slidebars/slidebars.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/slider-ui/slider.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/summernote-wysiwyg/summernote-wysiwyg.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/tabs-ui/tabs.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/theme-switcher/themeswitcher.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/timepicker/timepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/tocify/tocify.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/tooltip/tooltip.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/touchspin/touchspin.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/uniform/uniform.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/wizard/wizard.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='widgets/xeditable/xeditable.css') }}">
+
+    <!-- SNIPPETS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/chat.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/files-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/login-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/notification-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/progress-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/todo.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/user-profile.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='snippets/mobile-navigation.css') }}">
+
+    <!-- APPLICATIONS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='applications/mailbox.css') }}">
+
+    <!-- Admin theme -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='themes/admin/layout.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='themes/admin/color-schemes/default.css') }}">
+
+    <!-- Components theme -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='themes/components/default.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='themes/components/border-radius.css') }}">
+
+    <!-- Admin responsive -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/responsive-elements.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='helpers/admin-responsive.css') }}">
+
+    <!-- JS Core -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/jquery-core.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/jquery-ui-widget.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/jquery-ui-mouse.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/jquery-ui-position.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/modernizr.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/jquery-cookie.js') }}"></script>
+
+    <!--<script type="text/javascript">
+        $(window).load(function(){
+            setTimeout(function() {
+                $('#loading').fadeOut( 400, "linear" );
+            }, 300);
+        });
+    </script>-->
+
+    {% endblock head %}
+
+</head>
+<body>
+    <div id="sb-site">
+        <!--<div id="loading">
+            <div class="spinner">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+        </div>-->
+
+        <div id="page-wrapper">
+            <div id="page-header" class="bg-gradient-9">
+                <div id="header-logo" class="logo-bg">
+                    <a href="index.html" class="logo-content-big" title="MonarchUI">
+                        Monarch <i>UI</i>
+                        <span>The perfect solution for user interfaces</span>
+                    </a>
+                    <a id="close-sidebar" href="#" title="Close sidebar">
+                        <i class="glyph-icon icon-angle-left"></i>
+                    </a>
+                </div>
+                <div id="header-nav-left">
+                    <div class="user-account-btn dropdown">
+                        <a href="#" title="My Account" class="user-profile clearfix" data-toggle="dropdown">
+                            <img width="28" src="{{ url_for('static', filename='images/icons/JimV-icon_144X144.png') }}" alt="Profile image">
+                            <span>Thomas Barnes</span>
+                            <i class="glyph-icon icon-angle-down"></i>
+                        </a>
+                        <div class="dropdown-menu float-left">
+                            <div class="box-sm">
+                                <div class="login-box clearfix">
+                                    <div class="user-img">
+                                        <a href="#" title="" class="change-img">Change photo</a>
+                                        <img src="" alt="">
+                                    </div>
+                                    <div class="user-info">
+                                        <span>
+                                            Thomas Barnes
+                                            <i>UX/UI developer</i>
+                                        </span>
+                                        <a href="#" title="Edit profile">Edit profile</a>
+                                        <a href="#" title="View notifications">View notifications</a>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <ul class="reset-ul mrg5B">
+                                    <li>
+                                        <a href="#">
+                                            <i class="glyph-icon float-right icon-caret-right"></i>
+                                            View login page example
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="glyph-icon float-right icon-caret-right"></i>
+                                            View lockscreen example
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="glyph-icon float-right icon-caret-right"></i>
+                                            View account details
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="pad5A button-pane button-pane-alt text-center">
+                                        <a href="#" class="btn display-block font-normal btn-danger">
+                                            <i class="glyph-icon icon-power-off"></i>
+                                            Logout
+                                        </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- #header-nav-left -->
+
+                <div id="header-nav-right">
+                    <a class="header-btn" id="logout-btn" href="lockscreen-3.html" title="Lockscreen page example">
+                        <i class="glyph-icon icon-linecons-lock"></i>
+                    </a>
+                </div><!-- #header-nav-right -->
+            </div><!-- #page-header -->
+            <div id="page-sidebar" style="margin-top: 20px;">
+                <div class="scroll-sidebar">
+                    <ul id="sidebar-menu">
+                        <li class="header"><span>虚拟化平台管理</span></li>
+                        <li>
+                            <a href="{{ url_for('v_guests.show') }}" title="Guests">
+                                <i class="glyph-icon icon-linecons-cloud"></i>
+                                <span>虚拟机</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_guests.show') }}" title="Disks">
+                                <i class="glyph-icon icon-hdd-o"></i>
+                                <span>磁盘</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_guests.show') }}" title="Hosts">
+                                <i class="glyph-icon icon-linecons-desktop"></i>
+                                <span>宿主机</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_guests.show') }}" title="JimVLog">
+                                <i class="glyph-icon icon-linecons-eye"></i>
+                                <span>平台日志</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_guests.show') }}" title="GuestsTemplate">
+                                <i class="glyph-icon icon-linecons-inbox"></i>
+                                <span>虚拟机模板</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" title="OSInit">
+                                <i class="glyph-icon icon-linecons-paper-plane"></i>
+                                <span>虚拟机初始化操作</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li><a href="{{ url_for('v_guests.show') }}" title="OSInit"><span>初始化簇</span></a></li>
+                                    <li><a href="{{ url_for('v_guests.show') }}" title="OSInitWrite"><span>初始化规则</span></a></li>
+                                </ul>
+                            </div><!-- .sidebar-submenu -->
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_guests.show') }}" title="JimVConfig">
+                                <i class="glyph-icon icon-linecons-cog"></i>
+                                <span>系统配置</span>
+                            </a>
+                        </li>
+                    </ul><!-- #sidebar-menu -->
+                </div><!-- #scroll-sidebar -->
+            </div><!-- #page-sidebar -->
+            <div id="page-content-wrapper">
+                <div id="page-content">
+                    <div class="container">
+                    {% block content %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- WIDGETS -->
+        <script type="text/javascript" src="{{ url_for('static', filename='tether/js/tether.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+        <!-- Bootstrap Dropdown -->
+        <!-- <script type="text/javascript" src="{{ url_for('static', filename='widgets/dropdown/dropdown.js') }}"></script> -->
+        <!-- Bootstrap Tooltip -->
+        <!-- <script type="text/javascript" src="{{ url_for('static', filename='widgets/tooltip/tooltip.js') }}"></script> -->
+        <!-- Bootstrap Popover -->
+        <!-- <script type="text/javascript" src="{{ url_for('static', filename='widgets/popover/popover.js') }}"></script> -->
+        <!-- Bootstrap Progress Bar -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/progressbar/progressbar.js') }}"></script>
+        <!-- Bootstrap Buttons -->
+        <!-- <script type="text/javascript" src="{{ url_for('static', filename='widgets/button/button.js') }}"></script> -->
+        <!-- Bootstrap Collapse -->
+        <!-- <script type="text/javascript" src="{{ url_for('static', filename='widgets/collapse/collapse.js') }}"></script> -->
+        <!-- Superclick -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/superclick/superclick.js') }}"></script>
+        <!-- Input switch alternate -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/input-switch/inputswitch-alt.js') }}"></script>
+        <!-- Slim scroll -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/slimscroll/slimscroll.js') }}"></script>
+        <!-- Slidebars -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/slidebars/slidebars.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/slidebars/slidebars-demo.js') }}"></script>
+        <!-- PieGage -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/charts/piegage/piegage.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/charts/piegage/piegage-demo.js') }}"></script>
+        <!-- Screenfull -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/screenfull/screenfull.js') }}"></script>
+        <!-- Content box -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/content-box/contentbox.js') }}"></script>
+        <!-- Overlay -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/overlay/overlay.js') }}"></script>
+        <!-- Widgets init for demo -->
+        <script type="text/javascript" src="{{ url_for('static', filename='js-init/widgets-init.js') }}"></script>
+        <!-- Theme layout -->
+        <script type="text/javascript" src="{{ url_for('static', filename='themes/admin/layout.js') }}"></script>
+        <!-- Theme switcher -->
+        <script type="text/javascript" src="{{ url_for('static', filename='widgets/theme-switcher/themeswitcher.js') }}"></script>
+    </div>
+</body>
+</html>

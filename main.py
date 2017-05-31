@@ -17,6 +17,7 @@ from models import Utils
 from models.event_processor import EventProcessor
 from models.initialize import app, logger
 import api_route_table
+import views_route_table
 from models import Database as db
 from api.os_init import blueprint as os_init_blueprint
 from api.os_init import blueprints as os_init_blueprints
@@ -33,6 +34,9 @@ from api.log import blueprint as log_blueprint
 from api.log import blueprints as log_blueprints
 from api.host import blueprint as host_blueprint
 from api.host import blueprints as host_blueprints
+
+from views.guest import blueprint as view_guest_blueprint
+from views.guest import blueprints as view_guest_blueprints
 
 
 __author__ = 'James Iter'
@@ -73,6 +77,9 @@ try:
     app.register_blueprint(log_blueprints)
     app.register_blueprint(host_blueprint)
     app.register_blueprint(host_blueprints)
+
+    app.register_blueprint(view_guest_blueprint)
+    app.register_blueprint(view_guest_blueprints)
 
 except:
     logger.error(traceback.format_exc())
