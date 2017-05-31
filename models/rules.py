@@ -59,6 +59,7 @@ class Rules(Enum):
     REMARK = (basestring, 'remark')
     LABEL = (basestring, 'label')
     ACTIVE = (bool, 'active')
+    ICON = (basestring, 'icon')
 
     OS_INIT_ID_EXT = (int, 'os_init_id')
     OS_INIT_WRITE_PATH = (basestring, 'path')
