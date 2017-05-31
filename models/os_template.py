@@ -23,6 +23,7 @@ class OSTemplate(ORM):
         self.label = None
         self.path = None
         self.active = None
+        self.icon = None
         self.os_init_id = None
 
     @staticmethod
