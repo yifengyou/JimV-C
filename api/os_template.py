@@ -44,12 +44,14 @@ def r_create():
         Rules.LABEL.value,
         Rules.PATH.value,
         Rules.ACTIVE.value,
+        Rules.ICON.value,
         Rules.OS_INIT_ID_EXT.value
     ]
 
     os_template.label = request.json.get('label')
     os_template.path = request.json.get('path')
     os_template.active = request.json.get('active')
+    os_template.icon = request.json.get('icon')
     os_template.os_init_id = request.json.get('os_init_id', 0)
 
     try:
@@ -95,6 +97,11 @@ def r_update(_id):
             Rules.ACTIVE.value,
         )
 
+    if 'icon' in request.json:
+        args_rules.append(
+            Rules.ICON.value,
+        )
+
     if 'os_init_id' in request.json:
         args_rules.append(
             Rules.OS_INIT_ID_EXT.value,
@@ -115,6 +122,7 @@ def r_update(_id):
         os_template.label = request.json.get('label', os_template.label)
         os_template.path = request.json.get('path', os_template.path)
         os_template.active = request.json.get('active', os_template.active)
+        os_template.icon = request.json.get('icon', os_template.icon)
         os_template.os_init_id = request.json.get('os_init_id', os_template.os_init_id)
 
         os_template.update()
