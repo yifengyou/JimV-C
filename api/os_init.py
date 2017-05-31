@@ -21,13 +21,13 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 blueprint = Blueprint(
-    'os_init',
+    'api_os_init',
     __name__,
     url_prefix='/api/os_init'
 )
 
 blueprints = Blueprint(
-    'os_inits',
+    'api_os_inits',
     __name__,
     url_prefix='/api/os_inits'
 )

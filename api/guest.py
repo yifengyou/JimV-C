@@ -31,13 +31,13 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 blueprint = Blueprint(
-    'guest',
+    'api_guest',
     __name__,
     url_prefix='/api/guest'
 )
 
 blueprints = Blueprint(
-    'guests',
+    'api_guests',
     __name__,
     url_prefix='/api/guests'
 )

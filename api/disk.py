@@ -25,13 +25,13 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 blueprint = Blueprint(
-    'disk',
+    'api_disk',
     __name__,
     url_prefix='/api/disk'
 )
 
 blueprints = Blueprint(
-    'disks',
+    'api_disks',
     __name__,
     url_prefix='/api/disks'
 )

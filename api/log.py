@@ -17,13 +17,13 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 blueprint = Blueprint(
-    'log',
+    'api_log',
     __name__,
     url_prefix='/api/log'
 )
 
 blueprints = Blueprint(
-    'logs',
+    'api_logs',
     __name__,
     url_prefix='/api/logs'
 )

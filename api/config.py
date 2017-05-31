@@ -19,7 +19,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 blueprint = Blueprint(
-    'config',
+    'api_config',
     __name__,
     url_prefix='/api/config'
 )
