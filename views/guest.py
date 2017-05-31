@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-
-from flask import Blueprint, render_template
+import json
+from flask import Blueprint, render_template, url_for, request
+import requests
 
 
 __author__ = 'James Iter'
@@ -25,6 +25,10 @@ blueprints = Blueprint(
 
 
 def show():
-    return render_template('guest.html')
+    host_url = request.host_url.rstrip('/')
+    url = host_url + url_for('api_guests.r_get_by_filter')
+    ret = requests.get(url=url)
+    ret = json.loads(ret.content)
+    return render_template('guest.html', data=ret['data'])
 
 

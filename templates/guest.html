@@ -2,7 +2,192 @@
 {% block title %} Guest {% endblock %}
 {% block head %}
   {{ super() }}
+    <style type="text/css">
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+        }
+        .table > thead > tr > th,
+        .table > tfoot > tr > th {
+            color: #999999;
+            font-weight: normal;
+            border-bottom: 0 solid #e1e6eb;
+            background-color: #F5F6FA;
+        }
+        
+        .table > tbody > tr > td {
+            color: #6d6e6f;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
+    </style>
+
 {% endblock head %}
 {% block content %}
-    Welcome on my awesome homepage.
+
+<script type="text/javascript">
+
+    /* Datatable row highlight */
+
+    /*
+    $(document).ready(function() {
+        $('#datatable-row-highlight tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('tr-selected');
+        } );
+    });
+    */
+</script>
+<div class="panel">
+    <div class="panel-body">
+        <h3 class="title-hero" style="font-size: 24px;">
+            虚拟机实例
+        </h3>
+        <div>
+            <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
+                <div class="row" style="padding: 10px 10px 10px 0;">
+                    <div class="col-sm-6">
+                        <div class="dataTables_length" id="datatable-row-highlight_length">
+                            <label>
+                                <select name="datatable-row-highlight_length" aria-controls="datatable-row-highlight" class="form-control">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select> records per page</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="datatable-row-highlight_filter" class="dataTables_filter">
+                            <label>
+                                <input type="search" class="form-control" placeholder="Search..." aria-controls="datatable-row-highlight"></label>
+                        </div>
+                    </div>
+                </div>
+                <table id="guest_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                       style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <thead>
+                <tr role="row">
+                    <th><input type="checkbox"></th>
+                    <th>名称</th>
+                    <th></th>
+                    <th>状态</th>
+                    <th>计算节点</th>
+                    <th>配置</th>
+                    <th>IP</th>
+                    <th>密码</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in data %}
+                <tr role="row" class="odd">
+                    <td><input type="checkbox"></td>
+                    <td>
+                        <a href="javascript:;">{{ item.name }}</a>
+                        <br />
+                        {{ item.remark }}
+                    </td>
+                    <td>{{ item.os_template_id }}</td>
+                    <td>{{ format_guest_status(item.status)|safe }}</td>
+                    <td>{{ item.on_host }}</td>
+                    <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>
+                    <td>{{ item.ip }}</td>
+                    <td>{{ item.password }}</td>
+                    <td>{{ format_datetime_by_tus(item.create_time) }}</td>
+                    <td>
+                        <div class="dropdown inline-block">
+                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                更多
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="javascript:;">
+                                        <span>启用</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span>禁用</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="javascript:;">
+                                        <span>编辑</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="javascript:;">
+                                        <span>密码重置</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="javascript:;">
+                                        <span>删除</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+
+                <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                    <tfoot>
+                    <tr>
+                        <th><input type="checkbox" title="select-all"></th>
+                        <th>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="dataTables_info" id="datatable-row-highlight_info" role="status" aria-live="polite">
+                                        Showing 1 to 10 of 57 entries
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
+                                        <ul class="pagination">
+                                            <li class="previous disabled">
+                                                <a href="#">Previous</a>
+                                            </li>
+                                            <li class="active">
+                                                <a href="#">1</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">2</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">3</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">4</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">5</a>
+                                            </li>
+                                            <li class="next">
+                                                <a href="#">Next</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

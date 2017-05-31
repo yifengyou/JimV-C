@@ -4,6 +4,8 @@
 from functools import wraps
 
 import commands
+
+import time
 from flask import make_response, g, request
 from flask.wrappers import Response
 from werkzeug.utils import import_string, cached_property
@@ -129,3 +131,75 @@ def add_rule_api(blueprint, rule, api_func=None, **options):
 
 def add_rule_views(blueprint, rule, views_func=None, **options):
     blueprint.add_url_rule(rule=rule, view_func=LazyView(''.join(['views.', views_func])), **options)
+
+
+@app.context_processor
+def utility_processor():
+
+    def format_price(amount, currency=u'￥'):
+        return u'{0:.2f}{1}'.format(amount, currency)
+
+    def format_datetime_by_tus(tus, fmt='%y-%m-%d %H:%M'):
+        return time.strftime(fmt, time.localtime(tus/1000/1000))
+
+    def format_guest_status(status):
+        from status import GuestState
+
+        color = 'FF645B'
+        icon = 'glyph-icon icon-bolt'
+        desc = '未知状态'
+
+        if status == GuestState.running.value:
+            color = '82c251'
+            icon = 'glyph-icon icon-circle'
+            desc = '运行中'
+
+        elif status == GuestState.no_state.value:
+            color = 'FFC543'
+            icon = 'glyph-icon icon-spinner'
+            desc = '创建中'
+
+        elif status == GuestState.blocked.value:
+            color = '3D4245'
+            icon = 'glyph-icon icon-spinner'
+            desc = '被阻塞'
+
+        elif status == GuestState.paused.value:
+            color = 'FCFF07'
+            icon = 'glyph-icon icon-spinner'
+            desc = '暂停'
+
+        elif status == GuestState.shutdown.value:
+            color = '4E5356'
+            icon = 'glyph-icon icon-spinner'
+            desc = '关闭'
+
+        elif status == GuestState.shutoff.value:
+            color = 'FFC543'
+            icon = 'glyph-icon icon-spinner'
+            desc = '断电'
+
+        elif status == GuestState.crashed.value:
+            color = '9E2927'
+            icon = 'glyph-icon icon-spinner'
+            desc = '已崩溃'
+
+        elif status == GuestState.pm_suspended.value:
+            color = 'FCFF07'
+            icon = 'glyph-icon icon-spinner'
+            desc = '悬挂'
+
+        elif status == GuestState.dirty.value:
+            color = 'FCFF07'
+            icon = 'glyph-icon icon-spinner'
+            desc = '创建失败，待清理'
+
+        else:
+            pass
+
+        return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
+            icon=icon, color=color, desc=desc)
+
+    return dict(format_price=format_price, format_datetime_by_tus=format_datetime_by_tus,
+                format_guest_status=format_guest_status)
+
