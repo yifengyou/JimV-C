@@ -1,0 +1,50 @@
+
+.icon-os {
+    width: 16px;
+    height: 16px;
+    display: -moz-inline-stack;
+    display: inline-block;
+    vertical-align: middle;
+    zoom: 1;
+    background-image: url(../images/icons/jimv-icons.png);
+    background-repeat: no-repeat;
+    background-position: 0 -96px;
+    vertical-align: middle;
+}
+
+.icon-os-windows {
+    background-position: 0 0;
+}
+
+.icon-os-centos {
+    background-position: 0 -24px;
+}
+
+.icon-os-debian {
+    background-position: 0 -48px;
+}
+
+.icon-os-ubuntu {
+    background-position: 0 -74px;
+}
+
+.icon-os-linux {
+    background-position: 0 -96px;
+}
+
+.icon-os-redhat {
+    background-position: 0 -120px;
+}
+
+.icon-os-suse {
+    background-position: 0 -144px;
+}
+
+.icon-os-gentoo {
+    background-position: 0 -166px;
+}
+
+.icon-os-bsd {
+    background-position: 0 -190px;
+}
+
