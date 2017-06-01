@@ -6,6 +6,7 @@
         .table {
             font-size: 12px;
             border-width: 1px;
+            line-height: 20px;
         }
         .table > thead > tr > th,
         .table > tfoot > tr > th {
@@ -17,6 +18,12 @@
         
         .table > tbody > tr > td {
             color: #6d6e6f;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            height: 106px;
         }
 
         .table-bordered > thead > tr > th,
@@ -35,6 +42,36 @@
 {% block content %}
 
 <script type="text/javascript">
+    $(document).ready(function() {
+        var page = 1;
+        var page_size = $('#page_size').val();
+        var cur_url = '/api/guests?page=' + page + '&page_size=' + page_size;
+
+        var last_ready = null;
+        $('#content_search').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
+            }
+            last_ready = setTimeout(function () {
+                var keyword = $('#content_search').val();
+                cur_url = '/guests?page=' + page + '&page_size=' + page_size;
+                if (keyword.length > 0) {
+                    cur_url = '/guests?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+                }
+                window.location.href=cur_url;
+            }, 1000);
+        });
+
+        $('#page_size').change(function () {
+            var keyword = $('#content_search').val();
+            page_size = $('#page_size').val();
+            cur_url = '/guests?page=' + page + '&page_size=' + page_size;
+            if (keyword.length > 0) {
+                cur_url = '/guests?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+            }
+            window.location.href=cur_url;
+        });
+    });
 
     /* Datatable row highlight */
 
@@ -54,21 +91,9 @@
         <div>
             <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
                 <div class="row" style="padding: 10px 10px 10px 0;">
-                    <div class="col-sm-6">
-                        <div class="dataTables_length" id="datatable-row-highlight_length">
-                            <label>
-                                <select name="datatable-row-highlight_length" aria-controls="datatable-row-highlight" class="form-control">
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select> records per page</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div id="datatable-row-highlight_filter" class="dataTables_filter">
-                            <label>
-                                <input type="search" class="form-control" placeholder="Search..." aria-controls="datatable-row-highlight"></label>
+                            <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0;">
                         </div>
                     </div>
                 </div>
@@ -89,7 +114,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in guests_data %}
+                {% for item in guests_ret.data %}
                 <tr role="row" class="odd">
                     <td><input type="checkbox"></td>
                     <td>
@@ -149,34 +174,29 @@
                         <th><input type="checkbox" title="select-all"></th>
                         <th>
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="dataTables_info" id="datatable-row-highlight_info" role="status" aria-live="polite">
-                                        Showing 1 to 10 of 57 entries
-                                    </div>
+                                <div class="col-sm-8" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                    共有{{ guests_ret.paging.total }}条，每页显示：
+                                    <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
+                                        <option value="1" {% if page_size == 1 %} selected {% endif %}>1</option>
+                                        <option value="2" {% if page_size == 2 %} selected {% endif %}>2</option>
+                                        <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
+                                        <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
+                                        <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
+                                    </select>&nbsp;&nbsp;条
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-4" style="text-align: left;">
                                     <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
-                                        <ul class="pagination">
-                                            <li class="previous disabled">
-                                                <a href="#">Previous</a>
+                                        <ul id="pagination" class="pagination">
+                                            <li class="previous {% if page == 1 %} disabled {% endif %}">
+                                                <a href="/guests?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">Previous</a>
                                             </li>
-                                            <li class="active">
-                                                <a href="#">1</a>
+                                            {% for item in pages %}
+                                            <li class="{% if item == page %} active {% endif %}">
+                                                <a href="/guests?page={{ item }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">{{ item }}</a>
                                             </li>
-                                            <li>
-                                                <a href="#">2</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">3</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">4</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">5</a>
-                                            </li>
-                                            <li class="next">
-                                                <a href="#">Next</a>
+                                            {% endfor %}
+                                            <li class="next  {% if page == last_page %} disabled {% endif %}">
+                                                <a href="/guests?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">Next</a>
                                             </li>
                                         </ul>
                                     </div>
