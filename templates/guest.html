@@ -187,16 +187,16 @@
                                 <div class="col-sm-4" style="text-align: left;">
                                     <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
                                         <ul id="pagination" class="pagination">
-                                            <li class="previous {% if page == 1 %} disabled {% endif %}">
-                                                <a href="/guests?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">&nbsp;</a>
+                                            <li class="{% if page == 1 %} disabled {% endif %}">
+                                                <a href="/guests?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">«</a>
                                             </li>
                                             {% for item in pages %}
                                             <li class="{% if item == page %} active {% endif %}">
                                                 <a href="/guests?page={{ item }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">{{ item }}</a>
                                             </li>
                                             {% endfor %}
-                                            <li class="next  {% if page == last_page %} disabled {% endif %}">
-                                                <a href="/guests?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">&nbsp;</a>
+                                            <li class="{% if page == last_page %} disabled {% endif %}">
+                                                <a href="/guests?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">»</a>
                                             </li>
                                         </ul>
                                     </div>
