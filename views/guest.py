@@ -63,20 +63,20 @@ def show():
     last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
     page_length = 5
     pages = list()
-    if page < 3:
+    if page < int(ceil(page_length / 2.0)):
         for i in range(1, page_length + 1):
             pages.append(i)
             if i == last_page:
                 break
 
-    elif last_page - page < 2:
+    elif last_page - page < page_length / 2:
         for i in range(last_page - page_length + 1, last_page + 1):
             if i < 1:
                 continue
             pages.append(i)
 
     else:
-        for i in range(page - 2, page + 3):
+        for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
             pages.append(i)
             if i == last_page:
                 break
