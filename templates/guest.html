@@ -89,7 +89,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in data %}
+                {% for item in guests_data %}
                 <tr role="row" class="odd">
                     <td><input type="checkbox"></td>
                     <td>
@@ -97,7 +97,7 @@
                         <br />
                         {{ item.remark }}
                     </td>
-                    <td>{{ item.os_template_id }}</td>
+                    <td><span class="{{ os_template_mapping_by_id[item.os_template_id].icon }}"></span></td>
                     <td>{{ format_guest_status(item.status)|safe }}</td>
                     <td>{{ item.on_host }}</td>
                     <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>

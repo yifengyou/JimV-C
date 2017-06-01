@@ -26,9 +26,19 @@ blueprints = Blueprint(
 
 def show():
     host_url = request.host_url.rstrip('/')
-    url = host_url + url_for('api_guests.r_get_by_filter')
-    ret = requests.get(url=url)
-    ret = json.loads(ret.content)
-    return render_template('guest.html', data=ret['data'])
+    guests_url = host_url + url_for('api_guests.r_get_by_filter')
+    os_template_url = host_url + url_for('api_os_templates.r_get_by_filter')
+
+    guests_ret = requests.get(url=guests_url)
+    guests_ret = json.loads(guests_ret.content)
+
+    os_template_ret = requests.get(url=os_template_url)
+    os_template_ret = json.loads(os_template_ret.content)
+    os_template_mapping_by_id = dict()
+    for os_template in os_template_ret['data']:
+        os_template_mapping_by_id[os_template['id']] = os_template
+
+    return render_template('guest.html', guests_data=guests_ret['data'],
+                           os_template_mapping_by_id=os_template_mapping_by_id)
 
 
