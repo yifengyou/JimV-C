@@ -13,4 +13,5 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 add_rule_views(guest.blueprints, '', views_func='guest.show', methods=['GET'])
+add_rule_views(guest.blueprints, '/create', views_func='guest.create', methods=['GET'])
 

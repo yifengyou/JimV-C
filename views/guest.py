@@ -81,8 +81,10 @@ def show():
             if i == last_page:
                 break
 
-    return render_template('guest.html', guests_ret=guests_ret,
+    return render_template('guest_show.html', guests_ret=guests_ret,
                            os_template_mapping_by_id=os_template_mapping_by_id, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, last_page=last_page)
 
 
+def create():
+    return render_template('guest_create.html')

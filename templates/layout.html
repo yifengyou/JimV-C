@@ -183,6 +183,7 @@
             </div>
         </div>-->
 
+        {% block body %}
         <div id="page-wrapper">
             <div id="page-header" class="bg-gradient-9">
                 <div id="header-logo" class="logo-bg">
@@ -255,6 +256,8 @@
                     </a>
                 </div><!-- #header-nav-right -->
             </div><!-- #page-header -->
+
+            {% block page_sidebar %}
             <div id="page-sidebar" style="margin-top: 20px;">
                 <div class="scroll-sidebar">
                     <ul id="sidebar-menu" data-spy="affix" data-offset-top="10">
@@ -310,6 +313,7 @@
                     </ul><!-- #sidebar-menu -->
                 </div><!-- #scroll-sidebar -->
             </div><!-- #page-sidebar -->
+            {% endblock page_sidebar %}
             <div id="page-content-wrapper">
                 <div id="page-content">
                     <div class="container">
@@ -318,7 +322,8 @@
                 </div>
             </div>
         </div>
-        
+        {% endblock body %}
+
         <!-- WIDGETS -->
         <script type="text/javascript" src="{{ url_for('static', filename='tether/js/tether.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>

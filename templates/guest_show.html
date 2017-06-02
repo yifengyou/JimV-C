@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %} Guest {% endblock %}
 {% block head %}
-  {{ super() }}
+    {{ super() }}
     <style type="text/css">
         .table {
             font-size: 12px;
@@ -96,6 +96,14 @@
             }
         });
 
+
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+
     });
 
     function refresh() {
@@ -132,7 +140,7 @@
                         </div>
                         <div class="pull-right">
                             <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
-                            <button class="btn btn-info" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">创建实例</button>
+                            <a class="btn btn-info add-page-transition" href="/guests/create" data-transition="pt-page-moveFromRight-init" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">创建实例</a>
                         </div>
                     </div>
                 </div>
