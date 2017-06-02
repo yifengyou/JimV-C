@@ -42,10 +42,14 @@
 {% block content %}
 
 <script type="text/javascript">
+    var page = 1;
+    var page_size = 10;
+    var keyword = '';
+    var cur_url = '/guests';
+
     $(document).ready(function() {
-        var page = 1;
-        var page_size = $('#page_size').val();
-        var cur_url = '/api/guests?page=' + page + '&page_size=' + page_size;
+        page_size = $('#page_size').val();
+        cur_url = '/guests?page=' + page + '&page_size=' + page_size;
 
         var last_ready = null;
         $('#content_search').keydown(function() {
@@ -53,7 +57,7 @@
                 clearTimeout(last_ready);
             }
             last_ready = setTimeout(function () {
-                var keyword = $('#content_search').val();
+                keyword = $('#content_search').val();
                 cur_url = '/guests?page=' + page + '&page_size=' + page_size;
                 if (keyword.length > 0) {
                     cur_url = '/guests?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
@@ -63,7 +67,7 @@
         });
 
         $('#page_size').change(function () {
-            var keyword = $('#content_search').val();
+            keyword = $('#content_search').val();
             page_size = $('#page_size').val();
             cur_url = '/guests?page=' + page + '&page_size=' + page_size;
             if (keyword.length > 0) {
@@ -71,8 +75,39 @@
             }
             window.location.href=cur_url;
         });
+
+        $("thead").on('click', ".all_selector", function() {
+            if ($("thead .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+        });
+
+        $("tfoot").on('click', ".all_selector", function() {
+            if ($("tfoot .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+        });
+
     });
 
+    function refresh() {
+        keyword = $('#content_search').val();
+        page = $('#pagination li.active a').text();
+        page_size = $('#page_size').val();
+        cur_url = '/guests?page=' + page + '&page_size=' + page_size;
+        if (keyword.length > 0) {
+            cur_url = '/guests?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+        }
+        window.location.href=cur_url;
+    }
     /* Datatable row highlight */
 
     /*
@@ -90,10 +125,14 @@
         </h3>
         <div>
             <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
-                <div class="row" style="padding: 10px 10px 10px 0;">
-                    <div class="col-sm-4">
-                        <div id="datatable-row-highlight_filter" class="dataTables_filter">
+                <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                    <div class="col-sm-12" style="padding-right: 0;">
+                        <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
                             <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0;">
+                        </div>
+                        <div class="pull-right">
+                            <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                            <button class="btn btn-info" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">创建实例</button>
                         </div>
                     </div>
                 </div>
@@ -101,7 +140,7 @@
                        style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
                 <thead>
                 <tr role="row">
-                    <th><input type="checkbox"></th>
+                    <th><input class="all_selector" title="选取所有" type="checkbox"></th>
                     <th>名称</th>
                     <th></th>
                     <th>状态</th>
@@ -116,7 +155,7 @@
                 <tbody>
                 {% for item in guests_ret.data %}
                 <tr role="row" class="odd">
-                    <td><input type="checkbox"></td>
+                    <td><input title="选中" type="checkbox"></td>
                     <td>
                         <a href="javascript:;">{{ item.name }}</a>
                         <br />
@@ -171,7 +210,7 @@
                 <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
                     <tfoot>
                     <tr>
-                        <th><input type="checkbox" title="select-all"></th>
+                        <th><input type="checkbox" title="选取所有" class="all_selector"></th>
                         <th>
                             <div class="row">
                                 <div class="col-sm-8" style="font-size: 12px; padding-top: 5px; text-align: right;">
