@@ -87,4 +87,9 @@ def show():
 
 
 def create():
-    return render_template('guest_create.html')
+    host_url = request.host_url.rstrip('/')
+    os_template_url = host_url + url_for('api_os_templates.r_get_by_filter')
+    os_template_ret = requests.get(url=os_template_url)
+    os_template_ret = json.loads(os_template_ret.content)
+
+    return render_template('guest_create.html', os_template_data=os_template_ret['data'])

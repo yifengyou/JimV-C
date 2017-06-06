@@ -15,14 +15,16 @@
             color: deepskyblue;
         }
 
-        .btn {
+        .btn,
+        .form-group>div>div,
+        .form-control {
             border-radius: 0;
         }
 
         .btn-ability {
             margin-right: 16px;
             height: 50px;
-            padding: 2px 50px;
+            padding: 8px 50px;
             margin-bottom: 30px;
         }
 
@@ -34,70 +36,151 @@
 {% block body %}
 <script>
     $(document).ready(function() {
+        $('#os_template').chosen({
+            "disable_search": true
+        });
 
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
     });
+
+    $(function() { "use strict";
+        $(".chosen-select").chosen();
+        $(".chosen-search").append('<i class="glyph-icon icon-search"></i>');
+        $(".chosen-single div").html('<i class="glyph-icon icon-caret-down"></i>');
+    });
+
+    $(function() { "use strict";
+        $("#quantity").TouchSpin({
+            max: 20,
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+});
 </script>
 <div class="container" style="padding-top: 100px;">
     <div class="panel">
         <div class="panel-body">
-            <h3 class="title-hero">
+            <h3 class="title-hero" style="display: inline;">
                 创建实例
             </h3>
+            <a href="/guests" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
+                <span class="glyph-icon icon-separator" style="transform: rotateY(-180deg);">
+                    <i class="glyph-icon icon-level-up"></i>
+                </span>
+                <span class="button-content">
+                    返回虚拟机列表
+                </span>
+            </a>
             <div class="example-box-wrapper">
                 <form class="form-horizontal bordered-row">
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-gauge"></span>&nbsp;&nbsp;运算能力</label>
                         <div class="col-sm-10">
                             <div class="btn-ability-line" data-toggle="buttons">
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">1&nbsp;&nbsp;核&nbsp;&nbsp;1&nbsp;&nbsp;GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">1&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">2&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">2&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">8&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">8&nbsp;&nbsp;核&nbsp;&nbsp;16GB
                                 </a>
-                                 <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">1&nbsp;&nbsp;核&nbsp;&nbsp;16GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">16核&nbsp;&nbsp;16GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">24核&nbsp;&nbsp;24GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">32核&nbsp;&nbsp;32GB
                                 </a>
-                                <a href="#" class="btn btn-lg btn-default btn-ability">
+                                <a href="#" class="btn btn-default btn-ability">
                                     <input name="radio-toggle-1" type="radio">64核&nbsp;&nbsp;64GB
                                 </a>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;系统模板</label>
+                        <div class="col-sm-6">
+                            <select id="os_template" name="os_template" class="chosen-select" data-placeholder="请选择系统模板...">
+                                    <option></option>
+                                    {% for item in os_template_data %}
+                                    <option value="{{ item.id }}">{{ item.label }}</option>
+                                    {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;数量</label>
+                        <div class="col-sm-6">
+                            <input id="quantity" class="form-control" type="text" value="1" name="quantity">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;标识&密码</label>
+                        <div class="col-sm-6">
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">登录密码：</label>
+                                <div class="col-sm-6">
+                                    <input type="password" class="form-control" id="password">
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">确认密码：</label>
+                                <div class="col-sm-6">
+                                    <input type="password" class="form-control" id="confirm_password">
+                                </div>
+                            </div>
+                            <div style="height: 10px;"></div>
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">实例名称：</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="name">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-3 pull-right">
+                            <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
                         </div>
                     </div>
                 </form>
