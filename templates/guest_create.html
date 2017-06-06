@@ -79,58 +79,58 @@
                 </span>
             </a>
             <div class="example-box-wrapper">
-                <form class="form-horizontal bordered-row">
+                <form class="form-horizontal bordered-row" action="/guests/create" method="post">
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-gauge"></span>&nbsp;&nbsp;运算能力</label>
                         <div class="col-sm-10">
                             <div class="btn-ability-line" data-toggle="buttons">
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">1&nbsp;&nbsp;核&nbsp;&nbsp;1&nbsp;&nbsp;GB
+                                    <input title="1 CPU 1GB Memory" name="ability" type="radio" value="1c1g">1&nbsp;&nbsp;核&nbsp;&nbsp;1&nbsp;&nbsp;GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">1&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                    <input title="1 CPU 2GB Memory" name="ability" type="radio" value="1c2g">1&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">2&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                    <input title="2 CPU 2GB Memory" name="ability" type="radio" value="2c2g">2&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">2&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                    <input title="2 CPU 4GB Memory" name="ability" type="radio" value="2c4g">2&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                    <input title="4 CPU 4GB Memory" name="ability" type="radio" value="4c4g">4&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                    <input title="4 CPU 8GB Memory" name="ability" type="radio" value="4c8g">4&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">8&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                    <input title="8 CPU 8GB Memory" name="ability" type="radio" value="8c8g">8&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">8&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                    <input title="8 CPU 16GB Memory" name="ability" type="radio" value="8c16g">8&nbsp;&nbsp;核&nbsp;&nbsp;16GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">1&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                    <input title="1 CPU 16GB Memory" name="ability" type="radio" value="1c16g">1&nbsp;&nbsp;核&nbsp;&nbsp;16GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
+                                    <input title="4 CPU 32GB Memory" name="ability" type="radio" value="4c32g">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                    <input title="4 CPU 64GB Memory" name="ability" type="radio" value="4c64g">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                    <input title="8 CPU 64GB Memory" name="ability" type="radio" value="8c64g">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">16核&nbsp;&nbsp;16GB
+                                    <input title="16 CPU 16GB Memory" name="ability" type="radio" value="16c16g">16核&nbsp;&nbsp;16GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">24核&nbsp;&nbsp;24GB
+                                    <input title="24 CPU 24GB Memory" name="ability" type="radio" value="24c24g">24核&nbsp;&nbsp;24GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">32核&nbsp;&nbsp;32GB
+                                    <input title="32 CPU 32GB Memory" name="ability" type="radio" value="32c32g">32核&nbsp;&nbsp;32GB
                                 </a>
                                 <a href="#" class="btn btn-default btn-ability">
-                                    <input name="radio-toggle-1" type="radio">64核&nbsp;&nbsp;64GB
+                                    <input title="64 CPU 64GB Memory" name="ability" type="radio" value="64c64g">64核&nbsp;&nbsp;64GB
                                 </a>
                             </div>
                         </div>
@@ -138,11 +138,11 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;系统模板</label>
                         <div class="col-sm-6">
-                            <select id="os_template" name="os_template" class="chosen-select" data-placeholder="请选择系统模板...">
-                                    <option></option>
-                                    {% for item in os_template_data %}
-                                    <option value="{{ item.id }}">{{ item.label }}</option>
-                                    {% endfor %}
+                            <select id="os_template" name="os_template_id" class="chosen-select" data-placeholder="请选择系统模板...">
+                                <option></option>
+                                {% for item in os_template_data %}
+                                <option value="{{ item.id }}">{{ item.label }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -150,7 +150,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;数量</label>
                         <div class="col-sm-6">
-                            <input id="quantity" class="form-control" type="text" value="1" name="quantity">
+                            <input id="quantity" title="实例数量" class="form-control" type="text" value="1" name="quantity">
                         </div>
                     </div>
                     <div class="form-group">
@@ -159,20 +159,20 @@
                             <div class="row form-group">
                                 <label class="col-sm-2 control-label">登录密码：</label>
                                 <div class="col-sm-6">
-                                    <input type="password" class="form-control" id="password">
+                                    <input type="password" name="password" title="实例密码" class="form-control" id="password">
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label class="col-sm-2 control-label">确认密码：</label>
                                 <div class="col-sm-6">
-                                    <input type="password" class="form-control" id="confirm_password">
+                                    <input type="password" title="确认实例密码" class="form-control" id="confirm_password">
                                 </div>
                             </div>
                             <div style="height: 10px;"></div>
                             <div class="row form-group">
                                 <label class="col-sm-2 control-label">实例名称：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" class="form-control" id="name">
+                                    <input id="name" name="name" type="text" title="实例名称" class="form-control">
                                 </div>
                             </div>
                         </div>
