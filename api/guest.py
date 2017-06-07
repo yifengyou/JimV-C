@@ -54,7 +54,7 @@ def r_create():
         Rules.MEMORY.value,
         Rules.OS_TEMPLATE_ID.value,
         Rules.QUANTITY.value,
-        Rules.NAME.value,
+        Rules.REMARK.value,
         Rules.PASSWORD.value,
         Rules.LEASE_TERM.value
     ]

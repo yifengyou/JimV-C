@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+
 import json
 from flask import Blueprint, render_template, url_for, request
 import requests
@@ -95,7 +97,7 @@ def create():
         os_template_id = request.form.get('os_template_id')
         quantity = request.form.get('quantity')
         password = request.form.get('password')
-        name = request.form.get('name')
+        remark = request.form.get('remark')
 
         if not isinstance(ability, basestring):
             pass
@@ -112,7 +114,7 @@ def create():
             "memory": int(memory),
             "os_template_id": int(os_template_id),
             "quantity": int(quantity),
-            "name": name,
+            "remark": remark,
             "password": password,
             "lease_term": 100
         }
