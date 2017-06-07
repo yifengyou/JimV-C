@@ -388,7 +388,8 @@ body #nav-toggle.collapsed span {
 }
 #page-content {
     margin-left: 260px;
-    padding: 20px 30px;
+    margin-top: 40px;
+    padding: 0 30px;
 }
 
 #page-content > .container {

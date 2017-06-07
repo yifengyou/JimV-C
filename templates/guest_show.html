@@ -39,7 +39,7 @@
         .btn,
         .form-control,
         .modal-content {
-            border-radius: 0;
+            border-radius: 0 !important;
         }
     </style>
 
@@ -146,10 +146,11 @@
                 remark: remark
             }),
             error : function() {
-                insert_warning_window($('#header'), '<strong>更新用户信失败, 请联系管理员! </strong>');
+                alter_danger('实例备注更新失败！');
             },
             success : function() {
-                $('#guest_list tbody').find('td:contains(' + uuid + ')').next().next().find('p').text(remark)
+                $('#guest_list tbody').find('td:contains(' + uuid + ')').next().next().find('p').text(remark);
+                alter_success('实例备注更新成功！');
             }
         });
     }
@@ -218,30 +219,32 @@
                                 更多
                             </a>
                             <ul class="dropdown-menu">
-                                <li>
-                                    <a href="javascript:;">
-                                        <span>启用</span>
-                                    </a>
+                                <li class="{% if item.status not in [4, 5, 6] %} disabled {% endif %}">
+                                    <a href="javascript:;">启动</a>
                                 </li>
-                                <li>
-                                    <a href="javascript:;">
-                                        <span>禁用</span>
-                                    </a>
+                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
+                                    <a href="javascript:;">重启</a>
                                 </li>
+                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
+                                    <a href="javascript:;">停止</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
+                                    <a href="javascript:;">暂停</a>
+                                </li>
+                                <li class="{% if item.status not in [3] %} disabled {% endif %}">
+                                    <a href="javascript:;">恢复</a>
+                                </li>
+                                <li class="divider"></li>
                                 <li class="">
-                                    <a href="javascript:;">
-                                        <span>编辑</span>
-                                    </a>
+                                    <a href="javascript:;">密码重置</a>
                                 </li>
-                                <li class="">
-                                    <a href="javascript:;">
-                                        <span>密码重置</span>
-                                    </a>
+                                <li class="{% if item.status not in [1, 3, 4, 5, 6] %} disabled {% endif %}">
+                                    <a href="javascript:;">迁移到</a>
                                 </li>
-                                <li class="">
-                                    <a href="javascript:;">
-                                        <span>删除</span>
-                                    </a>
+                                <li class="divider"></li>
+                                <li class="{% if item.status not in [4, 5, 6, 255] %} disabled {% endif %}">
+                                    <a href="javascript:;">删除</a>
                                 </li>
                             </ul>
                         </div>

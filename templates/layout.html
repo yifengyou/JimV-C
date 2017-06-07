@@ -18,6 +18,17 @@
 
         .affix-bottom {
         }
+
+        .alert-top {
+            display: none;
+            position: fixed !important;
+            float: right !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            margin-right: 30px !important;
+            padding-top: .5rem !important;
+            padding-bottom: .5rem !important;
+        }
     </style>
 
 
@@ -162,13 +173,25 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/modernizr.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/jquery-cookie.js') }}"></script>
 
-    <!--<script type="text/javascript">
-        $(window).load(function(){
-            setTimeout(function() {
-                $('#loading').fadeOut( 400, "linear" );
-            }, 300);
-        });
-    </script>-->
+    <script type="text/javascript">
+
+        function alter_success(message) {
+            $('#alert-success-tip').text(message);
+            $('#alert-success-tip').css('display', 'block');
+            setTimeout(function () {
+                $('#alert-success-tip').css('display', 'none');
+            }, 3000);
+        }
+
+        function alter_danger(message) {
+            $('#alert-danger-tip').text(message);
+            $('#alert-danger-tip').css('display', 'block');
+            setTimeout(function () {
+                $('#alert-danger-tip').css('display', 'none');
+            }, 3000);
+        }
+
+    </script>
 
     {% endblock head %}
 
@@ -315,6 +338,10 @@
             </div><!-- #page-sidebar -->
             {% endblock page_sidebar %}
             <div id="page-content-wrapper">
+                <div id="alert-success-tip" class="alert alert-success alert-top">
+                </div>
+                <div id="alert-danger-tip" class="alert alert-danger alert-top">
+                </div>
                 <div id="page-content">
                     <div class="container">
                     {% block content %}{% endblock %}
