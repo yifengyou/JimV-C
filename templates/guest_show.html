@@ -149,7 +149,7 @@
                 insert_warning_window($('#header'), '<strong>更新用户信失败, 请联系管理员! </strong>');
             },
             success : function() {
-                $('#guest_list tbody').find('td:contains(' + uuid + ')').next().next().find('label').text(remark)
+                $('#guest_list tbody').find('td:contains(' + uuid + ')').next().next().find('p').text(remark)
             }
         });
     }
@@ -199,7 +199,7 @@
                             <a href="javascript:;">{{ item.name }}</a>
                         </div>
                         <div>
-                            <label style="display: inline-block;">{{ item.remark }}</label>
+                            <p style="display: inline-block;">{{ item.remark }}</p>
                             <a href="javascript:;" class="edit_remark_trigger" data-toggle="modal" data-target="#edit_remark_modal" style="display: none; float: right;">
                                 <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
                             </a>
@@ -294,7 +294,7 @@
     </div>
 </div>
 
-<div class="modal" id="edit_remark_modal" tabindex="-1" role="dialog">
+<div class="modal" id="edit_remark_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
