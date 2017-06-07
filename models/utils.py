@@ -161,37 +161,37 @@ def utility_processor():
 
         elif status == GuestState.blocked.value:
             color = '3D4245'
-            icon = 'glyph-icon icon-spinner'
+            icon = 'glyph-icon icon-minus-square'
             desc = '被阻塞'
 
         elif status == GuestState.paused.value:
-            color = 'FCFF07'
-            icon = 'glyph-icon icon-spinner'
+            color = 'B7B904'
+            icon = 'glyph-icon icon-pause'
             desc = '暂停'
 
         elif status == GuestState.shutdown.value:
             color = '4E5356'
-            icon = 'glyph-icon icon-spinner'
+            icon = 'glyph-icon icon-terminal'
             desc = '关闭'
 
         elif status == GuestState.shutoff.value:
             color = 'FFC543'
-            icon = 'glyph-icon icon-spinner'
+            icon = 'glyph-icon icon-plug'
             desc = '断电'
 
         elif status == GuestState.crashed.value:
             color = '9E2927'
-            icon = 'glyph-icon icon-spinner'
+            icon = 'glyph-icon icon-question'
             desc = '已崩溃'
 
         elif status == GuestState.pm_suspended.value:
             color = 'FCFF07'
-            icon = 'glyph-icon icon-spinner'
+            icon = 'glyph-icon icon-anchor'
             desc = '悬挂'
 
         elif status == GuestState.dirty.value:
             color = 'FCFF07'
-            icon = 'glyph-icon icon-spinner'
+            icon = 'glyph-icon icon-remove'
             desc = '创建失败，待清理'
 
         else:

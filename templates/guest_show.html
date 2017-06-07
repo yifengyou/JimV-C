@@ -154,6 +154,140 @@
             }
         });
     }
+
+    function boot(uuids) {
+        $.ajax({
+            url : '/api/guests/_boot/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例启动指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例启动指令发送成功！');
+            }
+        });
+    }
+
+    function reboot(uuids) {
+        $.ajax({
+            url : '/api/guests/_reboot/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例重启指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例重启指令发送成功！');
+            }
+        });
+    }
+
+    function force_reboot(uuids) {
+        $.ajax({
+            url : '/api/guests/_force_reboot/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例强制重启指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例强制重启指令发送成功！');
+            }
+        });
+    }
+
+    function shutdown(uuids) {
+        $.ajax({
+            url : '/api/guests/_shutdown/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例停止指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例停止指令发送成功！');
+            }
+        });
+    }
+
+    function force_shutdown(uuids) {
+        $.ajax({
+            url : '/api/guests/_force_shutdown/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例强制停止指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例强制停止指令发送成功！');
+            }
+        });
+    }
+
+    function suspend(uuids) {
+        $.ajax({
+            url : '/api/guests/_suspend/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例暂停指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例暂停指令发送成功！');
+            }
+        });
+    }
+
+    function resume(uuids) {
+        $.ajax({
+            url : '/api/guests/_resume/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例恢复指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例恢复指令发送成功！');
+            }
+        });
+    }
+
+    function boot_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        boot([uuid]);
+    }
+
+    function reboot_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        reboot([uuid]);
+    }
+
+    function force_reboot_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        force_reboot([uuid]);
+    }
+
+    function shutdown_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        shutdown([uuid]);
+    }
+
+    function force_shutdown_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        force_shutdown([uuid]);
+    }
+
+    function suspend_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        suspend([uuid]);
+    }
+
+    function resume_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        resume([uuid]);
+    }
+
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -220,20 +354,26 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li class="{% if item.status not in [4, 5, 6] %} disabled {% endif %}">
-                                    <a href="javascript:;">启动</a>
+                                    <a href="javascript:;" onclick="boot_at(this);">启动</a>
                                 </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;">重启</a>
+                                    <a href="javascript:;" onclick="reboot_at(this);">重启</a>
                                 </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;">停止</a>
+                                    <a href="javascript:;" onclick="force_reboot_at(this);">强制重启</a>
+                                </li>
+                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
+                                    <a href="javascript:;" onclick="shutdown_at(this);">停止</a>
+                                </li>
+                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
+                                    <a href="javascript:;" onclick="force_shutdown_at(this);">强制停止</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;">暂停</a>
+                                    <a href="javascript:;" onclick="suspend_at(this);">暂停</a>
                                 </li>
                                 <li class="{% if item.status not in [3] %} disabled {% endif %}">
-                                    <a href="javascript:;">恢复</a>
+                                    <a href="javascript:;" onclick="resume_at(this);">恢复</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="">
