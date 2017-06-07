@@ -95,16 +95,12 @@ def r_create():
             # 虚拟机内存单位，模板生成方法中已置其为GiB
             guest.memory = request.json.get('memory')
             guest.os_template_id = request.json.get('os_template_id')
-            guest.name = request.json.get('name')
-            if quantity > 0:
-                '-'.join([guest.name, quantity.__str__()])
+            guest.name = ji.Common.generate_random_code(length=8)
+            guest.remark = request.json.get('remark', '')
 
             guest.password = request.json.get('password')
             if guest.password is None or guest.password.__len__() < 1:
                 guest.password = ji.Common.generate_random_code(length=16)
-
-            while guest.name.__len__() < 1 or guest.exist_by('name'):
-                guest.name = ji.Common.generate_random_code(length=8)
 
             guest.ip = db.r.spop(app.config['ip_available_set'])
             db.r.sadd(app.config['ip_used_set'], guest.ip)
