@@ -17,7 +17,7 @@
         }
         
         .table > tbody > tr > td {
-            color: #6d6e6f;
+            color: #424547;
         }
 
         .table-bordered > tbody > tr {
@@ -40,6 +40,21 @@
         .form-control,
         .modal-content {
             border-radius: 0 !important;
+        }
+
+        .btn-shortcut {
+            font-size: 12px !important;
+            padding: 0 26px;
+        }
+
+        .show {
+            display: inline-block !important;
+        }
+
+        .tr-selected td,
+        .tr-selected {
+            color: #000 !important;
+            background: #fffdf4 !important;
         }
     </style>
 
@@ -89,6 +104,8 @@
                 $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
                 $(".all_selector").prop('checked', false);
             }
+
+            select_item_action();
         });
 
         $("tfoot").on('click', ".all_selector", function() {
@@ -99,8 +116,13 @@
                 $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
                 $(".all_selector").prop('checked', false);
             }
+
+            select_item_action();
         });
 
+        $("tbody tr").on('click', "input[type='checkbox']", function() {
+            select_item_action();
+        });
 
         $('body').addClass('add-transition');
         $('.add-page-transition').on('click', function(){
@@ -153,6 +175,47 @@
                 alter_success('实例备注更新成功！');
             }
         });
+    }
+    
+    function get_selected_element(checked) {
+        if (checked === null) {
+            checked = true;
+        }
+
+        if (checked) {
+            return $('tbody :checked');
+        } else {
+
+            return $('tbody input:not(:checked)');
+        }
+    }
+    
+    function highlight_selected_element() {
+        var selected_element = get_selected_element(true);
+        var no_selected_element = get_selected_element(false);
+
+        selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', true);
+        });
+
+        no_selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', false);
+        });
+    }
+    
+    function shortcut_bar_enable() {
+        var selected_element = get_selected_element(true);
+
+        if (selected_element.length > 0) {
+            $('.btn-shortcut').toggleClass('disabled', false);
+        } else {
+            $('.btn-shortcut').toggleClass('disabled', true);
+        }
+    }
+
+    function select_item_action() {
+        highlight_selected_element();
+        shortcut_bar_enable();
     }
 
     function boot(uuids) {
@@ -253,6 +316,20 @@
         });
     }
 
+    function remove(uuids) {
+        $.ajax({
+            url : '/api/guests/' + uuids.join(','),
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例删除指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例删除指令发送成功！');
+            }
+        });
+    }
+
     function boot_at(me) {
         var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
         boot([uuid]);
@@ -288,6 +365,89 @@
         resume([uuid]);
     }
 
+    function delete_at(me) {
+        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        remove([uuid]);
+    }
+
+    function get_selected_uuids() {
+        var selected_element = get_selected_element(true);
+        var uuids = [];
+
+        selected_element.each(function(i, e) {
+            var uuid = $(e).parent().prev().text();
+            uuids.push(uuid);
+        });
+
+        return uuids;
+    }
+
+    function get_checked_uuids() {
+        var uuids = get_selected_uuids();
+
+        if (uuids.length < 1) {
+            alter_warning('未选择任何可操作的实例！');
+            return false;
+        }
+
+        return uuids;
+    }
+
+    function batch_boot() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            boot(uuids);
+        }
+    }
+
+    function batch_reboot() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            reboot(uuids);
+        }
+    }
+
+    function batch_force_reboot() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            force_reboot(uuids);
+        }
+    }
+
+    function batch_shutdown() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            shutdown(uuids);
+        }
+    }
+
+    function batch_force_shutdown() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            force_shutdown(uuids);
+        }
+    }
+
+    function batch_suspend() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            suspend(uuids);
+        }
+    }
+
+    function batch_resume() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            resume(uuids);
+        }
+    }
+
+    function batch_delete() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            remove(uuids);
+        }
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -377,6 +537,10 @@
                                 </li>
                                 <li class="divider"></li>
                                 <li class="">
+                                    <a href="javascript:;">远程连接</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="">
                                     <a href="javascript:;">密码重置</a>
                                 </li>
                                 <li class="{% if item.status not in [1, 3, 4, 5, 6] %} disabled {% endif %}">
@@ -384,7 +548,7 @@
                                 </li>
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [4, 5, 6, 255] %} disabled {% endif %}">
-                                    <a href="javascript:;">删除</a>
+                                    <a href="javascript:;" onclick="delete_at(this);">删除</a>
                                 </li>
                             </ul>
                         </div>
@@ -396,11 +560,42 @@
 
                 <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
                     <tfoot>
-                    <tr>
+                    <tr style="height: 70px;">
                         <th><input type="checkbox" title="选取所有" class="all_selector"></th>
                         <th>
                             <div class="row">
-                                <div class="col-sm-8" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                <div class="col-sm-6">
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">启动</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_reboot();">重启</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_shutdown();">停止</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_suspend();">暂停</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_resume();">恢复</button>
+                                    <div class="dropup inline-block">
+                                        <button href="javascript:;" class="dropdown-toggle btn btn-default btn-shortcut disabled" data-toggle="dropdown">
+                                            更多
+                                        </button>
+                                        <ul class="dropdown-menu" style="width: 60px;">
+                                            <li>
+                                                <a href="javascript:;" onclick="batch_delete();">删除</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="javascript:;">迁移到</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;">密码重置</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="javascript:;" onclick="batch_force_shutdown();">强制停止</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" onclick="batch_force_reboot();">强制重启</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
                                     共有{{ guests_ret.paging.total }}条，每页显示：
                                     <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
                                         <option value="1" {% if page_size == 1 %} selected {% endif %}>1</option>
@@ -410,7 +605,7 @@
                                         <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
                                     </select>&nbsp;&nbsp;条
                                 </div>
-                                <div class="col-sm-4" style="text-align: left;">
+                                <div class="col-sm-3" style="text-align: left;">
                                     <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
                                         <ul id="pagination" class="pagination">
                                             <li class="{% if page == 1 %} disabled {% endif %}">

@@ -183,6 +183,14 @@
             }, 3000);
         }
 
+        function alter_warning(message) {
+            $('#alert-warning-tip').text(message);
+            $('#alert-warning-tip').css('display', 'block');
+            setTimeout(function () {
+                $('#alert-warning-tip').css('display', 'none');
+            }, 3000);
+        }
+
         function alter_danger(message) {
             $('#alert-danger-tip').text(message);
             $('#alert-danger-tip').css('display', 'block');
@@ -339,6 +347,8 @@
             {% endblock page_sidebar %}
             <div id="page-content-wrapper">
                 <div id="alert-success-tip" class="alert alert-success alert-top">
+                </div>
+                <div id="alert-warning-tip" class="alert alert-warning alert-top">
                 </div>
                 <div id="alert-danger-tip" class="alert alert-danger alert-top">
                 </div>

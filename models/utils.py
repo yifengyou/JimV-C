@@ -150,7 +150,7 @@ def utility_processor():
         desc = '未知状态'
 
         if status == GuestState.running.value:
-            color = '82c251'
+            color = '00BB00'
             icon = 'glyph-icon icon-circle'
             desc = '运行中'
 
