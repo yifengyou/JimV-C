@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
+from multiprocessing import JoinableQueue
 from flask import Flask, g
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -92,6 +93,7 @@ class Init(object):
         return _logger
 
 
+q_ws = JoinableQueue()
 # 预编译效率更高
 regex_sql_str = re.compile('\\\+"')
 regex_dsl_str = re.compile('^\w+:\w+:\S+$')

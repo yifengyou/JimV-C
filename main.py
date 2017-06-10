@@ -11,11 +11,13 @@ import time
 import jimit as ji
 import json
 
+import os
+import sys
 from flask import g
 
 from models import Utils
 from models.event_processor import EventProcessor
-from models.initialize import app, logger
+from models.initialize import app, logger, q_ws
 import api_route_table
 import views_route_table
 from models import Database as db
@@ -38,11 +40,35 @@ from api.host import blueprints as host_blueprints
 from views.guest import blueprint as view_guest_blueprint
 from views.guest import blueprints as view_guest_blueprints
 
+from websockify.websocketproxy import WebSocketProxy
+
 
 __author__ = 'James Iter'
 __date__ = '2017/3/31'
 __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
+
+
+def instantiation_ws_vnc(listen_port, target_host, target_port):
+    # 用于 Web noVNC 代理
+    ws = WebSocketProxy(listen_host="0.0.0.0", listen_port=listen_port, target_host=target_host,
+                        target_port=target_port, run_once=True, daemon=True, idle_timeout=10)
+    ws.start_server()
+
+
+def ws_engine_for_vnc():
+    while True:
+        payload = q_ws.get()
+        payload = json.loads(payload)
+
+        c_pid = os.fork()
+        if c_pid == 0:
+            instantiation_ws_vnc(payload['listen_port'], payload['target_host'], payload['target_port'])
+
+        # 因为 WebSocketProxy 使用了 daemon 参数，所以当执行到 ws.start_server() 时，会退出其所在的子进程，
+        # 故而这里设置wait来处理结束的子进程的环境，避免出现僵尸进程。
+        os.wait()
+        q_ws.task_done()
 
 
 @app.before_request
@@ -90,15 +116,23 @@ if __name__ == '__main__':
         signal.signal(signal.SIGTERM, Utils.signal_handle)
         signal.signal(signal.SIGINT, Utils.signal_handle)
 
-        thread.start_new_thread(EventProcessor.launch, ())
-        Utils.thread_counter += 1
+        pid = os.fork()
+        if pid == 0:
+            ws_engine_for_vnc()
 
-        app.run(host=app.config['jimv_listen'], port=app.config['jimv_port'], use_reloader=False, threaded=True)
+        else:
+            # 父进程退出时，会清理所有提前退出的子进程的环境。所以这里无需对子进程做等待操作。
+            # 即：即使子进程提前退出，且因父进程没有做wait处理，使其变成了僵尸进程。但当父进程退出时，会对因其所产生的僵尸进程做统一清理操作。
 
-        while Utils.thread_counter > 0:
-            time.sleep(1)
+            thread.start_new_thread(EventProcessor.launch, ())
+            Utils.thread_counter += 1
 
-        print 'Main say bye-bye!'
+            app.run(host=app.config['jimv_listen'], port=app.config['jimv_port'], use_reloader=False, threaded=True)
+
+            while Utils.thread_counter > 0:
+                time.sleep(1)
+
+            print 'Main say bye-bye!'
 
     except:
         logger.error(traceback.format_exc())

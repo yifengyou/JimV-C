@@ -3,10 +3,16 @@
 
 
 import json
+
+import random
+
+import os
 from flask import Blueprint, render_template, url_for, request
 import requests
 from math import ceil
 import re
+import socket
+from models.initialize import q_ws
 
 
 __author__ = 'James Iter'
@@ -132,6 +138,38 @@ def create():
         os_template_ret = requests.get(url=os_template_url)
         os_template_ret = json.loads(os_template_ret.content)
         return render_template('guest_create.html', os_template_data=os_template_ret['data'])
+
+
+def port_is_opened(port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = s.connect_ex(('0.0.0.0', port))
+    if result == 0:
+        return True
+    else:
+        return False
+
+
+def vnc(uuid):
+    host_url = request.host_url.rstrip('/')
+
+    guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
+
+    guest_ret = requests.get(url=guest_url)
+    guest_ret = json.loads(guest_ret.content)
+
+    port = random.randrange(50000, 60000)
+    while True:
+        if not port_is_opened(port=port):
+            break
+
+        port = random.randrange(50000, 60000)
+
+    payload = {'listen_port': port, 'target_host': '103.47.139.194', 'target_port': guest_ret['data']['vnc_port']}
+    q_ws.put(json.dumps(payload, ensure_ascii=False))
+    print port
+    q_ws.join()
+
+    return render_template('vnc_lite.html', port=port, password=guest_ret['data']['vnc_password'])
 
 
 def success():
