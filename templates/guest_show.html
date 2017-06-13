@@ -134,7 +134,33 @@
         $('#edit_remark_modal').on('show.bs.modal', function (me) {
             $('#instance_uuid').val($(me.relatedTarget).parent().parent().prev().prev().text());
             $('#edit_remark').val($(me.relatedTarget).prev().text());
-        })
+        });
+
+        $('#migrate_host').chosen({
+            "disable_search": true
+        });
+
+        $('#migrate_modal').on('show.bs.modal', function (me) {
+            $('#migrate_instance_uuid').val(
+                $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
+            $.ajax({
+                url : '/api/hosts',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    $('#migrate_host').empty();
+                    $.each(data.data, function(k, v) {
+                        $('#migrate_host').append(
+                            $('<option>', {value: v['hostname'], text: v['hostname']})
+                        );
+                    });
+                    $('#migrate_host').trigger("chosen:updated");
+                }
+            });
+        });
     });
 
     function refresh() {
@@ -176,7 +202,7 @@
             }
         });
     }
-    
+
     function get_selected_element(checked) {
         if (checked === null) {
             checked = true;
@@ -330,6 +356,20 @@
         });
     }
 
+    function migrate(uuids, host) {
+        $.ajax({
+            url : '/api/guests/_migrate/' + uuids.join(',') + '/' + host,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例迁移指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例迁移指令发送成功！');
+            }
+        });
+    }
+
     function boot_at(me) {
         var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
         boot([uuid]);
@@ -368,6 +408,19 @@
     function delete_at(me) {
         var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
         remove([uuid]);
+    }
+
+    function migrate_go() {
+        var migrate_type = $('#migrate_type').val();
+        var uuid = [];
+        if (migrate_type === 'single') {
+            uuid = [$('#migrate_instance_uuid').val()];
+        } else {
+            uuid = get_checked_uuids();
+        }
+        var host = $('#migrate_host').val();
+        $('#migrate_modal').modal('hide');
+        migrate([uuid], host);
     }
 
     function get_selected_uuids() {
@@ -544,7 +597,10 @@
                                     <a href="javascript:;">密码重置</a>
                                 </li>
                                 <li class="{% if item.status not in [1, 3, 4, 5, 6] %} disabled {% endif %}">
-                                    <a href="javascript:;">迁移到</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#migrate_modal"
+                                       onclick="$('#migrate_type').val('single')">
+                                        迁移到
+                                    </a>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [4, 5, 6, 255] %} disabled {% endif %}">
@@ -580,7 +636,10 @@
                                             </li>
                                             <li class="divider"></li>
                                             <li>
-                                                <a href="javascript:;">迁移到</a>
+                                                <a href="javascript:;" onclick="$('#migrate_type').val('batch');"
+                                                   data-toggle="modal" data-target="#migrate_modal" >
+                                                    迁移到
+                                                </a>
                                             </li>
                                             <li>
                                                 <a href="javascript:;">密码重置</a>
@@ -644,6 +703,26 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="remark_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="migrate_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">实例迁移至：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="migrate_type" title="迁移类型" class="form-control" name="migrate_type" value="single" hidden>
+                <input id="migrate_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+                <select id="migrate_host" name="migrate_host" title="可迁移宿主机" class="chosen-select">
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="migrate_go();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

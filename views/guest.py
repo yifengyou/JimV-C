@@ -3,10 +3,7 @@
 
 
 import json
-
 import random
-
-import os
 from flask import Blueprint, render_template, url_for, request
 import requests
 from math import ceil
@@ -166,7 +163,6 @@ def vnc(uuid):
 
     payload = {'listen_port': port, 'target_host': '103.47.139.194', 'target_port': guest_ret['data']['vnc_port']}
     q_ws.put(json.dumps(payload, ensure_ascii=False))
-    print port
     q_ws.join()
 
     return render_template('vnc_lite.html', port=port, password=guest_ret['data']['vnc_password'])

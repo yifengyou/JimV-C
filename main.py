@@ -12,7 +12,6 @@ import jimit as ji
 import json
 
 import os
-import sys
 from flask import g
 
 from models import Utils
