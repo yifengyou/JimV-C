@@ -14,6 +14,7 @@ from models import Log
 from models import Utils
 from models import EmitKind
 from models import ResponseState, GuestState, DiskState
+from models.guest import GuestMigrateInfo
 from models.initialize import app, logger
 
 
@@ -27,6 +28,7 @@ class EventProcessor(object):
     message = None
     log = Log()
     guest = Guest()
+    guest_migrate_info = GuestMigrateInfo()
     disk = Disk()
     config = Config()
 
@@ -41,8 +43,50 @@ class EventProcessor(object):
     def guest_event_processor(cls):
         cls.guest.uuid = cls.message['message']['uuid']
         cls.guest.get_by('uuid')
-        cls.guest.status = cls.message['type']
         cls.guest.on_host = cls.message['host']
+        cls.guest.status = cls.message['type']
+
+        if cls.guest.status == GuestState.update.value:
+            cls.guest.xml = cls.message['message']['xml']
+
+        elif cls.guest.status == GuestState.migrating.value:
+            try:
+                cls.guest_migrate_info.uuid = cls.guest.uuid
+                cls.guest_migrate_info.get_by('uuid')
+
+                cls.guest_migrate_info.type = cls.message['message']['migrating_info']['type']
+                cls.guest_migrate_info.time_elapsed = cls.message['message']['migrating_info']['time_elapsed']
+                cls.guest_migrate_info.time_remaining = cls.message['message']['migrating_info']['time_remaining']
+                cls.guest_migrate_info.data_total = cls.message['message']['migrating_info']['data_total']
+                cls.guest_migrate_info.data_processed = cls.message['message']['migrating_info']['data_processed']
+                cls.guest_migrate_info.data_remaining = cls.message['message']['migrating_info']['data_remaining']
+                cls.guest_migrate_info.mem_total = cls.message['message']['migrating_info']['mem_total']
+                cls.guest_migrate_info.mem_processed = cls.message['message']['migrating_info']['mem_processed']
+                cls.guest_migrate_info.mem_remaining = cls.message['message']['migrating_info']['mem_remaining']
+                cls.guest_migrate_info.file_total = cls.message['message']['migrating_info']['file_total']
+                cls.guest_migrate_info.file_processed = cls.message['message']['migrating_info']['file_processed']
+                cls.guest_migrate_info.file_remaining = cls.message['message']['migrating_info']['file_remaining']
+
+                cls.guest_migrate_info.update()
+
+            except ji.PreviewingError as e:
+                ret = json.loads(e.message)
+                if ret['state']['code'] == '404':
+                    cls.guest_migrate_info.type = cls.message['message']['migrating_info']['type']
+                    cls.guest_migrate_info.time_elapsed = cls.message['message']['migrating_info']['time_elapsed']
+                    cls.guest_migrate_info.time_remaining = cls.message['message']['migrating_info']['time_remaining']
+                    cls.guest_migrate_info.data_total = cls.message['message']['migrating_info']['data_total']
+                    cls.guest_migrate_info.data_processed = cls.message['message']['migrating_info']['data_processed']
+                    cls.guest_migrate_info.data_remaining = cls.message['message']['migrating_info']['data_remaining']
+                    cls.guest_migrate_info.mem_total = cls.message['message']['migrating_info']['mem_total']
+                    cls.guest_migrate_info.mem_processed = cls.message['message']['migrating_info']['mem_processed']
+                    cls.guest_migrate_info.mem_remaining = cls.message['message']['migrating_info']['mem_remaining']
+                    cls.guest_migrate_info.file_total = cls.message['message']['migrating_info']['file_total']
+                    cls.guest_migrate_info.file_processed = cls.message['message']['migrating_info']['file_processed']
+                    cls.guest_migrate_info.file_remaining = cls.message['message']['migrating_info']['file_remaining']
+
+                    cls.guest_migrate_info.create()
+
         cls.guest.update()
 
     @classmethod

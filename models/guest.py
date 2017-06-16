@@ -103,4 +103,40 @@ class Disk(ORM):
         return ['label', 'size']
 
 
+class GuestMigrateInfo(ORM):
+
+    _table_name = 'guest_migrate_info'
+    _primary_key = 'id'
+
+    def __init__(self):
+        super(GuestMigrateInfo, self).__init__()
+        self.id = 0
+        self.uuid = None
+        self.type = None
+        self.time_elapsed = None
+        self.time_remaining = None
+        self.data_total = None
+        self.data_processed = None
+        self.data_remaining = None
+        self.mem_total = None
+        self.mem_processed = None
+        self.mem_remaining = None
+        self.file_total = None
+        self.file_processed = None
+        self.file_remaining = None
+
+    @staticmethod
+    def get_filter_keywords():
+        return {
+            'id': FilterFieldType.INT.value,
+            'uuid': FilterFieldType.STR.value
+        }
+
+    @staticmethod
+    def get_allow_update_keywords():
+        return []
+
+    @staticmethod
+    def get_allow_content_search_keywords():
+        return []
 

@@ -411,7 +411,7 @@ def r_attach_disk(uuid, disk_uuid):
         # 取出该 guest 已挂载的磁盘，来做出决定，确定该磁盘的序列
         disk.guest_uuid = guest.uuid
         disks, count = disk.get_by_filter(filter_str='guest_uuid:in:' + guest.uuid)
-        disk.sequence = count + 1
+        disk.sequence = count
 
         config = Config()
         config.id = 1
@@ -420,7 +420,7 @@ def r_attach_disk(uuid, disk_uuid):
         xml = """
             <disk type='network' device='disk'>
                 <driver name='qemu' type='qcow2' cache='none'/>
-                <source protocol='gluster' name='{0}/DiskPool/{1}.{2}'>
+                <source protocol='gluster' name='{0}/Images/{1}.{2}'>
                     <host name='127.0.0.1' port='24007'/>
                 </source>
                 <target dev='{3}' bus='virtio'/>
@@ -477,7 +477,7 @@ def r_detach_disk(disk_uuid):
         xml = """
             <disk type='network' device='disk'>
                 <driver name='qemu' type='qcow2' cache='none'/>
-                <source protocol='gluster' name='{0}/DiskPool/{1}.{2}'>
+                <source protocol='gluster' name='{0}/Images/{1}.{2}'>
                     <host name='127.0.0.1' port='24007'/>
                 </source>
                 <target dev='{3}' bus='virtio'/>

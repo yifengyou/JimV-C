@@ -30,6 +30,8 @@ class GuestState(IntEnum):
     shutoff = 5
     crashed = 6
     pm_suspended = 7
+    migrating = 8
+    update = 9
     dirty = 255
 
 

@@ -189,6 +189,11 @@ def utility_processor():
             icon = 'glyph-icon icon-anchor'
             desc = '悬挂'
 
+        elif status == GuestState.migrating.value:
+            color = '1CF5E7'
+            icon = 'glyph-icon icon-space-shuttle'
+            desc = '迁移中'
+
         elif status == GuestState.dirty.value:
             color = 'FCFF07'
             icon = 'glyph-icon icon-remove'
