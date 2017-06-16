@@ -10,7 +10,7 @@
 - [x] 统一 guest_disk 称谓为 disk
 - [x] 统计活着的宿主机，并提供获取列表的接口，供迁移时选择
 - [x] 分离出 API 与 views 出入口，涉及 add_rule 与 route_table
-- [ ] 加入被动更新 Guest xml 的功能，由宿主机主动推送。具体时机待定
+- [x] 加入被动更新 Guest xml 的功能，由宿主机主动推送。具体时机待定
 - [ ] 重置Guest密码功能
 - [ ] 增加模板镜像上传功能
 - [ ] 添加对 Guest 的IP管理功能

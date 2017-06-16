@@ -43,10 +43,9 @@ class EventProcessor(object):
     def guest_event_processor(cls):
         cls.guest.uuid = cls.message['message']['uuid']
         cls.guest.get_by('uuid')
-        cls.guest.on_host = cls.message['host']
-        cls.guest.status = cls.message['type']
 
-        if cls.guest.status == GuestState.update.value:
+        if cls.message['type'] == GuestState.update.value:
+            cls.message['type'] = cls.guest.status
             cls.guest.xml = cls.message['message']['xml']
 
         elif cls.guest.status == GuestState.migrating.value:
@@ -87,6 +86,8 @@ class EventProcessor(object):
 
                     cls.guest_migrate_info.create()
 
+        cls.guest.on_host = cls.message['host']
+        cls.guest.status = cls.message['type']
         cls.guest.update()
 
     @classmethod
