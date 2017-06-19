@@ -11,7 +11,7 @@ import jimit as ji
 
 from api.base import Base
 from models import DiskState
-from models import OSInitWrite
+from models import OperateRule
 from models.initialize import app, dev_table
 from models import Database as db
 from models import Config
@@ -78,8 +78,8 @@ def r_create():
 
         os_template.get()
 
-        os_init_writes, os_init_writes_count = OSInitWrite.get_by_filter(
-            filter_str='os_init_id:in:' + os_template.os_init_id.__str__())
+        operate_rules, operate_rules_count = OperateRule.get_by_filter(
+            filter_str='boot_job_id:in:' + os_template.boot_job_id.__str__())
 
         if db.r.scard(app.config['ip_available_set']) < 1:
             ret['state'] = ji.Common.exchange_state(50350)
@@ -128,9 +128,9 @@ def r_create():
             guest.create()
 
             # 替换占位符为有效内容
-            _os_init_writes = copy.deepcopy(os_init_writes)
-            for k, v in enumerate(_os_init_writes):
-                _os_init_writes[k]['content'] = v['content'].replace('{IP}', guest.ip).\
+            _operate_rules = copy.deepcopy(operate_rules)
+            for k, v in enumerate(_operate_rules):
+                _operate_rules[k]['content'] = v['content'].replace('{IP}', guest.ip).\
                     replace('{HOSTNAME}', guest.name).\
                     replace('{NETMASK}', config.netmask).\
                     replace('{GATEWAY}', config.gateway).\
@@ -144,7 +144,7 @@ def r_create():
                 'glusterfs_volume': config.glusterfs_volume,
                 'template_path': os_template.path,
                 'disk': disk.__dict__,
-                'writes': _os_init_writes,
+                'writes': _operate_rules,
                 'password': guest.password,
                 'xml': guest_xml.get_domain()
             }

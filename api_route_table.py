@@ -6,8 +6,8 @@ from models.utils import add_rule_api
 from api import config
 from api import guest
 from api import disk
-from api import os_init
-from api import os_init_write
+from api import boot_job
+from api import operate_rule
 from api import os_template
 from api import log
 from api import host
@@ -25,20 +25,20 @@ add_rule_api(config.blueprint, '', api_func='config.r_create', methods=['POST'])
 add_rule_api(config.blueprint, '', api_func='config.r_update', methods=['PATCH'])
 add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
 
-# 系统初始化配置操作
-add_rule_api(os_init.blueprint, '', api_func='os_init.r_create', methods=['POST'])
-add_rule_api(os_init.blueprint, '/<_id>', api_func='os_init.r_update', methods=['PATCH'])
-add_rule_api(os_init.blueprints, '/<ids>', api_func='os_init.r_delete', methods=['DELETE'])
-add_rule_api(os_init.blueprints, '/<ids>', api_func='os_init.r_get', methods=['GET'])
-add_rule_api(os_init.blueprints, '', api_func='os_init.r_get_by_filter', methods=['GET'])
-add_rule_api(os_init.blueprints, '/_search', api_func='os_init.r_content_search', methods=['GET'])
+# 系统启动作业配置操作
+add_rule_api(boot_job.blueprint, '', api_func='boot_job.r_create', methods=['POST'])
+add_rule_api(boot_job.blueprint, '/<_id>', api_func='boot_job.r_update', methods=['PATCH'])
+add_rule_api(boot_job.blueprints, '/<ids>', api_func='boot_job.r_delete', methods=['DELETE'])
+add_rule_api(boot_job.blueprints, '/<ids>', api_func='boot_job.r_get', methods=['GET'])
+add_rule_api(boot_job.blueprints, '', api_func='boot_job.r_get_by_filter', methods=['GET'])
+add_rule_api(boot_job.blueprints, '/_search', api_func='boot_job.r_content_search', methods=['GET'])
 
-add_rule_api(os_init_write.blueprint, '', api_func='os_init_write.r_create', methods=['POST'])
-add_rule_api(os_init_write.blueprint, '/<_id>', api_func='os_init_write.r_update', methods=['PATCH'])
-add_rule_api(os_init_write.blueprints, '/<ids>', api_func='os_init_write.r_delete', methods=['DELETE'])
-add_rule_api(os_init_write.blueprints, '/<ids>', api_func='os_init_write.r_get', methods=['GET'])
-add_rule_api(os_init_write.blueprints, '', api_func='os_init_write.r_get_by_filter', methods=['GET'])
-add_rule_api(os_init_write.blueprints, '/_search', api_func='os_init_write.r_content_search', methods=['GET'])
+add_rule_api(operate_rule.blueprint, '', api_func='operate_rule.r_create', methods=['POST'])
+add_rule_api(operate_rule.blueprint, '/<_id>', api_func='operate_rule.r_update', methods=['PATCH'])
+add_rule_api(operate_rule.blueprints, '/<ids>', api_func='operate_rule.r_delete', methods=['DELETE'])
+add_rule_api(operate_rule.blueprints, '/<ids>', api_func='operate_rule.r_get', methods=['GET'])
+add_rule_api(operate_rule.blueprints, '', api_func='operate_rule.r_get_by_filter', methods=['GET'])
+add_rule_api(operate_rule.blueprints, '/_search', api_func='operate_rule.r_content_search', methods=['GET'])
 
 # 系统模板操作
 add_rule_api(os_template.blueprint, '', api_func='os_template.r_create', methods=['POST'])

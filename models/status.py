@@ -58,3 +58,15 @@ class DiskState(IntEnum):
     mounted = 2
     dirty = 255
 
+
+class BootJobUseFor(IntEnum):
+    template = 0
+    user = 1
+
+
+class OperateRuleKind(IntEnum):
+    cmd = 0
+    write_file = 1
+    append_file = 2
+
+

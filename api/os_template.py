@@ -45,14 +45,14 @@ def r_create():
         Rules.PATH.value,
         Rules.ACTIVE.value,
         Rules.ICON.value,
-        Rules.OS_INIT_ID_EXT.value
+        Rules.BOOT_JOB_ID_EXT.value
     ]
 
     os_template.label = request.json.get('label')
     os_template.path = request.json.get('path')
     os_template.active = request.json.get('active')
     os_template.icon = request.json.get('icon')
-    os_template.os_init_id = request.json.get('os_init_id', 0)
+    os_template.boot_job_id = request.json.get('boot_job_id', 0)
 
     try:
         ji.Check.previewing(args_rules, os_template.__dict__)
@@ -102,9 +102,9 @@ def r_update(_id):
             Rules.ICON.value,
         )
 
-    if 'os_init_id' in request.json:
+    if 'boot_job_id' in request.json:
         args_rules.append(
-            Rules.OS_INIT_ID_EXT.value,
+            Rules.BOOT_JOB_ID_EXT.value,
         )
 
     if args_rules.__len__() < 2:
@@ -123,7 +123,7 @@ def r_update(_id):
         os_template.path = request.json.get('path', os_template.path)
         os_template.active = request.json.get('active', os_template.active)
         os_template.icon = request.json.get('icon', os_template.icon)
-        os_template.os_init_id = request.json.get('os_init_id', os_template.os_init_id)
+        os_template.boot_job_id = request.json.get('boot_job_id', os_template.boot_job_id)
 
         os_template.update()
         os_template.get()

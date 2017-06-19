@@ -39,8 +39,8 @@ from guest_xml import (
     GuestXML
 )
 
-from os_init import (
-    OSInit, OSInitWrite
+from boot_job import (
+    BootJob, OperateRule
 )
 
 from os_template import (
@@ -72,7 +72,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState',
-    'LogLevel', 'ORM', 'Config', 'Guest', 'Disk', 'OSInit', 'OSInitWrite', 'OSTemplate', 'GuestXML', 'Log',
+    'LogLevel', 'ORM', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
     'EventProcessor', 'ResponseState'
 ]
 

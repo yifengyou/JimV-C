@@ -20,10 +20,10 @@ from models.initialize import app, logger, q_ws
 import api_route_table
 import views_route_table
 from models import Database as db
-from api.os_init import blueprint as os_init_blueprint
-from api.os_init import blueprints as os_init_blueprints
-from api.os_init_write import blueprint as os_init_write_blueprint
-from api.os_init_write import blueprints as os_init_write_blueprints
+from api.boot_job import blueprint as boot_job_blueprint
+from api.boot_job import blueprints as boot_job_blueprints
+from api.operate_rule import blueprint as operate_rule_blueprint
+from api.operate_rule import blueprints as operate_rule_blueprints
 from api.os_template import blueprint as os_template_blueprint
 from api.os_template import blueprints as os_template_blueprints
 from api.guest import blueprint as guest_blueprint
@@ -87,10 +87,10 @@ try:
     thread.start_new_thread(db.keepalived_mysql, ())
     db.init_conn_redis()
 
-    app.register_blueprint(os_init_blueprint)
-    app.register_blueprint(os_init_blueprints)
-    app.register_blueprint(os_init_write_blueprint)
-    app.register_blueprint(os_init_write_blueprints)
+    app.register_blueprint(boot_job_blueprint)
+    app.register_blueprint(boot_job_blueprints)
+    app.register_blueprint(operate_rule_blueprint)
+    app.register_blueprint(operate_rule_blueprints)
     app.register_blueprint(os_template_blueprint)
     app.register_blueprint(os_template_blueprints)
     app.register_blueprint(guest_blueprint)

@@ -13,11 +13,11 @@ __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
 
-class TestOSInitWrite(unittest.TestCase):
+class TestOperateRule(unittest.TestCase):
 
     base_url = 'http://127.0.0.1:8008/api'
-    os_init_id = 3
-    os_init_write_id = 0
+    boot_job_id = 2
+    operate_rule_id = 0
 
     def setUp(self):
         pass
@@ -29,21 +29,23 @@ class TestOSInitWrite(unittest.TestCase):
     # def test_11_create(self):
     #     payload = {
     #         "name": "CentOS-Systemd",
+    #         "use_for": 0,
     #         "remark": u"用作红帽 Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。"
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init'
+    #     url = TestOperateRule.base_url + '/boot_job'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
-    #     TestOSInitWrite.os_init_id = j_r['data']['id']
+    #     TestOperateRule.boot_job_id = j_r['data']['id']
     #     self.assertEqual('200', j_r['state']['code'])
-    #
+
     # # 添加系统初始化操作
     # def test_21_create(self):
     #     payload = {
-    #         "os_init_id": TestOSInitWrite.os_init_id,
+    #         "boot_job_id": TestOperateRule.boot_job_id,
+    #         "kind": 1,
     #         "path": "/etc/resolv.conf",
     #         "content": "\n".join([
     #             "nameserver {DNS1}",
@@ -51,7 +53,7 @@ class TestOSInitWrite(unittest.TestCase):
     #         ])
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
@@ -61,7 +63,8 @@ class TestOSInitWrite(unittest.TestCase):
     # # 添加系统初始化操作
     # def test_22_create(self):
     #     payload = {
-    #         "os_init_id": TestOSInitWrite.os_init_id,
+    #         "boot_job_id": TestOperateRule.boot_job_id,
+    #         "kind": 1,
     #         "path": "/etc/sysconfig/network-scripts/ifcfg-eth0",
     #         "content": "\n".join([
     #             "DEVICE=eth0",
@@ -78,7 +81,7 @@ class TestOSInitWrite(unittest.TestCase):
     #         ])
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
@@ -88,21 +91,22 @@ class TestOSInitWrite(unittest.TestCase):
     # # 添加系统初始化操作
     # def test_23_create(self):
     #     payload = {
-    #         "os_init_id": TestOSInitWrite.os_init_id,
+    #         "boot_job_id": TestOperateRule.boot_job_id,
+    #         "kind": 1,
     #         "path": "/etc/hostname",
     #         "content": "hostname"
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
-    #     TestOSInitWrite.os_init_write_id = j_r['data']['id']
+    #     TestOperateRule.operate_rule_id = j_r['data']['id']
     #     self.assertEqual('200', j_r['state']['code'])
-    #
+
     # def test_25_get_list(self):
-    #     url = TestOSInitWrite.base_url + '/os_init_writes'
+    #     url = TestOperateRule.base_url + '/operate_rules'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.get(url, headers=headers)
     #     j_r = json.loads(r.content)
@@ -115,16 +119,16 @@ class TestOSInitWrite(unittest.TestCase):
     #         "content": "{HOSTNAME}"
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write/' + TestOSInitWrite.os_init_write_id.__str__()
+    #     url = TestOperateRule.base_url + '/operate_rule/' + TestOperateRule.operate_rule_id.__str__()
     #     headers = {'content-type': 'application/json'}
     #     r = requests.patch(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
-    #
+
     # @unittest.skip('skip delete os init write!')
     # def test_27_delete(self):
-    #     url = TestOSInitWrite.base_url + '/os_init_writes/' + TestOSInitWrite.os_init_write_id.__str__()
+    #     url = TestOperateRule.base_url + '/operate_rules/' + TestOperateRule.operate_rule_id.__str__()
     #     headers = {'content-type': 'application/json'}
     #     r = requests.delete(url, headers=headers)
     #     j_r = json.loads(r.content)
@@ -134,7 +138,7 @@ class TestOSInitWrite(unittest.TestCase):
     # @unittest.skip('skip delete os init!')
     # # 删除系统初始化组列表更新结果
     # def test_31_delete(self):
-    #     url = TestOSInitWrite.base_url + '/os_init/' + TestOSInitWrite.os_init_id.__str__()
+    #     url = TestOperateRule.base_url + '/boot_jobs/' + TestOperateRule.boot_job_id.__str__()
     #     headers = {'content-type': 'application/json'}
     #     r = requests.delete(url, headers=headers)
     #     j_r = json.loads(r.content)
@@ -143,7 +147,8 @@ class TestOSInitWrite(unittest.TestCase):
     #
     # def test_51_create(self):
     #     payload = {
-    #         "os_init_id": 8,
+    #         "boot_job_id": 5,
+    #         "kind": 1,
     #         "path": "/etc/resolv.conf",
     #         "content": "\n".join([
     #             "nameserver {DNS1}",
@@ -151,7 +156,7 @@ class TestOSInitWrite(unittest.TestCase):
     #         ])
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
@@ -160,7 +165,8 @@ class TestOSInitWrite(unittest.TestCase):
     #
     # def test_52_create(self):
     #     payload = {
-    #         "os_init_id": 8,
+    #         "boot_job_id": 5,
+    #         "kind": 1,
     #         "path": "/etc/sysconfig/network-scripts/ifcfg-eth0",
     #         "content": "\n".join([
     #             "DEVICE=eth0",
@@ -175,7 +181,7 @@ class TestOSInitWrite(unittest.TestCase):
     #         ])
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
@@ -184,7 +190,8 @@ class TestOSInitWrite(unittest.TestCase):
     #
     # def test_53_create(self):
     #     payload = {
-    #         "os_init_id": 8,
+    #         "boot_job_id": 5,
+    #         "kind": 1,
     #         "path": "/etc/sysconfig/network",
     #         "content": "\n".join([
     #             "NETWORKING=yes",
@@ -192,17 +199,18 @@ class TestOSInitWrite(unittest.TestCase):
     #         ])
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
-    #     TestOSInitWrite.os_init_write_id = j_r['data']['id']
+    #     TestOperateRule.operate_rule_id = j_r['data']['id']
     #     self.assertEqual('200', j_r['state']['code'])
     #
     # def test_61_create(self):
     #     payload = {
-    #         "os_init_id": 7,
+    #         "boot_job_id": 3,
+    #         "kind": 1,
     #         "path": "/etc/resolv.conf",
     #         "content": "\n".join([
     #             "nameserver {DNS1}",
@@ -210,7 +218,7 @@ class TestOSInitWrite(unittest.TestCase):
     #         ])
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
@@ -219,7 +227,8 @@ class TestOSInitWrite(unittest.TestCase):
     #
     # def test_62_create(self):
     #     payload = {
-    #         "os_init_id": 7,
+    #         "boot_job_id": 3,
+    #         "kind": 1,
     #         "path": "/etc/conf.d/net",
     #         "content": "\n".join([
     #             "config_eth0=\"{IP}/{NETMASK}\"",
@@ -227,7 +236,7 @@ class TestOSInitWrite(unittest.TestCase):
     #         ])
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
@@ -236,17 +245,18 @@ class TestOSInitWrite(unittest.TestCase):
     #
     # def test_63_create(self):
     #     payload = {
-    #         "os_init_id": 7,
+    #         "boot_job_id": 3,
+    #         "kind": 1,
     #         "path": "/etc/conf.d/hostname",
     #         "content": "hostname=\"{HOSTNAME}\""
     #     }
     #
-    #     url = TestOSInitWrite.base_url + '/os_init_write'
+    #     url = TestOperateRule.base_url + '/operate_rule'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.post(url, data=json.dumps(payload), headers=headers)
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
-    #     TestOSInitWrite.os_init_write_id = j_r['data']['id']
+    #     TestOperateRule.operate_rule_id = j_r['data']['id']
     #     self.assertEqual('200', j_r['state']['code'])
 
 if __name__ == '__main__':

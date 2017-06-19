@@ -57,11 +57,14 @@ class Rules(Enum):
     DISK_SIZE_STR = ('regex:^\d{1,17}$', 'size')
 
     REMARK = (basestring, 'remark')
+    USE_FOR = (int, 'use_for')
     LABEL = (basestring, 'label')
     ACTIVE = (bool, 'active')
     ICON = (basestring, 'icon')
 
-    OS_INIT_ID_EXT = (int, 'os_init_id')
-    OS_INIT_WRITE_PATH = (basestring, 'path')
-    OS_INIT_WRITE_CONTENT = (basestring, 'content')
+    BOOT_JOB_ID_EXT = (int, 'boot_job_id')
+    OPERATE_RULE_KIND = (int, 'kind')
+    OPERATE_RULE_PATH = (basestring, 'path')
+    OPERATE_RULE_CONTENT = (basestring, 'content')
+    OPERATE_RULE_COMMAND = (basestring, 'command')
 

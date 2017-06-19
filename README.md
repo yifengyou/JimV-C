@@ -213,7 +213,7 @@ gunicorn -c gunicorn_config.py main:app
 
 ### [配置](docs/config.md)
 
-### [实例初始化操作簇](docs/os_init.md)
+### [实例初始化操作簇](docs/boot_job.md)
 
 ### [系统模板](docs/os_template.md)
 
