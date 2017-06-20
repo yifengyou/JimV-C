@@ -34,5 +34,7 @@
   "vnc_port_used_set": "S:VNCPort:Used",
   "downstream_queue": "Q:Downstream",
   "upstream_queue": "Q:Upstream",
-  "hosts_info": "H:HostsInfo"
+  "hosts_info": "H:HostsInfo",
+  "guest_boot_jobs": "S:GuestBootJobs",
+  "guest_boot_jobs_wait_time": 600
 }

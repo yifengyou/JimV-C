@@ -574,3 +574,78 @@ def r_update(uuid):
         return ret
     except ji.PreviewingError, e:
         return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_add_boot_jobs(uuid, boot_jobs_id):
+
+    args_rules = [
+        Rules.UUID.value,
+        Rules.BOOT_JOBS_ID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid, 'boot_jobs_id': boot_jobs_id})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        guest.add_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = guest.get_boot_jobs()
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_get_boot_jobs(uuid):
+
+    args_rules = [
+        Rules.UUID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid})
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = guest.get_boot_jobs()
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_delete_boot_jobs(uuid, boot_jobs_id):
+
+    args_rules = [
+        Rules.UUID.value,
+        Rules.BOOT_JOBS_ID.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid, 'boot_jobs_id': boot_jobs_id})
+
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+
+        guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = guest.get_boot_jobs()
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+

@@ -66,6 +66,10 @@ add_rule_api(guest.blueprints, '', api_func='guest.r_get_by_filter', methods=['G
 add_rule_api(guest.blueprints, '/_search', api_func='guest.r_content_search', methods=['GET'])
 add_rule_api(guest.blueprint, '/<uuid>', api_func='guest.r_update', methods=['PATCH'])
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_delete', methods=['DELETE'])
+add_rule_api(guest.blueprint, '/_boot_jobs/<uuid>/<boot_jobs_id>', api_func='guest.r_add_boot_jobs', methods=['PUT'])
+add_rule_api(guest.blueprint, '/_boot_jobs/<uuid>', api_func='guest.r_get_boot_jobs', methods=['GET'])
+add_rule_api(guest.blueprint, '/_boot_jobs/<uuid>/<boot_jobs_id>', api_func='guest.r_delete_boot_jobs',
+             methods=['DELETE'])
 
 # Disk操作
 add_rule_api(disk.blueprint, '', api_func='disk.r_create', methods=['POST'])

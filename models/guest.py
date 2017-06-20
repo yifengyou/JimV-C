@@ -65,6 +65,31 @@ class Guest(ORM):
     def emit_instruction(message):
         db.r.publish(app.config['instruction_channel'], message=message)
 
+    def get_boot_jobs_key(self):
+        return ':'.join([app.config['guest_boot_jobs'], self.uuid])
+
+    def add_boot_jobs(self, boot_jobs_id):
+        if not isinstance(boot_jobs_id, list):
+            raise
+
+        key = self.get_boot_jobs_key()
+        db.r.sadd(key, *boot_jobs_id)
+        db.r.expire(key, app.config['guest_boot_jobs_wait_time'])
+
+    def get_boot_jobs(self):
+        return list(db.r.smembers(self.get_boot_jobs_key()))
+
+    def delete_boot_jobs(self, boot_jobs_id):
+        if not isinstance(boot_jobs_id, list):
+            raise
+
+        key = self.get_boot_jobs_key()
+        db.r.srem(key, *boot_jobs_id)
+
+        # 如果集合下还有值，则更新启动作业有效时间
+        if db.r.exists(key):
+            db.r.expire(key, app.config['guest_boot_jobs_wait_time'])
+
 
 class Disk(ORM):
 
