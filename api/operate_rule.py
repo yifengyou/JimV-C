@@ -43,12 +43,14 @@ def r_create():
 
     args_rules = [
         Rules.BOOT_JOB_ID_EXT.value,
-        Rules.OPERATE_RULE_KIND.value
+        Rules.OPERATE_RULE_KIND.value,
+        Rules.OPERATE_RULE_SEQUENCE.value
     ]
 
     operate_rule.boot_job_id = request.json.get('boot_job_id')
     operate_rule.kind = request.json.get('kind')
     operate_rule.path = request.json.get('path', '')
+    operate_rule.sequence = request.json.get('sequence', 0)
     operate_rule.content = request.json.get('content', '')
     operate_rule.command = request.json.get('command', '')
 
@@ -115,6 +117,11 @@ def r_update(_id):
             Rules.OPERATE_RULE_KIND.value,
         )
 
+    if 'sequence' in request.json:
+        args_rules.append(
+            Rules.OPERATE_RULE_SEQUENCE.value,
+        )
+
     if 'path' in request.json:
         args_rules.append(
             Rules.OPERATE_RULE_PATH.value,
@@ -143,6 +150,7 @@ def r_update(_id):
         operate_rule.get()
         operate_rule.boot_job_id = request.json.get('boot_job_id', operate_rule.boot_job_id)
         operate_rule.kind = request.json.get('kind', operate_rule.kind)
+        operate_rule.sequence = request.json.get('sequence', operate_rule.sequence)
         operate_rule.path = request.json.get('path', operate_rule.path)
         operate_rule.content = request.json.get('content', operate_rule.content)
         operate_rule.command = request.json.get('command', operate_rule.command)

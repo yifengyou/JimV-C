@@ -51,6 +51,7 @@ class OperateRule(ORM):
         self.id = 0
         self.boot_job_id = None
         self.kind = ''
+        self.sequence = 0
         self.command = ''
         self.path = ''
         self.content = ''
@@ -60,6 +61,7 @@ class OperateRule(ORM):
         return {
             'id': FilterFieldType.INT.value,
             'boot_job_id': FilterFieldType.INT.value,
+            'sequence': FilterFieldType.INT.value,
             'command': FilterFieldType.STR.value,
             'path': FilterFieldType.STR.value,
             'content': FilterFieldType.STR.value,
@@ -67,7 +69,7 @@ class OperateRule(ORM):
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['boot_job_id']
+        return ['boot_job_id', 'sequence']
 
     @staticmethod
     def get_allow_content_search_keywords():

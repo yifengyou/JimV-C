@@ -60,8 +60,12 @@ class DiskState(IntEnum):
 
 
 class BootJobUseFor(IntEnum):
+    # 用于系统模板初始化
     template = 0
-    user = 1
+    # 用于系统及，比如通过重启系统更改密码功能之类
+    system = 1
+    # 用于用户自定义
+    user = 2
 
 
 class OperateRuleKind(IntEnum):

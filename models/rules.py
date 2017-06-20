@@ -64,6 +64,7 @@ class Rules(Enum):
 
     BOOT_JOB_ID_EXT = (int, 'boot_job_id')
     OPERATE_RULE_KIND = (int, 'kind')
+    OPERATE_RULE_SEQUENCE = (int, 'sequence')
     OPERATE_RULE_PATH = (basestring, 'path')
     OPERATE_RULE_CONTENT = (basestring, 'content')
     OPERATE_RULE_COMMAND = (basestring, 'command')
