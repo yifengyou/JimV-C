@@ -77,14 +77,27 @@ def r_create():
             ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', boot_job.id.__str__()])
             return ret
 
-        data, total = operate_rule.get_by_filter(
-            filter_str=':'.join(['boot_job_id', 'eq', operate_rule.boot_job_id.__str__()]) + ';' +
-                       ':'.join(['path', 'eq', operate_rule.path]))
+        if operate_rule.kind == OperateRuleKind.cmd.value:
+            data, total = operate_rule.get_by_filter(
+                filter_str=':'.join(['boot_job_id', 'eq', operate_rule.boot_job_id.__str__()]) + ';' +
+                           ':'.join(['command', 'eq', operate_rule.command]))
+
+        else:
+            data, total = operate_rule.get_by_filter(
+                filter_str=':'.join(['boot_job_id', 'eq', operate_rule.boot_job_id.__str__()]) + ';' +
+                           ':'.join(['path', 'eq', operate_rule.path]))
 
         if data.__len__() > 0:
             ret['state'] = ji.Common.exchange_state(40901)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ', path: ', operate_rule.path,
-                                                    ', boot_job_id: ', operate_rule.boot_job_id.__str__()])
+
+            if operate_rule.kind == OperateRuleKind.cmd.value:
+                ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'],
+                                                        ', command: ', operate_rule.command,
+                                                        ', boot_job_id: ', operate_rule.boot_job_id.__str__()])
+
+            else:
+                ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ', path: ', operate_rule.path,
+                                                        ', boot_job_id: ', operate_rule.boot_job_id.__str__()])
             return ret
 
         operate_rule.create()

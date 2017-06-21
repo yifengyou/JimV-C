@@ -131,10 +131,19 @@ def r_create():
             _operate_rules = copy.deepcopy(operate_rules)
             for k, v in enumerate(_operate_rules):
                 _operate_rules[k]['content'] = v['content'].replace('{IP}', guest.ip).\
-                    replace('{HOSTNAME}', guest.name).\
+                    replace('{HOSTNAME}', guest.name). \
+                    replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask).\
                     replace('{GATEWAY}', config.gateway).\
                     replace('{DNS1}', config.dns1).\
+                    replace('{DNS2}', config.dns2)
+
+                _operate_rules[k]['command'] = v['command'].replace('{IP}', guest.ip). \
+                    replace('{HOSTNAME}', guest.name). \
+                    replace('{PASSWORD}', guest.password). \
+                    replace('{NETMASK}', config.netmask). \
+                    replace('{GATEWAY}', config.gateway). \
+                    replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
             create_vm_msg = {
@@ -280,8 +289,38 @@ def r_boot(uuids):
             guest.uuid = uuid
             guest.get_by('uuid')
 
+        config = Config()
+        config.id = 1
+        config.get()
+
         for uuid in uuids.split(','):
-            message = {'action': 'boot', 'uuid': uuid}
+            boot_jobs_id = guest.get_boot_jobs()
+
+            boot_jobs = list()
+
+            if boot_jobs_id.__len__() > 0:
+                boot_jobs, count = OperateRule.get_by_filter(filter_str='boot_job_id:in:' + ','.join(boot_jobs_id))
+
+            # 替换占位符为有效内容
+            for k, v in enumerate(boot_jobs):
+                boot_jobs[k]['content'] = v['content'].replace('{IP}', guest.ip). \
+                    replace('{HOSTNAME}', guest.name). \
+                    replace('{PASSWORD}', guest.password). \
+                    replace('{NETMASK}', config.netmask). \
+                    replace('{GATEWAY}', config.gateway). \
+                    replace('{DNS1}', config.dns1). \
+                    replace('{DNS2}', config.dns2)
+
+                boot_jobs[k]['command'] = v['command'].replace('{IP}', guest.ip). \
+                    replace('{HOSTNAME}', guest.name). \
+                    replace('{PASSWORD}', guest.password). \
+                    replace('{NETMASK}', config.netmask). \
+                    replace('{GATEWAY}', config.gateway). \
+                    replace('{DNS1}', config.dns1). \
+                    replace('{DNS2}', config.dns2)
+
+            message = {'action': 'boot', 'uuid': uuid, 'boot_jobs': boot_jobs,
+                       'passback_parameters': {'boot_jobs_id': boot_jobs_id}}
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -577,25 +616,38 @@ def r_update(uuid):
 
 
 @Utils.dumps2response
-def r_add_boot_jobs(uuid, boot_jobs_id):
+def r_add_boot_jobs(uuids, boot_jobs_id):
 
     args_rules = [
-        Rules.UUID.value,
+        Rules.UUIDS.value,
         Rules.BOOT_JOBS_ID.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid, 'boot_jobs_id': boot_jobs_id})
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'boot_jobs_id': boot_jobs_id})
 
         guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
 
-        guest.add_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.add_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = guest.get_boot_jobs()
+
+        if uuids.split(',').__len__() > 1:
+            ret['data'] = dict()
+            for uuid in uuids.split(','):
+                guest.uuid = uuid
+                ret['data'][uuid] = guest.get_boot_jobs()
+
+        else:
+            guest.uuid = uuids
+            ret['data'] = guest.get_boot_jobs()
+
         return ret
 
     except ji.PreviewingError, e:
@@ -603,21 +655,34 @@ def r_add_boot_jobs(uuid, boot_jobs_id):
 
 
 @Utils.dumps2response
-def r_get_boot_jobs(uuid):
+def r_get_boot_jobs(uuids):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUIDS.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
+        ji.Check.previewing(args_rules, {'uuids': uuids})
+
         guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = guest.get_boot_jobs()
+
+        if uuids.split(',').__len__() > 1:
+            ret['data'] = dict()
+            for uuid in uuids.split(','):
+                guest.uuid = uuid
+                ret['data'][uuid] = guest.get_boot_jobs()
+
+        else:
+            guest.uuid = uuids
+            ret['data'] = guest.get_boot_jobs()
+
         return ret
 
     except ji.PreviewingError, e:
@@ -625,25 +690,62 @@ def r_get_boot_jobs(uuid):
 
 
 @Utils.dumps2response
-def r_delete_boot_jobs(uuid, boot_jobs_id):
+def r_delete_boot_jobs(uuids, boot_jobs_id):
 
     args_rules = [
-        Rules.UUID.value,
+        Rules.UUIDS.value,
         Rules.BOOT_JOBS_ID.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid, 'boot_jobs_id': boot_jobs_id})
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'boot_jobs_id': boot_jobs_id})
 
         guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
+        # 检测所指定的 UUDIs 实例都存在
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
 
-        guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = guest.get_boot_jobs()
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_reset_password(uuids, password):
+
+    args_rules = [
+        Rules.UUIDS.value,
+        Rules.PASSWORD.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'password': password})
+
+        guest = Guest()
+        # 检测所指定的 UUDIs 实例都存在
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        # 重置密码的 boot job id 固定为 1
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+            guest.password = password
+            guest.update()
+
+            guest.add_boot_jobs(boot_jobs_id=['1'])
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
     except ji.PreviewingError, e:

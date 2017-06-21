@@ -254,26 +254,26 @@ class TestGuest(unittest.TestCase):
     #     self.assertEqual('200', j_r['state']['code'])
 
     # def test_71_add_boot_jobs_id(self):
-    #     TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6'
-    #     url = TestGuest.base_url + '/guest/_boot_jobs/' + TestGuest.uuid + '/' + '1,2,4'
+    #     TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6,5fdfe92a-b2dd-4fcf-8be5-06b185212e70'
+    #     url = TestGuest.base_url + '/guests/_boot_jobs/' + TestGuest.uuid + '/' + '1,2,4'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.put(url, headers=headers)
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
-
-    def test_72_get_boot_jobs_id(self):
-        TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6'
-        url = TestGuest.base_url + '/guest/_boot_jobs/' + TestGuest.uuid
-        headers = {'content-type': 'application/json'}
-        r = requests.get(url, headers=headers)
-        j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
-        self.assertEqual('200', j_r['state']['code'])
-
+    #
+    # def test_72_get_boot_jobs_id(self):
+    #     TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6,5fdfe92a-b2dd-4fcf-8be5-06b185212e70'
+    #     url = TestGuest.base_url + '/guests/_boot_jobs/' + TestGuest.uuid
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.get(url, headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     self.assertEqual('200', j_r['state']['code'])
+    #
     # def test_73_delete_boot_jobs_id(self):
-    #     TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6'
-    #     url = TestGuest.base_url + '/guest/_boot_jobs/' + TestGuest.uuid + '/' + '1,2,3'
+    #     TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6,5fdfe92a-b2dd-4fcf-8be5-06b185212e70'
+    #     url = TestGuest.base_url + '/guests/_boot_jobs/' + TestGuest.uuid + '/' + '1,2,3'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.delete(url, headers=headers)
     #     j_r = json.loads(r.content)
@@ -281,13 +281,22 @@ class TestGuest(unittest.TestCase):
     #     self.assertEqual('200', j_r['state']['code'])
     #
     # def test_74_delete_boot_jobs_id(self):
-    #     TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6'
-    #     url = TestGuest.base_url + '/guest/_boot_jobs/' + TestGuest.uuid + '/' + '4'
+    #     TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6,5fdfe92a-b2dd-4fcf-8be5-06b185212e70'
+    #     url = TestGuest.base_url + '/guests/_boot_jobs/' + TestGuest.uuid + '/' + '4'
     #     headers = {'content-type': 'application/json'}
     #     r = requests.delete(url, headers=headers)
     #     j_r = json.loads(r.content)
     #     print json.dumps(j_r, ensure_ascii=False)
     #     self.assertEqual('200', j_r['state']['code'])
+    #
+    def test_81_reset_password(self):
+        TestGuest.uuid = 'ba38a067-83cb-49e8-bfc1-7dce7d5e34e6,5fdfe92a-b2dd-4fcf-8be5-06b185212e70'
+        url = TestGuest.base_url + '/guests/_reset_password/' + TestGuest.uuid + '/' + 'new.pswd.com'
+        headers = {'content-type': 'application/json'}
+        r = requests.put(url, headers=headers)
+        j_r = json.loads(r.content)
+        print json.dumps(j_r, ensure_ascii=False)
+        self.assertEqual('200', j_r['state']['code'])
 
 if __name__ == '__main__':
     unittest.main()

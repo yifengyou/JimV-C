@@ -96,7 +96,7 @@ class Init(object):
 q_ws = JoinableQueue()
 # 预编译效率更高
 regex_sql_str = re.compile('\\\+"')
-regex_dsl_str = re.compile('^\w+:\w+:\S+$')
+regex_dsl_str = re.compile('^\w+:\w+:[\S| ]+$')
 
 config = Init.load_config()
 logger = Init.init_logger()

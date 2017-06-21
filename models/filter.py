@@ -52,7 +52,7 @@ class Filter(object):
         if regex_dsl_str.match(dsl) is None:
             return sql_stmt
 
-        keyword, operator, value = dsl.split(':')
+        keyword, operator, value = dsl.split(':', 2)
         operator = operator.lower()
 
         if keyword not in allow_keywords.keys():

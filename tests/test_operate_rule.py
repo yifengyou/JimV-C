@@ -259,6 +259,21 @@ class TestOperateRule(unittest.TestCase):
     #     TestOperateRule.operate_rule_id = j_r['data']['id']
     #     self.assertEqual('200', j_r['state']['code'])
 
+    # def test_64_create(self):
+    #     payload = {
+    #         "boot_job_id": 1,
+    #         "kind": 0,
+    #         "command": "echo \"root:{PASSWORD}\" | chpasswd"
+    #     }
+    #
+    #     url = TestOperateRule.base_url + '/operate_rule'
+    #     headers = {'content-type': 'application/json'}
+    #     r = requests.post(url, data=json.dumps(payload), headers=headers)
+    #     j_r = json.loads(r.content)
+    #     print json.dumps(j_r, ensure_ascii=False)
+    #     TestOperateRule.operate_rule_id = j_r['data']['id']
+    #     self.assertEqual('200', j_r['state']['code'])
+
 if __name__ == '__main__':
     unittest.main()
 
