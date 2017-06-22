@@ -196,7 +196,7 @@ def utility_processor():
             desc = '迁移中'
 
         elif status == GuestState.dirty.value:
-            color = 'FCFF07'
+            color = 'FF0707'
             icon = 'glyph-icon icon-remove'
             desc = '创建失败，待清理'
 

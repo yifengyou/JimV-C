@@ -110,6 +110,7 @@ class EventProcessor(object):
 
         if action == 'create_guest':
             if state == ResponseState.success.value:
+                # 系统盘的 UUID 与其 Guest 的 UUID 相同
                 cls.disk.uuid = uuid
                 cls.disk.get_by('uuid')
                 cls.disk.guest_uuid = uuid

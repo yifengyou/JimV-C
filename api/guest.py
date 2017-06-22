@@ -77,9 +77,12 @@ def r_create():
             return ret
 
         os_template.get()
+        # 重置密码的 boot job id 固定为 1
+        boot_jobs_id = [1, os_template.boot_job_id]
 
-        operate_rules, operate_rules_count = OperateRule.get_by_filter(
-            filter_str='boot_job_id:in:' + os_template.boot_job_id.__str__())
+        boot_jobs, boot_jobs_count = OperateRule.get_by_filter(
+            filter_str='boot_job_id:in:' +
+                       ','.join(['{0}'.format(boot_job_id) for boot_job_id in boot_jobs_id]).__str__())
 
         if db.r.scard(app.config['ip_available_set']) < 1:
             ret['state'] = ji.Common.exchange_state(50350)
@@ -128,9 +131,9 @@ def r_create():
             guest.create()
 
             # 替换占位符为有效内容
-            _operate_rules = copy.deepcopy(operate_rules)
-            for k, v in enumerate(_operate_rules):
-                _operate_rules[k]['content'] = v['content'].replace('{IP}', guest.ip).\
+            _boot_jobs = copy.deepcopy(boot_jobs)
+            for k, v in enumerate(_boot_jobs):
+                _boot_jobs[k]['content'] = v['content'].replace('{IP}', guest.ip).\
                     replace('{HOSTNAME}', guest.name). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask).\
@@ -138,7 +141,7 @@ def r_create():
                     replace('{DNS1}', config.dns1).\
                     replace('{DNS2}', config.dns2)
 
-                _operate_rules[k]['command'] = v['command'].replace('{IP}', guest.ip). \
+                _boot_jobs[k]['command'] = v['command'].replace('{IP}', guest.ip). \
                     replace('{HOSTNAME}', guest.name). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask). \
@@ -153,9 +156,9 @@ def r_create():
                 'glusterfs_volume': config.glusterfs_volume,
                 'template_path': os_template.path,
                 'disk': disk.__dict__,
-                'writes': _operate_rules,
-                'password': guest.password,
-                'xml': guest_xml.get_domain()
+                'xml': guest_xml.get_domain(),
+                'boot_jobs': _boot_jobs,
+                'passback_parameters': {'boot_jobs_id': boot_jobs_id}
             }
             db.r.rpush(app.config['downstream_queue'], json.dumps(create_vm_msg, ensure_ascii=False))
 
