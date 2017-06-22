@@ -190,6 +190,13 @@ class EventProcessor(object):
             cls.disk.get_by('uuid')
             cls.disk.delete()
 
+        elif action == 'boot':
+            boot_jobs_id = cls.message['message']['passback_parameters']['boot_jobs_id']
+
+            if state == ResponseState.success.value:
+                cls.guest.uuid = uuid
+                cls.guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id)
+
         else:
             pass
 
