@@ -161,6 +161,11 @@
                 }
             });
         });
+
+        $('#reset_password_modal').on('show.bs.modal', function (me) {
+            $('#reset_password_instance_uuid').val(
+                $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
+        });
     });
 
     function refresh() {
@@ -370,6 +375,20 @@
         });
     }
 
+    function reset_password(uuids, password) {
+        $.ajax({
+            url : '/api/guests/_reset_password/' + uuids.join(',') + '/' + password,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例重置密码指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例重置密码指令发送成功！');
+            }
+        });
+    }
+
     function boot_at(me) {
         var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
         boot([uuid]);
@@ -412,15 +431,28 @@
 
     function migrate_go() {
         var migrate_type = $('#migrate_type').val();
-        var uuid = [];
+        var uuids = [];
         if (migrate_type === 'single') {
-            uuid = [$('#migrate_instance_uuid').val()];
+            uuids = [$('#migrate_instance_uuid').val()];
         } else {
-            uuid = get_checked_uuids();
+            uuids = get_checked_uuids();
         }
         var host = $('#migrate_host').val();
         $('#migrate_modal').modal('hide');
-        migrate([uuid], host);
+        migrate([uuids], host);
+    }
+
+    function reset_password_go() {
+        var migrate_type = $('#reset_password_type').val();
+        var uuids = [];
+        if (migrate_type === 'single') {
+            uuids = [$('#reset_password_instance_uuid').val()];
+        } else {
+            uuids = get_checked_uuids();
+        }
+        var password = $('#new_password').val();
+        $('#reset_password_modal').modal('hide');
+        reset_password([uuids], password);
     }
 
     function get_selected_uuids() {
@@ -594,7 +626,10 @@
                                 </li>
                                 <li class="divider"></li>
                                 <li class="">
-                                    <a href="javascript:;">密码重置</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"
+                                       onclick="$('#reset_password_type').val('single')">
+                                        密码重置
+                                    </a>
                                 </li>
                                 <li class="{% if item.status not in [1, 3, 4, 5, 6] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#migrate_modal"
@@ -642,7 +677,10 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="javascript:;">密码重置</a>
+                                                <a href="javascript:;" onclick="$('#reset_password_type').val('batch');"
+                                                   data-toggle="modal" data-target="#reset_password_modal">
+                                                    密码重置
+                                                </a>
                                             </li>
                                             <li class="divider"></li>
                                             <li>
@@ -723,6 +761,25 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="migrate_go();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="reset_password_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">重置密码：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
+                <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+                <input id="new_password" title="新密码" class="form-control" name="new_password" type="password">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="reset_password_go();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
