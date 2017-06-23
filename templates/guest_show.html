@@ -774,9 +774,16 @@
                 <h4 class="modal-title">重置密码：</h4>
             </div>
             <div class="modal-body">
-                <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
-                <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
-                <input id="new_password" title="新密码" class="form-control" name="new_password" type="password">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
+                        <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+                        <label class="col-sm-3 control-label" for="new_password">新密码：</label>
+                        <div class="col-sm-9">
+                            <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="New password">
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="reset_password_go();">确定</button>
