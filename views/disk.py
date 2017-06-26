@@ -85,44 +85,25 @@ def create():
     host_url = request.host_url.rstrip('/')
 
     if request.method == 'POST':
-        ability = request.form.get('ability')
-        os_template_id = request.form.get('os_template_id')
+        size = request.form.get('size')
         quantity = request.form.get('quantity')
-        password = request.form.get('password')
         remark = request.form.get('remark')
 
-        if not isinstance(ability, basestring):
-            pass
-
-        m = re.search('^(\d)c(\d)g$', ability.lower())
-        if m is None:
-            pass
-
-        cpu = m.groups()[0]
-        memory = m.groups()[1]
-
         payload = {
-            "cpu": int(cpu),
-            "memory": int(memory),
-            "os_template_id": int(os_template_id),
+            "size": int(size),
             "quantity": int(quantity),
-            "remark": remark,
-            "password": password,
-            "lease_term": 100
+            "remark": remark
         }
 
-        url = host_url + '/api/guest'
+        url = host_url + '/api/disk'
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         j_r = json.loads(r.content)
         return render_template('success.html', go_back_url='/disks', timeout=10000, title='提交成功',
                                message_title='创建实例的请求已被接受',
-                               message='您所提交的资源正在创建中。根据所提交资源的大小，需要等待几到十几分钟。页面将在10秒钟后自动跳转到实例列表页面！')
+                               message='您所提交的资源正在创建中。根据所提交资源的数量，需要等待几到十几秒钟。页面将在10秒钟后自动跳转到实例列表页面！')
 
     else:
-        os_template_url = host_url + url_for('api_os_templates.r_get_by_filter')
-        os_template_ret = requests.get(url=os_template_url)
-        os_template_ret = json.loads(os_template_ret.content)
-        return render_template('guest_create.html', os_template_data=os_template_ret['data'])
+        return render_template('disk_create.html')
 
 

@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+{% block title %} Guest {% endblock %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+        
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+
+        .btn-ability {
+            margin-right: 16px;
+            height: 50px;
+            padding: 8px 50px;
+            margin-bottom: 30px;
+        }
+    </style>
+{% endblock head %}
+{% block body %}
+<script>
+    $(document).ready(function() {
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+    });
+
+    $(function() { "use strict";
+        $("#size").TouchSpin({
+            max: 10240,
+            min: 100,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#quantity").TouchSpin({
+            max: 20,
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+</script>
+
+<div class="container" style="padding-top: 100px;">
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero" style="display: inline;">
+                创建磁盘
+            </h3>
+            <a href="/disks" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
+                <span class="glyph-icon icon-separator" style="transform: rotateY(-180deg);">
+                    <i class="glyph-icon icon-level-up"></i>
+                </span>
+                <span class="button-content">
+                    返回磁盘列表
+                </span>
+            </a>
+            <div class="example-box-wrapper">
+                <form class="form-horizontal bordered-row" action="/disks/create" method="post">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-hdd"></span>&nbsp;&nbsp;磁盘大小 (GB)</label>
+                        <div class="col-sm-6">
+                            <input id="size" title="磁盘大小" class="form-control" type="text" value="100" name="size">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;数量</label>
+                        <div class="col-sm-6">
+                            <input id="quantity" title="实例数量" class="form-control" type="text" value="1" name="quantity">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;标识</label>
+                        <div class="col-sm-6">
+                            <div style="height: 10px;"></div>
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">磁盘标识：</label>
+                                <div class="col-sm-6">
+                                    <input id="remark" name="remark" type="text" title="磁盘标识" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-3 pull-right">
+                            <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
