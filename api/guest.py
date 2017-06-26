@@ -98,7 +98,7 @@ def r_create():
             # 虚拟机内存单位，模板生成方法中已置其为GiB
             guest.memory = request.json.get('memory')
             guest.os_template_id = request.json.get('os_template_id')
-            guest.name = ji.Common.generate_random_code(length=8)
+            guest.label = ji.Common.generate_random_code(length=8)
             guest.remark = request.json.get('remark', '')
 
             guest.password = request.json.get('password')
@@ -118,7 +118,7 @@ def r_create():
 
             disk = Disk()
             disk.uuid = guest.uuid
-            disk.label = guest.name + '_SystemImage'
+            disk.remark = guest.label + '_SystemImage'
             disk.format = 'qcow2'
             disk.sequence = 0
             disk.size = 0
@@ -134,7 +134,7 @@ def r_create():
             _boot_jobs = copy.deepcopy(boot_jobs)
             for k, v in enumerate(_boot_jobs):
                 _boot_jobs[k]['content'] = v['content'].replace('{IP}', guest.ip).\
-                    replace('{HOSTNAME}', guest.name). \
+                    replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask).\
                     replace('{GATEWAY}', config.gateway).\
@@ -142,7 +142,7 @@ def r_create():
                     replace('{DNS2}', config.dns2)
 
                 _boot_jobs[k]['command'] = v['command'].replace('{IP}', guest.ip). \
-                    replace('{HOSTNAME}', guest.name). \
+                    replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask). \
                     replace('{GATEWAY}', config.gateway). \
@@ -152,7 +152,7 @@ def r_create():
             create_vm_msg = {
                 'action': 'create_guest',
                 'uuid': guest.uuid,
-                'name': guest.name,
+                'name': guest.label,
                 'glusterfs_volume': config.glusterfs_volume,
                 'template_path': os_template.path,
                 'disk': disk.__dict__,
@@ -307,7 +307,7 @@ def r_boot(uuids):
             # 替换占位符为有效内容
             for k, v in enumerate(boot_jobs):
                 boot_jobs[k]['content'] = v['content'].replace('{IP}', guest.ip). \
-                    replace('{HOSTNAME}', guest.name). \
+                    replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask). \
                     replace('{GATEWAY}', config.gateway). \
@@ -315,7 +315,7 @@ def r_boot(uuids):
                     replace('{DNS2}', config.dns2)
 
                 boot_jobs[k]['command'] = v['command'].replace('{IP}', guest.ip). \
-                    replace('{HOSTNAME}', guest.name). \
+                    replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask). \
                     replace('{GATEWAY}', config.gateway). \
@@ -605,7 +605,7 @@ def r_update(uuid):
         guest.uuid = uuid
         guest.get_by('uuid')
 
-        guest.remark = request.json.get('remark', guest.name)
+        guest.remark = request.json.get('remark', guest.label)
 
         guest.update()
         guest.get()

@@ -106,4 +106,8 @@ app.config = dict(app.config, **config)
 ji.index_state['branch'] = dict(ji.index_state['branch'], **own_state_branch)
 
 # sequence_device_node_mapping = ['vda', 'vdb', 'vdc', 'vdd']
-dev_table = ['vda', 'vdb', 'vdc', 'vdd']
+dev_table = list()
+
+for i in range(26):
+    dev_table.append('vd' + chr(97 + i))
+

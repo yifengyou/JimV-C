@@ -26,7 +26,7 @@ class Guest(ORM):
         super(Guest, self).__init__()
         self.id = 0
         self.uuid = None
-        self.name = None
+        self.label = None
         self.password = None
         self.remark = ''
         self.os_template_id = None
@@ -47,7 +47,7 @@ class Guest(ORM):
         return {
             'id': FilterFieldType.INT.value,
             'uuid': FilterFieldType.STR.value,
-            'name': FilterFieldType.STR.value,
+            'label': FilterFieldType.STR.value,
             'remark': FilterFieldType.STR.value,
             'on_host': FilterFieldType.STR.value,
             'ip': FilterFieldType.STR.value
@@ -59,7 +59,7 @@ class Guest(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['name', 'remark', 'on_host', 'ip']
+        return ['label', 'remark', 'on_host', 'ip']
 
     @staticmethod
     def emit_instruction(message):
@@ -100,12 +100,13 @@ class Disk(ORM):
         super(Disk, self).__init__()
         self.id = 0
         self.uuid = None
-        self.label = None
+        self.remark = None
         self.path = None
         self.size = None
         self.sequence = None
         self.state = DiskState.pending.value
         self.format = 'qcow2'
+        self.create_time = ji.Common.tus()
         self.guest_uuid = None
 
     @staticmethod
@@ -113,7 +114,7 @@ class Disk(ORM):
         return {
             'id': FilterFieldType.INT.value,
             'uuid': FilterFieldType.STR.value,
-            'label': FilterFieldType.STR.value,
+            'remark': FilterFieldType.STR.value,
             'size': FilterFieldType.INT.value,
             'state': FilterFieldType.INT.value,
             'guest_uuid': FilterFieldType.STR.value
@@ -125,7 +126,7 @@ class Disk(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['label', 'size']
+        return ['remark', 'size']
 
 
 class GuestMigrateInfo(ORM):

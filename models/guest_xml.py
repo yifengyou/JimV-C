@@ -86,7 +86,7 @@ class GuestXML(object):
         """
 
     def get_name(self):
-        return """<name>{0}</name>""".format(self.guest.name)
+        return """<name>{0}</name>""".format(self.guest.label)
 
     def get_uuid(self):
         return """<uuid>{0}</uuid>""".format(self.guest.uuid)

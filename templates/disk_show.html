@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %} Guest {% endblock %}
+{% block title %} Disk {% endblock %}
 {% block head %}
     {{ super() }}
     <style type="text/css">
@@ -133,39 +133,35 @@
         });
 
         $('#edit_remark_modal').on('show.bs.modal', function (me) {
-            $('#instance_uuid').val($(me.relatedTarget).parent().parent().prev().prev().text());
+            $('#instance_uuid').val($(me.relatedTarget).parent().parent().find('div a')[0].text);
             $('#edit_remark').val($(me.relatedTarget).prev().text());
         });
 
-        $('#migrate_host').chosen({
-            "disable_search": true
+        $('#mountable_guest').chosen({
+            "search_contains": true
         });
 
-        $('#migrate_modal').on('show.bs.modal', function (me) {
-            $('#migrate_instance_uuid').val(
-                $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
+        $('#mount_modal').on('show.bs.modal', function (me) {
             $.ajax({
-                url : '/api/hosts',
+                url : '/api/guests?page=1&page_size=10000',
                 type : 'GET',
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json',
                 error : function() {
                 },
                 success : function(data, textStatus, xhr) {
-                    $('#migrate_host').empty();
+                    $('#mountable_guest').empty();
+                    $('#mountable_guest').append(
+                        $('<option>')
+                    );
                     $.each(data.data, function(k, v) {
-                        $('#migrate_host').append(
-                            $('<option>', {value: v['hostname'], text: v['hostname']})
+                        $('#mountable_guest').append(
+                            $('<option>', {value: v['uuid'], text: v['label'] + '/' + v['remark']})
                         );
                     });
-                    $('#migrate_host').trigger("chosen:updated");
+                    $('#mountable_guest').trigger("chosen:updated");
                 }
             });
-        });
-
-        $('#reset_password_modal').on('show.bs.modal', function (me) {
-            $('#reset_password_instance_uuid').val(
-                $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
         });
     });
 
@@ -193,18 +189,18 @@
         var remark = $('#edit_remark').val();
         $('#edit_remark_modal').modal('hide');
         $.ajax({
-            url : '/api/guest/' + uuid,
+            url : '/api/disk/' + uuid,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
                 remark: remark
             }),
             error : function() {
-                alter_danger('实例备注更新失败！');
+                alter_danger('磁盘备注更新失败！');
             },
             success : function() {
-                $('#guest_list tbody').find('td:contains(' + uuid + ')').next().next().find('p').text(remark);
-                alter_success('实例备注更新成功！');
+                $('#disk_list tbody').find('td:contains(' + uuid + ')').find('p').text(remark);
+                alter_success('磁盘备注更新成功！');
             }
         });
     }
@@ -250,107 +246,51 @@
         shortcut_bar_enable();
     }
 
-    function boot(uuids) {
+    function mount(uuid, disk_uuid) {
         $.ajax({
-            url : '/api/guests/_boot/' + uuids.join(','),
+            url : '/api/guest/_attach_disk/' + uuid + '/' + disk_uuid,
             type : 'PUT',
             contentType: "application/json; charset=utf-8",
             error : function() {
-                alter_danger('实例启动指令发送失败！');
+                alter_danger('实例挂载指令发送失败！');
             },
             success : function() {
-                alter_success('实例启动指令发送成功！');
+                alter_success('实例挂载指令发送成功！');
             }
         });
     }
 
-    function reboot(uuids) {
+    function unmount(disk_uuid) {
         $.ajax({
-            url : '/api/guests/_reboot/' + uuids.join(','),
+            url : '/api/guest/_detach_disk/' + disk_uuid,
             type : 'PUT',
             contentType: "application/json; charset=utf-8",
             error : function() {
-                alter_danger('实例重启指令发送失败！');
+                alter_danger('实例卸载指令发送失败！');
             },
             success : function() {
-                alter_success('实例重启指令发送成功！');
+                alter_success('实例卸载指令发送成功！');
             }
         });
     }
 
-    function force_reboot(uuids) {
+    function resize(disk_uuid) {
         $.ajax({
-            url : '/api/guests/_force_reboot/' + uuids.join(','),
+            url : '/api/disk/_disk_resize/' + disk_uuid,
             type : 'PUT',
             contentType: "application/json; charset=utf-8",
             error : function() {
-                alter_danger('实例强制重启指令发送失败！');
+                alter_danger('实例扩容指令发送失败！');
             },
             success : function() {
-                alter_success('实例强制重启指令发送成功！');
-            }
-        });
-    }
-
-    function shutdown(uuids) {
-        $.ajax({
-            url : '/api/guests/_shutdown/' + uuids.join(','),
-            type : 'PUT',
-            contentType: "application/json; charset=utf-8",
-            error : function() {
-                alter_danger('实例停止指令发送失败！');
-            },
-            success : function() {
-                alter_success('实例停止指令发送成功！');
-            }
-        });
-    }
-
-    function force_shutdown(uuids) {
-        $.ajax({
-            url : '/api/guests/_force_shutdown/' + uuids.join(','),
-            type : 'PUT',
-            contentType: "application/json; charset=utf-8",
-            error : function() {
-                alter_danger('实例强制停止指令发送失败！');
-            },
-            success : function() {
-                alter_success('实例强制停止指令发送成功！');
-            }
-        });
-    }
-
-    function suspend(uuids) {
-        $.ajax({
-            url : '/api/guests/_suspend/' + uuids.join(','),
-            type : 'PUT',
-            contentType: "application/json; charset=utf-8",
-            error : function() {
-                alter_danger('实例暂停指令发送失败！');
-            },
-            success : function() {
-                alter_success('实例暂停指令发送成功！');
-            }
-        });
-    }
-
-    function resume(uuids) {
-        $.ajax({
-            url : '/api/guests/_resume/' + uuids.join(','),
-            type : 'PUT',
-            contentType: "application/json; charset=utf-8",
-            error : function() {
-                alter_danger('实例恢复指令发送失败！');
-            },
-            success : function() {
-                alter_success('实例恢复指令发送成功！');
+                alter_success('实例扩容指令发送成功！');
             }
         });
     }
 
     function remove(uuids) {
         $.ajax({
-            url : '/api/guests/' + uuids.join(','),
+            url : '/api/disks/' + uuids.join(','),
             type : 'DELETE',
             contentType: "application/json; charset=utf-8",
             error : function() {
@@ -362,98 +302,16 @@
         });
     }
 
-    function migrate(uuids, host) {
-        $.ajax({
-            url : '/api/guests/_migrate/' + uuids.join(',') + '/' + host,
-            type : 'PUT',
-            contentType: "application/json; charset=utf-8",
-            error : function() {
-                alter_danger('实例迁移指令发送失败！');
-            },
-            success : function() {
-                alter_success('实例迁移指令发送成功！');
-            }
-        });
+    function mount_at(me) {
+        var guest_uuid = $('#mountable_guest').val();
+        var disk_uuid = $('#instance_uuid').val();
+        mount(guest_uuid, disk_uuid);
+        $('#mount_modal').modal('hide');
     }
 
-    function reset_password(uuids, password) {
-        $.ajax({
-            url : '/api/guests/_reset_password/' + uuids.join(',') + '/' + password,
-            type : 'PUT',
-            contentType: "application/json; charset=utf-8",
-            error : function() {
-                alter_danger('实例重置密码指令发送失败！');
-            },
-            success : function() {
-                alter_success('实例重置密码指令发送成功！');
-            }
-        });
-    }
-
-    function boot_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        boot([uuid]);
-    }
-
-    function reboot_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        reboot([uuid]);
-    }
-
-    function force_reboot_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        force_reboot([uuid]);
-    }
-
-    function shutdown_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        shutdown([uuid]);
-    }
-
-    function force_shutdown_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        force_shutdown([uuid]);
-    }
-
-    function suspend_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        suspend([uuid]);
-    }
-
-    function resume_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        resume([uuid]);
-    }
-
-    function delete_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
-        remove([uuid]);
-    }
-
-    function migrate_go() {
-        var migrate_type = $('#migrate_type').val();
-        var uuids = [];
-        if (migrate_type === 'single') {
-            uuids = [$('#migrate_instance_uuid').val()];
-        } else {
-            uuids = get_checked_uuids();
-        }
-        var host = $('#migrate_host').val();
-        $('#migrate_modal').modal('hide');
-        migrate([uuids], host);
-    }
-
-    function reset_password_go() {
-        var migrate_type = $('#reset_password_type').val();
-        var uuids = [];
-        if (migrate_type === 'single') {
-            uuids = [$('#reset_password_instance_uuid').val()];
-        } else {
-            uuids = get_checked_uuids();
-        }
-        var password = $('#new_password').val();
-        $('#reset_password_modal').modal('hide');
-        reset_password([uuids], password);
+    function unmount_at(me) {
+        var disk_uuid = $($(me).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text;
+        unmount(disk_uuid);
     }
 
     function get_selected_uuids() {
@@ -479,56 +337,7 @@
         return uuids;
     }
 
-    function batch_boot() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            boot(uuids);
-        }
-    }
-
-    function batch_reboot() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            reboot(uuids);
-        }
-    }
-
-    function batch_force_reboot() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            force_reboot(uuids);
-        }
-    }
-
-    function batch_shutdown() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            shutdown(uuids);
-        }
-    }
-
-    function batch_force_shutdown() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            force_shutdown(uuids);
-        }
-    }
-
-    function batch_suspend() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            suspend(uuids);
-        }
-    }
-
-    function batch_resume() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            resume(uuids);
-        }
-    }
-
-    function batch_delete() {
+   function batch_delete() {
         var uuids = get_checked_uuids();
         if (uuids) {
             remove(uuids);
@@ -538,7 +347,7 @@
 <div class="panel">
     <div class="panel-body">
         <h3 class="title-hero" style="font-size: 24px;">
-            虚拟机实例
+            磁盘实例
         </h3>
         <div>
             <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
@@ -549,35 +358,31 @@
                         </div>
                         <div class="pull-right">
                             <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
-                            <a class="btn btn-info add-page-transition" href="/guests/create" data-transition="pt-page-moveFromRight-init" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">创建实例</a>
+                            <a class="btn btn-info add-page-transition" href="/disks/create" data-transition="pt-page-moveFromRight-init" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">创建磁盘</a>
                         </div>
                     </div>
                 </div>
-                <table id="guest_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                <table id="disk_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
                        style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
                 <thead>
                 <tr role="row">
-                    <th style="display: none;">UUID</th>
                     <th><input class="all_selector" title="选取所有" type="checkbox"></th>
-                    <th width="180px;">名称</th>
-                    <th></th>
+                    <th width="280px;">UUID</th>
                     <th>状态</th>
-                    <th>计算节点</th>
-                    <th>配置</th>
-                    <th>IP</th>
-                    <th>密码</th>
+                    <th>大小</th>
+                    <th>设备号</th>
+                    <th>所属 Guest</th>
                     <th>创建时间</th>
                     <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in guests_ret.data %}
+                {% for item in disks_ret.data %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
-                    <td style="display: none;">{{ item.uuid }}</td>
                     <td><input title="选中" type="checkbox"></td>
                     <td>
                         <div>
-                            <a href="javascript:;">{{ item.label }}</a>
+                            <a href="javascript:;">{{ item.uuid }}</a>
                         </div>
                         <div>
                             <p style="display: inline-block;">{{ item.remark }}</p>
@@ -586,12 +391,10 @@
                             </a>
                         </div>
                     </td>
-                    <td><span class="{{ os_template_mapping_by_id[item.os_template_id].icon }}"></span></td>
-                    <td>{{ format_guest_status(item.status)|safe }}</td>
-                    <td>{{ item.on_host }}</td>
-                    <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>
-                    <td>{{ item.ip }}</td>
-                    <td>{{ item.password }}</td>
+                    <td>{{ format_disk_state(item.state)|safe }}</td>
+                    <td>{{ item.size }} GB</td>
+                    <td>{{ format_sequence_to_device_name(item.sequence) }}</td>
+                    <td><a href="javascript:;">{{ item.guest_uuid }}</a></td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
                     <td>
                         <div class="dropdown inline-block">
@@ -599,47 +402,24 @@
                                 更多
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="{% if item.status not in [4, 5, 6] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="boot_at(this);">启动</a>
-                                </li>
-                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="reboot_at(this);">重启</a>
-                                </li>
-                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="force_reboot_at(this);">强制重启</a>
-                                </li>
-                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="shutdown_at(this);">停止</a>
-                                </li>
-                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="force_shutdown_at(this);">强制停止</a>
-                                </li>
-                                <li class="divider"></li>
-                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="suspend_at(this);">暂停</a>
-                                </li>
-                                <li class="{% if item.status not in [3] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="resume_at(this);">恢复</a>
-                                </li>
-                                <li class="divider"></li>
-                                <li class="">
-                                    <a href="/guest/vnc/{{ item.uuid }}" target="_blank">远程连接</a>
-                                </li>
-                                <li class="divider"></li>
-                                <li class="">
-                                    <a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"
-                                       onclick="$('#reset_password_type').val('single')">
-                                        密码重置
+                                <li class="{% if item.state not in [1] %} disabled {% endif %}">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#mount_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);">
+                                        挂载
                                     </a>
                                 </li>
-                                <li class="{% if item.status not in [1, 3, 4, 5, 6] %} disabled {% endif %}">
-                                    <a href="javascript:;" data-toggle="modal" data-target="#migrate_modal"
-                                       onclick="$('#migrate_type').val('single')">
-                                        迁移到
+                                <li class="{% if item.sequence == 0 or item.state not in [2] %} disabled {% endif %}">
+                                    <a href="javascript:;" onclick="unmount_at(this);">卸载</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="{% if item.state not in [1, 2] %} disabled {% endif %}">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#resize_modal"
+                                       onclick="$('#resize_type').val('single')">
+                                        磁盘扩容
                                     </a>
                                 </li>
                                 <li class="divider"></li>
-                                <li class="{% if item.status not in [4, 5, 6, 255] %} disabled {% endif %}">
+                                <li class="{% if item.state not in [1, 255] %} disabled {% endif %}">
                                     <a href="javascript:;" onclick="delete_at(this);">删除</a>
                                 </li>
                             </ul>
@@ -657,44 +437,13 @@
                         <th>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">启动</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_reboot();">重启</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_shutdown();">停止</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_suspend();">暂停</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_resume();">恢复</button>
-                                    <div class="dropup inline-block">
-                                        <button href="javascript:;" class="dropdown-toggle btn btn-default btn-shortcut disabled" data-toggle="dropdown">
-                                            更多
-                                        </button>
-                                        <ul class="dropdown-menu" style="width: 60px;">
-                                            <li>
-                                                <a href="javascript:;" onclick="batch_delete();">删除</a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li>
-                                                <a href="javascript:;" onclick="$('#migrate_type').val('batch');"
-                                                   data-toggle="modal" data-target="#migrate_modal" >
-                                                    迁移到
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:;" onclick="$('#reset_password_type').val('batch');"
-                                                   data-toggle="modal" data-target="#reset_password_modal">
-                                                    密码重置
-                                                </a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li>
-                                                <a href="javascript:;" onclick="batch_force_shutdown();">强制停止</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:;" onclick="batch_force_reboot();">强制重启</a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">挂载</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_reboot();">卸载</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_shutdown();">磁盘扩容</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_suspend();">删除</button>
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                    共有{{ guests_ret.paging.total }}条，每页显示：
+                                    共有{{ disks_ret.paging.total }}条，每页显示：
                                     <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
                                         <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
                                         <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
@@ -728,6 +477,8 @@
     </div>
 </div>
 
+<input id="instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+
 <div class="modal" id="edit_remark_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -735,7 +486,6 @@
                 <h4 class="modal-title">编辑实例名称：</h4>
             </div>
             <div class="modal-body">
-                <input id="instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
                 <input id="edit_remark" title="实例名称" class="form-control" name="remark">
             </div>
             <div class="modal-footer">
@@ -746,20 +496,19 @@
     </div>
 </div>
 
-<div class="modal" id="migrate_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="mount_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">实例迁移至：</h4>
+                <h4 class="modal-title">挂载至：</h4>
             </div>
             <div class="modal-body">
-                <input id="migrate_type" title="迁移类型" class="form-control" name="migrate_type" value="single" hidden>
-                <input id="migrate_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
-                <select id="migrate_host" name="migrate_host" title="可迁移宿主机" class="chosen-select">
+                <select id="mountable_guest" name="mountable_host" title="可被挂载的 Guest" class="chosen-select" data-placeholder="挂载至 ...">
+                    <option></option>
                 </select>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="migrate_go();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="mount_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

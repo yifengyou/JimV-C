@@ -38,6 +38,8 @@ from api.host import blueprints as host_blueprints
 
 from views.guest import blueprint as view_guest_blueprint
 from views.guest import blueprints as view_guest_blueprints
+from views.disk import blueprint as view_disk_blueprint
+from views.disk import blueprints as view_disk_blueprints
 
 from websockify.websocketproxy import WebSocketProxy
 
@@ -105,6 +107,8 @@ try:
 
     app.register_blueprint(view_guest_blueprint)
     app.register_blueprint(view_guest_blueprints)
+    app.register_blueprint(view_disk_blueprint)
+    app.register_blueprint(view_disk_blueprints)
 
 except:
     logger.error(traceback.format_exc())

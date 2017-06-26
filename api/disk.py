@@ -44,7 +44,9 @@ disk_base = Base(the_class=Disk, the_blueprint=blueprint, the_blueprints=bluepri
 def r_create():
 
     args_rules = [
-        Rules.DISK_SIZE.value
+        Rules.DISK_SIZE.value,
+        Rules.REMARK.value,
+        Rules.QUANTITY.value
     ]
 
     try:
@@ -54,31 +56,34 @@ def r_create():
         ret['state'] = ji.Common.exchange_state(20000)
 
         size = request.json['size']
+        quantity = request.json.get('quantity')
 
         if size < 1:
             ret['state'] = ji.Common.exchange_state(41255)
             return ret
 
-        disk = Disk()
-        disk.guest_uuid = ''
-        disk.size = size
-        disk.uuid = uuid4().__str__()
-        disk.label = ji.Common.generate_random_code(length=8)
-        disk.sequence = -1
-        disk.format = 'qcow2'
+        while quantity:
+            quantity -= 1
+            disk = Disk()
+            disk.guest_uuid = ''
+            disk.size = size
+            disk.uuid = uuid4().__str__()
+            disk.remark = request.json.get('remark', '')
+            disk.sequence = -1
+            disk.format = 'qcow2'
 
-        config = Config()
-        config.id = 1
-        config.get()
+            config = Config()
+            config.id = 1
+            config.get()
 
-        disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
+            disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
 
-        message = {'action': 'create_disk', 'glusterfs_volume': config.glusterfs_volume,
-                   'image_path': disk.path, 'size': disk.size, 'uuid': disk.uuid}
+            message = {'action': 'create_disk', 'glusterfs_volume': config.glusterfs_volume,
+                       'image_path': disk.path, 'size': disk.size, 'uuid': disk.uuid}
 
-        db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
+            db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
 
-        disk.create()
+            disk.create()
 
         return ret
 
@@ -200,9 +205,9 @@ def r_update(uuid):
         Rules.UUID.value
     ]
 
-    if 'label' in request.json:
+    if 'remark' in request.json:
         args_rules.append(
-            Rules.LABEL.value,
+            Rules.REMARK.value
         )
 
     if args_rules.__len__() < 2:
@@ -218,7 +223,7 @@ def r_update(uuid):
         disk.uuid = uuid
         disk.get_by('uuid')
 
-        disk.label = request.json.get('label', disk.label)
+        disk.remark = request.json.get('remark', disk.remark)
 
         disk.update()
         disk.get()

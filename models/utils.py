@@ -206,6 +206,50 @@ def utility_processor():
         return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
             icon=icon, color=color, desc=desc)
 
+    def format_sequence_to_device_name(sequence):
+        # sequence 不能大于 25。dev_table 序数从 0 开始。
+        if sequence == -1:
+            return u'无'
+
+        if sequence >= dev_table.__len__():
+            return 'Unknown'
+
+        return dev_table[sequence]
+
+    def format_disk_state(state):
+        from status import DiskState
+
+        color = 'FF645B'
+        icon = 'glyph-icon icon-bolt'
+        desc = '未知状态'
+
+        if state == DiskState.pending.value:
+            color = 'FFC543'
+            icon = 'glyph-icon icon-spinner'
+            desc = '创建中'
+
+        elif state == DiskState.idle.value:
+            color = '0077BB'
+            icon = 'glyph-icon icon-unlink'
+            desc = '待挂载'
+
+        elif state == DiskState.mounted.value:
+            color = '00BB00'
+            icon = 'glyph-icon icon-link'
+            desc = '使用中'
+
+        elif state == DiskState.dirty.value:
+            color = 'FF0707'
+            icon = 'glyph-icon icon-remove'
+            desc = '创建失败，待清理'
+
+        else:
+            pass
+
+        return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
+            icon=icon, color=color, desc=desc)
+
     return dict(format_price=format_price, format_datetime_by_tus=format_datetime_by_tus,
-                format_guest_status=format_guest_status)
+                format_guest_status=format_guest_status, format_sequence_to_device_name=format_sequence_to_device_name,
+                format_disk_state=format_disk_state)
 

@@ -6,7 +6,7 @@ USE jimv;
 CREATE TABLE IF NOT EXISTS guest(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     uuid CHAR(36) NOT NULL,
-    name VARCHAR(64) NOT NULL UNIQUE,
+    label VARCHAR(64) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     remark VARCHAR(255) NOT NULL DEFAULT '',
     os_template_id BIGINT UNSIGNED NOT NULL,
@@ -27,9 +27,10 @@ CREATE TABLE IF NOT EXISTS guest(
     DEFAULT CHARSET=utf8;
 
 ALTER TABLE guest ADD INDEX (uuid);
-ALTER TABLE guest ADD INDEX (name);
+ALTER TABLE guest ADD INDEX (label);
 ALTER TABLE guest ADD INDEX (on_host);
 ALTER TABLE guest ADD INDEX (ip);
+ALTER TABLE guest ADD INDEX (remark);
 
 
 CREATE TABLE IF NOT EXISTS guest_migrate_info(
@@ -57,13 +58,14 @@ ALTER TABLE guest_migrate_info ADD INDEX (uuid);
 CREATE TABLE IF NOT EXISTS disk(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     uuid CHAR(36) NOT NULL,
-    label VARCHAR(255) NOT NULL,
     path VARCHAR(255) NOT NULL,
     size INT UNSIGNED NOT NULL,
+    remark VARCHAR(255) NOT NULL DEFAULT '',
     sequence TINYINT NOT NULL,
     format CHAR(16) NOT NULL DEFAULT 'qcow2',
     -- 实例固有的状态用 state;
     state TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    create_time BIGINT UNSIGNED NOT NULL,
     guest_uuid CHAR(36) NOT NULL,
     PRIMARY KEY (id))
     ENGINE=InnoDB
@@ -71,6 +73,7 @@ CREATE TABLE IF NOT EXISTS disk(
 
 ALTER TABLE disk ADD INDEX (size);
 ALTER TABLE disk ADD INDEX (guest_uuid);
+ALTER TABLE disk ADD INDEX (remark);
 
 
 CREATE TABLE IF NOT EXISTS os_template(
