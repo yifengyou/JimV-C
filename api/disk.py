@@ -118,7 +118,7 @@ def r_resize(uuid, size):
             ret['state'] = ji.Common.exchange_state(41257)
             return ret
 
-        message = {'action': 'resize_disk', 'size': size, 'guest_uuid': disk.guest_uuid,
+        message = {'action': 'resize_disk', 'size': int(size), 'guest_uuid': disk.guest_uuid,
                    'disk_uuid': disk.uuid, 'passback_parameters': {'size': size}}
 
         if used:

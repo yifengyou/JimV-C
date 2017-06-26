@@ -274,9 +274,9 @@
         });
     }
 
-    function resize(disk_uuid) {
+    function resize(disk_uuid, size) {
         $.ajax({
-            url : '/api/disk/_disk_resize/' + disk_uuid,
+            url : '/api/disk/_disk_resize/' + disk_uuid + '/' + size,
             type : 'PUT',
             contentType: "application/json; charset=utf-8",
             error : function() {
@@ -314,34 +314,24 @@
         unmount(disk_uuid);
     }
 
-    function get_selected_uuids() {
-        var selected_element = get_selected_element(true);
-        var uuids = [];
+    function resize_at(me) {
+        var disk_uuid = $('#instance_uuid').val();
+        var size = $('#size').val();
+        resize(disk_uuid, size);
+        $('#resize_modal').modal('hide');
+    }
 
-        selected_element.each(function(i, e) {
-            var uuid = $(e).parent().prev().text();
-            uuids.push(uuid);
+    function reset_resize_value(me) {
+        var min = $(me).parent().parent().parent().parent().parent().children()[3].textContent.split(' ')[0];
+        $(function() { "use strict";
+            $("#size").TouchSpin({
+                max: 10240,
+                min: min,
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
         });
-
-        return uuids;
-    }
-
-    function get_checked_uuids() {
-        var uuids = get_selected_uuids();
-
-        if (uuids.length < 1) {
-            alter_warning('未选择任何可操作的实例！');
-            return false;
-        }
-
-        return uuids;
-    }
-
-   function batch_delete() {
-        var uuids = get_checked_uuids();
-        if (uuids) {
-            remove(uuids);
-        }
     }
 </script>
 <div class="panel">
@@ -414,7 +404,7 @@
                                 <li class="divider"></li>
                                 <li class="{% if item.state not in [1, 2] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#resize_modal"
-                                       onclick="$('#resize_type').val('single')">
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);reset_resize_value(this);">
                                         磁盘扩容
                                     </a>
                                 </li>
@@ -515,21 +505,19 @@
     </div>
 </div>
 
-<div class="modal" id="reset_password_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="resize_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">重置密码：</h4>
+                <h4 class="modal-title">磁盘扩容：</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
-                    <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
-                    <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="New password">
+                    <input id="size" title="磁盘大小" class="form-control" type="text" value="100" name="size">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="reset_password_go();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="resize_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
