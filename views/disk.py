@@ -64,6 +64,26 @@ def show():
     disks_ret = requests.get(url=disks_url)
     disks_ret = json.loads(disks_ret.content)
 
+    guest_uuids = list()
+
+    for disk in disks_ret['data']:
+        if disk['guest_uuid'].__len__() == 36:
+            guest_uuids.append(disk['guest_uuid'])
+
+    if guest_uuids.__len__() > 0:
+        guests_url = host_url + url_for('api_guests.r_get_by_filter')
+        guests_url += '?filter=uuid:in:' + ','.join(guest_uuids)
+        guests_ret = requests.get(url=guests_url)
+        guests_ret = json.loads(guests_ret.content)
+
+        guests_uuid_mapping = dict()
+        for guest in guests_ret['data']:
+            guests_uuid_mapping[guest['uuid']] = guest
+
+        for i, disk in enumerate(disks_ret['data']):
+            if disk['guest_uuid'].__len__() == 36:
+                disks_ret['data'][i]['guest'] = guests_uuid_mapping[disk['guest_uuid']]
+
     last_page = int(ceil(disks_ret['paging']['total'] / float(page_size)))
     page_length = 5
     pages = list()

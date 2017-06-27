@@ -390,7 +390,9 @@
                     <td>{{ format_disk_state(item.state)|safe }}</td>
                     <td>{{ item.size }} GB</td>
                     <td>{{ format_sequence_to_device_name(item.sequence) }}</td>
-                    <td><a href="javascript:;">{{ item.guest_uuid }}</a></td>
+                    <td><a href="/guest/detail/{{ item.guest_uuid }}" {% if 'guest' not in item %}style="display: none"{% endif %}>{% if 'guest' in item %}
+                        {{ item.guest.label }}/{{ item.guest.remark }}
+                    {% endif %}</a></td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
                     <td>
                         <div class="dropdown inline-block">
