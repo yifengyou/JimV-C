@@ -33,6 +33,8 @@ def show():
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('page_size', 10))
     keyword = request.args.get('keyword', None)
+    order_by = request.args.get('order_by', None)
+    order = request.args.get('order', None)
     resource_path = request.path
 
     if page is not None:
@@ -43,6 +45,12 @@ def show():
 
     if keyword is not None:
         args.append('keyword=' + keyword.__str__())
+
+    if order_by is not None:
+        args.append('order_by=' + order_by)
+
+    if order is not None:
+        args.append('order=' + order)
 
     host_url = request.host_url.rstrip('/')
 
@@ -78,7 +86,8 @@ def show():
                 break
 
     return render_template('disk_show.html', disks_ret=disks_ret, resource_path=resource_path, page=page,
-                           page_size=page_size, keyword=keyword, pages=pages, last_page=last_page)
+                           page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
+                           last_page=last_page)
 
 
 def create():

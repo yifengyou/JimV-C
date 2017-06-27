@@ -288,9 +288,9 @@
         });
     }
 
-    function remove(uuids) {
+    function remove(disk_uuid) {
         $.ajax({
-            url : '/api/disks/' + uuids.join(','),
+            url : '/api/disks/' + disk_uuid,
             type : 'DELETE',
             contentType: "application/json; charset=utf-8",
             error : function() {
@@ -332,6 +332,12 @@
                 verticaldownclass: 'glyph-icon icon-minus'
             });
         });
+    }
+
+    function delete_at(me) {
+        var disk_uuid = $('#instance_uuid').val();
+        remove(disk_uuid);
+        $('#delete_modal').modal('hide');
     }
 </script>
 <div class="panel">
@@ -392,25 +398,29 @@
                                 更多
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="{% if item.state not in [1] %} disabled {% endif %}">
+                                <li class="{% if item.state not in [1] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#mount_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);">
                                         挂载
                                     </a>
                                 </li>
-                                <li class="{% if item.sequence == 0 or item.state not in [2] %} disabled {% endif %}">
+                                <li class="{% if item.sequence == 0 or item.state not in [2] %} disabled {% endif %}" style="{% if item.sequence == 0 %}display: none;{% endif %}">
                                     <a href="javascript:;" onclick="unmount_at(this);">卸载</a>
                                 </li>
-                                <li class="divider"></li>
+                                <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
                                 <li class="{% if item.state not in [1, 2] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#resize_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);reset_resize_value(this);">
                                         磁盘扩容
                                     </a>
                                 </li>
-                                <li class="divider"></li>
-                                <li class="{% if item.state not in [1, 255] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="delete_at(this);">删除</a>
+                                <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                <li class="{% if item.state not in [1, 255] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);
+                                       $('#delete_instance_desc').text($('#instance_uuid').val().split('-')[0] + '/' + $($(this).parent().parent().parent().parent().parent().children()[1]).find('div p')[0].textContent)">
+                                        删除
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -427,10 +437,7 @@
                         <th>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">挂载</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_reboot();">卸载</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_shutdown();">磁盘扩容</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_suspend();">删除</button>
+                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">备注</button>
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
                                     共有{{ disks_ret.paging.total }}条，每页显示：
@@ -444,15 +451,15 @@
                                     <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
                                         <ul id="pagination" class="pagination">
                                             <li class="{% if page == 1 %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">«</a>
+                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
                                             </li>
                                             {% for item in pages %}
                                             <li class="{% if item == page %} active {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">{{ item }}</a>
+                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
                                             </li>
                                             {% endfor %}
                                             <li class="{% if page == last_page %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">»</a>
+                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
                                             </li>
                                         </ul>
                                     </div>
@@ -518,6 +525,24 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="resize_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除磁盘：</h4>
+            </div>
+            <div class="modal-body">
+                <p>删除的磁盘将无法找回，上面数据将永久消失。你确定要删除该磁盘吗？</p>
+                <h3 style="color: orangered;" id="delete_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

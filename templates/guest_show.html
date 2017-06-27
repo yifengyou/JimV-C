@@ -705,15 +705,15 @@
                                     <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
                                         <ul id="pagination" class="pagination">
                                             <li class="{% if page == 1 %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">«</a>
+                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}">«</a>
                                             </li>
                                             {% for item in pages %}
                                             <li class="{% if item == page %} active {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">{{ item }}</a>
+                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ item }}</a>
                                             </li>
                                             {% endfor %}
                                             <li class="{% if page == last_page %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %} &keyword={{ keyword }} {% endif %}">»</a>
+                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}">»</a>
                                             </li>
                                         </ul>
                                     </div>
