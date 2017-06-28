@@ -185,7 +185,7 @@ ALTER TABLE traffic ADD INDEX (tx_packets);
 ALTER TABLE traffic ADD INDEX (timestamp);
 
 
-CREATE TABLE IF NOT EXISTS disk_performance(
+CREATE TABLE IF NOT EXISTS disk_io(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     guest_uuid CHAR(36) NOT NULL,
     dev VARCHAR(36) NOT NULL,
@@ -198,10 +198,10 @@ CREATE TABLE IF NOT EXISTS disk_performance(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE disk_performance ADD INDEX (guest_uuid);
-ALTER TABLE disk_performance ADD INDEX (rd_req);
-ALTER TABLE disk_performance ADD INDEX (rd_bytes);
-ALTER TABLE disk_performance ADD INDEX (wr_req);
-ALTER TABLE disk_performance ADD INDEX (wr_bytes);
-ALTER TABLE disk_performance ADD INDEX (timestamp);
+ALTER TABLE disk_io ADD INDEX (guest_uuid);
+ALTER TABLE disk_io ADD INDEX (rd_req);
+ALTER TABLE disk_io ADD INDEX (rd_bytes);
+ALTER TABLE disk_io ADD INDEX (wr_req);
+ALTER TABLE disk_io ADD INDEX (wr_bytes);
+ALTER TABLE disk_io ADD INDEX (timestamp);
 
