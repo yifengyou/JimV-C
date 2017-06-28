@@ -56,6 +56,8 @@ class DiskState(IntEnum):
     pending = 0
     idle = 1
     mounted = 2
+    mounting = 3
+    unloading = 4
     dirty = 255
 
 

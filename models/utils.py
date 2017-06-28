@@ -238,6 +238,16 @@ def utility_processor():
             icon = 'glyph-icon icon-link'
             desc = '使用中'
 
+        elif state == DiskState.mounting.value:
+            color = '00BBBB'
+            icon = 'glyph-icon icon-elusive-upload'
+            desc = '挂载中'
+
+        elif state == DiskState.unloading.value:
+            color = '93969B'
+            icon = 'glyph-icon icon-elusive-download'
+            desc = '卸载中'
+
         elif state == DiskState.dirty.value:
             color = 'FF0707'
             icon = 'glyph-icon icon-remove'

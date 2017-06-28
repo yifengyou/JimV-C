@@ -441,7 +441,7 @@ def r_attach_disk(uuid, disk_uuid):
         ret['state'] = ji.Common.exchange_state(20000)
 
         # 判断欲挂载的磁盘是否空闲
-        if disk.guest_uuid.__len__() > 0:
+        if disk.guest_uuid.__len__() > 0 or disk.state != DiskState.idle.value:
             ret['state'] = ji.Common.exchange_state(41258)
             return ret
 
@@ -454,6 +454,7 @@ def r_attach_disk(uuid, disk_uuid):
         disk.guest_uuid = guest.uuid
         disks, count = disk.get_by_filter(filter_str='guest_uuid:in:' + guest.uuid)
         disk.sequence = count
+        disk.state = DiskState.mounting.value
 
         config = Config()
         config.id = 1
@@ -473,6 +474,7 @@ def r_attach_disk(uuid, disk_uuid):
         message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml,
                    'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence}}
         Guest.emit_instruction(message=json.dumps(message))
+        disk.update()
 
         return ret
 
@@ -530,6 +532,9 @@ def r_detach_disk(disk_uuid):
         message = {'action': 'detach_disk', 'uuid': disk.guest_uuid, 'xml': xml,
                    'passback_parameters': {'disk_uuid': disk.uuid}}
         Guest.emit_instruction(message=json.dumps(message))
+
+        disk.state = DiskState.unloading.value
+        disk.update()
 
         return ret
 
