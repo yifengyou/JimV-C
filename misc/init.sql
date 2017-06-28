@@ -143,3 +143,65 @@ CREATE TABLE IF NOT EXISTS log(
 
 ALTER TABLE log ADD INDEX (host);
 
+
+CREATE TABLE IF NOT EXISTS cpu_memory(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    guest_uuid CHAR(36) NOT NULL,
+    cpu_load INT UNSIGNED NOT NULL,
+    memory_available BIGINT UNSIGNED NOT NULL,
+    memory_unused BIGINT UNSIGNED NOT NULL,
+    timestamp BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE cpu_memory ADD INDEX (guest_uuid);
+ALTER TABLE cpu_memory ADD INDEX (cpu_load);
+ALTER TABLE cpu_memory ADD INDEX (timestamp);
+
+
+CREATE TABLE IF NOT EXISTS traffic(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    guest_uuid CHAR(36) NOT NULL,
+    name VARCHAR(36) NOT NULL,
+    rx_bytes BIGINT UNSIGNED NOT NULL,
+    rx_packets BIGINT UNSIGNED NOT NULL,
+    rx_errs BIGINT UNSIGNED NOT NULL,
+    rx_drop BIGINT UNSIGNED NOT NULL,
+    tx_bytes BIGINT UNSIGNED NOT NULL,
+    tx_packets BIGINT UNSIGNED NOT NULL,
+    tx_errs BIGINT UNSIGNED NOT NULL,
+    tx_drop BIGINT UNSIGNED NOT NULL,
+    timestamp BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE traffic ADD INDEX (guest_uuid);
+ALTER TABLE traffic ADD INDEX (rx_bytes);
+ALTER TABLE traffic ADD INDEX (rx_packets);
+ALTER TABLE traffic ADD INDEX (tx_bytes);
+ALTER TABLE traffic ADD INDEX (tx_packets);
+ALTER TABLE traffic ADD INDEX (timestamp);
+
+
+CREATE TABLE IF NOT EXISTS disk_performance(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    guest_uuid CHAR(36) NOT NULL,
+    dev VARCHAR(36) NOT NULL,
+    rd_req BIGINT UNSIGNED NOT NULL,
+    rd_bytes BIGINT UNSIGNED NOT NULL,
+    wr_req BIGINT UNSIGNED NOT NULL,
+    wr_bytes BIGINT UNSIGNED NOT NULL,
+    timestamp BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE disk_performance ADD INDEX (guest_uuid);
+ALTER TABLE disk_performance ADD INDEX (rd_req);
+ALTER TABLE disk_performance ADD INDEX (rd_bytes);
+ALTER TABLE disk_performance ADD INDEX (wr_req);
+ALTER TABLE disk_performance ADD INDEX (wr_bytes);
+ALTER TABLE disk_performance ADD INDEX (timestamp);
+
