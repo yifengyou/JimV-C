@@ -204,6 +204,20 @@ class EventProcessor(object):
             pass
 
     @classmethod
+    def collection_performance_processor(cls):
+        action = cls.message['message']['action']
+        uuid = cls.message['message']['uuid']
+        state = cls.message['type']
+        data = cls.message['message']['data']
+
+        if action == 'create_guest':
+            if state == ResponseState.success.value:
+                # 系统盘的 UUID 与其 Guest 的 UUID 相同
+                cls.disk.uuid = uuid
+        else:
+            pass
+
+    @classmethod
     def launch(cls):
         while True:
             if Utils.exit_flag:
@@ -231,6 +245,9 @@ class EventProcessor(object):
 
                 elif cls.message['kind'] == EmitKind.response.value:
                     cls.response_processor()
+
+                elif cls.message['kind'] == EmitKind.collection_performance.value:
+                    cls.collection_performance_processor()
 
                 else:
                     pass

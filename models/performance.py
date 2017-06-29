@@ -95,7 +95,7 @@ class DiskIO(ORM):
     def __init__(self):
         super(DiskIO, self).__init__()
         self.id = 0
-        self.guest_uuid = None
+        self.disk_uuid = None
         self.dev = None
         self.rd_req = None
         self.rd_bytes = None
@@ -107,8 +107,7 @@ class DiskIO(ORM):
     def get_filter_keywords():
         return {
             'id': FilterFieldType.INT.value,
-            'guest_uuid': FilterFieldType.STR.value,
-            'dev': FilterFieldType.STR.value,
+            'disk_uuid': FilterFieldType.STR.value,
             'rd_req': FilterFieldType.INT.value,
             'rd_bytes': FilterFieldType.INT.value,
             'wr_req': FilterFieldType.INT.value,

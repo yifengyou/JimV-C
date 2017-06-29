@@ -63,7 +63,7 @@ from event_processor import (
     EventProcessor
 )
 
-from Performance import (
+from performance import (
     CPUMemory,
     Traffic,
     DiskIO
