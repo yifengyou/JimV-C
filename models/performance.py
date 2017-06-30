@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-import jimit as ji
-
 from models import ORM, FilterFieldType
 
 
@@ -25,7 +23,7 @@ class CPUMemory(ORM):
         self.cpu_load = None
         self.memory_available = None
         self.memory_unused = None
-        self.timestamp = ji.Common.tus()
+        self.timestamp = None
 
     @staticmethod
     def get_filter_keywords():
@@ -63,7 +61,7 @@ class Traffic(ORM):
         self.tx_packets = None
         self.tx_errs = None
         self.tx_drop = None
-        self.timestamp = ji.Common.tus()
+        self.timestamp = None
 
     @staticmethod
     def get_filter_keywords():
@@ -100,7 +98,7 @@ class DiskIO(ORM):
         self.rd_bytes = None
         self.wr_req = None
         self.wr_bytes = None
-        self.timestamp = ji.Common.tus()
+        self.timestamp = None
 
     @staticmethod
     def get_filter_keywords():

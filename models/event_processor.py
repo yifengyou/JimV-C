@@ -210,7 +210,8 @@ class EventProcessor(object):
     @classmethod
     def collection_performance_processor(cls):
         data_kind = cls.message['type']
-        timestamp = cls.message['timestamp']
+        timestamp = ji.Common.ts()
+        timestamp -= (timestamp % 60)
         data = cls.message['message']['data']
 
         if data_kind == CollectionPerformanceDataKind.cpu_memory.value:
