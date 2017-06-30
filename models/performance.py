@@ -96,7 +96,6 @@ class DiskIO(ORM):
         super(DiskIO, self).__init__()
         self.id = 0
         self.disk_uuid = None
-        self.dev = None
         self.rd_req = None
         self.rd_bytes = None
         self.wr_req = None

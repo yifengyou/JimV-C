@@ -7,7 +7,7 @@ import time
 from IPy import IP
 import jimit as ji
 
-from models import Database as db, Config
+from models import Database as db, Config, CPUMemory, Traffic, DiskIO
 from models import Guest
 from models import Disk
 from models import Log
@@ -16,6 +16,7 @@ from models import EmitKind
 from models import ResponseState, GuestState, DiskState
 from models.guest import GuestMigrateInfo
 from models.initialize import app, logger
+from models.status import CollectionPerformanceDataKind
 
 
 __author__ = 'James Iter'
@@ -31,6 +32,9 @@ class EventProcessor(object):
     guest_migrate_info = GuestMigrateInfo()
     disk = Disk()
     config = Config()
+    cpu_memory = CPUMemory()
+    traffic = Traffic()
+    disk_io = DiskIO()
 
     @classmethod
     def log_processor(cls):
@@ -205,15 +209,44 @@ class EventProcessor(object):
 
     @classmethod
     def collection_performance_processor(cls):
-        action = cls.message['message']['action']
-        uuid = cls.message['message']['uuid']
-        state = cls.message['type']
+        data_kind = cls.message['type']
+        timestamp = cls.message['timestamp']
         data = cls.message['message']['data']
 
-        if action == 'create_guest':
-            if state == ResponseState.success.value:
-                # 系统盘的 UUID 与其 Guest 的 UUID 相同
-                cls.disk.uuid = uuid
+        if data_kind == CollectionPerformanceDataKind.cpu_memory.value:
+            for item in data:
+                cls.cpu_memory.guest_uuid = item['guest_uuid']
+                cls.cpu_memory.cpu_load = item['cpu_load']
+                cls.cpu_memory.memory_available = item['memory_available']
+                cls.cpu_memory.memory_unused = item['memory_unused']
+                cls.cpu_memory.timestamp = timestamp
+                cls.cpu_memory.create()
+
+        if data_kind == CollectionPerformanceDataKind.traffic.value:
+            for item in data:
+                cls.traffic.guest_uuid = item['guest_uuid']
+                cls.traffic.name = item['name']
+                cls.traffic.rx_bytes = item['rx_bytes']
+                cls.traffic.rx_packets = item['rx_packets']
+                cls.traffic.rx_errs = item['rx_errs']
+                cls.traffic.rx_drop = item['rx_drop']
+                cls.traffic.tx_bytes = item['tx_bytes']
+                cls.traffic.tx_packets = item['tx_packets']
+                cls.traffic.tx_errs = item['tx_errs']
+                cls.traffic.tx_drop = item['tx_drop']
+                cls.traffic.timestamp = timestamp
+                cls.traffic.create()
+
+        if data_kind == CollectionPerformanceDataKind.disk_io.value:
+            for item in data:
+                cls.disk_io.disk_uuid = item['disk_uuid']
+                cls.disk_io.rd_req = item['rd_req']
+                cls.disk_io.rd_bytes = item['rd_bytes']
+                cls.disk_io.wr_req = item['wr_req']
+                cls.disk_io.wr_bytes = item['wr_bytes']
+                cls.disk_io.timestamp = timestamp
+                cls.disk_io.create()
+
         else:
             pass
 

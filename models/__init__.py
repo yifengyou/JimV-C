@@ -59,14 +59,14 @@ from log import (
     Log
 )
 
-from event_processor import (
-    EventProcessor
-)
-
 from performance import (
     CPUMemory,
     Traffic,
     DiskIO
+)
+
+from event_processor import (
+    EventProcessor
 )
 
 
