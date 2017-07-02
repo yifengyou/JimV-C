@@ -11,6 +11,7 @@ from api import operate_rule
 from api import os_template
 from api import log
 from api import host
+from api import performance
 
 
 __author__ = 'James Iter'
@@ -92,3 +93,45 @@ add_rule_api(log.blueprints, '/_search', api_func='log.r_content_search', method
 add_rule_api(host.blueprints, '/<ids>', api_func='host.r_get', methods=['GET'])
 add_rule_api(host.blueprints, '', api_func='host.r_get_by_filter', methods=['GET'])
 add_rule_api(host.blueprints, '/_search', api_func='host.r_content_search', methods=['GET'])
+
+# 性能查询
+add_rule_api(performance.blueprint, '/cpu_memory', api_func='performance.r_cpu_memory_get_by_filter', methods=['GET'])
+add_rule_api(performance.blueprint, '/traffic', api_func='performance.r_traffic_get_by_filter', methods=['GET'])
+add_rule_api(performance.blueprint, '/disk_io', api_func='performance.r_disk_io_get_by_filter', methods=['GET'])
+add_rule_api(performance.blueprint, '/cpu_memory/last_hour/<uuid>',
+             api_func='performance.r_cpu_memory_last_hour', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/cpu_memory/last_six_hours/<uuid>',
+             api_func='performance.r_cpu_memory_last_six_hours', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/cpu_memory/last_day/<uuid>',
+             api_func='performance.r_cpu_memory_last_day', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/cpu_memory/last_seven_days/<uuid>',
+             api_func='performance.r_cpu_memory_last_seven_days', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/traffic/last_hour/<uuid>',
+             api_func='performance.r_traffic_last_hour', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/traffic/last_six_hours/<uuid>',
+             api_func='performance.r_traffic_last_six_hours', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/traffic/last_day/<uuid>',
+             api_func='performance.r_traffic_last_day', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/traffic/last_seven_days/<uuid>',
+             api_func='performance.r_traffic_last_seven_days', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/disk_io/last_hour/<uuid>',
+             api_func='performance.r_disk_io_last_hour', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/disk_io/last_six_hours/<uuid>',
+             api_func='performance.r_disk_io_last_six_hours', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/disk_io/last_day/<uuid>',
+             api_func='performance.r_disk_io_last_day', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/disk_io/last_seven_days/<uuid>',
+             api_func='performance.r_disk_io_last_seven_days', methods=['GET'])
+
+

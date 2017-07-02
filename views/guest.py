@@ -169,6 +169,10 @@ def vnc(uuid):
     return render_template('vnc_lite.html', port=port, password=guest_ret['data']['vnc_password'])
 
 
+def detail(uuid):
+    return render_template('guest_detail.html', uuid=uuid)
+
+
 def success():
     return render_template('success.html', go_back_url='/guests', timeout=10000, title='提交成功',
                            message_title='创建实例的请求已被接受',

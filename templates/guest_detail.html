@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+{% block title %} Guest {% endblock %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+        
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+
+        .btn-ability {
+            margin-right: 16px;
+            height: 50px;
+            padding: 8px 50px;
+            margin-bottom: 30px;
+        }
+
+        .btn-ability-line {
+        }
+
+    </style>
+{% endblock head %}
+{% block body %}
+<script>
+    var resource_path = window.location.pathname;
+    var resource_path_array = resource_path.split('/');
+    var uuid = resource_path_array[resource_path_array.length - 1];
+    var cpu_chart = null;
+
+    function format_time(timestamp, i) {
+        return new Date(timestamp).format('HH:MM');
+    }
+
+    function render_cpu_memory_chart(uuid) {
+        $.ajax({
+            url : '/api/performance/cpu_memory/last_six_hours/' + uuid,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                var option = {
+                    color: ['#3BC0FF'],
+                    title: {
+                        text: 'CPU'
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 1,
+                        max: 'dataMax',
+                        minInterval: 1,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'CPU 负载',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['cpu_load']
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                cpu_chart.setOption(option);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+
+        cpu_chart = echarts.init(document.getElementById('cpu_chart'));
+        render_cpu_memory_chart(uuid);
+    });
+</script>
+<div class="container" style="padding-top: 100px;">
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero" style="display: inline;">
+                虚拟机实例详情
+            </h3>
+            <a href="/guests" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
+                <span class="glyph-icon icon-separator" style="transform: rotateY(-180deg);">
+                    <i class="glyph-icon icon-level-up"></i>
+                </span>
+                <span class="button-content">
+                    返回虚拟机列表
+                </span>
+            </a>
+            <div>
+                <div id="cpu_chart" style="width: 800px;height:280px;"></div>
+                <div id="traffic_chart" style="width: 600px;height:300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
