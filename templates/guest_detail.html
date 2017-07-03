@@ -50,9 +50,20 @@
         }
     }
 
-    function render_cpu_memory_chart(uuid) {
+    function render_cpu_memory_chart(uuid, granularity) {
+        var url = '/api/performance/cpu_memory/last_hour/' + uuid;
+        if (granularity === 'hour') {
+            url = '/api/performance/cpu_memory/last_hour/' + uuid
+        } else if (granularity === 'six_hours') {
+            url = '/api/performance/cpu_memory/last_six_hours/' + uuid
+        } else if (granularity === 'day') {
+            url = '/api/performance/cpu_memory/last_day/' + uuid
+        } else {
+            url = '/api/performance/cpu_memory/last_seven_days/' + uuid
+        }
+
         $.ajax({
-            url : '/api/performance/cpu_memory/last_hour/' + uuid,
+            url : url,
             type : 'GET',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
@@ -177,7 +188,7 @@
         });
 
         cpu_chart = echarts.init(document.getElementById('cpu_chart'));
-        render_cpu_memory_chart(uuid);
+        render_cpu_memory_chart(uuid, 'six_hours');
     });
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
