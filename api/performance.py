@@ -58,40 +58,73 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
     try:
         ji.Check.previewing(args_rules, {'uuid': uuid})
         uuids_str = ':'.join([uuid_field, 'in', uuid])
-        filter_str = uuids_str
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = list()
 
-        limit = 60
+        max_limit = 10080
+        ts = ji.Common.ts()
+        _boundary = ts - 60 * 60
         if granularity == 'hour':
-            limit = 60
+            _boundary = ts - 60 * 60
 
         elif granularity == 'six_hours':
-            limit = 60 * 6
+            _boundary = ts - 60 * 60 * 6
 
         elif granularity == 'day':
-            limit = 60 * 24
+            _boundary = ts - 60 * 60 * 24
 
         elif granularity == 'seven_days':
-            limit = 60 * 24 * 7
+            _boundary = ts - 60 * 60 * 24 * 7
 
         else:
             pass
 
-        rows, rows_count = the_class.get_by_filter(
-            offset=0, limit=limit, order_by='id', order='desc', filter_str=filter_str)
+        filter_str = ';'.join([uuids_str, 'timestamp:gt:' + _boundary.__str__()])
 
-        if granularity in ['day', 'seven_days']:
+        _rows, _rows_count = the_class.get_by_filter(
+            offset=0, limit=max_limit, order_by='id', order='asc', filter_str=filter_str)
+
+        def smooth_data(boundary=0, interval=60, now_ts=ji.Common.ts(), rows=None):
+            needs = list()
+            data = list()
+
+            for t in range(boundary, now_ts, interval):
+                needs.append(t - t % interval)
+
             for row in rows:
-                if row['timestamp'] % 600 != 0:
+                if row['timestamp'] % interval != 0:
                     continue
 
-                ret['data'].append(row)
+                if needs.__len__() > 0:
+                    t = needs.pop(0)
+                else:
+                    t = now_ts
+
+                while t < row['timestamp']:
+                    data.append({
+                        'timestamp': t,
+                        'cpu_load': None
+                    })
+
+                    if needs.__len__() > 0:
+                        t = needs.pop(0)
+                    else:
+                        t = now_ts
+
+                data.append(row)
+
+            return data
+
+        if granularity == 'day':
+            ret['data'] = smooth_data(boundary=_boundary, interval=600, now_ts=ts, rows=_rows)
+
+        if granularity == 'seven_days':
+            ret['data'] = smooth_data(boundary=_boundary, interval=600, now_ts=ts, rows=_rows)
 
         else:
-            ret['data'] = rows
+            ret['data'] = smooth_data(boundary=_boundary, interval=60, now_ts=ts, rows=_rows)
 
         return ret
 

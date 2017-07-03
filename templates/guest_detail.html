@@ -40,13 +40,19 @@
     var uuid = resource_path_array[resource_path_array.length - 1];
     var cpu_chart = null;
 
+    var datetime_format_type = 'time';
+
     function format_time(timestamp, i) {
-        return new Date(timestamp).format('HH:MM');
+        if (datetime_format_type === 'time') {
+            return new Date(timestamp).format('HH:MM');
+        } else {
+            return new Date(timestamp).format('mm-dd');
+        }
     }
 
     function render_cpu_memory_chart(uuid) {
         $.ajax({
-            url : '/api/performance/cpu_memory/last_six_hours/' + uuid,
+            url : '/api/performance/cpu_memory/last_hour/' + uuid,
             type : 'GET',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
@@ -55,10 +61,20 @@
             },
             success : function(data, textStatus, xhr) {
 
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    }
+                }
+
                 var option = {
                     color: ['#3BC0FF'],
                     title: {
                         text: 'CPU'
+                    },
+                    legend: {
+                        data:['CPU使用率(%)'],
+                        bottom: 5
                     },
                     toolbox: {
                         feature: {
@@ -71,7 +87,19 @@
                     },
                     tooltip: {
                         show: true,
-                        trigger: 'axis'
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var cpu_load = params[0].data[1];
+                            var seriesName = params[0].seriesName;
+                            var marker = params[0].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (cpu_load === null) {
+                                cpu_load = '无数据';
+                            }
+
+                            return datetime + '<br />' + [marker, seriesName, cpu_load].join(' ')
+                        })
                     },
                     xAxis: {
                         type: 'time',
@@ -92,9 +120,9 @@
                         }
                     },
                     yAxis: {
-                        min: 1,
+                        min: 0,
                         max: 'dataMax',
-                        minInterval: 1,
+                        minInterval: 2,
                         axisTick: {
                             show: false
                         },
@@ -113,7 +141,7 @@
                         }
                     },
                     series: [{
-                        name: 'CPU 负载',
+                        name: 'CPU使用率(%)',
                         type: 'line',
                         showSymbol: false,
                         smooth: true,
@@ -152,7 +180,7 @@
         render_cpu_memory_chart(uuid);
     });
 </script>
-<div class="container" style="padding-top: 100px;">
+<div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
     <div class="panel">
         <div class="panel-body">
             <h3 class="title-hero" style="display: inline;">
@@ -166,9 +194,14 @@
                     返回虚拟机列表
                 </span>
             </a>
-            <div>
-                <div id="cpu_chart" style="width: 800px;height:280px;"></div>
-                <div id="traffic_chart" style="width: 600px;height:300px;"></div>
+            <div class="row">
+                <div class="col-xs-4">
+                    <h1>H1llo</h1>
+                </div>
+                <div class="col-xs-8">
+                    <div id="cpu_chart" style="width: 800px;height:280px;"></div>
+                    <div id="traffic_chart" style="width: 600px;height:300px;"></div>
+                </div>
             </div>
         </div>
     </div>
