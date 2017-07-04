@@ -21,14 +21,37 @@
             border-radius: 0;
         }
 
-        .btn-ability {
-            margin-right: 16px;
-            height: 50px;
-            padding: 8px 50px;
-            margin-bottom: 30px;
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+            line-height: 22px;
         }
 
-        .btn-ability-line {
+        .table > tbody > tr > td {
+            color: #424547;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
+        .guest-label {
+            color: #999999;
+        }
+
+        .guest-desc {
+            color: #333333;
         }
 
     </style>
@@ -39,6 +62,7 @@
     var resource_path_array = resource_path.split('/');
     var uuid = resource_path_array[resource_path_array.length - 1];
     var cpu_chart = null;
+    var traffic_chart = null;
 
     var datetime_format_type = 'time';
 
@@ -179,6 +203,163 @@
         });
     }
 
+    function render_traffic_chart(uuid, granularity) {
+        var url = '/api/performance/traffic/last_hour/' + uuid;
+        if (granularity === 'hour') {
+            url = '/api/performance/traffic/last_hour/' + uuid
+        } else if (granularity === 'six_hours') {
+            url = '/api/performance/traffic/last_six_hours/' + uuid
+        } else if (granularity === 'day') {
+            url = '/api/performance/traffic/last_day/' + uuid
+        } else {
+            url = '/api/performance/traffic/last_seven_days/' + uuid
+        }
+
+        $.ajax({
+            url : url,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    }
+                }
+
+                var option = {
+                    color: ['#3BC0FF', '#e5b715'],
+                    title: {
+                        text: '网络'
+                    },
+                    legend: {
+                        data:['流入(kbps)', '流出(kbps)'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var inflowSeriesName = params[0].seriesName;
+                            var outflowSeriesName = params[1].seriesName;
+                            var inflow = params[0].data[1];
+                            var outflow = params[1].data[1];
+                            var inflowMarker = params[0].marker;
+                            var outflowMarker = params[1].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (inflow === null) {
+                                inflow = '无数据';
+                            }
+
+                            if (outflow === null) {
+                                outflow = '无数据';
+                            }
+
+                            return datetime + '<br />' + [inflowMarker, inflowSeriesName, inflow].join(' ') +
+                                '<br />' + [outflowMarker, outflowSeriesName, outflow].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '流入(kbps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['rx_bytes'] / 1000
+                                ])
+                            });
+                            return d;
+                        })()
+                    },{
+                        name: '流出(kbps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['tx_bytes'] / 1000
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                traffic_chart.setOption(option);
+            }
+        });
+    }
+
     $(document).ready(function() {
         $('body').addClass('add-transition');
         $('.add-page-transition').on('click', function(){
@@ -188,7 +369,9 @@
         });
 
         cpu_chart = echarts.init(document.getElementById('cpu_chart'));
+        traffic_chart = echarts.init(document.getElementById('traffic_chart'));
         render_cpu_memory_chart(uuid, 'six_hours');
+        render_traffic_chart(uuid, 'six_hours');
     });
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
@@ -205,66 +388,93 @@
                     返回虚拟机列表
                 </span>
             </a>
-            <div class="row">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-xs-4">
-                    <table>
-                        <thead>
+                    <div style="background: #F5f6FA; border: 1px solid #e1e6eb; padding: 10px; font-size: 14px; width: 100%;">
+                        <span>
                         实例信息
-                        </thead>
+                        </span>
+                    </div>
+                    <table class="table table-bordered">
                         <tbody>
                         <tr>
                             <td>
-                                <span>UUID: </span>
-                                <span>
+                                <span class="guest-label">UUID:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
                                 {{ guest_ret.data.uuid }}
                                 </span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <span>标识: </span>
-                                <span>
+                                <span class="guest-label">标识:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
                                 {{ guest_ret.data.label }}
                                 </span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <span>备注: </span>
-                                <span>
+                                <span class="guest-label">名称:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
                                 {{ guest_ret.data.remark }}
                                 </span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <span>所在宿主机: </span>
-                                <span>
+                                <span class="guest-label">CPU:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ guest_ret.data.cpu }} 核
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">内存:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ guest_ret.data.memory }} GB
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">操作系统:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ os_template_ret.data.label }}
+                                </span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <span class="{{ os_template_ret.data.icon }}"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">IP:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ guest_ret.data.ip }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">密码:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ guest_ret.data.password }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">所在宿主机:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
                                 {{ guest_ret.data.on_host }}
                                 </span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <span>CPU: </span>
-                                <span>
-                                {{ guest_ret.data.cpu }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span>内存: </span>
-                                <span>
-                                {{ guest_ret.data.memory }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span>IP: </span>
-                                <span>
-                                {{ guest_ret.data.ip }}
+                                <span class="guest-label">创建时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ format_datetime_by_tus(guest_ret.data.create_time) }}
                                 </span>
                             </td>
                         </tr>
@@ -274,7 +484,7 @@
                 </div>
                 <div class="col-xs-8">
                     <div id="cpu_chart" style="width: 800px;height:280px;"></div>
-                    <div id="traffic_chart" style="width: 600px;height:300px;"></div>
+                    <div id="traffic_chart" style="width: 800px;height:280px;"></div>
                 </div>
             </div>
         </div>

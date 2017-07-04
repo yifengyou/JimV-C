@@ -177,7 +177,12 @@ def detail(uuid):
     guest_ret = requests.get(url=guest_url)
     guest_ret = json.loads(guest_ret.content)
 
-    return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret)
+    os_template_url = host_url + url_for('api_os_templates.r_get', ids=guest_ret['data']['os_template_id'].__str__())
+
+    os_template_ret = requests.get(url=os_template_url)
+    os_template_ret = json.loads(os_template_ret.content)
+
+    return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret)
 
 
 def success():

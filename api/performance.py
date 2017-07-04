@@ -105,7 +105,17 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
                 while t < row['timestamp']:
                     data.append({
                         'timestamp': t,
-                        'cpu_load': None
+                        'cpu_load': None,
+                        'memory_available': None,
+                        'memory_unused': None,
+                        'rx_packets': None,
+                        'rx_bytes': None,
+                        'tx_packets': None,
+                        'tx_bytes': None,
+                        'rd_req': None,
+                        'rd_bytes': None,
+                        'wr_req': None,
+                        'wr_bytes': None
                     })
 
                     if needs.__len__() > 0:
