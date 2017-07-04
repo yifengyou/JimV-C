@@ -63,6 +63,7 @@
     var uuid = resource_path_array[resource_path_array.length - 1];
     var cpu_chart = null;
     var traffic_chart = null;
+    var memory_chart = null;
 
     var datetime_format_type = 'time';
 
@@ -74,7 +75,7 @@
         }
     }
 
-    function render_cpu_memory_chart(uuid, granularity) {
+    function render_cpu_chart(uuid, granularity) {
         var url = '/api/performance/cpu_memory/last_hour/' + uuid;
         if (granularity === 'hour') {
             url = '/api/performance/cpu_memory/last_hour/' + uuid
@@ -232,7 +233,7 @@
                 }
 
                 var option = {
-                    color: ['#3BC0FF', '#e5b715'],
+                    color: ['#3BC0FF', '#FAB406'],
                     title: {
                         text: '网络'
                     },
@@ -327,7 +328,7 @@
                             $.each(data.data, function(i, ele) {
                                 d.push([
                                     ele['timestamp'] * 1000,
-                                    ele['rx_bytes'] / 1000
+                                    ele['rx_bytes'] !== null ? ele['rx_bytes'] / 1000 : null
                                 ])
                             });
                             return d;
@@ -347,7 +348,7 @@
                             $.each(data.data, function(i, ele) {
                                 d.push([
                                     ele['timestamp'] * 1000,
-                                    ele['tx_bytes'] / 1000
+                                    ele['tx_bytes'] !== null ? ele['tx_bytes'] / 1000 : null
                                 ])
                             });
                             return d;
@@ -356,6 +357,136 @@
                 };
 
                 traffic_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_memory_chart(uuid, granularity) {
+        var url = '/api/performance/cpu_memory/last_hour/' + uuid;
+        if (granularity === 'hour') {
+            url = '/api/performance/cpu_memory/last_hour/' + uuid
+        } else if (granularity === 'six_hours') {
+            url = '/api/performance/cpu_memory/last_six_hours/' + uuid
+        } else if (granularity === 'day') {
+            url = '/api/performance/cpu_memory/last_day/' + uuid
+        } else {
+            url = '/api/performance/cpu_memory/last_seven_days/' + uuid
+        }
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error: function () {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success: function (data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    }
+                }
+
+                var option = {
+                    color: ['#35CD03'],
+                    title: {
+                        text: '内存'
+                    },
+                    legend: {
+                        data: ['可用量'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var seriesName = params[0].seriesName;
+                            var free = params[0].data[1];
+                            var marker = params[0].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (free === null) {
+                                free = '无数据';
+                            }
+
+                            return datetime + '<br />' + [marker, seriesName, free].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '可用量(GB)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        areaStyle: {normal: {}},
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function (i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['memory_unused'] !== null ? Math.floor(ele['memory_unused'] / 1024) / 1000 : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                memory_chart.setOption(option);
             }
         });
     }
@@ -370,8 +501,10 @@
 
         cpu_chart = echarts.init(document.getElementById('cpu_chart'));
         traffic_chart = echarts.init(document.getElementById('traffic_chart'));
-        render_cpu_memory_chart(uuid, 'six_hours');
-        render_traffic_chart(uuid, 'six_hours');
+        // memory_chart = echarts.init(document.getElementById('memory_chart'));
+        render_cpu_chart(uuid, 'hour');
+        render_traffic_chart(uuid, 'hour');
+        // render_memory_chart(uuid, 'hour');
     });
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
@@ -485,6 +618,7 @@
                 <div class="col-xs-8">
                     <div id="cpu_chart" style="width: 800px;height:280px;"></div>
                     <div id="traffic_chart" style="width: 800px;height:280px;"></div>
+                    <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
                 </div>
             </div>
         </div>
