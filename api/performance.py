@@ -55,6 +55,8 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
         Rules.UUID.value,
     ]
 
+    t = {'t1': 0, 't2': 1}
+
     try:
         ji.Check.previewing(args_rules, {'uuid': uuid})
         uuids_str = ':'.join([uuid_field, 'in', uuid])

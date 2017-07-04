@@ -506,6 +506,11 @@
         render_traffic_chart(uuid, 'hour');
         // render_memory_chart(uuid, 'hour');
     });
+    
+    function refresh_render_with_specify_granularity(granularity) {
+        render_cpu_chart(uuid, granularity);
+        render_traffic_chart(uuid, granularity);
+    }
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
     <div class="panel">
@@ -616,9 +621,20 @@
                     </table>
                 </div>
                 <div class="col-xs-8">
-                    <div id="cpu_chart" style="width: 800px;height:280px;"></div>
-                    <div id="traffic_chart" style="width: 800px;height:280px;"></div>
-                    <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-xs-8"></div>
+                        <div class="col-xs-4">
+                            <div class="btn-group btn-group-justified btn-group-xs">
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('hour');">1小时</a>
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('six_hours');">6小时</a>
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('day');">1天</a>
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('seven_days');">7天</a>
+                            </div>
+                        </div>
+                    </div>
+                        <div id="cpu_chart" style="width: 800px;height:280px;"></div>
+                        <div id="traffic_chart" style="width: 800px;height:280px;"></div>
+                        <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
                 </div>
             </div>
         </div>
