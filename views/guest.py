@@ -170,7 +170,14 @@ def vnc(uuid):
 
 
 def detail(uuid):
-    return render_template('guest_detail.html', uuid=uuid)
+    host_url = request.host_url.rstrip('/')
+
+    guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
+
+    guest_ret = requests.get(url=guest_url)
+    guest_ret = json.loads(guest_ret.content)
+
+    return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret)
 
 
 def success():

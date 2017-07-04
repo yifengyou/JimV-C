@@ -207,7 +207,70 @@
             </a>
             <div class="row">
                 <div class="col-xs-4">
-                    <h1>H1llo</h1>
+                    <table>
+                        <thead>
+                        实例信息
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <span>UUID: </span>
+                                <span>
+                                {{ guest_ret.data.uuid }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>标识: </span>
+                                <span>
+                                {{ guest_ret.data.label }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>备注: </span>
+                                <span>
+                                {{ guest_ret.data.remark }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>所在宿主机: </span>
+                                <span>
+                                {{ guest_ret.data.on_host }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>CPU: </span>
+                                <span>
+                                {{ guest_ret.data.cpu }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>内存: </span>
+                                <span>
+                                {{ guest_ret.data.memory }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>IP: </span>
+                                <span>
+                                {{ guest_ret.data.ip }}
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+
+                    </table>
                 </div>
                 <div class="col-xs-8">
                     <div id="cpu_chart" style="width: 800px;height:280px;"></div>
