@@ -500,6 +500,363 @@
         });
     }
 
+    function render_disk_throughput_chart(disk_uuid, granularity, dev_id, dev_name) {
+        var url = '/api/performance/disk_io/last_hour/' + disk_uuid;
+        if (granularity === 'hour') {
+            url = '/api/performance/disk_io/last_hour/' + disk_uuid
+        } else if (granularity === 'six_hours') {
+            url = '/api/performance/disk_io/last_six_hours/' + disk_uuid
+        } else if (granularity === 'day') {
+            url = '/api/performance/disk_io/last_day/' + disk_uuid
+        } else {
+            url = '/api/performance/disk_io/last_seven_days/' + disk_uuid
+        }
+
+        $.ajax({
+            url : url,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    }
+                }
+
+                var option = {
+                    color: ['#3BC0FF', '#FAB406'],
+                    title: {
+                        text: '磁盘吞吐量 - ' + dev_name
+                    },
+                    legend: {
+                        data:['读(MBps)', '写(MBps)'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var readSeriesName = params[0].seriesName;
+                            var writeSeriesName = params[1].seriesName;
+                            var read = params[0].data[1];
+                            var write = params[1].data[1];
+                            var readMarker = params[0].marker;
+                            var writeMarker = params[1].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (read === null) {
+                                read = '无数据';
+                            }
+
+                            if (write === null) {
+                                write = '无数据';
+                            }
+
+                            return datetime + '<br />' + [readMarker, readSeriesName, read].join(' ') +
+                                '<br />' + [writeMarker, writeSeriesName, write].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '读(MBps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['rd_bytes'] !== null ? Math.floor(ele['rd_bytes'] / 1024 / 1024 * 1000) / 1000 : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    },{
+                        name: '写(MBps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['wr_bytes'] !== null ? Math.floor(ele['wr_bytes'] / 1024 / 1024 * 1000) / 1000 : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                var disk_chart = echarts.init(document.getElementById(dev_id));
+                disk_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_disk_iops_chart(disk_uuid, granularity, dev_id, dev_name) {
+        var url = '/api/performance/disk_io/last_hour/' + disk_uuid;
+        if (granularity === 'hour') {
+            url = '/api/performance/disk_io/last_hour/' + disk_uuid
+        } else if (granularity === 'six_hours') {
+            url = '/api/performance/disk_io/last_six_hours/' + disk_uuid
+        } else if (granularity === 'day') {
+            url = '/api/performance/disk_io/last_day/' + disk_uuid
+        } else {
+            url = '/api/performance/disk_io/last_seven_days/' + disk_uuid
+        }
+
+        $.ajax({
+            url : url,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    }
+                }
+
+                var option = {
+                    color: ['#3BC0FF', '#FAB406'],
+                    title: {
+                        text: '磁盘IOPS - ' + dev_name
+                    },
+                    legend: {
+                        data:['读(IOPS)', '写(IOPS)'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var readSeriesName = params[0].seriesName;
+                            var writeSeriesName = params[1].seriesName;
+                            var read = params[0].data[1];
+                            var write = params[1].data[1];
+                            var readMarker = params[0].marker;
+                            var writeMarker = params[1].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (read === null) {
+                                read = '无数据';
+                            }
+
+                            if (write === null) {
+                                write = '无数据';
+                            }
+
+                            return datetime + '<br />' + [readMarker, readSeriesName, read].join(' ') +
+                                '<br />' + [writeMarker, writeSeriesName, write].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '读(IOPS)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['rd_req'] !== null ? ele['rd_req'] : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    },{
+                        name: '写(IOPS)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['wr_req'] !== null ? ele['wr_req'] : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                var disk_chart = echarts.init(document.getElementById(dev_id));
+                disk_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_disks_chart(uuid, granularity) {
+        var dev_table = [];
+
+        for (var i = 1; i <= 26; i++) {
+            dev_table.push('vd' + String.fromCharCode(0x60+i));
+        }
+
+        var disks = [];
+        var url = '/api/disks?filter=guest_uuid:in:' + uuid;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error: function () {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success: function (data, textStatus, xhr) {
+                $('#disks_chart').empty();
+                $.each(data.data, function(i, ele) {
+                    var dev_name = dev_table[ele['sequence']];
+                    var dev_id_throughput = 'throughput_' + dev_table[ele['sequence']];
+                    var dev_id_iops = 'iops_' + dev_table[ele['sequence']];
+                    var disk_uuid = ele['uuid'];
+
+                    $('#disks_chart').append($('<div id=' + dev_id_throughput +' style="width: 800px;height:280px;"></div>'));
+                    render_disk_throughput_chart(disk_uuid, granularity, dev_id_throughput, dev_name);
+
+                    $('#disks_chart').append($('<div id=' + dev_id_iops +' style="width: 800px;height:280px;"></div>'));
+                    render_disk_iops_chart(disk_uuid, granularity, dev_id_iops, dev_name);
+                });
+            }
+        });
+    }
+
     $(document).ready(function() {
         $('body').addClass('add-transition');
         $('.add-page-transition').on('click', function(){
@@ -513,26 +870,25 @@
         // memory_chart = echarts.init(document.getElementById('memory_chart'));
         render_cpu_chart(uuid, 'hour');
         render_traffic_chart(uuid, 'hour');
+        render_disks_chart(uuid, 'hour')
         // render_memory_chart(uuid, 'hour');
     });
     
     function refresh_render_with_specify_granularity(granularity) {
         render_cpu_chart(uuid, granularity);
         render_traffic_chart(uuid, granularity);
+        render_disks_chart(uuid, 'hour')
     }
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
     <div class="panel">
         <div class="panel-body">
-            <h3 class="title-hero" style="display: inline;">
-                虚拟机实例详情
-            </h3>
             <a href="/guests" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
                 <span class="glyph-icon icon-separator" style="transform: rotateY(-180deg);">
                     <i class="glyph-icon icon-level-up"></i>
                 </span>
                 <span class="button-content">
-                    返回虚拟机列表
+                    返回
                 </span>
             </a>
             <div class="row" style="margin-top: 10px;">
@@ -641,9 +997,12 @@
                             </div>
                         </div>
                     </div>
+                    <div>
                         <div id="cpu_chart" style="width: 800px;height:280px;"></div>
                         <div id="traffic_chart" style="width: 800px;height:280px;"></div>
-                        <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
+                    </div>
+                    <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
+                    <div id="disks_chart"></div>
                 </div>
             </div>
         </div>
