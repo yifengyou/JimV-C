@@ -118,7 +118,10 @@
                                 yAxisIndex: 'none'
                             },
                             magicType: {type: ['line', 'bar']},
-                            saveAsImage: {show: true}
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
                         }
                     },
                     tooltip: {
@@ -247,7 +250,10 @@
                                 yAxisIndex: 'none'
                             },
                             magicType: {type: ['line', 'bar']},
-                            saveAsImage: {show: true}
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
                         }
                     },
                     tooltip: {
@@ -328,7 +334,7 @@
                             $.each(data.data, function(i, ele) {
                                 d.push([
                                     ele['timestamp'] * 1000,
-                                    ele['rx_bytes'] !== null ? ele['rx_bytes'] / 1000 : null
+                                    ele['rx_bytes'] !== null ? Math.floor(ele['rx_bytes'] / 1000) : null
                                 ])
                             });
                             return d;
@@ -348,7 +354,7 @@
                             $.each(data.data, function(i, ele) {
                                 d.push([
                                     ele['timestamp'] * 1000,
-                                    ele['tx_bytes'] !== null ? ele['tx_bytes'] / 1000 : null
+                                    ele['tx_bytes'] !== null ? Math.floor(ele['tx_bytes'] / 1000) : null
                                 ])
                             });
                             return d;
@@ -404,7 +410,10 @@
                                 yAxisIndex: 'none'
                             },
                             magicType: {type: ['line', 'bar']},
-                            saveAsImage: {show: true}
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
                         }
                     },
                     tooltip: {
