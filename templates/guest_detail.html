@@ -975,6 +975,22 @@
                         </tr>
                         <tr>
                             <td>
+                                <span class="guest-label">VNC 端口:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ guest_ret.data.vnc_port }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">VNC 密码:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ guest_ret.data.vnc_password }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <span class="guest-label">创建时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                 {{ format_datetime_by_tus(guest_ret.data.create_time) }}
