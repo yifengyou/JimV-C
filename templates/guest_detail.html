@@ -926,6 +926,14 @@
                         </tr>
                         <tr>
                             <td>
+                                <span class="guest-label">状态:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ format_guest_status(guest_ret.data.status)|safe }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <span class="guest-label">CPU:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                 {{ guest_ret.data.cpu }} 核
