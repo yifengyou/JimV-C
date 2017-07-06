@@ -16,7 +16,7 @@ from flask import g
 
 from models import Utils
 from models.event_processor import EventProcessor
-from models.initialize import app, logger, q_ws
+from models.initialize import app, logger, q_ws, Init
 import api_route_table
 import views_route_table
 from models import Database as db
@@ -132,6 +132,9 @@ if __name__ == '__main__':
             # 即：即使子进程提前退出，且因父进程没有做wait处理，使其变成了僵尸进程。但当父进程退出时，会对因其所产生的僵尸进程做统一清理操作。
 
             thread.start_new_thread(EventProcessor.launch, ())
+            Utils.thread_counter += 1
+
+            thread.start_new_thread(Init.pub_sub_ping_pong, ())
             Utils.thread_counter += 1
 
             app.run(host=app.config['jimv_listen'], port=app.config['jimv_port'], use_reloader=False, threaded=True)

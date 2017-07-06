@@ -3,7 +3,7 @@
 
 
 from multiprocessing import JoinableQueue
-from flask import Flask, g
+from flask import Flask
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import json
@@ -12,6 +12,7 @@ import sys
 import re
 import getopt
 import jimit as ji
+import time
 
 from jimvc_exception import PathNotExist
 from state_code import own_state_branch
@@ -91,6 +92,20 @@ class Init(object):
         fh.setFormatter(formatter)
         _logger.addHandler(fh)
         return _logger
+
+    @staticmethod
+    def pub_sub_ping_pong():
+        from models import Database as db
+        from models import Utils
+
+        while True:
+            if Utils.exit_flag:
+                Utils.thread_counter -= 1
+                print 'Thread pub_sub_ping_pong say bye-bye'
+                return
+
+            time.sleep(10)
+            db.r.publish(app.config['instruction_channel'], message=json.dumps({'action': 'ping'}))
 
 
 q_ws = JoinableQueue()
