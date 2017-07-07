@@ -14,7 +14,7 @@
 }
 #header-logo .logo-content-big,
 .logo-content-small {
-    background: url('../../images/Logo.png') no-repeat;
+    background: url('../../images/Logo.svg') no-repeat;
     text-indent: -999em;
     position: absolute;
     height: 80px;
