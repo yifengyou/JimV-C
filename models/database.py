@@ -7,6 +7,7 @@ import mysql.connector.pooling
 import redis
 from mysql.connector import errorcode
 import time
+import jimit as ji
 
 from initialize import app, logger
 
@@ -84,4 +85,6 @@ class Database(object):
                                       port=app.config.get('redis_port', 6379),
                                       db=app.config.get('redis_dbid', 0), password=app.config.get('redis_password', ''),
                                       decode_responses=True)
+
+        cls.r.client_setname(ji.Common.get_hostname())
 

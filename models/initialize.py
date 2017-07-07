@@ -102,6 +102,7 @@ class Init(object):
             if Utils.exit_flag:
                 Utils.thread_counter -= 1
                 print 'Thread pub_sub_ping_pong say bye-bye'
+                print 'Current thread_counter: ' + Utils.thread_counter.__str__()
                 return
 
             time.sleep(10)
