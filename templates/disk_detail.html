@@ -469,7 +469,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <span class="guest-label">磁盘属性:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-label">磁盘性别:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                     {% if disk_ret.data.sequence == 0 %}
                                         系统盘
@@ -489,7 +489,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <span class="guest-label">被挂载于:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-label">所属 Guest:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                     {% if disk_ret.data.sequence != -1 %}
                                         <a href="/guest/detail/{{ disk_ret.data.guest_uuid }}">{{ guest_ret.data.label }}/{{ guest_ret.data.remark }}</a>

@@ -367,6 +367,7 @@
                     <th>大小</th>
                     <th>设备号</th>
                     <th>所属 Guest</th>
+                    <th>磁盘性别</th>
                     <th>创建时间</th>
                     <th>操作</th>
                 </tr>
@@ -392,6 +393,13 @@
                     <td><a href="/guest/detail/{{ item.guest_uuid }}" {% if 'guest' not in item %}style="display: none"{% endif %}>{% if 'guest' in item %}
                         {{ item.guest.label }}/{{ item.guest.remark }}
                     {% endif %}</a></td>
+                    <td>
+                        {% if item.sequence == 0 %}
+                            系统盘
+                        {% else %}
+                            数据盘
+                        {% endif %}
+                    </td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
                     <td>
                         <div class="dropdown inline-block">
