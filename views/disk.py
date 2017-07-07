@@ -32,8 +32,11 @@ def show():
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('page_size', 10))
     keyword = request.args.get('keyword', None)
+    guest_uuid = request.args.get('guest_uuid', None)
+    sequence = request.args.get('sequence', None)
     order_by = request.args.get('order_by', None)
     order = request.args.get('order', None)
+    filters = list()
     resource_path = request.path
 
     if page is not None:
@@ -45,11 +48,20 @@ def show():
     if keyword is not None:
         args.append('keyword=' + keyword.__str__())
 
+    if guest_uuid is not None:
+        filters.append('guest_uuid:in:' + guest_uuid.__str__())
+
+    if sequence is not None:
+        filters.append('sequence:in:' + sequence.__str__())
+
     if order_by is not None:
         args.append('order_by=' + order_by)
 
     if order is not None:
         args.append('order=' + order)
+
+    if filters.__len__() > 0:
+        args.append('filter=' + ','.join(filters))
 
     host_url = request.host_url.rstrip('/')
 

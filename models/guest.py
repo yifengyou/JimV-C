@@ -117,6 +117,7 @@ class Disk(ORM):
             'remark': FilterFieldType.STR.value,
             'size': FilterFieldType.INT.value,
             'state': FilterFieldType.INT.value,
+            'sequence': FilterFieldType.INT.value,
             'guest_uuid': FilterFieldType.STR.value
         }
 
@@ -126,7 +127,7 @@ class Disk(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['remark', 'size']
+        return ['remark', 'size', 'guest_uuid', 'uuid']
 
 
 class GuestMigrateInfo(ORM):

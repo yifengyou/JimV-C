@@ -949,6 +949,14 @@
                         </tr>
                         <tr>
                             <td>
+                                <span class="guest-label">磁盘&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                <a href="/disks?guest_uuid={{ guest_ret.data.uuid }}" style="color: #0275d8;">{{ disks_ret.data|length }}</a>
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <span class="guest-label">操作系统:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                 {{ os_template_ret.data.label }}

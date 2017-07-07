@@ -182,7 +182,13 @@ def detail(uuid):
     os_template_ret = requests.get(url=os_template_url)
     os_template_ret = json.loads(os_template_ret.content)
 
-    return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret)
+    disks_url = host_url + url_for('api_disks.r_get_by_filter')
+    disks_url = disks_url + '?filter=guest_uuid:in:' + guest_ret['data']['uuid']
+    disks_ret = requests.get(url=disks_url)
+    disks_ret = json.loads(disks_ret.content)
+
+    return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,
+                           disks_ret=disks_ret)
 
 
 def success():
