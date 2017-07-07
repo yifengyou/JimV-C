@@ -450,10 +450,20 @@ def r_attach_disk(uuid, disk_uuid):
             ret['state'] = ji.Common.exchange_state(41259)
             return ret
 
-        # 取出该 guest 已挂载的磁盘，来做出决定，确定该磁盘的序列
+        # 通过检测未被使用的序列，来确定当前磁盘在目标 Guest 身上的序列
         disk.guest_uuid = guest.uuid
         disks, count = disk.get_by_filter(filter_str='guest_uuid:in:' + guest.uuid)
-        disk.sequence = count
+
+        already_used_sequence = list()
+
+        for _disk in disks:
+            already_used_sequence.append(_disk['sequence'])
+
+        for sequence in range(0, dev_table.__len__()):
+            if sequence not in already_used_sequence:
+                disk.sequence = sequence
+                break
+
         disk.state = DiskState.mounting.value
 
         config = Config()

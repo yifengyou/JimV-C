@@ -6,7 +6,6 @@ import json
 from flask import Blueprint, render_template, url_for, request
 import requests
 from math import ceil
-import re
 
 
 __author__ = 'James Iter'
