@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-{% block title %} Guest {% endblock %}
 {% block head %}
     {{ super() }}
 
@@ -877,13 +876,13 @@
     function refresh_render_with_specify_granularity(granularity) {
         render_cpu_chart(uuid, granularity);
         render_traffic_chart(uuid, granularity);
-        render_disks_chart(uuid, 'hour')
+        render_disks_chart(uuid, granularity)
     }
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
     <div class="panel">
         <div class="panel-body">
-            <a href="/guests" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
+            <a href="javascript:history.go(-1)" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
                 <span class="glyph-icon icon-separator" style="transform: rotateY(-180deg);">
                     <i class="glyph-icon icon-level-up"></i>
                 </span>

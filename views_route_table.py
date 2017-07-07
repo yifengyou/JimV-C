@@ -20,4 +20,5 @@ add_rule_views(guest.blueprint, '/detail/<uuid>', views_func='guest.detail', met
 
 add_rule_views(disk.blueprints, '', views_func='disk.show', methods=['GET'])
 add_rule_views(disk.blueprints, '/create', views_func='disk.create', methods=['GET', 'POST'])
+add_rule_views(disk.blueprint, '/detail/<uuid>', views_func='disk.detail', methods=['GET', 'POST'])
 

@@ -136,3 +136,29 @@ def create():
         return render_template('disk_create.html')
 
 
+def detail(uuid):
+    host_url = request.host_url.rstrip('/')
+
+    disk_url = host_url + url_for('api_disks.r_get', uuids=uuid)
+
+    disk_ret = requests.get(url=disk_url)
+    disk_ret = json.loads(disk_ret.content)
+
+    guest_ret = None
+    os_template_ret = None
+
+    if disk_ret['data']['sequence'] != -1:
+        guest_url = host_url + url_for('api_guests.r_get', uuids=disk_ret['data']['guest_uuid'])
+
+        guest_ret = requests.get(url=guest_url)
+        guest_ret = json.loads(guest_ret.content)
+
+        os_template_url = host_url + url_for('api_os_templates.r_get', ids=guest_ret['data']['os_template_id'].__str__())
+
+        os_template_ret = requests.get(url=os_template_url)
+        os_template_ret = json.loads(os_template_ret.content)
+
+    return render_template('disk_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,
+                           disk_ret=disk_ret)
+
+
