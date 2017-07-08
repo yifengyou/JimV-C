@@ -140,6 +140,9 @@ def utility_processor():
     def format_price(amount, currency=u'￥'):
         return u'{0:.2f}{1}'.format(amount, currency)
 
+    def format_datetime_by_ts(ts, fmt='%Y-%m-%d %H:%M'):
+        return time.strftime(fmt, time.localtime(ts))
+
     def format_datetime_by_tus(tus, fmt='%y-%m-%d %H:%M'):
         return time.strftime(fmt, time.localtime(tus/1000/1000))
 
@@ -260,6 +263,6 @@ def utility_processor():
             icon=icon, color=color, desc=desc)
 
     return dict(format_price=format_price, format_datetime_by_tus=format_datetime_by_tus,
-                format_guest_status=format_guest_status, format_sequence_to_device_name=format_sequence_to_device_name,
-                format_disk_state=format_disk_state)
+                format_datetime_by_ts=format_datetime_by_ts, format_guest_status=format_guest_status,
+                format_sequence_to_device_name=format_sequence_to_device_name, format_disk_state=format_disk_state)
 
