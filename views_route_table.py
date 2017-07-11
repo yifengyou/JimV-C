@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from models.utils import add_rule_views
-from views import guest, disk, log
+from views import guest, disk, log, os_template
 
 
 __author__ = 'James Iter'
@@ -22,4 +22,6 @@ add_rule_views(disk.blueprints, '/create', views_func='disk.create', methods=['G
 add_rule_views(disk.blueprint, '/detail/<uuid>', views_func='disk.detail', methods=['GET', 'POST'])
 
 add_rule_views(log.blueprints, '', views_func='log.show', methods=['GET'])
+
+add_rule_views(os_template.blueprints, '', views_func='os_template.show', methods=['GET'])
 
