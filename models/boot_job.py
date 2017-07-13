@@ -29,6 +29,7 @@ class BootJob(ORM):
         return {
             'id': FilterFieldType.INT.value,
             'name': FilterFieldType.STR.value,
+            'use_for': FilterFieldType.INT.value,
             'remark': FilterFieldType.STR.value
         }
 

@@ -2,6 +2,17 @@
 {% block head %}
     {{ super() }}
     <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+
+        label>span {
+            color: deepskyblue;
+        }
+
         .table {
             font-size: 12px;
             border-width: 1px;
@@ -123,18 +134,19 @@
             select_item_action();
         });
 
-        $('body').addClass('add-transition');
-        $('.add-page-transition').on('click', function(){
-            var transAttr = $(this).attr('data-transition');
-            $('.add-transition').attr('class', 'add-transition');
-            $('.add-transition').addClass(transAttr);
+        $('#edit_label_modal').on('show.bs.modal', function (me) {
+            $('#os_template_id').val($(me.relatedTarget).parent().parent().prev().prev().text());
+            $('#edit_label').val($(me.relatedTarget).prev().text());
         });
 
-        $('#edit_remark_modal').on('show.bs.modal', function (me) {
-            $('#instance_uuid').val($(me.relatedTarget).parent().parent().find('div a')[0].text);
-            $('#edit_remark').val($(me.relatedTarget).prev().text());
+        $('#edit_path_modal').on('show.bs.modal', function (me) {
+            $('#os_template_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().text());
+            $('#edit_path').val($(me.relatedTarget).prev().text());
         });
 
+        $('#add_os_template_modal').on('show.bs.modal', function (me) {
+            refresh_os_template_boot_job_selectpicker();
+        });
     });
 
     function refresh() {
@@ -149,30 +161,71 @@
     }
 
     function row_onmouseover(me) {
-        $(me).find(".edit_remark_trigger").css('display','inline-flex');
+        $(me).find(".edit_label_trigger, .edit_path_trigger").css('display','inline-flex');
     }
 
     function row_onmouseout(me) {
-        $(me).find(".edit_remark_trigger").css('display','none');
+        $(me).find(".edit_label_trigger, .edit_path_trigger").css('display','none');
     }
 
-    function remark_update(me) {
-        var uuid = $('#instance_uuid').val();
-        var remark = $('#edit_remark').val();
-        $('#edit_remark_modal').modal('hide');
+    function refresh_os_template_boot_job_selectpicker() {
         $.ajax({
-            url : '/api/os_template/' + uuid,
+            url : '/api/boot_jobs?filter=use_for:eq:0',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                $('#boot_job_id').empty();
+                $.each(data.data, function(k, v) {
+                    $('#boot_job_id').append(
+                        $('<option>', {value: v['id'], text: v['name'], 'data-subtext': v['remark']})
+                    );
+                });
+                $('#boot_job_id').selectpicker('refresh');
+            }
+        });
+    }
+
+    function label_update(me) {
+        var os_template_id = $('#os_template_id').val();
+        var label = $('#edit_label').val();
+        $('#edit_label_modal').modal('hide');
+        $.ajax({
+            url : '/api/os_template/' + os_template_id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
-                remark: remark
+                label: label
             }),
             error : function() {
                 alter_danger('模板名称更新失败！');
             },
             success : function() {
-                $('#disk_list tbody').find('td:contains(' + uuid + ')').find('p').text(remark);
                 alter_success('模板名称更新成功！');
+                refresh()
+            }
+        });
+    }
+
+    function path_update(me) {
+        var os_template_id = $('#os_template_id').val();
+        var path = $('#edit_path').val();
+        $('#edit_path_modal').modal('hide');
+        $.ajax({
+            url : '/api/os_template/' + os_template_id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                path: path
+            }),
+            error : function() {
+                alter_danger('模板路径更新失败！');
+            },
+            success : function() {
+                alter_success('模板路径更新成功！');
+                refresh()
             }
         });
     }
@@ -218,20 +271,72 @@
         shortcut_bar_enable();
     }
 
-    function mount(uuid, disk_uuid) {
+    function enable(id) {
         $.ajax({
-            url : '/api/guest/_attach_disk/' + uuid + '/' + disk_uuid,
-            type : 'PUT',
+            url : '/api/os_template/' + id,
+            type : 'PATCH',
             contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                active: true
+            }),
             error : function() {
-                alter_danger('实例挂载指令发送失败！');
+                alter_danger('启用指令发送失败！');
             },
             success : function() {
-                alter_success('实例挂载指令发送成功！');
+                alter_success('启用指令发送成功！');
+                refresh();
             }
         });
     }
 
+    function disable(id) {
+        $.ajax({
+            url : '/api/os_template/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                active: false
+            }),
+            error : function() {
+                alter_danger('禁用指令发送失败！');
+            },
+            success : function() {
+                alter_success('禁用指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function remove(id) {
+        $.ajax({
+            url : '/api/os_templates/' + id,
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('模板删除指令发送失败！');
+            },
+            success : function() {
+                alter_success('模板删除指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function enable_at(me) {
+        var id = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        enable(id);
+    }
+
+    function disable_at(me) {
+        var id = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        disable(id);
+    }
+
+    function delete_at(me) {
+        var id = $('#os_template_id').val();
+        remove(id);
+        $('#delete_modal').modal('hide');
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -247,7 +352,7 @@
                         </div>
                         <div class="pull-right">
                             <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
-                            <a class="btn btn-info add-page-transition" href="/os_templates/create" data-transition="pt-page-moveFromRight-init" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加模板</a>
+                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_os_template_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加模板</a>
                         </div>
                     </div>
                 </div>
@@ -255,10 +360,11 @@
                        style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
                 <thead>
                 <tr role="row">
+                    <th style="display: none;">ID</th>
                     <th><input class="all_selector" title="选取所有" type="checkbox"></th>
                     <th width="180px;">名称</th>
                     <th>状态</th>
-                    <th>路径</th>
+                    <th width="500px;">路径</th>
                     <th>ICON</th>
                     <th>初始化作业</th>
                     <th>操作</th>
@@ -267,11 +373,12 @@
                 <tbody>
                 {% for item in os_templates_ret.data %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                    <td style="display: none;">{{ item.id }}</td>
                     <td><input title="选中" type="checkbox"></td>
                     <td>
                         <div>
                             <p style="display: inline-block;">{{ item.label }}</p>
-                            <a href="javascript:;" class="edit_remark_trigger" data-toggle="modal" data-target="#edit_remark_modal" style="display: none; float: right;">
+                            <a href="javascript:;" class="edit_label_trigger" data-toggle="modal" data-target="#edit_label_modal" style="display: none; float: right;">
                                 <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
                             </a>
                         </div>
@@ -282,7 +389,14 @@
                         <span style="color: #00BB00;">启用</span>
                         {% endif %}
                     </td>
-                    <td>{{ item.path }}</td>
+                    <td>
+                        <div>
+                            <p style="display: inline-block;">{{ item.path }}</p>
+                            <a href="javascript:;" class="edit_path_trigger" data-toggle="modal" data-target="#edit_path_modal" style="display: none; float: right;">
+                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                            </a>
+                        </div>
+                    </td>
                     <td><span class="{{ item.icon }}"></span></td>
                     <td>{{ item.boot_job_id }}</td>
                     <td>
@@ -291,15 +405,13 @@
                                 更多
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="{% if item.state not in [1] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
-                                    <a href="javascript:;" data-toggle="modal" data-target="#mount_modal"
-                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);">
+                                <li class="{% if item.active == true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                    <a href="javascript:;" onclick="enable_at(this);">
                                         启用
                                     </a>
                                 </li>
-                                <li class="{% if item.state not in [1] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
-                                    <a href="javascript:;" data-toggle="modal" data-target="#mount_modal"
-                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);">
+                                <li class="{% if item.active != true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                    <a href="javascript:;" onclick="disable_at(this);">
                                         禁用
                                     </a>
                                 </li>
@@ -311,10 +423,10 @@
                                     </a>
                                 </li>
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                <li class="{% if item.state not in [1, 255] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                <li>
                                     <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
-                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);
-                                       $('#delete_instance_desc').text($('#instance_uuid').val().split('-')[0] + '/' + $($(this).parent().parent().parent().parent().parent().children()[1]).find('div p')[0].textContent)">
+                                       onclick="$('#os_template_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                       $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
                                         删除
                                     </a>
                                 </li>
@@ -333,7 +445,6 @@
                         <th>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">编辑名称</button>
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
                                     共有{{ os_templates_ret.paging.total }}条，每页显示：
@@ -370,19 +481,36 @@
     </div>
 </div>
 
-<input id="instance_uuid" title="模板 ID" class="form-control" name="uuid" hidden>
+<input id="os_template_id" title="模板 ID" class="form-control" name="os_template_id" hidden>
 
-<div class="modal" id="edit_remark_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="edit_label_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">编辑模板名称：</h4>
             </div>
             <div class="modal-body">
-                <input id="edit_remark" title="实例名称" class="form-control" name="remark">
+                <input id="edit_label" title="系统模板名称" class="form-control" name="os_template_label">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="remark_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="label_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="edit_path_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑模板路径：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_path" title="系统模板路径" class="form-control" name="os_template_path">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="path_update();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
@@ -402,6 +530,68 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="add_os_template_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">添加模板：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
+                <div class="example-box-wrapper">
+                    <form class="form-horizontal bordered-row" action="/os_template" method="post">
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板名称</label>
+                            <div class="col-sm-6">
+                                <input id="label" name="label" type="text" title="模板名称" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;ICON</label>
+                            <div class="col-sm-6">
+                                <select id="icon" name="icon" title="模板 ICON" class="selectpicker">
+                                    <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos" selected>CentOS</option>
+                                    <option value="icon-os icon-os-linux" data-icon="icon-os icon-os-linux">Linux</option>
+                                    <option value="icon-os icon-os-ubuntu" data-icon="icon-os icon-os-ubuntu">Ubuntu</option>
+                                    <option value="icon-os icon-os-suse" data-icon="icon-os icon-os-suse">Suse</option>
+                                    <option value="icon-os icon-os-gentoo" data-icon="icon-os icon-os-gentoo">Gentoo</option>
+                                    <option value="icon-os icon-os-debian" data-icon="icon-os icon-os-debian">Debian</option>
+                                    <option value="icon-os icon-os-redhat" data-icon="icon-os icon-os-redhat">Redhat</option>
+                                    <option value="icon-os icon-os-bsd" data-icon="icon-os icon-os-bsd">BSD</option>
+                                    <option value="icon-os icon-os-windows" data-icon="icon-os icon-os-windows">Windows</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-stumbleupon"></span>&nbsp;&nbsp;模板路径</label>
+                            <div class="col-sm-6">
+                                <input id="path" name="path" type="text" title="模板路径" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-file-code-o"></span>&nbsp;&nbsp;初始化作业</label>
+                            <div class="col-sm-6">
+                                <select id="boot_job_id" name="boot_job_id" title="实例的启动作业" class="selectpicker">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-6 pull-right">
+                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

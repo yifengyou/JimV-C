@@ -3,7 +3,7 @@
 
 
 import json
-from flask import Blueprint, render_template, url_for, request
+from flask import Blueprint, render_template, url_for, request, redirect
 import requests
 from math import ceil
 
@@ -105,26 +105,29 @@ def create():
     host_url = request.host_url.rstrip('/')
 
     if request.method == 'POST':
-        size = request.form.get('size')
-        quantity = request.form.get('quantity')
-        remark = request.form.get('remark')
+        label = request.form.get('label')
+        path = request.form.get('path')
+        icon = request.form.get('icon')
+        boot_job_id = request.form.get('boot_job_id')
 
         payload = {
-            "size": int(size),
-            "quantity": int(quantity),
-            "remark": remark
+            "label": label,
+            "path": path,
+            "active": True,
+            "icon": icon,
+            "boot_job_id": int(boot_job_id)
         }
 
-        url = host_url + '/api/disk'
+        url = host_url + '/api/os_template'
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         j_r = json.loads(r.content)
-        return render_template('success.html', go_back_url='/disks', timeout=10000, title='提交成功',
-                               message_title='创建实例的请求已被接受',
-                               message='您所提交的资源正在创建中。根据所提交资源的数量，需要等待几到十几秒钟。页面将在10秒钟后自动跳转到实例列表页面！')
+        return render_template('success.html', go_back_url='/os_templates', timeout=10000, title='提交成功',
+                               message_title='添加模板的请求已被接受',
+                               message='您所提交的模板已创建。页面将在10秒钟后自动跳转到模板列表页面！')
 
     else:
-        return render_template('disk_create.html')
+        return redirect(url_for('v_os_templates.show'))
 
 
 
