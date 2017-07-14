@@ -145,7 +145,16 @@
         });
 
         $('#add_os_template_modal').on('show.bs.modal', function (me) {
-            refresh_os_template_boot_job_selectpicker();
+            refresh_os_template_boot_job_selectpicker($('#boot_job_id'));
+        });
+
+        $('#update_boot_job_modal').on('show.bs.modal', function (me) {
+            refresh_os_template_boot_job_selectpicker($('#update_boot_job_id'));
+        });
+
+        $('#update_icon_modal').on('show.bs.modal', function (me) {
+            $('#os_template_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().text());
+            $('#update_icon_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().text());
         });
     });
 
@@ -168,7 +177,7 @@
         $(me).find(".edit_label_trigger, .edit_path_trigger").css('display','none');
     }
 
-    function refresh_os_template_boot_job_selectpicker() {
+    function refresh_os_template_boot_job_selectpicker(selectpicker) {
         $.ajax({
             url : '/api/boot_jobs?filter=use_for:eq:0',
             type : 'GET',
@@ -177,13 +186,21 @@
             error : function() {
             },
             success : function(data, textStatus, xhr) {
-                $('#boot_job_id').empty();
+                selectpicker.empty();
                 $.each(data.data, function(k, v) {
-                    $('#boot_job_id').append(
+                    selectpicker.append(
                         $('<option>', {value: v['id'], text: v['name'], 'data-subtext': v['remark']})
                     );
                 });
-                $('#boot_job_id').selectpicker('refresh');
+                selectpicker.selectpicker('refresh');
+
+                // $('#boot_job_id').empty();
+                // $.each(data.data, function(k, v) {
+                //     $('#boot_job_id').append(
+                //         $('<option>', {value: v['id'], text: v['name'], 'data-subtext': v['remark']})
+                //     );
+                // });
+                // $('#boot_job_id').selectpicker('refresh');
             }
         });
     }
@@ -322,6 +339,42 @@
         });
     }
 
+    function update_boot_job(id) {
+        $.ajax({
+            url : '/api/os_template/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                boot_job_id: parseInt($('#update_boot_job_id').val())
+            }),
+            error : function() {
+                alter_danger('变更初始化作业指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更初始化作业指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function update_icon(id) {
+        $.ajax({
+            url : '/api/os_template/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                icon: $('#update_icon').val()
+            }),
+            error : function() {
+                alter_danger('变更 ICON 指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更 ICON 指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
     function enable_at(me) {
         var id = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
         enable(id);
@@ -336,6 +389,18 @@
         var id = $('#os_template_id').val();
         remove(id);
         $('#delete_modal').modal('hide');
+    }
+
+    function update_boot_job_at(me) {
+        var id = $('#os_template_id').val();
+        update_boot_job(id);
+        $('#update_boot_job_modal').modal('hide');
+    }
+
+    function update_icon_at(me) {
+        var id = $('#os_template_id').val();
+        update_icon(id);
+        $('#update_icon_modal').modal('hide');
     }
 </script>
 <div class="panel">
@@ -397,8 +462,16 @@
                             </a>
                         </div>
                     </td>
-                    <td><span class="{{ item.icon }}"></span></td>
-                    <td>{{ item.boot_job_id }}</td>
+                    <td>
+                        <a href="javascript:;" data-toggle="modal" data-target="#update_icon_modal">
+                            <span class="{{ item.icon }}"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="/boot_jobs/{{ item.boot_job_id }}">
+                            {{ boot_jobs_mapping_by_id[item.boot_job_id].name }}
+                        </a>
+                    </td>
                     <td>
                         <div class="dropdown inline-block">
                             <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
@@ -416,9 +489,10 @@
                                     </a>
                                 </li>
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                <li class="{% if item.state not in [1] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
-                                    <a href="javascript:;" data-toggle="modal" data-target="#mount_modal"
-                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);">
+                                <li>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#update_boot_job_modal"
+                                        onclick="$('#os_template_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                        $('#update_boot_job_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
                                         变更初始化作业
                                     </a>
                                 </li>
@@ -592,6 +666,80 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="update_boot_job_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更初始化作业：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板名称</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_boot_job_instance_desc"></h3>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-file-code-o"></span>&nbsp;&nbsp;初始化作业</label>
+                        <div class="col-sm-8">
+                            <select id="update_boot_job_id" name="boot_job_id" title="实例的启动作业" class="selectpicker">
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_boot_job_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="update_icon_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更 ICON：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板名称</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_icon_instance_desc"></h3>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-8">
+                            <select id="update_icon" name="icon" title="模板 ICON" class="selectpicker">
+                                <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos" selected>CentOS</option>
+                                <option value="icon-os icon-os-linux" data-icon="icon-os icon-os-linux">Linux</option>
+                                <option value="icon-os icon-os-ubuntu" data-icon="icon-os icon-os-ubuntu">Ubuntu</option>
+                                <option value="icon-os icon-os-suse" data-icon="icon-os icon-os-suse">Suse</option>
+                                <option value="icon-os icon-os-gentoo" data-icon="icon-os icon-os-gentoo">Gentoo</option>
+                                <option value="icon-os icon-os-debian" data-icon="icon-os icon-os-debian">Debian</option>
+                                <option value="icon-os icon-os-redhat" data-icon="icon-os icon-os-redhat">Redhat</option>
+                                <option value="icon-os icon-os-bsd" data-icon="icon-os icon-os-bsd">BSD</option>
+                                <option value="icon-os icon-os-windows" data-icon="icon-os icon-os-windows">Windows</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_icon_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>

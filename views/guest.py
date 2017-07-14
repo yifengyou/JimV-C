@@ -53,7 +53,7 @@ def show():
     if keyword is not None:
         guests_url = host_url + url_for('api_guests.r_content_search')
 
-    os_template_url = host_url + url_for('api_os_templates.r_get_by_filter')
+    os_templates_url = host_url + url_for('api_os_templates.r_get_by_filter')
 
     if args.__len__() > 0:
         guests_url = guests_url + '?' + '&'.join(args)
@@ -61,11 +61,11 @@ def show():
     guests_ret = requests.get(url=guests_url)
     guests_ret = json.loads(guests_ret.content)
 
-    os_template_ret = requests.get(url=os_template_url)
-    os_template_ret = json.loads(os_template_ret.content)
-    os_template_mapping_by_id = dict()
-    for os_template in os_template_ret['data']:
-        os_template_mapping_by_id[os_template['id']] = os_template
+    os_templates_ret = requests.get(url=os_templates_url)
+    os_templates_ret = json.loads(os_templates_ret.content)
+    os_templates_mapping_by_id = dict()
+    for os_template in os_templates_ret['data']:
+        os_templates_mapping_by_id[os_template['id']] = os_template
 
     last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
     page_length = 5
@@ -89,7 +89,7 @@ def show():
                 break
 
     return render_template('guest_show.html', guests_ret=guests_ret, resource_path=resource_path,
-                           os_template_mapping_by_id=os_template_mapping_by_id, page=page,
+                           os_templates_mapping_by_id=os_templates_mapping_by_id, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, last_page=last_page)
 
 

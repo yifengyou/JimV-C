@@ -69,11 +69,19 @@ def show():
     if keyword is not None:
         os_templates_url = host_url + url_for('api_os_templates.r_content_search')
 
+    boot_job_url = host_url + url_for('api_boot_jobs.r_get_by_filter')
+
     if args.__len__() > 0:
         os_templates_url = os_templates_url + '?' + '&'.join(args)
 
     os_templates_ret = requests.get(url=os_templates_url)
     os_templates_ret = json.loads(os_templates_ret.content)
+
+    boot_jobs_ret = requests.get(url=boot_job_url)
+    boot_jobs_ret = json.loads(boot_jobs_ret.content)
+    boot_jobs_mapping_by_id = dict()
+    for boot_job in boot_jobs_ret['data']:
+        boot_jobs_mapping_by_id[boot_job['id']] = boot_job
 
     last_page = int(ceil(os_templates_ret['paging']['total'] / float(page_size)))
     page_length = 5
@@ -96,7 +104,8 @@ def show():
             if i == last_page:
                 break
 
-    return render_template('os_template_show.html', os_templates_ret=os_templates_ret, resource_path=resource_path,
+    return render_template('os_template_show.html', os_templates_ret=os_templates_ret,
+                           boot_jobs_mapping_by_id=boot_jobs_mapping_by_id, resource_path=resource_path,
                            page=page, page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
                            last_page=last_page)
 
