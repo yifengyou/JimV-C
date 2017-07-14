@@ -255,9 +255,7 @@ class EventProcessor(object):
     def launch(cls):
         while True:
             if Utils.exit_flag:
-                Utils.thread_counter -= 1
                 print 'Thread EventProcessor say bye-bye'
-                print 'Current thread_counter: ' + Utils.thread_counter.__str__()
                 return
 
             try:

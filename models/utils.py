@@ -39,6 +39,7 @@ class Utils(object):
     @classmethod
     def signal_handle(cls, signum=0, frame=None):
         cls.exit_flag = True
+        raise RuntimeError('Shutdown app!')
 
     @staticmethod
     def dumps2response(func):

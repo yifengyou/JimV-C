@@ -12,6 +12,7 @@ import jimit as ji
 import json
 
 import os
+import threading
 from flask import g
 
 from models import Utils
@@ -92,7 +93,6 @@ def r_before_request():
 # noinspection PyBroadException
 try:
     db.init_conn_mysql()
-    thread.start_new_thread(db.keepalived_mysql, ())
     db.init_conn_redis()
 
     app.register_blueprint(boot_job_blueprint)
@@ -139,16 +139,29 @@ if __name__ == '__main__':
             # 父进程退出时，会清理所有提前退出的子进程的环境。所以这里无需对子进程做等待操作。
             # 即：即使子进程提前退出，且因父进程没有做wait处理，使其变成了僵尸进程。但当父进程退出时，会对因其所产生的僵尸进程做统一清理操作。
 
-            thread.start_new_thread(EventProcessor.launch, ())
-            Utils.thread_counter += 1
+            threads = []
+            t_ = threading.Thread(target=EventProcessor.launch, args=())
+            threads.append(t_)
 
-            thread.start_new_thread(Init.pub_sub_ping_pong, ())
-            Utils.thread_counter += 1
+            t_ = threading.Thread(target=Init.pub_sub_ping_pong, args=())
+            threads.append(t_)
+
+            for t in threads:
+                t.start()
 
             app.run(host=app.config['jimv_listen'], port=app.config['jimv_port'], use_reloader=False, threaded=True)
 
-            while Utils.thread_counter > 0:
+            while True:
+                if Utils.exit_flag:
+                    # 主线程即将结束
+                    break
                 time.sleep(1)
+
+            print 'fuck'
+
+            # 等待子线程结束
+            for t in threads:
+                t.join()
 
             print 'Main say bye-bye!'
 
