@@ -1,0 +1,481 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+            line-height: 20px;
+        }
+        .table > thead > tr > th,
+        .table > tfoot > tr > th {
+            color: #999999;
+            font-weight: normal;
+            border-bottom: 0 solid #e1e6eb;
+            background-color: #F5F6FA;
+        }
+        
+        .table > tbody > tr > td {
+            color: #424547;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
+        .btn,
+        .form-control,
+        .modal-content {
+            border-radius: 0 !important;
+        }
+    </style>
+
+{% endblock head %}
+{% block content %}
+
+<script type="text/javascript">
+    var page = 1;
+    var page_size = 10;
+    var keyword = '';
+    var resource_path = window.location.pathname;
+    var cur_url = resource_path;
+
+    $(document).ready(function() {
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+
+        var last_ready = null;
+        $('#content_search').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
+            }
+            last_ready = setTimeout(function () {
+                keyword = $('#content_search').val();
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+                if (keyword.length > 0) {
+                    cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+                }
+                window.location.href=cur_url;
+            }, 1000);
+        });
+
+        $('#page_size').change(function () {
+            keyword = $('#content_search').val();
+            page_size = $('#page_size').val();
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+            if (keyword.length > 0) {
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+            }
+            window.location.href=cur_url;
+        });
+
+        $('#edit_name_modal').on('show.bs.modal', function (me) {
+            $('#boot_job_id').val($(me.relatedTarget).parent().parent().prev().text());
+            $('#edit_name').val($(me.relatedTarget).prev().text());
+        });
+
+        $('#edit_remark_modal').on('show.bs.modal', function (me) {
+            $('#boot_job_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().text());
+            $('#edit_remark').val($(me.relatedTarget).prev().text());
+        });
+
+        $('#add_boot_job_modal').on('show.bs.modal', function (me) {
+        });
+
+        $('#update_use_for_modal').on('show.bs.modal', function (me) {
+            $('#boot_job_id').val($(me.relatedTarget).parent().prev().prev().text());
+            $('#update_use_for_instance_desc').text($(me.relatedTarget).parent().prev().text());
+        });
+    });
+
+    function refresh() {
+        keyword = $('#content_search').val();
+        page = $('#pagination li.active a').text();
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+        if (keyword.length > 0) {
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+        }
+        window.location.href=cur_url;
+    }
+
+    function row_onmouseover(me) {
+        $(me).find(".edit_name_trigger, .edit_remark_trigger").css('display','inline-flex');
+    }
+
+    function row_onmouseout(me) {
+        $(me).find(".edit_name_trigger, .edit_remark_trigger").css('display','none');
+    }
+
+    function name_update(me) {
+        var boot_job_id = $('#boot_job_id').val();
+        var name = $('#edit_name').val();
+        $('#edit_name_modal').modal('hide');
+        $.ajax({
+            url : '/api/boot_job/' + boot_job_id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                name: name
+            }),
+            error : function() {
+                alter_danger('启动作业名称更新失败！');
+            },
+            success : function() {
+                alter_success('启动作业名称更新成功！');
+                refresh()
+            }
+        });
+    }
+
+    function remark_update(me) {
+        var boot_job_id = $('#boot_job_id').val();
+        var remark = $('#edit_remark').val();
+        $('#edit_remark_modal').modal('hide');
+        $.ajax({
+            url : '/api/boot_job/' + boot_job_id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                remark: remark
+            }),
+            error : function() {
+                alter_danger('启动作业备注更新失败！');
+            },
+            success : function() {
+                alter_success('启动作业备注路径更新成功！');
+                refresh()
+            }
+        });
+    }
+
+    function update_use_for(id) {
+        $.ajax({
+            url : '/api/boot_job/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                use_for: parseInt($('#update_use_for').val())
+            }),
+            error : function() {
+                alter_danger('变更启动作业作用域指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更启动作业作用域指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function remove(id) {
+        $.ajax({
+            url : '/api/boot_jobs/' + id,
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('启动作业删除指令发送失败！');
+            },
+            success : function() {
+                alter_success('启动作业删除指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function delete_at(me) {
+        var id = $('#boot_job_id').val();
+        remove(id);
+        $('#delete_modal').modal('hide');
+    }
+
+    function update_use_for_at(me) {
+        var id = $('#boot_job_id').val();
+        update_use_for(id);
+        $('#update_use_for_modal').modal('hide');
+    }
+</script>
+<div class="panel">
+    <div class="panel-body">
+        <h3 class="title-hero" style="font-size: 24px;">
+            启动作业
+        </h3>
+        <div>
+            <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
+                <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                    <div class="col-sm-12" style="padding-right: 0;">
+                        <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                            <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                        </div>
+                        <div class="pull-right">
+                            <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_boot_job_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加启动作业</a>
+                        </div>
+                    </div>
+                </div>
+                <table id="boot_job_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                       style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <thead>
+                <tr role="row">
+                    <th style="display: none;">ID</th>
+                    <th width="280px;">名称</th>
+                    <th>作用域</th>
+                    <th width="600px;">备注</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in boot_jobs_ret.data %}
+                <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                    <td style="display: none;">{{ item.id }}</td>
+                    <td>
+                        <div>
+                            <p style="display: inline-block;">{{ item.name }}</p>
+                            <a href="javascript:;" class="edit_name_trigger" data-toggle="modal" data-target="#edit_name_modal" style="display: none; float: right;">
+                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="javascript:;" data-toggle="modal" data-target="#update_use_for_modal">
+                            {% if item.use_for == 0 %}
+                                <span style="color: #8800FF;">模板</span>
+                            {% elif item.use_for == 1 %}
+                                <span style="color: #3333FF;">系统</span>
+                            {% elif item.use_for == 2 %}
+                                <span style="color: #00BB00;">用户</span>
+                            {% else %}
+                                <span style="color: #990000;">未知</span>
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td>
+                        <div>
+                            <p style="display: inline-block;">{{ item.remark }}</p>
+                            <a href="javascript:;" class="edit_remark_trigger" data-toggle="modal" data-target="#edit_remark_modal" style="display: none; float: right;">
+                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="dropdown inline-block">
+                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                更多
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                       onclick="$('#boot_job_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                       $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[1].textContent)">
+                                        删除
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+
+                <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                    <tfoot>
+                    <tr style="height: 70px;">
+                        <th>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                </div>
+                                <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                    共有{{ boot_jobs_ret.paging.total }}条，每页显示：
+                                    <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
+                                        <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
+                                        <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
+                                        <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
+                                    </select>&nbsp;&nbsp;条
+                                </div>
+                                <div class="col-sm-3" style="text-align: left;">
+                                    <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
+                                        <ul id="pagination" class="pagination">
+                                            <li class="{% if page == 1 %} disabled {% endif %}">
+                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
+                                            </li>
+                                            {% for item in pages %}
+                                            <li class="{% if item == page %} active {% endif %}">
+                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
+                                            </li>
+                                            {% endfor %}
+                                            <li class="{% if page == last_page %} disabled {% endif %}">
+                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input id="boot_job_id" title="启动作业 ID" class="form-control" name="boot_job_id" hidden>
+
+<div class="modal" id="edit_name_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑启动作业名称：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_name" title="启动作业名称" class="form-control" name="boot_job_name">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="name_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="edit_remark_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑模板路径：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_remark" title="启动作业备注" class="form-control" name="boot_job_remark">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="remark_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除启动作业：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要删除该启动作业吗？</p>
+                <h3 style="color: orangered;" id="delete_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="add_boot_job_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">添加启动作业：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
+                <div class="example-box-wrapper">
+                    <form class="form-horizontal bordered-row" action="/boot_job" method="post">
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;启动作业名称</label>
+                            <div class="col-sm-6">
+                                <input id="name" name="name" type="text" title="启动作业名称" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-pie-chart"></span>&nbsp;&nbsp;作用域</label>
+                            <div class="col-sm-6">
+                                <select id="use_for" name="use_for" title="作用域" class="selectpicker">
+                                    <option value="0" data-subtext="从模板克隆的虚拟机，首次启动时初始化系统使用" selected>模板</option>
+                                    <option value="1" data-subtext="JimV系统平台内置的功能，如重置系统密码，更换IP等操作">系统</option>
+                                    <option value="2" data-subtext="通过重启系统，批量执行用户预定的操作">用户</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;备注</label>
+                            <div class="col-sm-6">
+                                <input id="remark" name="remark" type="text" title="备注" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-6 pull-right">
+                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="update_use_for_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更作用域：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;启动作业名称</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_use_for_instance_desc"></h3>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-pie-chart"></span>&nbsp;&nbsp;作用域</label>
+                        <div class="col-sm-8">
+                            <select id="update_use_for" name="use_for" title="作用域" class="selectpicker">
+                                <option value="0" data-subtext="从模板克隆的虚拟机，首次启动时初始化系统使用" selected>模板</option>
+                                <option value="1" data-subtext="JimV系统平台内置的功能，如重置系统密码，更换IP等操作">系统</option>
+                                <option value="2" data-subtext="通过重启系统，批量执行用户预定的操作">用户</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_use_for_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

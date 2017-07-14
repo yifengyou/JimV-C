@@ -3,7 +3,7 @@
 
 
 from models.utils import add_rule_views
-from views import guest, disk, log, os_template
+from views import guest, disk, log, os_template, boot_job
 
 
 __author__ = 'James Iter'
@@ -26,4 +26,7 @@ add_rule_views(log.blueprints, '', views_func='log.show', methods=['GET'])
 
 add_rule_views(os_template.blueprints, '', views_func='os_template.show', methods=['GET'])
 add_rule_views(os_template.blueprint, '', views_func='os_template.create', methods=['POST'])
+
+add_rule_views(boot_job.blueprints, '', views_func='boot_job.show', methods=['GET'])
+add_rule_views(boot_job.blueprint, '', views_func='boot_job.create', methods=['POST'])
 

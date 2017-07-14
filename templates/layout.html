@@ -297,49 +297,49 @@
                     <ul id="sidebar-menu" data-spy="affix" data-offset-top="10">
                         <li class="header"><span>虚拟化平台管理</span></li>
                         <li>
-                            <a href="{{ url_for('v_guests.show') }}" title="Guests">
+                            <a href="{{ url_for('v_guests.show') }}" title="虚拟机实例列表">
                                 <i class="glyph-icon icon-linecons-cloud"></i>
                                 <span>虚拟机</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url_for('v_disks.show') }}" title="Disks">
+                            <a href="{{ url_for('v_disks.show') }}" title="磁盘实例列表">
                                 <i class="glyph-icon icon-hdd-o"></i>
                                 <span>磁盘</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url_for('v_guests.show') }}" title="Hosts">
+                            <a href="{{ url_for('v_guests.show') }}" title="宿主机列表">
                                 <i class="glyph-icon icon-linecons-desktop"></i>
                                 <span>宿主机</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url_for('v_logs.show') }}" title="JimVLog">
+                            <a href="{{ url_for('v_logs.show') }}" title="JimV 虚拟化平台日志">
                                 <i class="glyph-icon icon-linecons-eye"></i>
                                 <span>平台日志</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url_for('v_os_templates.show') }}" title="GuestsTemplate">
+                            <a href="{{ url_for('v_os_templates.show') }}" title="虚拟机模板列表">
                                 <i class="glyph-icon icon-linecons-inbox"></i>
                                 <span>虚拟机模板</span>
                             </a>
                         </li>
                         <li>
-                            <a href="#" title="OSInit">
+                            <a href="#" title="虚拟机启动作业">
                                 <i class="glyph-icon icon-linecons-paper-plane"></i>
-                                <span>虚拟机初始化操作</span>
+                                <span>启动作业</span>
                             </a>
                             <div class="sidebar-submenu">
                                 <ul>
-                                    <li><a href="{{ url_for('v_guests.show') }}" title="OSInit"><span>初始化簇</span></a></li>
-                                    <li><a href="{{ url_for('v_guests.show') }}" title="OSInitWrite"><span>初始化规则</span></a></li>
+                                    <li><a href="{{ url_for('v_boot_jobs.show') }}" title="启动作业列表"><span>启动作业</span></a></li>
+                                    <li><a href="{{ url_for('v_boot_jobs.show') }}" title="启动作业操作细则"><span>启动作业操作细则</span></a></li>
                                 </ul>
                             </div><!-- .sidebar-submenu -->
                         </li>
                         <li>
-                            <a href="{{ url_for('v_guests.show') }}" title="JimVConfig">
+                            <a href="{{ url_for('v_guests.show') }}" title="JimV 虚拟化平台系统配置">
                                 <i class="glyph-icon icon-linecons-cog"></i>
                                 <span>系统配置</span>
                             </a>

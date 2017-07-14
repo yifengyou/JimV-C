@@ -3,8 +3,6 @@
 
 
 import traceback
-import thread
-
 import signal
 
 import time
@@ -47,6 +45,8 @@ from views.log import blueprint as view_log_blueprint
 from views.log import blueprints as view_log_blueprints
 from views.os_template import blueprint as view_os_template_blueprint
 from views.os_template import blueprints as view_os_template_blueprints
+from views.boot_job import blueprint as view_boot_job_blueprint
+from views.boot_job import blueprints as view_boot_job_blueprints
 
 from websockify.websocketproxy import WebSocketProxy
 
@@ -121,6 +121,8 @@ try:
     app.register_blueprint(view_log_blueprints)
     app.register_blueprint(view_os_template_blueprint)
     app.register_blueprint(view_os_template_blueprints)
+    app.register_blueprint(view_boot_job_blueprint)
+    app.register_blueprint(view_boot_job_blueprints)
 
 except:
     logger.error(traceback.format_exc())
@@ -156,8 +158,6 @@ if __name__ == '__main__':
                     # 主线程即将结束
                     break
                 time.sleep(1)
-
-            print 'fuck'
 
             # 等待子线程结束
             for t in threads:
