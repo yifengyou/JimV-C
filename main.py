@@ -47,6 +47,8 @@ from views.os_template import blueprint as view_os_template_blueprint
 from views.os_template import blueprints as view_os_template_blueprints
 from views.boot_job import blueprint as view_boot_job_blueprint
 from views.boot_job import blueprints as view_boot_job_blueprints
+from views.operate_rule import blueprint as view_operate_rule_blueprint
+from views.operate_rule import blueprints as view_operate_rule_blueprints
 
 from websockify.websocketproxy import WebSocketProxy
 
@@ -123,6 +125,8 @@ try:
     app.register_blueprint(view_os_template_blueprints)
     app.register_blueprint(view_boot_job_blueprint)
     app.register_blueprint(view_boot_job_blueprints)
+    app.register_blueprint(view_operate_rule_blueprint)
+    app.register_blueprint(view_operate_rule_blueprints)
 
 except:
     logger.error(traceback.format_exc())

@@ -50,6 +50,20 @@
         .modal-content {
             border-radius: 0 !important;
         }
+
+        .path_or_command {
+            white-space: nowrap;
+            overflow: hidden;
+            background-color: #e5eef4;
+            text-overflow: ellipsis;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .path_or_command:hover {
+            white-space: inherit;
+            overflow: visible;
+        }
     </style>
 
 {% endblock head %}
@@ -91,22 +105,33 @@
             window.location.href=cur_url;
         });
 
-        $('#edit_name_modal').on('show.bs.modal', function (me) {
-            $('#boot_job_id').val($(me.relatedTarget).parent().parent().prev().text());
-            $('#edit_name').val($(me.relatedTarget).prev().text());
+        $('#edit_path_modal').on('show.bs.modal', function (me) {
+            $(me.relatedTarget).css('display','none');
+            $('#operate_rule_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().text());
+            $('#edit_path').val($(me.relatedTarget).parent()[0].innerText);
         });
 
-        $('#edit_remark_modal').on('show.bs.modal', function (me) {
-            $('#boot_job_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().text());
-            $('#edit_remark').val($(me.relatedTarget).prev().text());
+        $('#edit_content_modal').on('show.bs.modal', function (me) {
+            // 下行 display 设为 none 的目的为，第三行取框内文本时，避免了末尾多出来的换行符。
+            $(me.relatedTarget).css('display','none');
+            $('#operate_rule_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().text());
+            $('#edit_content').val($(me.relatedTarget).parent()[0].innerText);
+        });
+
+        $('#edit_command_modal').on('show.bs.modal', function (me) {
+            $(me.relatedTarget).css('display','none');
+            $('#operate_rule_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().text());
+            $('#edit_command').val($(me.relatedTarget).parent()[0].innerText);
         });
 
         $('#add_boot_job_modal').on('show.bs.modal', function (me) {
         });
 
-        $('#update_use_for_modal').on('show.bs.modal', function (me) {
-            $('#boot_job_id').val($(me.relatedTarget).parent().prev().prev().text());
-            $('#update_use_for_instance_desc').text($(me.relatedTarget).parent().prev().text());
+        $('#update_kind_modal').on('show.bs.modal', function (me) {
+            $('#operate_rule_id').val($(me.relatedTarget).parent().prev().prev().text());
+            $('#update_kind_instance_desc').text($(me.relatedTarget).parent().prev()[0].innerText);
+            $('#update_kind_instance_desc_sub').empty();
+            $('#update_kind_instance_desc_sub').append($(me.relatedTarget).parent().next().next().find('div').prop('outerHTML'));
         });
     });
 
@@ -122,68 +147,89 @@
     }
 
     function row_onmouseover(me) {
-        $(me).find(".edit_name_trigger, .edit_remark_trigger").css('display','inline-flex');
+        $(me).find(".edit_trigger").css('display','inline-flex');
     }
 
     function row_onmouseout(me) {
-        $(me).find(".edit_name_trigger, .edit_remark_trigger").css('display','none');
+        $(me).find(".edit_trigger").css('display','none');
     }
 
-    function name_update(me) {
-        var boot_job_id = $('#boot_job_id').val();
-        var name = $('#edit_name').val();
-        $('#edit_name_modal').modal('hide');
+    function path_update(me) {
+        var operate_rule_id = $('#operate_rule_id').val();
+        var path = $('#edit_path').val();
+        $('#edit_path_modal').modal('hide');
         $.ajax({
-            url : '/api/boot_job/' + boot_job_id,
+            url : '/api/operate_rule/' + operate_rule_id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
-                name: name
+                path: path
             }),
             error : function() {
-                alter_danger('启动作业名称更新失败！');
+                alter_danger('操作细则文件路径更新失败！');
             },
             success : function() {
-                alter_success('启动作业名称更新成功！');
+                alter_success('操作细则文件路径更新成功！');
                 refresh()
             }
         });
     }
 
-    function remark_update(me) {
-        var boot_job_id = $('#boot_job_id').val();
-        var remark = $('#edit_remark').val();
-        $('#edit_remark_modal').modal('hide');
+    function content_update(me) {
+        var operate_rule_id = $('#operate_rule_id').val();
+        var content = $('#edit_content').val();
+        $('#edit_content_modal').modal('hide');
         $.ajax({
-            url : '/api/boot_job/' + boot_job_id,
+            url : '/api/operate_rule/' + operate_rule_id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
-                remark: remark
+                content: content
             }),
             error : function() {
-                alter_danger('启动作业备注更新失败！');
+                alter_danger('操作细则文件内容更新失败！');
             },
             success : function() {
-                alter_success('启动作业备注路径更新成功！');
+                alter_success('操作细则文件内容更新成功！');
                 refresh()
             }
         });
     }
 
-    function update_use_for(id) {
+    function command_update(me) {
+        var operate_rule_id = $('#operate_rule_id').val();
+        var command = $('#edit_command').val();
+        $('#edit_command_modal').modal('hide');
         $.ajax({
-            url : '/api/boot_job/' + id,
+            url : '/api/operate_rule/' + operate_rule_id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
-                use_for: parseInt($('#update_use_for').val())
+                command: command
             }),
             error : function() {
-                alter_danger('变更启动作业作用域指令发送失败！');
+                alter_danger('操作细则命令更新失败！');
             },
             success : function() {
-                alter_success('变更启动作业作用域指令发送成功！');
+                alter_success('操作细则命令更新成功！');
+                refresh()
+            }
+        });
+    }
+
+    function update_kind(id) {
+        $.ajax({
+            url : '/api/operate_rule/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                kind: parseInt($('#update_kind').val())
+            }),
+            error : function() {
+                alter_danger('变更操作细则类型指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更操作细则类型指令发送成功！');
                 refresh();
             }
         });
@@ -195,31 +241,31 @@
             type : 'DELETE',
             contentType: "application/json; charset=utf-8",
             error : function() {
-                alter_danger('启动作业删除指令发送失败！');
+                alter_danger('操作细则删除指令发送失败！');
             },
             success : function() {
-                alter_success('启动作业删除指令发送成功！');
+                alter_success('操作细则删除指令发送成功！');
                 refresh();
             }
         });
     }
 
     function delete_at(me) {
-        var id = $('#boot_job_id').val();
+        var id = $('#operate_rule_id').val();
         remove(id);
         $('#delete_modal').modal('hide');
     }
 
-    function update_use_for_at(me) {
-        var id = $('#boot_job_id').val();
-        update_use_for(id);
-        $('#update_use_for_modal').modal('hide');
+    function update_kind_at(me) {
+        var id = $('#operate_rule_id').val();
+        update_kind(id);
+        $('#update_kind_modal').modal('hide');
     }
 </script>
 <div class="panel">
     <div class="panel-body">
         <h3 class="title-hero" style="font-size: 24px;">
-            启动作业
+            启动作业操作细则
         </h3>
         <div>
             <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
@@ -230,53 +276,62 @@
                         </div>
                         <div class="pull-right">
                             <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
-                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_boot_job_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加启动作业</a>
+                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_boot_job_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加操作细则</a>
                         </div>
                     </div>
                 </div>
-                <table id="boot_job_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                <table id="operate_rule_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
                        style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
                 <thead>
                 <tr role="row">
                     <th style="display: none;">ID</th>
-                    <th width="280px;">名称</th>
-                    <th>作用域</th>
-                    <th width="600px;">备注</th>
+                    <th>操作细则名称</th>
+                    <th width="80px;">类型</th>
+                    <th>执行序列</th>
+                    <th width="600px;">[路径/内容 | 命令]</th>
                     <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in boot_jobs_ret.data %}
+                {% for item in operate_rules_ret.data %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
                     <td style="display: none;">{{ item.id }}</td>
                     <td>
-                        <div>
-                            <a href="/operate_rules?boot_job_id={{ item.id }}"><p style="display: inline-block;">{{ item.name }}</p></a>
-                            <a href="javascript:;" class="edit_name_trigger" data-toggle="modal" data-target="#edit_name_modal" style="display: none; float: right;">
-                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
-                            </a>
-                        </div>
+                        <a href="/boot_jobs?boot_job_id={{ item.boot_job_id }}">
+                            {{ boot_jobs_mapping_by_id[item.boot_job_id].name }}
+                        </a>
                     </td>
                     <td>
-                        <a href="javascript:;" data-toggle="modal" data-target="#update_use_for_modal">
-                            {% if item.use_for == 0 %}
-                                <span style="color: #8800FF;">模板</span>
-                            {% elif item.use_for == 1 %}
-                                <span style="color: #3333FF;">系统</span>
-                            {% elif item.use_for == 2 %}
-                                <span style="color: #00BB00;">用户</span>
+                        <a href="javascript:;" data-toggle="modal" data-target="#update_kind_modal">
+                            {% if item.kind == 0 %}
+                                <span style="color: #8800FF;">命令</span>
+                            {% elif item.kind == 1 %}
+                                <span style="color: #3333FF;">覆写文件</span>
+                            {% elif item.kind == 2 %}
+                                <span style="color: #00BB00;">追加内容</span>
                             {% else %}
                                 <span style="color: #990000;">未知</span>
                             {% endif %}
                         </a>
                     </td>
                     <td>
-                        <div>
-                            <p style="display: inline-block;">{{ item.remark }}</p>
-                            <a href="javascript:;" class="edit_remark_trigger" data-toggle="modal" data-target="#edit_remark_modal" style="display: none; float: right;">
-                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
-                            </a>
-                        </div>
+                        {{ item.sequence }}
+                    </td>
+                    <td>
+                        {% if item.kind in [1, 2]%}
+                            <div class="path_or_command">{{ item.path }}<a href="javascript:;" class="edit_trigger" data-toggle="modal" data-target="#edit_path_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                            <pre style="border-radius: 0; padding-right: 5px;">{{ item.content }}<a href="javascript:;" class="edit_trigger" data-toggle="modal" data-target="#edit_content_modal" style="display: none; float: right;">
+                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 18px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                            </a></pre>
+                        {% elif item.kind == 0 %}
+                            <div class="path_or_command" style="background-color: #f9f2f4">{{ item.command }}<a href="javascript:;" class="edit_trigger" data-toggle="modal" data-target="#edit_command_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                        {% endif %}
                     </td>
                     <td>
                         <div class="dropdown inline-block">
@@ -286,7 +341,7 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
-                                       onclick="$('#boot_job_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                       onclick="$('#operate_rule_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                        $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[1].textContent)">
                                         删除
                                     </a>
@@ -307,7 +362,7 @@
                                 <div class="col-sm-6">
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                    共有{{ boot_jobs_ret.paging.total }}条，每页显示：
+                                    共有{{ operate_rules_ret.paging.total }}条，每页显示：
                                     <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
                                         <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
                                         <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
@@ -341,36 +396,54 @@
     </div>
 </div>
 
-<input id="boot_job_id" title="启动作业 ID" class="form-control" name="boot_job_id" hidden>
+<input id="operate_rule_id" title="操作细则 ID" class="form-control" name="operate_rule_id" hidden>
 
-<div class="modal" id="edit_name_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="edit_path_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">编辑启动作业名称：</h4>
+                <h4 class="modal-title">编辑操作细则文件路径：</h4>
             </div>
             <div class="modal-body">
-                <input id="edit_name" title="启动作业名称" class="form-control" name="boot_job_name">
+                <input id="edit_path" title="操作细则文件路径" class="form-control" name="operate_rule_path">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="name_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="path_update();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal" id="edit_remark_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="edit_content_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">编辑模板路径：</h4>
+                <h4 class="modal-title">编辑操作细则文件内容：</h4>
             </div>
             <div class="modal-body">
-                <input id="edit_remark" title="启动作业备注" class="form-control" name="boot_job_remark">
+                <textarea id="edit_content" title="操作细则文件内容" class="form-control" rows="6"
+                          name="operate_rule_content"></textarea>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="remark_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="content_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="edit_command_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑操作细则命令：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_command" title="操作细则命令" class="form-control" name="operate_rule_command">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="command_update();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
@@ -381,10 +454,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">删除启动作业：</h4>
+                <h4 class="modal-title">删除操作细则：</h4>
             </div>
             <div class="modal-body">
-                <p>你确定要删除该启动作业吗？</p>
+                <p>你确定要删除该操作细则吗？</p>
                 <h3 style="color: orangered;" id="delete_instance_desc"></h3>
             </div>
             <div class="modal-footer">
@@ -399,16 +472,16 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">添加启动作业：</h4>
+                <h4 class="modal-title">添加操作细则：</h4>
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
                     <form class="form-horizontal bordered-row" action="/boot_job" method="post">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;启动作业名称</label>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;操作细则名称</label>
                             <div class="col-sm-6">
-                                <input id="name" name="name" type="text" title="启动作业名称" class="form-control">
+                                <input id="name" name="name" type="text" title="操作细则名称" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
@@ -443,36 +516,37 @@
     </div>
 </div>
 
-<div class="modal" id="update_use_for_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="update_kind_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">变更作用域：</h4>
+                <h4 class="modal-title">变更操作类型：</h4>
             </div>
             <div class="modal-body" style="padding-top: 0;">
                 <form class="form-horizontal bordered-row">
                     <div class="form-group">
                         <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;启动作业名称</label>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;操作细则类型</label>
                         <div class="col-sm-8">
-                            <h3 style="color: orangered;" id="update_use_for_instance_desc"></h3>
+                            <h3 style="color: orangered;" id="update_kind_instance_desc"></h3>
+                            <h6 id="update_kind_instance_desc_sub"></h6>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-pie-chart"></span>&nbsp;&nbsp;作用域</label>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-pie-chart"></span>&nbsp;&nbsp;操作类型</label>
                         <div class="col-sm-8">
-                            <select id="update_use_for" name="use_for" title="作用域" class="selectpicker">
-                                <option value="0" data-subtext="从模板克隆的虚拟机，首次启动时初始化系统使用" selected>模板</option>
-                                <option value="1" data-subtext="JimV系统平台内置的功能，如重置系统密码，更换IP等操作">系统</option>
-                                <option value="2" data-subtext="通过重启系统，批量执行用户预定的操作">用户</option>
+                            <select id="update_kind" name="use_for" title="操作类型" class="selectpicker">
+                                <option value="0" data-subtext="系统启动前，通过 guestfish 所执行的命令" selected>命令</option>
+                                <option value="1" data-subtext="系统启动前，通过 guestfish 替换目标文件中的内容">覆写文件</option>
+                                <option value="2" data-subtext="系统启动前，通过 guestfish 向目标文件追加内容">追加内容</option>
                             </select>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="update_use_for_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_kind_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
