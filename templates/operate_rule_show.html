@@ -124,7 +124,8 @@
             $('#edit_command').val($(me.relatedTarget).parent()[0].innerText);
         });
 
-        $('#add_boot_job_modal').on('show.bs.modal', function (me) {
+        $('#add_operate_rule_modal').on('show.bs.modal', function (me) {
+            refresh_operate_rule_boot_job_selectpicker($('#boot_job_id'));
         });
 
         $('#update_kind_modal').on('show.bs.modal', function (me) {
@@ -140,6 +141,40 @@
             $('#update_sequence_instance_desc').text($(me.relatedTarget).parent().prev().prev()[0].innerText);
             $('#update_sequence_instance_desc_sub').empty();
             $('#update_sequence_instance_desc_sub').append($(me.relatedTarget).parent().next().find('div').prop('outerHTML'));
+        });
+
+        $('#kind').on('changed.bs.select', function (me) {
+            $('#payload_panel').empty();
+            if ($('#kind').val() == '0') {
+                $('#payload_panel').append('\
+                    <div class="form-group">\
+                        <div class="col-sm-2"></div>\
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-terminal"></span>&nbsp;&nbsp;命令</label>\
+                        <div class="col-sm-6">\
+                            <input id="command" title="命令" class="form-control" name="command">\
+                        </div>\
+                    </div>'
+                );
+            } else {
+                $('#payload_panel').append('\
+                    <div class="form-group">\
+                        <div class="col-sm-2"></div>\
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-stumbleupon"></span>&nbsp;&nbsp;文件路径</label>\
+                        <div class="col-sm-6">\
+                            <input id="path" title="操作细则文件路径" class="form-control" name="path">\
+                        </div>\
+                    </div>'
+                );
+                $('#payload_panel').append('\
+                    <div class="form-group">\
+                        <div class="col-sm-2"></div>\
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-file-text-o"></span>&nbsp;&nbsp;文件内容</label>\
+                        <div class="col-sm-6">\
+                            <textarea id="content" title="操作细则文件内容" class="form-control" rows="6" name="content"></textarea>\
+                        </div>\
+                    </div>'
+                );
+            }
         });
     });
 
@@ -163,7 +198,7 @@
     }
 
     $(function() { "use strict";
-        $("#update_sequence").TouchSpin({
+        $("#update_sequence, #sequence").TouchSpin({
             max: 20,
             min: 1,
             verticalbuttons: true,
@@ -171,6 +206,26 @@
             verticaldownclass: 'glyph-icon icon-minus'
         });
     });
+
+    function refresh_operate_rule_boot_job_selectpicker(selectpicker) {
+        $.ajax({
+            url : '/api/boot_jobs',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    selectpicker.append(
+                        $('<option>', {value: v['id'], text: v['name'], 'data-subtext': v['remark']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+            }
+        });
+    }
 
     function path_update(me) {
         var operate_rule_id = $('#operate_rule_id').val();
@@ -273,7 +328,7 @@
 
     function remove(id) {
         $.ajax({
-            url : '/api/boot_jobs/' + id,
+            url : '/api/operate_rules/' + id,
             type : 'DELETE',
             contentType: "application/json; charset=utf-8",
             error : function() {
@@ -318,7 +373,7 @@
                         </div>
                         <div class="pull-right">
                             <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
-                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_boot_job_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加操作细则</a>
+                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_operate_rule_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加操作细则</a>
                         </div>
                     </div>
                 </div>
@@ -327,7 +382,7 @@
                 <thead>
                 <tr role="row">
                     <th style="display: none;">ID</th>
-                    <th>操作细则名称</th>
+                    <th>启动作业</th>
                     <th width="80px;">类型</th>
                     <th>执行序列</th>
                     <th width="600px;">[路径/内容 | 命令]</th>
@@ -385,8 +440,10 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
-                                       onclick="$('#operate_rule_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
-                                       $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[1].textContent)">
+                                        onclick="$('#operate_rule_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                        $('#delete_instance_desc_sub').empty();
+                                        $('#delete_instance_desc_sub').append($(this).parent().parent().parent().parent().prev().find('div').prop('outerHTML'));
+                                        $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[1].textContent)">
                                         删除
                                     </a>
                                 </li>
@@ -503,6 +560,7 @@
             <div class="modal-body">
                 <p>你确定要删除该操作细则吗？</p>
                 <h3 style="color: orangered;" id="delete_instance_desc"></h3>
+                <h6 id="delete_instance_desc_sub"></h6>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
@@ -512,7 +570,7 @@
     </div>
 </div>
 
-<div class="modal" id="add_boot_job_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="add_operate_rule_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -520,31 +578,34 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form class="form-horizontal bordered-row" action="/boot_job" method="post">
+                    <form class="form-horizontal bordered-row" action="/operate_rule" method="post">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;操作细则名称</label>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;启动作业</label>
                             <div class="col-sm-6">
-                                <input id="name" name="name" type="text" title="操作细则名称" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-pie-chart"></span>&nbsp;&nbsp;作用域</label>
-                            <div class="col-sm-6">
-                                <select id="use_for" name="use_for" title="作用域" class="selectpicker">
-                                    <option value="0" data-subtext="从模板克隆的虚拟机，首次启动时初始化系统使用" selected>模板</option>
-                                    <option value="1" data-subtext="JimV系统平台内置的功能，如重置系统密码，更换IP等操作">系统</option>
-                                    <option value="2" data-subtext="通过重启系统，批量执行用户预定的操作">用户</option>
+                                <select id="boot_job_id" name="boot_job_id" title="启动作业" class="selectpicker">
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;备注</label>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-th-list"></span>&nbsp;&nbsp;类型</label>
                             <div class="col-sm-6">
-                                <input id="remark" name="remark" type="text" title="备注" class="form-control">
+                                <select id="kind" name="kind" title="请选择" class="selectpicker">
+                                    <option value="0" data-subtext="系统启动前，通过 guestfish 所执行的命令">命令</option>
+                                    <option value="1" data-subtext="系统启动前，通过 guestfish 替换目标文件中的内容">覆写文件</option>
+                                    <option value="2" data-subtext="系统启动前，通过 guestfish 向目标文件追加内容">追加内容</option>
+                                </select>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-sort-numeric-asc"></span>&nbsp;&nbsp;执行序列</label>
+                            <div class="col-sm-6">
+                                <input id="sequence" title="执行序列" class="form-control" type="text" value="1" name="sequence">
+                            </div>
+                        </div>
+                        <div id="payload_panel" class="form-group">
                         </div>
                         <div class="form-group">
                             <div class="col-sm-4"></div>

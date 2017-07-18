@@ -7,6 +7,8 @@ from flask import Blueprint, render_template, url_for, request, redirect
 import requests
 from math import ceil
 
+from models.status import OperateRuleKind
+
 
 __author__ = 'James Iter'
 __date__ = '2017/7/17'
@@ -110,26 +112,32 @@ def create():
     host_url = request.host_url.rstrip('/')
 
     if request.method == 'POST':
-        name = request.form.get('name')
-        use_for = request.form.get('use_for')
-        remark = request.form.get('remark')
+        boot_job_id = int(request.form.get('boot_job_id'))
+        kind = int(request.form.get('kind'))
+        sequence = int(request.form.get('sequence'))
 
         payload = {
-            "name": name,
-            "use_for": int(use_for),
-            "remark": remark
+            "boot_job_id": boot_job_id,
+            "kind": kind,
+            "sequence": sequence
         }
 
-        url = host_url + '/api/boot_job'
+        if kind == OperateRuleKind.cmd.value:
+            payload['command'] = request.form.get('command', '')
+
+        else:
+            payload['path'] = request.form.get('path', '')
+            payload['content'] = request.form.get('content', '')
+
+        url = host_url + '/api/operate_rule'
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         j_r = json.loads(r.content)
-        return render_template('success.html', go_back_url='/boot_jobs', timeout=10000, title='提交成功',
-                               message_title='添加启动作业的请求已被接受',
-                               message='您所提交的启动作业已创建。页面将在10秒钟后自动跳转到模板列表页面！')
+        return render_template('success.html', go_back_url='/operate_rules', timeout=10000, title='提交成功',
+                               message_title='添加启动作业操作细则的请求已被接受',
+                               message='您所提交的启动作业操作细则已创建。页面将在10秒钟后自动跳转到模板列表页面！')
 
     else:
-        return redirect(url_for('v_boot_jobs.show'))
-
+        return redirect(url_for('v_operate_rules.show'))
 
 
