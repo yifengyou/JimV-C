@@ -133,6 +133,14 @@
             $('#update_kind_instance_desc_sub').empty();
             $('#update_kind_instance_desc_sub').append($(me.relatedTarget).parent().next().next().find('div').prop('outerHTML'));
         });
+
+        $('#update_sequence_modal').on('show.bs.modal', function (me) {
+            $('#operate_rule_id').val($(me.relatedTarget).parent().prev().prev().prev().text());
+            $('#update_sequence').val($(me.relatedTarget)[0].innerText);
+            $('#update_sequence_instance_desc').text($(me.relatedTarget).parent().prev().prev()[0].innerText);
+            $('#update_sequence_instance_desc_sub').empty();
+            $('#update_sequence_instance_desc_sub').append($(me.relatedTarget).parent().next().find('div').prop('outerHTML'));
+        });
     });
 
     function refresh() {
@@ -146,13 +154,23 @@
         window.location.href=cur_url;
     }
 
-    function row_onmouseover(me) {
+    function panel_onmouseover(me) {
         $(me).find(".edit_trigger").css('display','inline-flex');
     }
 
-    function row_onmouseout(me) {
+    function panel_onmouseout(me) {
         $(me).find(".edit_trigger").css('display','none');
     }
+
+    $(function() { "use strict";
+        $("#update_sequence").TouchSpin({
+            max: 20,
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
 
     function path_update(me) {
         var operate_rule_id = $('#operate_rule_id').val();
@@ -235,6 +253,24 @@
         });
     }
 
+    function update_sequence(id) {
+        $.ajax({
+            url : '/api/operate_rule/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                sequence: parseInt($('#update_sequence').val())
+            }),
+            error : function() {
+                alter_danger('变更操作细则执行序列指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更操作细则执行序列指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
     function remove(id) {
         $.ajax({
             url : '/api/boot_jobs/' + id,
@@ -260,6 +296,12 @@
         var id = $('#operate_rule_id').val();
         update_kind(id);
         $('#update_kind_modal').modal('hide');
+    }
+
+    function update_sequence_at(me) {
+        var id = $('#operate_rule_id').val();
+        update_sequence(id);
+        $('#update_sequence_modal').modal('hide');
     }
 </script>
 <div class="panel">
@@ -294,7 +336,7 @@
                 </thead>
                 <tbody>
                 {% for item in operate_rules_ret.data %}
-                <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                <tr role="row" class="odd">
                     <td style="display: none;">{{ item.id }}</td>
                     <td>
                         <a href="/boot_jobs?boot_job_id={{ item.boot_job_id }}">
@@ -315,9 +357,11 @@
                         </a>
                     </td>
                     <td>
-                        {{ item.sequence }}
+                        <a href="javascript:;" data-toggle="modal" data-target="#update_sequence_modal">
+                            {{ item.sequence }}
+                        </a>
                     </td>
-                    <td>
+                    <td onmouseover="panel_onmouseover(this);" onmouseout="panel_onmouseout(this);">
                         {% if item.kind in [1, 2]%}
                             <div class="path_or_command">{{ item.path }}<a href="javascript:;" class="edit_trigger" data-toggle="modal" data-target="#edit_path_modal" style="display: none; float: right;">
                                     <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
@@ -399,7 +443,7 @@
 <input id="operate_rule_id" title="操作细则 ID" class="form-control" name="operate_rule_id" hidden>
 
 <div class="modal" id="edit_path_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">编辑操作细则文件路径：</h4>
@@ -526,7 +570,7 @@
                 <form class="form-horizontal bordered-row">
                     <div class="form-group">
                         <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;操作细则类型</label>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;标识</label>
                         <div class="col-sm-8">
                             <h3 style="color: orangered;" id="update_kind_instance_desc"></h3>
                             <h6 id="update_kind_instance_desc_sub"></h6>
@@ -534,7 +578,7 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-pie-chart"></span>&nbsp;&nbsp;操作类型</label>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-th-list"></span>&nbsp;&nbsp;操作细则类型</label>
                         <div class="col-sm-8">
                             <select id="update_kind" name="use_for" title="操作类型" class="selectpicker">
                                 <option value="0" data-subtext="系统启动前，通过 guestfish 所执行的命令" selected>命令</option>
@@ -547,6 +591,39 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="update_kind_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="update_sequence_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更操作细则执行序列：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;标识</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_sequence_instance_desc"></h3>
+                            <h6 id="update_sequence_instance_desc_sub"></h6>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-sort-numeric-asc"></span>&nbsp;&nbsp;执行序列</label>
+                        <div class="col-sm-8">
+                            <input id="update_sequence" title="执行序列" class="form-control" type="text" value="1" name="update_sequence">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_sequence_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
