@@ -209,7 +209,7 @@
 
     function refresh_operate_rule_boot_job_selectpicker(selectpicker) {
         $.ajax({
-            url : '/api/boot_jobs',
+            url : '/api/boot_jobs?filter=use_for:notin:1',
             type : 'GET',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
