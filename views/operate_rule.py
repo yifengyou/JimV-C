@@ -7,8 +7,7 @@ from flask import Blueprint, render_template, url_for, request, redirect
 import requests
 from math import ceil
 
-from models.status import OperateRuleKind
-
+from models.status import OperateRuleKind, BootJobUseFor
 
 __author__ = 'James Iter'
 __date__ = '2017/7/17'
@@ -75,11 +74,21 @@ def show():
     operate_rules_ret = requests.get(url=operate_rules_url)
     operate_rules_ret = json.loads(operate_rules_ret.content)
 
+    system_level_ids = list()
+
     boot_jobs_ret = requests.get(url=boot_jobs_url)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
     boot_jobs_mapping_by_id = dict()
     for boot_job in boot_jobs_ret['data']:
         boot_jobs_mapping_by_id[boot_job['id']] = boot_job
+
+        if boot_job['use_for'] == BootJobUseFor.system.value:
+            system_level_ids.append(boot_job['id'])
+
+    for i, operate_rule in enumerate(operate_rules_ret['data']):
+        # 去除系统级的启动作业。系统级的启动作业不展示给使用者。
+        if operate_rule['boot_job_id'] in system_level_ids:
+            del operate_rules_ret['data'][i]
 
     last_page = int(ceil(operate_rules_ret['paging']['total'] / float(page_size)))
     page_length = 5

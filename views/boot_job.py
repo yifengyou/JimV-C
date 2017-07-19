@@ -7,6 +7,7 @@ from flask import Blueprint, render_template, url_for, request, redirect
 import requests
 from math import ceil
 
+from models.status import BootJobUseFor
 
 __author__ = 'James Iter'
 __date__ = '2017/7/15'
@@ -70,6 +71,11 @@ def show():
 
     boot_jobs_ret = requests.get(url=boot_jobs_url)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
+
+    for i, boot_job in enumerate(boot_jobs_ret['data']):
+        # 去除系统级的启动作业。系统级的启动作业不展示给使用者。
+        if boot_job['use_for'] == BootJobUseFor.system.value:
+            del boot_jobs_ret['data'][i]
 
     last_page = int(ceil(boot_jobs_ret['paging']['total'] / float(page_size)))
     page_length = 5
