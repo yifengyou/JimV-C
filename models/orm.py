@@ -111,7 +111,8 @@ class ORM(object):
         else:
             ret = dict()
             ret['state'] = ji.Common.exchange_state(40401)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', self._primary_key.__str__()])
+            ret['state']['sub']['zh-cn'] = ': '.join([ret['state']['sub']['zh-cn'], self._primary_key.__str__(),
+                                                      self.__getattribute__(self._primary_key)])
             raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
 
     def exist(self):
@@ -150,7 +151,8 @@ class ORM(object):
         else:
             ret = dict()
             ret['state'] = ji.Common.exchange_state(40401)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', self._primary_key.__str__()])
+            ret['state']['sub']['zh-cn'] = ': '.join([ret['state']['sub']['zh-cn'], self._primary_key.__str__(),
+                                                      self.__getattribute__(self._primary_key)])
             raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
 
     def exist_by(self, field):
