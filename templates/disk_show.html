@@ -64,6 +64,7 @@
     var page = 1;
     var page_size = 10;
     var keyword = '';
+    var show_area = '';
     var resource_path = window.location.pathname;
     var cur_url = resource_path;
 
@@ -162,15 +163,24 @@
                 }
             });
         });
+
+        $('#show_area').on('changed.bs.select', function (me) {
+            $('#content_search').val('');
+            refresh();
+        });
     });
 
     function refresh() {
         keyword = $('#content_search').val();
         page = $('#pagination li.active a').text();
         page_size = $('#page_size').val();
+        show_area = $('#show_area').val();
         cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
         if (keyword.length > 0) {
-            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+            cur_url += '&keyword=' + keyword;
+        }
+        if (show_area.length > 0) {
+            cur_url += '&show_area=' + show_area;
         }
         window.location.href=cur_url;
     }
@@ -350,6 +360,11 @@
                     <div class="col-sm-12" style="padding-right: 0;">
                         <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
                             <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                            <select id="show_area" name="show_area" title="显示域" class="selectpicker">
+                                <option value="unmount" data-subtext="显示所有未挂载的磁盘" {% if show_area == 'unmount' %} selected {% endif %}>未挂载</option>
+                                <option value="data_disk" data-subtext="显示所有数据盘" {% if show_area == 'data_disk' %} selected {% endif %}>数据盘</option>
+                                <option value="all" data-subtext="显示所有磁盘，包含系统盘" {% if show_area == 'all' %} selected {% endif %}>ALL</option>
+                            </select>
                         </div>
                         <div class="pull-right">
                             <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>

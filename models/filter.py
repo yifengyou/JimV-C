@@ -34,7 +34,7 @@ class Filter(object):
     @staticmethod
     def get_fit_statement(field_type=None, value=''):
         if field_type == FilterFieldType.INT.value:
-            if not value.isdigit():
+            if not value.lstrip('-').isdigit():
                 raise TypeError(''.join(['Value: ', str(value), ' should be digit']))
             return value
         elif field_type == FilterFieldType.STR.value:

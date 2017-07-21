@@ -32,6 +32,7 @@ def show():
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('page_size', 10))
     keyword = request.args.get('keyword', None)
+    show_area = request.args.get('show_area', 'unmount')
     guest_uuid = request.args.get('guest_uuid', None)
     sequence = request.args.get('sequence', None)
     order_by = request.args.get('order_by', None)
@@ -47,6 +48,20 @@ def show():
 
     if keyword is not None:
         args.append('keyword=' + keyword.__str__())
+
+    if show_area in ['unmount', 'data_disk', 'all']:
+        if show_area == 'unmount':
+            filters.append('sequence:eq:-1')
+
+        elif show_area == 'data_disk':
+            filters.append('sequence:gt:0')
+
+        else:
+            pass
+
+    else:
+        # 与前端页面相照应，首次打开时，默认只显示未挂载的磁盘
+        filters.append('sequence:eq:-1')
 
     if guest_uuid is not None:
         filters.append('guest_uuid:in:' + guest_uuid.__str__())
@@ -68,6 +83,8 @@ def show():
     disks_url = host_url + url_for('api_disks.r_get_by_filter')
     if keyword is not None:
         disks_url = host_url + url_for('api_disks.r_content_search')
+        # 关键字检索，不支持显示域过滤
+        show_area = 'all'
 
     if args.__len__() > 0:
         disks_url = disks_url + '?' + '&'.join(args)
@@ -118,7 +135,7 @@ def show():
 
     return render_template('disk_show.html', disks_ret=disks_ret, resource_path=resource_path, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
-                           last_page=last_page)
+                           last_page=last_page, show_area=show_area)
 
 
 def create():
