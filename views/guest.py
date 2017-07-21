@@ -195,3 +195,29 @@ def success():
     return render_template('success.html', go_back_url='/guests', timeout=10000, title='提交成功',
                            message_title='创建实例的请求已被接受',
                            message='您所提交的资源正在创建中。根据所提交资源的大小，需要等待几到十几分钟。页面将在10秒钟后自动跳转到实例列表页面！')
+
+
+def show_boot_job(uuid):
+    host_url = request.host_url.rstrip('/')
+
+    guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
+
+    guest_ret = requests.get(url=guest_url)
+    guest_ret = json.loads(guest_ret.content)
+
+    guest_boot_jobs_url = host_url + url_for('api_guests.r_get_boot_jobs', uuids=uuid)
+    guest_boot_jobs_ret = requests.get(url=guest_boot_jobs_url)
+    guest_boot_jobs_ret = json.loads(guest_boot_jobs_ret.content)
+
+    boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter') + '?filter=id:in:' + \
+        ','.join(guest_boot_jobs_ret['data']['boot_jobs'])
+
+    boot_jobs_ret = requests.get(url=boot_jobs_url)
+    boot_jobs_ret = json.loads(boot_jobs_ret.content)
+    boot_jobs_mapping_by_id = dict()
+    for boot_job in boot_jobs_ret['data']:
+        boot_jobs_mapping_by_id[boot_job['id']] = boot_job
+
+    return render_template('guest_boot_job.html', uuid=uuid, guest_ret=guest_ret,
+                           guest_boot_jobs_ret=guest_boot_jobs_ret, boot_jobs_mapping_by_id=boot_jobs_mapping_by_id)
+

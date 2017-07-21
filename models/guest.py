@@ -77,7 +77,7 @@ class Guest(ORM):
         db.r.expire(key, app.config['guest_boot_jobs_wait_time'])
 
     def get_boot_jobs(self):
-        return list(db.r.smembers(self.get_boot_jobs_key()))
+        return db.r.ttl(self.get_boot_jobs_key()), list(db.r.smembers(self.get_boot_jobs_key()))
 
     def delete_boot_jobs(self, boot_jobs_id):
         if not isinstance(boot_jobs_id, list):

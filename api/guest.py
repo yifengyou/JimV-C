@@ -297,7 +297,7 @@ def r_boot(uuids):
         config.get()
 
         for uuid in uuids.split(','):
-            boot_jobs_id = guest.get_boot_jobs()
+            _, boot_jobs_id = guest.get_boot_jobs()
 
             boot_jobs = list()
 
@@ -660,11 +660,14 @@ def r_add_boot_jobs(uuids, boot_jobs_id):
             ret['data'] = dict()
             for uuid in uuids.split(','):
                 guest.uuid = uuid
-                ret['data'][uuid] = guest.get_boot_jobs()
+                boot_jobs = dict()
+                boot_jobs['ttl'], boot_jobs['boot_jobs'] = guest.get_boot_jobs()
+                ret['data'][uuid] = boot_jobs
 
         else:
             guest.uuid = uuids
-            ret['data'] = guest.get_boot_jobs()
+            ret['data'] = dict()
+            ret['data']['ttl'], ret['data']['boot_jobs'] = guest.get_boot_jobs()
 
         return ret
 
@@ -695,11 +698,14 @@ def r_get_boot_jobs(uuids):
             ret['data'] = dict()
             for uuid in uuids.split(','):
                 guest.uuid = uuid
-                ret['data'][uuid] = guest.get_boot_jobs()
+                boot_jobs = dict()
+                boot_jobs['ttl'], boot_jobs['boot_jobs'] = guest.get_boot_jobs()
+                ret['data'][uuid] = boot_jobs
 
         else:
             guest.uuid = uuids
-            ret['data'] = guest.get_boot_jobs()
+            ret['data'] = dict()
+            ret['data']['ttl'], ret['data']['boot_jobs'] = guest.get_boot_jobs()
 
         return ret
 
