@@ -135,7 +135,7 @@ def show():
             if i == last_page:
                 break
 
-    return render_template('disk_show.html', disks_ret=disks_ret, resource_path=resource_path, page=page,
+    return render_template('disks_show.html', disks_ret=disks_ret, resource_path=resource_path, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
                            last_page=last_page, show_area=show_area)
 

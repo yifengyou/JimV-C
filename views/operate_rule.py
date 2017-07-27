@@ -111,7 +111,7 @@ def show():
             if i == last_page:
                 break
 
-    return render_template('operate_rule_show.html', operate_rules_ret=operate_rules_ret,
+    return render_template('operate_rules_show.html', operate_rules_ret=operate_rules_ret,
                            boot_jobs_mapping_by_id=boot_jobs_mapping_by_id, resource_path=resource_path,
                            page=page, page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
                            last_page=last_page)

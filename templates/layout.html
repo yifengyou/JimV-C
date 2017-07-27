@@ -297,10 +297,16 @@
                     <ul id="sidebar-menu" data-spy="affix" data-offset-top="10">
                         <li class="header"><span>虚拟化平台管理</span></li>
                         <li>
-                            <a href="{{ url_for('v_guests.show') }}" title="虚拟机实例列表">
+                            <a href="#" title="虚拟机">
                                 <i class="glyph-icon icon-linecons-cloud"></i>
                                 <span>虚拟机</span>
                             </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li><a href="{{ url_for('v_guests.show') }}" title="虚拟机实例列表"><span>实例</span></a></li>
+                                    <li><a href="#" title="虚拟机启动作业列表"><span>启动作业</span></a></li>
+                                </ul>
+                            </div><!-- .sidebar-submenu -->
                         </li>
                         <li>
                             <a href="{{ url_for('v_disks.show') }}" title="磁盘实例列表">
@@ -309,7 +315,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url_for('v_guests.show') }}" title="宿主机列表">
+                            <a href="#" title="宿主机列表">
                                 <i class="glyph-icon icon-linecons-desktop"></i>
                                 <span>宿主机</span>
                             </a>
@@ -339,7 +345,7 @@
                             </div><!-- .sidebar-submenu -->
                         </li>
                         <li>
-                            <a href="{{ url_for('v_guests.show') }}" title="JimV 虚拟化平台系统配置">
+                            <a href="#" title="JimV 虚拟化平台系统配置">
                                 <i class="glyph-icon icon-linecons-cog"></i>
                                 <span>系统配置</span>
                             </a>

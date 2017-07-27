@@ -88,7 +88,7 @@ def show():
             if i == last_page:
                 break
 
-    return render_template('guest_show.html', guests_ret=guests_ret, resource_path=resource_path,
+    return render_template('guests_show.html', guests_ret=guests_ret, resource_path=resource_path,
                            os_templates_mapping_by_id=os_templates_mapping_by_id, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, last_page=last_page)
 
@@ -218,6 +218,6 @@ def show_boot_job(uuid):
     for boot_job in boot_jobs_ret['data']:
         boot_jobs_mapping_by_id[boot_job['id']] = boot_job
 
-    return render_template('guest_boot_job.html', uuid=uuid, guest_ret=guest_ret,
+    return render_template('guest_boot_jobs.html', uuid=uuid, guest_ret=guest_ret,
                            guest_boot_jobs_ret=guest_boot_jobs_ret, boot_jobs_mapping_by_id=boot_jobs_mapping_by_id)
 

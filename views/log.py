@@ -84,7 +84,7 @@ def show():
             if i == last_page:
                 break
 
-    return render_template('log.html', logs_ret=logs_ret, resource_path=resource_path, page=page,
+    return render_template('logs.html', logs_ret=logs_ret, resource_path=resource_path, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
                            last_page=last_page)
 

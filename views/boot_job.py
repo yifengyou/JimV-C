@@ -98,7 +98,7 @@ def show():
             if i == last_page:
                 break
 
-    return render_template('boot_job_show.html', boot_jobs_ret=boot_jobs_ret,
+    return render_template('boot_jobs_show.html', boot_jobs_ret=boot_jobs_ret,
                            resource_path=resource_path,
                            page=page, page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
                            last_page=last_page)
