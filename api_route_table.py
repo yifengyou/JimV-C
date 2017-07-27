@@ -71,6 +71,7 @@ add_rule_api(guest.blueprints, '/_boot_jobs/<uuids>/<boot_jobs_id>', api_func='g
 add_rule_api(guest.blueprints, '/_boot_jobs/<uuids>', api_func='guest.r_get_boot_jobs', methods=['GET'])
 add_rule_api(guest.blueprints, '/_boot_jobs/<uuids>/<boot_jobs_id>', api_func='guest.r_delete_boot_jobs',
              methods=['DELETE'])
+add_rule_api(guest.blueprints, '/_boot_jobs/uuids', api_func='guest.r_get_uuids_of_all_had_boot_job', methods=['GET'])
 add_rule_api(guest.blueprints, '/_reset_password/<uuids>/<password>', api_func='guest.r_reset_password',
              methods=['PUT'])
 

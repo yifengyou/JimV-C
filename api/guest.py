@@ -743,6 +743,18 @@ def r_delete_boot_jobs(uuids, boot_jobs_id):
 
 
 @Utils.dumps2response
+def r_get_uuids_of_all_had_boot_job():
+    guest = Guest()
+    try:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = guest.get_uuids_of_all_had_boot_job()
+        return ret
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
 def r_reset_password(uuids, password):
 
     args_rules = [

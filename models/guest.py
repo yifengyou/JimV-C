@@ -90,6 +90,15 @@ class Guest(ORM):
         if db.r.exists(key):
             db.r.expire(key, app.config['guest_boot_jobs_wait_time'])
 
+    @staticmethod
+    def get_uuids_of_all_had_boot_job():
+        boot_job_keys = db.r.keys(pattern=app.config['guest_boot_jobs'] + '*')
+        uuids = list()
+        for boot_job_key in boot_job_keys:
+            uuids.append(boot_job_key.split(':')[-1])
+
+        return uuids
+
 
 class Disk(ORM):
 

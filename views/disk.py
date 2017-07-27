@@ -49,6 +49,14 @@ def show():
     if keyword is not None:
         args.append('keyword=' + keyword.__str__())
 
+    if guest_uuid is not None:
+        filters.append('guest_uuid:in:' + guest_uuid.__str__())
+        show_area = 'all'
+
+    if sequence is not None:
+        filters.append('sequence:in:' + sequence.__str__())
+        show_area = 'all'
+
     if show_area in ['unmount', 'data_disk', 'all']:
         if show_area == 'unmount':
             filters.append('sequence:eq:-1')
@@ -62,12 +70,6 @@ def show():
     else:
         # 与前端页面相照应，首次打开时，默认只显示未挂载的磁盘
         filters.append('sequence:eq:-1')
-
-    if guest_uuid is not None:
-        filters.append('guest_uuid:in:' + guest_uuid.__str__())
-
-    if sequence is not None:
-        filters.append('sequence:in:' + sequence.__str__())
 
     if order_by is not None:
         args.append('order_by=' + order_by)
