@@ -177,8 +177,25 @@
                             <span style="color: #b94a48; {% if boot_jobs.ttl // 60 == 0 %}display: none;{% endif %}">{{ boot_jobs.ttl // 60 }}分</span>
                             <span style="color: #b94a48; {% if boot_jobs.ttl % 60 == 0 %}display: none;{% endif %}">{{ boot_jobs.ttl % 60 }}秒</span>
                         </td>
-                        <td>{{ boot_jobs_mapping_by_id[boot_job_id | int].name }}</td>
-                        <td>{{ guests_mapping_by_uuid[uuid].label }}</td>
+                        <td>
+                            <div>
+                                <a href="/operate_rules?boot_job_id={{ boot_job_id }}">
+                                    <p style="display: inline-block;">{{ boot_jobs_mapping_by_id[boot_job_id | int].name }}</p>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <a href="/guest/detail/{{ uuid }}">
+                                    <p style="display: inline-block;">
+                                        {{ guests_mapping_by_uuid[uuid].label }}
+                                    </p>
+                                </a>
+                                <div>
+                                    <p style="display: inline-block;">{{ guests_mapping_by_uuid[uuid].remark }}</p>
+                                </div>
+                            </div>
+                        </td>
                         <td><span class="{{ os_templates_mapping_by_id[guests_mapping_by_uuid[uuid].os_template_id].icon }}"></span></td>
                         <td>{{ format_guest_status(guests_mapping_by_uuid[uuid].status)|safe }}</td>
                         <td>{{ guests_mapping_by_uuid[uuid].ip }}</td>
@@ -188,7 +205,7 @@
                                     更多
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li">
+                                    <li>
                                         <a href="javascript:;" onclick="delete_at(this);">删除</a>
                                     </li>
                                 </ul>
