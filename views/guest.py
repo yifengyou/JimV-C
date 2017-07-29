@@ -9,6 +9,7 @@ import requests
 from math import ceil
 import re
 import socket
+import jimit as ji
 from models.initialize import q_ws
 
 
@@ -220,4 +221,74 @@ def show_boot_job(uuid):
 
     return render_template('guest_boot_jobs.html', uuid=uuid, guest_ret=guest_ret,
                            guest_boot_jobs_ret=guest_boot_jobs_ret, boot_jobs_mapping_by_id=boot_jobs_mapping_by_id)
+
+
+def show_guests_boot_jobs():
+    host_url = request.host_url.rstrip('/')
+
+    # 获取所有有启动作业的 Guests uuid
+    uuids_of_all_had_boot_job_url = host_url + url_for('api_guests.r_get_uuids_of_all_had_boot_job')
+
+    uuids_of_all_had_boot_job_ret = requests.get(url=uuids_of_all_had_boot_job_url)
+    uuids_of_all_had_boot_job_ret = json.loads(uuids_of_all_had_boot_job_ret.content)
+    guests_uuid = uuids_of_all_had_boot_job_ret['data']
+
+    guests_boot_jobs_ret = {'data': dict()}
+
+    if guests_uuid.__len__() > 0:
+        # 获取指定 Guest 的启动作业 ID
+        guests_boot_jobs_url = host_url + url_for('api_guests.r_get_boot_jobs',
+                                                  uuids=','.join(guests_uuid))
+        guests_boot_jobs_ret = requests.get(url=guests_boot_jobs_url)
+
+        guests_boot_jobs_ret = json.loads(guests_boot_jobs_ret.content)
+
+        # 统一单个、多个的返回JSON格式
+        if guests_uuid.__len__() == 1:
+            guests_boot_jobs_ret['data'] = {guests_uuid[0]: guests_boot_jobs_ret['data']}
+
+    # 取出 Guests 的启动作业 IDs，并去重
+    guests_boot_jobs_id = list()
+    for uuid, guest_boot_jobs in guests_boot_jobs_ret['data'].items():
+        guests_boot_jobs_id.extend(guest_boot_jobs['boot_jobs'])
+
+    guests_boot_jobs_id = list(set(guests_boot_jobs_id))
+
+    # 获取指定启动作业ID 的启动作业
+    boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter') + '?filter=id:in:' + \
+        ','.join(guests_boot_jobs_id)
+
+    boot_jobs_ret = requests.get(url=boot_jobs_url)
+    boot_jobs_ret = json.loads(boot_jobs_ret.content)
+
+    # 启动作业 ID 与启动作业的映射
+    boot_jobs_mapping_by_id = dict()
+    for boot_job in boot_jobs_ret['data']:
+        boot_jobs_mapping_by_id[boot_job['id']] = boot_job
+
+    guests_url = host_url + url_for('api_guests.r_get_by_filter')
+
+    guests_url = guests_url + '?uuid=' + ','.join(guests_uuid)
+
+    guests_ret = requests.get(url=guests_url)
+    guests_ret = json.loads(guests_ret.content)
+
+    # Guest uuid 与 Guest 的映射
+    guests_mapping_by_uuid = dict()
+    for guest in guests_ret['data']:
+        guests_mapping_by_uuid[guest['uuid']] = guest
+
+    os_templates_url = host_url + url_for('api_os_templates.r_get_by_filter')
+    os_templates_ret = requests.get(url=os_templates_url)
+    os_templates_ret = json.loads(os_templates_ret.content)
+
+    # 模板与模板 ID 的映射
+    os_templates_mapping_by_id = dict()
+    for os_template in os_templates_ret['data']:
+        os_templates_mapping_by_id[os_template['id']] = os_template
+
+    return render_template('guests_boot_jobs.html', guests_boot_jobs_ret=guests_boot_jobs_ret,
+                           boot_jobs_mapping_by_id=boot_jobs_mapping_by_id,
+                           guests_mapping_by_uuid=guests_mapping_by_uuid,
+                           os_templates_mapping_by_id=os_templates_mapping_by_id)
 

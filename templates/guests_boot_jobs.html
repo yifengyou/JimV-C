@@ -1,0 +1,245 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+            line-height: 20px;
+        }
+        .table > thead > tr > th,
+        .table > tfoot > tr > th {
+            color: #999999;
+            font-weight: normal;
+            border-bottom: 0 solid #e1e6eb;
+            background-color: #F5F6FA;
+        }
+        
+        .table > tbody > tr > td {
+            color: #424547;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
+        .btn,
+        .form-control,
+        .modal-content {
+            border-radius: 0 !important;
+        }
+
+        .tr-selected td,
+        .tr-selected {
+            color: #000 !important;
+            background: #fffdf4 !important;
+        }
+    </style>
+
+{% endblock head %}
+{% block content %}
+
+<script type="text/javascript">
+    var page = 1;
+    var page_size = 10;
+    var keyword = '';
+    var resource_path = window.location.pathname;
+    var cur_url = resource_path;
+
+    $(document).ready(function() {
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+
+        var last_ready = null;
+        $('#content_search').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
+            }
+            last_ready = setTimeout(function () {
+                keyword = $('#content_search').val();
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+                if (keyword.length > 0) {
+                    cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+                }
+                window.location.href=cur_url;
+            }, 1000);
+        });
+
+        $('#page_size').change(function () {
+            keyword = $('#content_search').val();
+            page_size = $('#page_size').val();
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+            if (keyword.length > 0) {
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+            }
+            window.location.href=cur_url;
+        });
+
+        $("thead").on('click', ".all_selector", function() {
+            if ($("thead .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+
+            select_item_action();
+        });
+
+        $("tfoot").on('click', ".all_selector", function() {
+            if ($("tfoot .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+
+            select_item_action();
+        });
+
+        $("tbody tr").on('click', "input[type='checkbox']", function() {
+            select_item_action();
+        });
+
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+    });
+
+    function refresh() {
+        keyword = $('#content_search').val();
+        page = $('#pagination li.active a').text();
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+        if (keyword.length > 0) {
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+        }
+        window.location.href=cur_url;
+    }
+</script>
+<div class="panel">
+    <div class="panel-body">
+        <h3 class="title-hero" style="font-size: 24px;">
+            虚拟机启动作业
+        </h3>
+        <div>
+            <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
+                <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                    <div class="col-sm-12" style="padding-right: 0;">
+                        <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                            <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                        </div>
+                        <div class="pull-right">
+                            <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <table id="guests_boot_jobs_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                       style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <thead>
+                <tr role="row">
+                    <th style="display: none;">UUID</th>
+                    <th style="display: none;">启动作业 ID</th>
+                    <th><input class="all_selector" title="选取所有" type="checkbox"></th>
+                    <th width="180px;">有效时间</th>
+                    <th width="180px;">启动作业</th>
+                    <th width="180px;">名称</th>
+                    <th></th>
+                    <th>状态</th>
+                    <th>IP</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for uuid, boot_jobs in guests_boot_jobs_ret.data.iteritems() %}
+                    {% for boot_job_id in boot_jobs.boot_jobs %}
+                    <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                        <td style="display: none;">{{ uuid }}</td>
+                        <td style="display: none;">{{ boot_job_id }}</td>
+                        <td><input title="选中" type="checkbox"></td>
+                        <td>
+                            <span style="color: #b94a48; {% if boot_jobs.ttl // 60 == 0 %}display: none;{% endif %}">{{ boot_jobs.ttl // 60 }}分</span>
+                            <span style="color: #b94a48; {% if boot_jobs.ttl % 60 == 0 %}display: none;{% endif %}">{{ boot_jobs.ttl % 60 }}秒</span>
+                        </td>
+                        <td>{{ boot_jobs_mapping_by_id[boot_job_id | int].name }}</td>
+                        <td>{{ guests_mapping_by_uuid[uuid].label }}</td>
+                        <td><span class="{{ os_templates_mapping_by_id[guests_mapping_by_uuid[uuid].os_template_id].icon }}"></span></td>
+                        <td>{{ format_guest_status(guests_mapping_by_uuid[uuid].status)|safe }}</td>
+                        <td>{{ guests_mapping_by_uuid[uuid].ip }}</td>
+                        <td>
+                            <div class="dropdown inline-block">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                    更多
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li">
+                                        <a href="javascript:;" onclick="delete_at(this);">删除</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+                </tbody>
+                </table>
+
+                <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                    <tfoot>
+                    <tr style="height: 70px;">
+                        <th><input type="checkbox" title="选取所有" class="all_selector"></th>
+                        <th>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                </div>
+                                <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                </div>
+                                <div class="col-sm-3" style="text-align: left;">
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="reset_password_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">重置密码：</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
+                    <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+                    <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="New password">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="reset_password_go();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

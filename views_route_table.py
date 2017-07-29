@@ -18,6 +18,7 @@ add_rule_views(guest.blueprints, '/success', views_func='guest.success', methods
 add_rule_views(guest.blueprint, '/vnc/<uuid>', views_func='guest.vnc', methods=['GET'])
 add_rule_views(guest.blueprint, '/detail/<uuid>', views_func='guest.detail', methods=['GET'])
 add_rule_views(guest.blueprint, '/boot_jobs/<uuid>', views_func='guest.show_boot_job', methods=['GET'])
+add_rule_views(guest.blueprints, '/boot_jobs_list', views_func='guest.show_guests_boot_jobs', methods=['GET'])
 
 add_rule_views(disk.blueprints, '', views_func='disk.show', methods=['GET'])
 add_rule_views(disk.blueprints, '/create', views_func='disk.create', methods=['GET', 'POST'])
