@@ -122,6 +122,47 @@
         });
     });
 
+    function get_selected_element(checked) {
+        if (checked === null) {
+            checked = true;
+        }
+
+        if (checked) {
+            return $('tbody :checked');
+        } else {
+
+            return $('tbody input:not(:checked)');
+        }
+    }
+
+    function highlight_selected_element() {
+        var selected_element = get_selected_element(true);
+        var no_selected_element = get_selected_element(false);
+
+        selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', true);
+        });
+
+        no_selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', false);
+        });
+    }
+
+    function shortcut_bar_enable() {
+        var selected_element = get_selected_element(true);
+
+        if (selected_element.length > 0) {
+            $('.btn-shortcut').toggleClass('disabled', false);
+        } else {
+            $('.btn-shortcut').toggleClass('disabled', true);
+        }
+    }
+
+    function select_item_action() {
+        highlight_selected_element();
+        shortcut_bar_enable();
+    }
+
     function refresh() {
         keyword = $('#content_search').val();
         page = $('#pagination li.active a').text();
@@ -131,6 +172,71 @@
             cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
         }
         window.location.href=cur_url;
+    }
+
+    function remove(uuid, boot_job_id, do_refresh) {
+        $.ajax({
+            url : '/api/guests/_boot_jobs/' + uuid + '/' + boot_job_id,
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('启动作业删除指令发送失败！');
+            },
+            success : function() {
+                // 未指定值的参数为 undefined
+                if (do_refresh) {
+                    alter_success('启动作业删除指令发送成功！');
+                    refresh();
+                }
+            }
+        });
+    }
+
+    function delete_at(me) {
+        var uuid = $('#instance_uuid').val();
+        var boot_job_id = $('#instance_boot_job_id').val();
+        remove(uuid, boot_job_id, true);
+        $('#delete_modal').modal('hide');
+    }
+
+    function get_selected_uuids_and_boot_jobs_id() {
+        var selected_element = get_selected_element(true);
+        var uuids = [];
+        var boot_jobs_id = [];
+
+        selected_element.each(function(i, e) {
+            var uuid = $(e).parent().prev().prev().text();
+            var boot_job_id = $(e).parent().prev().text();
+            uuids.push(uuid);
+            boot_jobs_id.push(boot_job_id);
+        });
+
+        return {'uuids': uuids, 'boot_jobs_id': boot_jobs_id};
+    }
+
+    function get_checked_uuids_and_boot_jobs_id() {
+        var uuids_and_boot_jobs_id = get_selected_uuids_and_boot_jobs_id();
+
+        if (uuids_and_boot_jobs_id['uuids'].length < 1) {
+            alter_warning('未选择任何可操作的实例！');
+            return false;
+        }
+
+        return uuids_and_boot_jobs_id;
+    }
+
+    function batch_delete() {
+        var uuids_and_boot_jobs_id = get_checked_uuids_and_boot_jobs_id();
+        if (uuids_and_boot_jobs_id['uuids'] && uuids_and_boot_jobs_id['boot_jobs_id']) {
+            for (var i=0; i<uuids_and_boot_jobs_id['uuids'].length; i++) {
+                if (i === uuids_and_boot_jobs_id['uuids'].length  - 1) {
+                    remove(uuids_and_boot_jobs_id['uuids'][i], uuids_and_boot_jobs_id['boot_jobs_id'][i], true);
+                } else {
+                    remove(uuids_and_boot_jobs_id['uuids'][i], uuids_and_boot_jobs_id['boot_jobs_id'][i], false);
+                }
+            }
+        }
+        $('#batch_delete_modal').modal('hide');
     }
 </script>
 <div class="panel">
@@ -169,7 +275,7 @@
                 <tbody>
                 {% for uuid, boot_jobs in guests_boot_jobs_ret.data.iteritems() %}
                     {% for boot_job_id in boot_jobs.boot_jobs %}
-                    <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                    <tr role="row" class="odd">
                         <td style="display: none;">{{ uuid }}</td>
                         <td style="display: none;">{{ boot_job_id }}</td>
                         <td><input title="选中" type="checkbox"></td>
@@ -206,7 +312,13 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a href="javascript:;" onclick="delete_at(this);">删除</a>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                            onclick="$('#instance_uuid').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                                $('#instance_boot_job_id').val($(this).parent().parent().parent().parent().parent().children()[1].textContent);
+                                                $('#delete_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[5]).find('div a')[0].text);
+                                                $('#delete_instance_desc').append('/' + $($(this).parent().parent().parent().parent().parent().children()[4]).find('div a')[0].text)">
+                                            删除
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -224,6 +336,7 @@
                         <th>
                             <div class="row">
                                 <div class="col-sm-6">
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_delete_modal">删除</button>
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
                                     共有{{ paging_total }}个，每页显示：
@@ -260,21 +373,38 @@
     </div>
 </div>
 
-<div class="modal" id="reset_password_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
-    <div class="modal-dialog modal-sm">
+<input id="instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+<input id="instance_boot_job_id" title="实例启动作业 ID" class="form-control" name="boot_job_id" hidden>
+
+<div class="modal" id="delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">重置密码：</h4>
+                <h4 class="modal-title">删除启动作业：</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
-                    <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
-                    <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="New password">
-                </div>
+                <p>你确定要删除该启动作业吗？</p>
+                <h3 style="color: orangered;" id="delete_instance_desc"></h3>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="reset_password_go();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量删除启动作业：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要执行批量删除选择的启动作业吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_delete();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
