@@ -9,7 +9,6 @@ import requests
 from math import ceil
 import re
 import socket
-import jimit as ji
 from models.initialize import q_ws
 
 
@@ -224,6 +223,9 @@ def show_boot_job(uuid):
 
 
 def show_guests_boot_jobs():
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 10))
+
     host_url = request.host_url.rstrip('/')
 
     # 获取所有有启动作业的 Guests uuid
@@ -238,7 +240,7 @@ def show_guests_boot_jobs():
     if guests_uuid.__len__() > 0:
         # 获取指定 Guest 的启动作业 ID
         guests_boot_jobs_url = host_url + url_for('api_guests.r_get_boot_jobs',
-                                                  uuids=','.join(guests_uuid))
+                                                  uuids=','.join(guests_uuid[page_size * (page - 1): page_size * page]))
         guests_boot_jobs_ret = requests.get(url=guests_boot_jobs_url)
 
         guests_boot_jobs_ret = json.loads(guests_boot_jobs_ret.content)
@@ -268,7 +270,7 @@ def show_guests_boot_jobs():
 
     guests_url = host_url + url_for('api_guests.r_get_by_filter')
 
-    guests_url = guests_url + '?uuid=' + ','.join(guests_uuid)
+    guests_url = guests_url + '?filter=uuid:in:' + ','.join(guests_uuid[page_size * (page - 1): page_size * page])
 
     guests_ret = requests.get(url=guests_url)
     guests_ret = json.loads(guests_ret.content)
@@ -287,8 +289,35 @@ def show_guests_boot_jobs():
     for os_template in os_templates_ret['data']:
         os_templates_mapping_by_id[os_template['id']] = os_template
 
+    paging_total = guests_uuid.__len__()
+
+    last_page = int(ceil(paging_total / float(page_size)))
+    if last_page == 0:
+        last_page = 1
+
+    page_length = 5
+    pages = list()
+    if page < int(ceil(page_length / 2.0)):
+        for i in range(1, page_length + 1):
+            pages.append(i)
+            if i == last_page:
+                break
+
+    elif last_page - page < page_length / 2:
+        for i in range(last_page - page_length + 1, last_page + 1):
+            if i < 1:
+                continue
+            pages.append(i)
+
+    else:
+        for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
+            pages.append(i)
+            if i == last_page:
+                break
+
     return render_template('guests_boot_jobs.html', guests_boot_jobs_ret=guests_boot_jobs_ret,
                            boot_jobs_mapping_by_id=boot_jobs_mapping_by_id,
                            guests_mapping_by_uuid=guests_mapping_by_uuid,
-                           os_templates_mapping_by_id=os_templates_mapping_by_id)
+                           os_templates_mapping_by_id=os_templates_mapping_by_id, page=page, page_size=page_size,
+                           pages=pages, last_page=last_page, paging_total=paging_total)
 
