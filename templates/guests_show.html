@@ -423,7 +423,8 @@
             },
             success : function() {
                 alter_success('启动作业添加指令发送成功！');
-                refresh();
+                window.location.href='/guests/boot_jobs_list';
+                // refresh();
             }
         });
     }

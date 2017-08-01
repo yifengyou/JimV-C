@@ -164,13 +164,9 @@
     }
 
     function refresh() {
-        keyword = $('#content_search').val();
         page = $('#pagination li.active a').text();
         page_size = $('#page_size').val();
         cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
-        if (keyword.length > 0) {
-            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
-        }
         window.location.href=cur_url;
     }
 
