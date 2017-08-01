@@ -67,6 +67,24 @@ def show():
     for os_template in os_templates_ret['data']:
         os_templates_mapping_by_id[os_template['id']] = os_template
 
+    guests_uuid = list()
+
+    for guest in guests_ret['data']:
+        guests_uuid.append(guest['uuid'])
+
+    guests_boot_jobs_ret = {'data': dict()}
+
+    if guests_uuid.__len__() > 0:
+        # 获取指定 Guest 的启动作业 ID
+        guests_boot_jobs_url = host_url + url_for('api_guests.r_get_boot_jobs', uuids=','.join(guests_uuid))
+        guests_boot_jobs_ret = requests.get(url=guests_boot_jobs_url)
+
+        guests_boot_jobs_ret = json.loads(guests_boot_jobs_ret.content)
+
+        # 统一单个、多个的返回JSON格式
+        if guests_uuid.__len__() == 1:
+            guests_boot_jobs_ret['data'] = {guests_uuid[0]: guests_boot_jobs_ret['data']}
+
     last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
     page_length = 5
     pages = list()
@@ -89,7 +107,8 @@ def show():
                 break
 
     return render_template('guests_show.html', guests_ret=guests_ret, resource_path=resource_path,
-                           os_templates_mapping_by_id=os_templates_mapping_by_id, page=page,
+                           os_templates_mapping_by_id=os_templates_mapping_by_id,
+                           guests_boot_jobs_ret=guests_boot_jobs_ret, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, last_page=last_page)
 
 
