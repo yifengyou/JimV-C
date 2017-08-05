@@ -101,6 +101,10 @@ class EventProcessor(object):
         key = cls.message['message']['node_id']
         value = {
             'hostname': cls.message['host'],
+            'cpu': cls.message['message']['cpu'],
+            'memory': cls.message['message']['memory'],
+            'interfaces': cls.message['message']['interfaces'],
+            'disks': cls.message['message']['disks'],
             'timestamp': ji.Common.ts()
         }
 
