@@ -69,6 +69,12 @@ from event_processor import (
     EventProcessor
 )
 
+from host_performance import (
+    HostCPUMemory,
+    HostTraffic,
+    HostDiskUsageIO
+)
+
 
 __author__ = 'James Iter'
 __date__ = '2017/3/21'
@@ -79,7 +85,8 @@ __copyright__ = '(c) 2017 by James Iter.'
 __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState',
     'LogLevel', 'ORM', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
-    'EventProcessor', 'ResponseState', 'CPUMemory', 'Traffic', 'DiskIO'
+    'EventProcessor', 'ResponseState', 'CPUMemory', 'Traffic', 'DiskIO', 'HostCPUMemory', 'HostTraffic',
+    'HostDiskUsageIO'
 ]
 
 

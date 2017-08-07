@@ -16,7 +16,8 @@ from models import EmitKind
 from models import ResponseState, GuestState, DiskState
 from models.guest import GuestMigrateInfo
 from models.initialize import app, logger
-from models.status import CollectionPerformanceDataKind
+from models.status import CollectionPerformanceDataKind, HostCollectionPerformanceDataKind
+from models import HostCPUMemory, HostTraffic, HostDiskUsageIO
 
 
 __author__ = 'James Iter'
@@ -35,6 +36,9 @@ class EventProcessor(object):
     cpu_memory = CPUMemory()
     traffic = Traffic()
     disk_io = DiskIO()
+    host_cpu_memory = HostCPUMemory()
+    host_traffic = HostTraffic()
+    host_disk_usage_io = HostDiskUsageIO()
 
     @classmethod
     def log_processor(cls):
@@ -256,6 +260,49 @@ class EventProcessor(object):
             pass
 
     @classmethod
+    def host_collection_performance_processor(cls):
+        data_kind = cls.message['type']
+        timestamp = ji.Common.ts()
+        timestamp -= (timestamp % 60)
+        data = cls.message['message']['data']
+
+        if data_kind == HostCollectionPerformanceDataKind.cpu_memory.value:
+            cls.host_cpu_memory.node_id = data['node_id']
+            cls.host_cpu_memory.cpu_load = data['cpu_load']
+            cls.host_cpu_memory.memory_available = data['memory_available']
+            cls.host_cpu_memory.timestamp = timestamp
+            cls.host_cpu_memory.create()
+
+        if data_kind == HostCollectionPerformanceDataKind.traffic.value:
+            for item in data:
+                cls.host_traffic.node_id = item['node_id']
+                cls.host_traffic.name = item['name']
+                cls.host_traffic.rx_bytes = item['rx_bytes']
+                cls.host_traffic.rx_packets = item['rx_packets']
+                cls.host_traffic.rx_errs = item['rx_errs']
+                cls.host_traffic.rx_drop = item['rx_drop']
+                cls.host_traffic.tx_bytes = item['tx_bytes']
+                cls.host_traffic.tx_packets = item['tx_packets']
+                cls.host_traffic.tx_errs = item['tx_errs']
+                cls.host_traffic.tx_drop = item['tx_drop']
+                cls.host_traffic.timestamp = timestamp
+                cls.host_traffic.create()
+
+        if data_kind == HostCollectionPerformanceDataKind.disk_usage_io.value:
+            cls.host_disk_usage_io.node_id = data['node_id']
+            cls.host_disk_usage_io.mountpoint = data['mountpoint']
+            cls.host_disk_usage_io.used = data['used']
+            cls.host_disk_usage_io.rd_req = data['rd_req']
+            cls.host_disk_usage_io.rd_bytes = data['rd_bytes']
+            cls.host_disk_usage_io.wr_req = data['wr_req']
+            cls.host_disk_usage_io.wr_bytes = data['wr_bytes']
+            cls.host_disk_usage_io.timestamp = timestamp
+            cls.host_disk_usage_io.create()
+
+        else:
+            pass
+
+    @classmethod
     def launch(cls):
         while True:
             if Utils.exit_flag:
@@ -285,6 +332,9 @@ class EventProcessor(object):
 
                 elif cls.message['kind'] == EmitKind.collection_performance.value:
                     cls.collection_performance_processor()
+
+                elif cls.message['kind'] == EmitKind.host_collection_performance.value:
+                    cls.host_collection_performance_processor()
 
                 else:
                     pass

@@ -210,7 +210,7 @@ ALTER TABLE disk_io ADD INDEX (disk_uuid, timestamp);
 
 CREATE TABLE IF NOT EXISTS host_cpu_memory(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    host_uuid CHAR(36) NOT NULL,
+    node_id BIGINT UNSIGNED NOT NULL,
     cpu_load INT UNSIGNED NOT NULL,
     memory_available BIGINT UNSIGNED NOT NULL,
     timestamp BIGINT UNSIGNED NOT NULL,
@@ -218,14 +218,14 @@ CREATE TABLE IF NOT EXISTS host_cpu_memory(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE host_cpu_memory ADD INDEX (host_uuid);
+ALTER TABLE host_cpu_memory ADD INDEX (node_id);
 ALTER TABLE host_cpu_memory ADD INDEX (timestamp);
-ALTER TABLE host_cpu_memory ADD INDEX (host_uuid, timestamp);
+ALTER TABLE host_cpu_memory ADD INDEX (node_id, timestamp);
 
 
 CREATE TABLE IF NOT EXISTS host_traffic(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    host_uuid CHAR(36) NOT NULL,
+    node_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(36) NOT NULL,
     rx_bytes BIGINT UNSIGNED NOT NULL,
     rx_packets BIGINT UNSIGNED NOT NULL,
@@ -240,18 +240,18 @@ CREATE TABLE IF NOT EXISTS host_traffic(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE host_traffic ADD INDEX (host_uuid);
+ALTER TABLE host_traffic ADD INDEX (node_id);
 ALTER TABLE host_traffic ADD INDEX (rx_bytes);
 ALTER TABLE host_traffic ADD INDEX (rx_packets);
 ALTER TABLE host_traffic ADD INDEX (tx_bytes);
 ALTER TABLE host_traffic ADD INDEX (tx_packets);
 ALTER TABLE host_traffic ADD INDEX (timestamp);
-ALTER TABLE host_traffic ADD INDEX (host_uuid, timestamp);
+ALTER TABLE host_traffic ADD INDEX (node_id, timestamp);
 
 
 CREATE TABLE IF NOT EXISTS host_disk_usage_io(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    host_uuid CHAR(36) NOT NULL,
+    node_id BIGINT UNSIGNED NOT NULL,
     mountpoint VARCHAR(255) NOT NULL,
     used BIGINT UNSIGNED NOT NULL,
     rd_req BIGINT UNSIGNED NOT NULL,
@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS host_disk_usage_io(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE host_disk_usage_io ADD INDEX (host_uuid);
+ALTER TABLE host_disk_usage_io ADD INDEX (node_id);
 ALTER TABLE host_disk_usage_io ADD INDEX (mountpoint);
 ALTER TABLE host_disk_usage_io ADD INDEX (used);
 ALTER TABLE host_disk_usage_io ADD INDEX (rd_req);
@@ -271,6 +271,6 @@ ALTER TABLE host_disk_usage_io ADD INDEX (rd_bytes);
 ALTER TABLE host_disk_usage_io ADD INDEX (wr_req);
 ALTER TABLE host_disk_usage_io ADD INDEX (wr_bytes);
 ALTER TABLE host_disk_usage_io ADD INDEX (timestamp);
-ALTER TABLE host_disk_usage_io ADD INDEX (host_uuid, mountpoint, timestamp);
+ALTER TABLE host_disk_usage_io ADD INDEX (node_id, mountpoint, timestamp);
 
 
