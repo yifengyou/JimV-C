@@ -65,14 +65,14 @@ from performance import (
     DiskIO
 )
 
-from event_processor import (
-    EventProcessor
-)
-
 from host_performance import (
     HostCPUMemory,
     HostTraffic,
     HostDiskUsageIO
+)
+
+from event_processor import (
+    EventProcessor
 )
 
 

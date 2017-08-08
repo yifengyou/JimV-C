@@ -289,15 +289,16 @@ class EventProcessor(object):
                 cls.host_traffic.create()
 
         if data_kind == HostCollectionPerformanceDataKind.disk_usage_io.value:
-            cls.host_disk_usage_io.node_id = data['node_id']
-            cls.host_disk_usage_io.mountpoint = data['mountpoint']
-            cls.host_disk_usage_io.used = data['used']
-            cls.host_disk_usage_io.rd_req = data['rd_req']
-            cls.host_disk_usage_io.rd_bytes = data['rd_bytes']
-            cls.host_disk_usage_io.wr_req = data['wr_req']
-            cls.host_disk_usage_io.wr_bytes = data['wr_bytes']
-            cls.host_disk_usage_io.timestamp = timestamp
-            cls.host_disk_usage_io.create()
+            for item in data:
+                cls.host_disk_usage_io.node_id = item['node_id']
+                cls.host_disk_usage_io.mountpoint = item['mountpoint']
+                cls.host_disk_usage_io.used = item['used']
+                cls.host_disk_usage_io.rd_req = item['rd_req']
+                cls.host_disk_usage_io.rd_bytes = item['rd_bytes']
+                cls.host_disk_usage_io.wr_req = item['wr_req']
+                cls.host_disk_usage_io.wr_bytes = item['wr_bytes']
+                cls.host_disk_usage_io.timestamp = timestamp
+                cls.host_disk_usage_io.create()
 
         else:
             pass
