@@ -36,6 +36,8 @@ from api.host import blueprint as host_blueprint
 from api.host import blueprints as host_blueprints
 from api.performance import blueprint as performance_blueprint
 from api.performance import blueprints as performance_blueprints
+from api.host_performance import blueprint as host_performance_blueprint
+from api.host_performance import blueprints as host_performance_blueprints
 
 from views.guest import blueprint as view_guest_blueprint
 from views.guest import blueprints as view_guest_blueprints
@@ -114,6 +116,8 @@ try:
     app.register_blueprint(host_blueprints)
     app.register_blueprint(performance_blueprint)
     app.register_blueprint(performance_blueprints)
+    app.register_blueprint(host_performance_blueprint)
+    app.register_blueprint(host_performance_blueprints)
 
     app.register_blueprint(view_guest_blueprint)
     app.register_blueprint(view_guest_blueprints)

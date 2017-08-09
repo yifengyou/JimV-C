@@ -46,6 +46,7 @@ class Rules(Enum):
     RSA_PUBLIC = (basestring, 'rsa_public')
 
     UUID = (basestring, 'uuid', (36, 36))
+    NODE_ID = (basestring, 'node_id', (14, 14))
     UUIDS = (REG_UUIDS, 'uuids')
     CPU = (int, 'cpu')
     MEMORY = (int, 'memory')

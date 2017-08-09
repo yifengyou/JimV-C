@@ -49,15 +49,15 @@ def r_disk_usage_io_get_by_filter():
     return host_disk_usage_io.get_by_filter()
 
 
-def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
+def get_performance_data(node_id, the_class=None, granularity='hour'):
 
     args_rules = [
-        Rules.UUID.value,
+        Rules.NODE_ID.value,
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuid': uuid})
-        uuids_str = ':'.join([uuid_field, 'in', uuid])
+        ji.Check.previewing(args_rules, {'node_id': node_id})
+        node_ids_str = 'node_id:in:' + node_id.__str__()
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -81,7 +81,7 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
         else:
             pass
 
-        filter_str = ';'.join([uuids_str, 'timestamp:gt:' + _boundary.__str__()])
+        filter_str = ';'.join([node_ids_str, 'timestamp:gt:' + _boundary.__str__()])
 
         _rows, _rows_count = the_class.get_by_filter(
             offset=0, limit=max_limit, order_by='id', order='asc', filter_str=filter_str)
@@ -143,62 +143,62 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
 
 
 @Utils.dumps2response
-def r_cpu_memory_last_hour(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostCPUMemory, granularity='hour')
+def r_cpu_memory_last_hour(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostCPUMemory, granularity='hour')
 
 
 @Utils.dumps2response
-def r_cpu_memory_last_six_hours(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostCPUMemory, granularity='six_hours')
+def r_cpu_memory_last_six_hours(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostCPUMemory, granularity='six_hours')
 
 
 @Utils.dumps2response
-def r_cpu_memory_last_day(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostCPUMemory, granularity='day')
+def r_cpu_memory_last_day(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostCPUMemory, granularity='day')
 
 
 @Utils.dumps2response
-def r_cpu_memory_last_seven_days(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostCPUMemory, granularity='seven_days')
+def r_cpu_memory_last_seven_days(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostCPUMemory, granularity='seven_days')
 
 
 @Utils.dumps2response
-def r_traffic_last_hour(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostTraffic, granularity='hour')
+def r_traffic_last_hour(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='hour')
 
 
 @Utils.dumps2response
-def r_traffic_last_six_hours(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostTraffic, granularity='six_hours')
+def r_traffic_last_six_hours(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='six_hours')
 
 
 @Utils.dumps2response
-def r_traffic_last_day(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostTraffic, granularity='day')
+def r_traffic_last_day(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='day')
 
 
 @Utils.dumps2response
-def r_traffic_last_seven_days(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostTraffic, granularity='seven_days')
+def r_traffic_last_seven_days(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='seven_days')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_hour(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostDiskUsageIO, granularity='hour')
+def r_disk_usage_io_last_hour(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='hour')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_six_hours(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostDiskUsageIO, granularity='six_hours')
+def r_disk_usage_io_last_six_hours(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='six_hours')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_day(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostDiskUsageIO, granularity='day')
+def r_disk_usage_io_last_day(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='day')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_seven_days(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='host_uuid', the_class=HostDiskUsageIO, granularity='seven_days')
+def r_disk_usage_io_last_seven_days(node_id):
+    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='seven_days')
 
 

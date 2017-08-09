@@ -64,7 +64,7 @@ def r_get(ids):
             if db.r.hexists(app.config['hosts_info'], _id):
                 v = json.loads(db.r.hget(app.config['hosts_info'], _id))
                 v = alive_check(v)
-                v['uuid'] = _id
+                v['node_id'] = _id
                 ret['data'] = v
 
         else:
@@ -72,7 +72,7 @@ def r_get(ids):
                 if db.r.hexists(app.config['hosts_info'], _id):
                     v = json.loads(db.r.hget(app.config['hosts_info'], _id))
                     v = alive_check(v)
-                    v['uuid'] = _id
+                    v['node_id'] = _id
                     ret['data'].append(v)
 
         return ret
@@ -91,7 +91,7 @@ def r_get_by_filter():
         for k, v in db.r.hgetall(app.config['hosts_info']).items():
             v = json.loads(v)
             v = alive_check(v)
-            v['uuid'] = k
+            v['node_id'] = k
             ret['data'].append(v)
 
         return ret
@@ -119,7 +119,7 @@ def r_content_search():
             v = json.loads(v)
             if -1 != v['hostname'].find(keyword):
                 v = alive_check(v)
-                v['uuid'] = k
+                v['node_id'] = k
                 ret['data'].append(v)
 
         return ret
