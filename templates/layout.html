@@ -167,6 +167,7 @@
 
     <!-- JimV -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/icons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/host-table.css') }}">
 
     <!-- JS Core -->
     <script type="text/javascript" src="{{ url_for('static', filename='js-core-min/jquery-core.js') }}"></script>
@@ -315,7 +316,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" title="宿主机列表">
+                            <a href="{{ url_for('v_hosts.show') }}" title="宿主机列表">
                                 <i class="glyph-icon icon-linecons-desktop"></i>
                                 <span>宿主机</span>
                             </a>

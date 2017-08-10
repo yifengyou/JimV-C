@@ -51,6 +51,8 @@ from views.boot_job import blueprint as view_boot_job_blueprint
 from views.boot_job import blueprints as view_boot_job_blueprints
 from views.operate_rule import blueprint as view_operate_rule_blueprint
 from views.operate_rule import blueprints as view_operate_rule_blueprints
+from views.host import blueprint as view_host_blueprint
+from views.host import blueprints as view_host_blueprints
 
 from websockify.websocketproxy import WebSocketProxy
 
@@ -131,6 +133,8 @@ try:
     app.register_blueprint(view_boot_job_blueprints)
     app.register_blueprint(view_operate_rule_blueprint)
     app.register_blueprint(view_operate_rule_blueprints)
+    app.register_blueprint(view_host_blueprint)
+    app.register_blueprint(view_host_blueprints)
 
 except:
     logger.error(traceback.format_exc())

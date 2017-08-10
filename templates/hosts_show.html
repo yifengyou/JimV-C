@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+{% endblock head %}
+{% block content %}
+
+<script type="text/javascript">
+    var page = 1;
+    var page_size = 10;
+    var keyword = '';
+    var resource_path = window.location.pathname;
+    var cur_url = resource_path;
+
+    $(document).ready(function() {
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+
+        var last_ready = null;
+        $('#content_search').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
+            }
+            last_ready = setTimeout(function () {
+                keyword = $('#content_search').val();
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+                if (keyword.length > 0) {
+                    cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+                }
+                window.location.href=cur_url;
+            }, 1000);
+        });
+
+        $('#page_size').change(function () {
+            keyword = $('#content_search').val();
+            page_size = $('#page_size').val();
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+            if (keyword.length > 0) {
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+            }
+            window.location.href=cur_url;
+        });
+
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+    });
+
+    function refresh() {
+        keyword = $('#content_search').val();
+        page = $('#pagination li.active a').text();
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+        if (keyword.length > 0) {
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+        }
+        window.location.href=cur_url;
+    }
+
+</script>
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero" style="font-size: 24px;">
+                宿主机
+            </h3>
+            <div>
+                <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
+                    <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                        <div class="col-sm-12" style="padding-right: 0;">
+                            <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                                <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                            </div>
+                            <div class="pull-right">
+                                <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    {% for item in hosts_ret.data %}
+                    <div class="col-md-4">
+                        <div class="host-box content-box">
+                            <h3 class="bg-black host-title">{{ item.hostname }}</h3>
+                            <div class="bg-blue host-specs">
+                                <span><sup>$</sup>1.5</span>
+                                <i>当前负载</i>
+                            </div>
+                            <ul>
+                                <li>CPU: {{ item.cpu }}核</li>
+                                <li>内存: {{ item.memory / 1024 / 1024 / 1024 }}</li>
+                                <li><i class="glyph-icon icon-circle font-size-23 {% if item.alive == true %}font-green{% else %}font-red{% endif %}"></i></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

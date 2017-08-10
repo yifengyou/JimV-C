@@ -1,0 +1,225 @@
+/* Pricing tables */
+
+.host-box {
+    text-align: center;
+}
+.host-box .host-title,
+.host-box .host-specs {
+    margin: -1px -1px 0;
+}
+.host-box .host-title {
+    font-weight: normal;
+    padding: 15px;
+}
+.host-box ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.host-box .host-specs {
+    padding: 10px 15px 20px;
+}
+.host-box .host-specs span {
+    font-size: 50px;
+}
+.host-box .host-specs span sup {
+    font-size: 30px;
+    margin-left: -20px;
+    padding-right: 5px;
+}
+.host-box .host-specs i {
+    font-size: 14px;
+    font-style: normal;
+    display: block;
+    color: rgba(255, 255, 255, .6);
+}
+.host-box ul li {
+    font-size: 14px;
+    line-height: 48px;
+    height: 48px;
+    padding: 0 10px;
+    border-bottom: #eee solid 1px;
+}
+.host-box ul li:nth-child(even) {
+    background: #fafafa;
+}
+/* Pricing table alternate style */
+
+.host-table .host-box {
+    padding: 0;
+}
+.host-table .host-box + .host-box {
+    border-width: 1px 1px 1px 0;
+    border-radius: 0;
+}
+.host-table .host-box + .host-box:nth-child(2):last-child {
+    border-width: 1px 1px 1px;
+}
+.host-table .host-box .host-title,
+.host-table .host-box .host-specs {
+    margin: 0;
+    border-bottom: #eee solid 1px;
+    border-radius: 0;
+}
+.host-table .host-box .host-specs span {
+    font-size: 40px;
+}
+.host-table .host-box .host-specs span sup {
+    font-size: 20px;
+    margin-left: -10px;
+    padding-right: 5px;
+}
+.host-table .host-box .host-specs i {
+    color: rgba(0, 0, 0, .5);
+}
+.host-table .host-best {
+    position: relative;
+    z-index: 15;
+    margin-right: -1px;
+    margin-left: -1px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, .1);
+}
+.host-table .host-best .host-specs {
+    background: #fafafa;
+}
+.host-table .host-best .host-title {
+    font-size: 28px;
+    line-height: 60px;
+    height: 90px;
+    margin: -25px -1px 0;
+}
+
+/* Pricing alternate */
+
+.host-box-alt {
+    position: relative;
+}
+
+.host-box-alt .col-md-3 {
+    padding: 0;
+    border: #c6c6c6 solid 1px;
+    border-width: 1px 1px 1px 0;
+    width: 26%;
+    text-align: center;
+}
+
+.host-box-alt .plans-features {
+    width: 22%;
+    text-align: right;
+    border-color: transparent #c6c6c6 transparent transparent;
+}
+
+.host-box-alt .plans-features .plan-header {
+    height: 170px;
+}
+
+.host-box-alt .plans-features ul li {
+    border-left: #f0f0f0 solid 1px;
+}
+
+.host-box-alt ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.host-box-alt .plan-header {
+    padding: 15px;
+    border-bottom: #f0f0f0 solid 1px;
+}
+
+.host-box-alt .plan-header h4 {
+    margin: 0;
+    color: #f26b33;
+    text-transform: uppercase;
+    font-size: 17px;
+    font-weight: bold;
+    height: 40px;
+    line-height: 30px;
+    border-bottom: #F3F3F3 solid 1px;
+}
+
+.host-box-alt .plan-header .plan-price {
+    font-size: 45px;
+    font-weight: 100;
+    height: 60px;
+    line-height: 65px;
+    margin: 0 0 5px;
+}
+
+.host-box-alt .plan-header .plan-price small {
+    font-size: 30px;
+    opacity: 0.4;
+    padding-right: 3px;
+}
+
+.host-box-alt .studio-plan .plan-header h4 {
+    color: #32cf4e;
+}
+
+.host-box-alt .unlimited-plan .plan-header h4 {
+    color: #3792f2;
+}
+
+.host-box-alt ul li {
+    height: 32px;
+    line-height: 32px;
+    padding: 0 10px;
+    border-bottom: #f0f0f0 solid 1px;
+    color: #0093d9;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.host-box-alt .plans-features ul li {
+    color: #6f6f6f;
+    font-weight: normal;
+}
+
+.host-box-alt ul li .feature-included,
+.host-box-alt ul li .feature-excluded {
+    border-radius: 30px;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+}
+
+.host-box-alt ul li .feature-excluded {
+    background: #e6e6e6;
+}
+
+.host-box-alt .host-btn {
+    padding: 15px;
+    background: #fafafa;
+}
+
+.host-box-alt .host-btn .btn {
+    padding: 15px 0;
+    font-weight: bold;
+    font-size: 16px;
+    box-sizing: initial;
+    display: block;
+    line-height: 1;
+}
+
+.host-box-alt .host-btn .btn b {
+    opacity: 0.6;
+    display: block;
+    padding: 6px 0 0;
+    font-size: 13px;
+    font-weight: normal;
+}
+
+.individual-plan .host-btn {
+    border-left: #c6c6c6 solid 1px;
+    margin-left: -1px;
+}
+
+.host-box-alt ul li.header {
+    background: #f9f9f9;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: right;
+    font-size: 12px;
+    color: #000;
+}
