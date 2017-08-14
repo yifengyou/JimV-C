@@ -92,7 +92,7 @@ add_rule_api(log.blueprints, '', api_func='log.r_get_by_filter', methods=['GET']
 add_rule_api(log.blueprints, '/_search', api_func='log.r_content_search', methods=['GET'])
 
 # 宿主机查询
-add_rule_api(host.blueprints, '/<ids>', api_func='host.r_get', methods=['GET'])
+add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_get', methods=['GET'])
 add_rule_api(host.blueprints, '', api_func='host.r_get_by_filter', methods=['GET'])
 add_rule_api(host.blueprints, '/_search', api_func='host.r_content_search', methods=['GET'])
 

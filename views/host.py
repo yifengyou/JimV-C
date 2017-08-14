@@ -58,3 +58,12 @@ def show():
     return render_template('hosts_show.html', hosts_ret=hosts_ret, resource_path=resource_path, keyword=keyword)
 
 
+def detail(node_id):
+    host_url = request.host_url.rstrip('/')
+
+    _host_url = host_url + url_for('api_hosts.r_get', nodes_id=node_id)
+
+    host_ret = requests.get(url=_host_url)
+    host_ret = json.loads(host_ret.content)
+
+    return render_template('host_detail.html', node_id=node_id, host_ret=host_ret)

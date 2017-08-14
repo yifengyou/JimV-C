@@ -46,33 +46,33 @@ def alive_check(v):
 
 
 @Utils.dumps2response
-def r_get(ids):
+def r_get(nodes_id):
 
     args_rules = [
         Rules.IDS.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {args_rules[0][1]: ids})
+        ji.Check.previewing(args_rules, {args_rules[0][1]: nodes_id})
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = list()
 
-        if -1 == ids.find(','):
-            _id = ids
-            if db.r.hexists(app.config['hosts_info'], _id):
-                v = json.loads(db.r.hget(app.config['hosts_info'], _id))
+        if -1 == nodes_id.find(','):
+            node_id = nodes_id
+            if db.r.hexists(app.config['hosts_info'], node_id):
+                v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
                 v = alive_check(v)
-                v['node_id'] = _id
+                v['node_id'] = node_id
                 ret['data'] = v
 
         else:
-            for _id in ids.split(','):
-                if db.r.hexists(app.config['hosts_info'], _id):
-                    v = json.loads(db.r.hget(app.config['hosts_info'], _id))
+            for node_id in nodes_id.split(','):
+                if db.r.hexists(app.config['hosts_info'], node_id):
+                    v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
                     v = alive_check(v)
-                    v['node_id'] = _id
+                    v['node_id'] = node_id
                     ret['data'].append(v)
 
         return ret

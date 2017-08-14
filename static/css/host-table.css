@@ -10,6 +10,7 @@
 .host-box .host-title {
     font-weight: normal;
     padding: 15px;
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif !important;
 }
 .host-box ul {
     margin: 0;

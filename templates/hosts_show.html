@@ -48,6 +48,13 @@
         window.location.href=cur_url;
     }
 
+    function panel_onmouseover(me) {
+        $(me).find(".show_detail_link").css('display','block');
+    }
+
+    function panel_onmouseout(me) {
+        $(me).find(".show_detail_link").css('display','none');
+    }
 </script>
     <div class="panel">
         <div class="panel-body">
@@ -68,10 +75,15 @@
                 </div>
                 <div class="row">
                     {% for item in hosts_ret.data %}
-                    <div class="col-md-4">
+                    <div class="col-md-4" onmouseover="panel_onmouseover(this);" onmouseout="panel_onmouseout(this);">
                         <div class="host-box content-box">
-                            <h3 class="bg-black host-title">{{ item.hostname }}</h3>
+                            <h2 class="bg-black host-title">{{ item.hostname }}
+                                <i style="float: right;" class="glyph-icon icon-circle font-size-23 {% if item.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                            </h2>
                             <div class="bg-blue host-specs">
+                                <div class="show_detail_link" style="display: none; position: absolute; z-index: 9999; margin-left: 246px; margin-top: 20px;">
+                                    <a href="/host/detail/{{ item.node_id }}" style="color: white; background-color: black;">&nbsp;&nbsp;&nbsp;&nbsp;主机详情&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                </div>
                                 <span>{{ '%0.2f'| format(item.system_load[0] / item.cpu | round) }}</span>
                                 <i>当前系统负载</i>
                             </div>
