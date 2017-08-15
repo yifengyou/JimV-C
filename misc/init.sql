@@ -247,6 +247,7 @@ ALTER TABLE host_traffic ADD INDEX (tx_bytes);
 ALTER TABLE host_traffic ADD INDEX (tx_packets);
 ALTER TABLE host_traffic ADD INDEX (timestamp);
 ALTER TABLE host_traffic ADD INDEX (node_id, timestamp);
+ALTER TABLE host_traffic ADD INDEX (node_id, name, timestamp);
 
 
 CREATE TABLE IF NOT EXISTS host_disk_usage_io(

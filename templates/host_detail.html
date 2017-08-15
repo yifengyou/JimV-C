@@ -59,10 +59,10 @@
 <script>
     var resource_path = window.location.pathname;
     var resource_path_array = resource_path.split('/');
-    var uuid = resource_path_array[resource_path_array.length - 1];
+    var node_id = resource_path_array[resource_path_array.length - 1];
     var cpu_chart = null;
-    var traffic_chart = null;
     var memory_chart = null;
+    var host_info = null;
 
     var datetime_format_type = 'time';
 
@@ -74,7 +74,7 @@
         }
     }
 
-    function render_cpu_chart(node_id, granularity) {
+    function render_cpu_chart(granularity) {
         var url = '/api/host_performance/cpu_memory/last_hour/' + node_id;
         if (granularity === 'hour') {
             url = '/api/host_performance/cpu_memory/last_hour/' + node_id
@@ -99,6 +99,8 @@
                 if (data.data.length > 1) {
                     if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
                         datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
                     }
                 }
 
@@ -206,16 +208,16 @@
         });
     }
 
-    function render_traffic_chart(node_id, granularity) {
-        var url = '/api/host_performance/traffic/last_hour/' + node_id;
+    function render_traffic_chart(nic_name, granularity) {
+        var url = '/api/host_performance/traffic/last_hour/' + node_id + '/' + nic_name;
         if (granularity === 'hour') {
-            url = '/api/host_performance/traffic/last_hour/' + node_id
+            url = '/api/host_performance/traffic/last_hour/' + node_id + '/' + nic_name
         } else if (granularity === 'six_hours') {
-            url = '/api/host_performance/traffic/last_six_hours/' + node_id
+            url = '/api/host_performance/traffic/last_six_hours/' + node_id + '/' + nic_name
         } else if (granularity === 'day') {
-            url = '/api/host_performance/traffic/last_day/' + node_id
+            url = '/api/host_performance/traffic/last_day/' + node_id + '/' + nic_name
         } else {
-            url = '/api/host_performance/traffic/last_seven_days/' + node_id
+            url = '/api/host_performance/traffic/last_seven_days/' + node_id + '/' + nic_name
         }
 
         $.ajax({
@@ -231,13 +233,15 @@
                 if (data.data.length > 1) {
                     if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
                         datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
                     }
                 }
 
                 var option = {
                     color: ['#3BC0FF', '#FAB406'],
                     title: {
-                        text: '网络'
+                        text: '网络(' + nic_name + ')'
                     },
                     legend: {
                         data:['流入(kbps)', '流出(kbps)'],
@@ -361,12 +365,13 @@
                     }]
                 };
 
+                var traffic_chart = echarts.init(document.getElementById(nic_name));
                 traffic_chart.setOption(option);
             }
         });
     }
 
-    function render_memory_chart(node_id, granularity) {
+    function render_memory_chart(granularity) {
         var url = '/api/host_performance/cpu_memory/last_hour/' + node_id;
         if (granularity === 'hour') {
             url = '/api/host_performance/cpu_memory/last_hour/' + node_id
@@ -391,6 +396,8 @@
                 if (data.data.length > 1) {
                     if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
                         datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
                     }
                 }
 
@@ -451,7 +458,7 @@
                     },
                     yAxis: {
                         min: 0,
-                        max: 'dataMax',
+                        max: Math.floor(host_info['memory'] / 1024 / 1024 / 1024),
                         minInterval: 2,
                         axisTick: {
                             show: false
@@ -486,7 +493,8 @@
                             $.each(data.data, function (i, ele) {
                                 d.push([
                                     ele['timestamp'] * 1000,
-                                    ele['memory_unused'] !== null ? Math.floor(ele['memory_unused'] / 1024) / 1000 : null
+                                    // 保留一位小数
+                                    ele['memory_available'] !== null ? Math.floor(ele['memory_available'] / 1024 / 1024 / 102.4) / 10 : null
                                 ])
                             });
                             return d;
@@ -499,17 +507,22 @@
         });
     }
 
-    function render_disk_throughput_chart(disk_uuid, granularity, dev_id, dev_name) {
-        var url = '/api/performance/disk_io/last_hour/' + disk_uuid;
+    function render_disk_throughput_chart(granularity, dev_id, mountpoint) {
+
+        mountpoint = window.btoa(mountpoint);
+
+        var url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint;
         if (granularity === 'hour') {
-            url = '/api/performance/disk_io/last_hour/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint
         } else if (granularity === 'six_hours') {
-            url = '/api/performance/disk_io/last_six_hours/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_six_hours/' + node_id + '/' + mountpoint
         } else if (granularity === 'day') {
-            url = '/api/performance/disk_io/last_day/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_day/' + node_id + '/' + mountpoint
         } else {
-            url = '/api/performance/disk_io/last_seven_days/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_seven_days/' + node_id + '/' + mountpoint
         }
+
+        mountpoint = window.atob(mountpoint);
 
         $.ajax({
             url : url,
@@ -524,13 +537,15 @@
                 if (data.data.length > 1) {
                     if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
                         datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
                     }
                 }
 
                 var option = {
                     color: ['#3BC0FF', '#FAB406'],
                     title: {
-                        text: '磁盘吞吐量 - ' + dev_name
+                        text: '磁盘吞吐量 - ' + host_info['disks'][mountpoint]['device']
                     },
                     legend: {
                         data:['读(MBps)', '写(MBps)'],
@@ -660,17 +675,22 @@
         });
     }
 
-    function render_disk_iops_chart(disk_uuid, granularity, dev_id, dev_name) {
-        var url = '/api/performance/disk_io/last_hour/' + disk_uuid;
+    function render_disk_iops_chart(granularity, dev_id, mountpoint) {
+
+        mountpoint = window.btoa(mountpoint);
+
+        var url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint;
         if (granularity === 'hour') {
-            url = '/api/performance/disk_io/last_hour/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint
         } else if (granularity === 'six_hours') {
-            url = '/api/performance/disk_io/last_six_hours/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_six_hours/' + node_id + '/' + mountpoint
         } else if (granularity === 'day') {
-            url = '/api/performance/disk_io/last_day/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_day/' + node_id + '/' + mountpoint
         } else {
-            url = '/api/performance/disk_io/last_seven_days/' + disk_uuid
+            url = '/api/host_performance/disk_io/last_seven_days/' + node_id + '/' + mountpoint
         }
+
+        mountpoint = window.atob(mountpoint);
 
         $.ajax({
             url : url,
@@ -685,13 +705,15 @@
                 if (data.data.length > 1) {
                     if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
                         datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
                     }
                 }
 
                 var option = {
                     color: ['#3BC0FF', '#FAB406'],
                     title: {
-                        text: '磁盘IOPS - ' + dev_name
+                        text: '磁盘IOPS - ' + host_info['disks'][mountpoint]['device']
                     },
                     legend: {
                         data:['读(IOPS)', '写(IOPS)'],
@@ -821,38 +843,26 @@
         });
     }
 
-    function render_disks_chart(uuid, granularity) {
-        var dev_table = [];
+    function render_traffics_chart(granularity) {
+        $('#traffics_chart').empty();
+        $.each(host_info['interfaces'], function(key, ele) {
+            $('#traffics_chart').append($('<div id=' + key +' style="width: 800px;height:280px;"></div>'));
+            render_traffic_chart(key,granularity);
+        });
+    }
 
-        for (var i = 1; i <= 26; i++) {
-            dev_table.push('vd' + String.fromCharCode(0x60+i));
-        }
+    function render_disks_chart(granularity) {
+        $('#disks_chart').empty();
+        $.each(host_info['disks'], function(key, ele) {
+            var mountpoint = key;
+            var dev_id_throughput = 'throughput_' + key;
+            var dev_id_iops = 'iops_' + key;
 
-        var disks = [];
-        var url = '/api/disks?filter=guest_uuid:in:' + uuid;
-        $.ajax({
-            url: url,
-            type: 'GET',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            error: function () {
-                alter_danger('获取图表数据失败失败！');
-            },
-            success: function (data, textStatus, xhr) {
-                $('#disks_chart').empty();
-                $.each(data.data, function(i, ele) {
-                    var dev_name = dev_table[ele['sequence']];
-                    var dev_id_throughput = 'throughput_' + dev_table[ele['sequence']];
-                    var dev_id_iops = 'iops_' + dev_table[ele['sequence']];
-                    var disk_uuid = ele['uuid'];
+            $('#disks_chart').append($('<div id=' + dev_id_throughput +' style="width: 800px;height:280px;"></div>'));
+            render_disk_throughput_chart(granularity, dev_id_throughput, mountpoint);
 
-                    $('#disks_chart').append($('<div id=' + dev_id_throughput +' style="width: 800px;height:280px;"></div>'));
-                    render_disk_throughput_chart(disk_uuid, granularity, dev_id_throughput, dev_name);
-
-                    $('#disks_chart').append($('<div id=' + dev_id_iops +' style="width: 800px;height:280px;"></div>'));
-                    render_disk_iops_chart(disk_uuid, granularity, dev_id_iops, dev_name);
-                });
-            }
+            $('#disks_chart').append($('<div id=' + dev_id_iops +' style="width: 800px;height:280px;"></div>'));
+            render_disk_iops_chart(granularity, dev_id_iops, mountpoint);
         });
     }
 
@@ -864,19 +874,35 @@
             $('.add-transition').addClass(transAttr);
         });
 
+        var url = '/api/hosts/' + node_id;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            async: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error: function () {
+                alter_danger('获取宿主机数据失败失败！');
+            },
+            success: function (data, textStatus, xhr) {
+                host_info = data.data;
+            }
+        });
+
         cpu_chart = echarts.init(document.getElementById('cpu_chart'));
-        traffic_chart = echarts.init(document.getElementById('traffic_chart'));
-        // memory_chart = echarts.init(document.getElementById('memory_chart'));
-        // render_cpu_chart(uuid, 'hour');
-        // render_traffic_chart(uuid, 'hour');
-        // render_disks_chart(uuid, 'hour')
-        // render_memory_chart(uuid, 'hour');
+        memory_chart = echarts.init(document.getElementById('memory_chart'));
+
+        render_cpu_chart('hour');
+        render_memory_chart('hour');
+        render_traffics_chart('hour');
+        render_disks_chart('hour')
     });
     
     function refresh_render_with_specify_granularity(granularity) {
-        render_cpu_chart(uuid, granularity);
-        render_traffic_chart(uuid, granularity);
-        render_disks_chart(uuid, granularity)
+        render_cpu_chart(granularity);
+        render_memory_chart(granularity);
+        render_traffics_chart(granularity);
+        render_disks_chart(granularity)
     }
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
@@ -911,7 +937,7 @@
                             <td>
                                 <span class="guest-label">状态:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                    <i style="float: right;" class="glyph-icon icon-circle font-size-23 {% if host_ret.data.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                    <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                                 </span>
                             </td>
                         </tr>
@@ -927,28 +953,28 @@
                             <td>
                                 <span class="guest-label">内存:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ (host_ret_data.memory / 1024 / 1024 / 1024)|int }} GB
+                                {{ (host_ret.data.memory / 1024 / 1024 / 1024)|int }} GB
                                 </span>
                             </td>
                         </tr>
 
                         {% for nic_name, nic in host_ret.data.interfaces.iteritems() %}
                             <tr>
-                                <td>
-                                    <span class="guest-label">网卡:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                    <span class="guest-desc">
-                                    {{ nic_name }} | IP: {{ nic.ip }} | MAC: {{ nic.mac }}
-                                </span>
+                                <td style="padding: 0;">
+                                    <table style="width: 100%;">
+                                        <tr class="guest-label"><th>网络接口</th><th width="30%">IP</th><th width="30%">MAC</th></tr>
+                                        <tr><th>{{ nic_name }}</th><th>{{ nic.ip }}</th><th>{{ nic.mac }}</th></tr>
+                                    </table>
                                 </td>
                             </tr>
                         {% endfor %}
                         {% for mountpoint, disk in host_ret.data.disks.iteritems() %}
                             <tr>
-                                <td>
-                                    <span class="guest-label">挂载点:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                    <span class="guest-desc">
-                                    {{ mountpoint }} | {{ (disk.total / 1024 / 1024 / 1024) | int }} GB | 使用率: {{ disk.percent }}%
-                                </span>
+                                <td style="padding: 0;">
+                                    <table style="width: 100%;">
+                                        <tr class="guest-label"><th>挂载点</th><th width="20%">设备路径</th><th width="20%">磁盘大小</th><th width="20%">使用率</th></tr>
+                                        <tr class="guest-desc"><th>{{ mountpoint }}</th><th>{{ disk.device }}</th><th>{{ (disk.total / 1024 / 1024 / 1024) | int  }} GB</th><th>{{ disk.percent }}</th></tr>
+                                    </table>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -956,7 +982,7 @@
                             <td>
                                 <span class="guest-label">数据更新时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_datetime_by_tus(host_ret.data.timestamp) }}
+                                {{ format_datetime_by_tus(host_ret.data.timestamp * 1000 * 1000) }}
                                 </span>
                             </td>
                         </tr>
@@ -977,9 +1003,9 @@
                     </div>
                     <div>
                         <div id="cpu_chart" style="width: 800px;height:280px;"></div>
-                        <div id="traffic_chart" style="width: 800px;height:280px;"></div>
+                        <div id="memory_chart" style="width: 800px;height:280px;"></div>
                     </div>
-                    <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
+                    <div id="traffics_chart"></div>
                     <div id="disks_chart"></div>
                 </div>
             </div>

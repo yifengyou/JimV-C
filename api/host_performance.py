@@ -5,6 +5,7 @@
 from flask import Blueprint
 import json
 import jimit as ji
+import base64
 
 from api.base import Base
 from models import HostCPUMemory, HostTraffic, HostDiskUsageIO, Utils, Rules
@@ -49,15 +50,25 @@ def r_disk_usage_io_get_by_filter():
     return host_disk_usage_io.get_by_filter()
 
 
-def get_performance_data(node_id, the_class=None, granularity='hour'):
+def get_performance_data(node_id, the_class=None, nic_name=None, mountpoint=None, granularity='hour'):
 
     args_rules = [
         Rules.NODE_ID.value,
     ]
 
+    filters = list()
+
     try:
         ji.Check.previewing(args_rules, {'node_id': node_id})
+
         node_ids_str = 'node_id:in:' + node_id.__str__()
+        filters.append(node_ids_str)
+
+        if nic_name is not None:
+            filters.append('name:eq:' + nic_name)
+
+        if mountpoint is not None:
+            filters.append('mountpoint:eq:' + mountpoint)
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -81,7 +92,9 @@ def get_performance_data(node_id, the_class=None, granularity='hour'):
         else:
             pass
 
-        filter_str = ';'.join([node_ids_str, 'timestamp:gt:' + _boundary.__str__()])
+        filters.append('timestamp:gt:' + _boundary.__str__())
+
+        filter_str = ';'.join(filters)
 
         _rows, _rows_count = the_class.get_by_filter(
             offset=0, limit=max_limit, order_by='id', order='asc', filter_str=filter_str)
@@ -163,42 +176,48 @@ def r_cpu_memory_last_seven_days(node_id):
 
 
 @Utils.dumps2response
-def r_traffic_last_hour(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='hour')
+def r_traffic_last_hour(node_id, nic_name):
+    return get_performance_data(node_id=node_id, nic_name=nic_name, the_class=HostTraffic, granularity='hour')
 
 
 @Utils.dumps2response
-def r_traffic_last_six_hours(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='six_hours')
+def r_traffic_last_six_hours(node_id, nic_name):
+    return get_performance_data(node_id=node_id, nic_name=nic_name, the_class=HostTraffic, granularity='six_hours')
 
 
 @Utils.dumps2response
-def r_traffic_last_day(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='day')
+def r_traffic_last_day(node_id, nic_name):
+    return get_performance_data(node_id=node_id, nic_name=nic_name, the_class=HostTraffic, granularity='day')
 
 
 @Utils.dumps2response
-def r_traffic_last_seven_days(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostTraffic, granularity='seven_days')
+def r_traffic_last_seven_days(node_id, nic_name):
+    return get_performance_data(node_id=node_id, nic_name=nic_name, the_class=HostTraffic, granularity='seven_days')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_hour(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='hour')
+def r_disk_usage_io_last_hour(node_id, mountpoint):
+    mountpoint = base64.b64decode(mountpoint)
+    return get_performance_data(node_id=node_id, mountpoint=mountpoint, the_class=HostDiskUsageIO, granularity='hour')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_six_hours(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='six_hours')
+def r_disk_usage_io_last_six_hours(node_id, mountpoint):
+    mountpoint = base64.b64decode(mountpoint)
+    return get_performance_data(node_id=node_id, mountpoint=mountpoint, the_class=HostDiskUsageIO,
+                                granularity='six_hours')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_day(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='day')
+def r_disk_usage_io_last_day(node_id, mountpoint):
+    mountpoint = base64.b64decode(mountpoint)
+    return get_performance_data(node_id=node_id, mountpoint=mountpoint, the_class=HostDiskUsageIO, granularity='day')
 
 
 @Utils.dumps2response
-def r_disk_usage_io_last_seven_days(node_id):
-    return get_performance_data(node_id=node_id, the_class=HostDiskUsageIO, granularity='seven_days')
+def r_disk_usage_io_last_seven_days(node_id, mountpoint):
+    mountpoint = base64.b64decode(mountpoint)
+    return get_performance_data(node_id=node_id, mountpoint=mountpoint, the_class=HostDiskUsageIO,
+                                granularity='seven_days')
 
 

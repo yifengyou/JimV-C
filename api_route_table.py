@@ -155,28 +155,28 @@ add_rule_api(host_performance.blueprint, '/cpu_memory/last_day/<node_id>',
 add_rule_api(host_performance.blueprint, '/cpu_memory/last_seven_days/<node_id>',
              api_func='host_performance.r_cpu_memory_last_seven_days', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/traffic/last_hour/<node_id>',
+add_rule_api(host_performance.blueprint, '/traffic/last_hour/<node_id>/<nic_name>',
              api_func='host_performance.r_traffic_last_hour', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/traffic/last_six_hours/<node_id>',
+add_rule_api(host_performance.blueprint, '/traffic/last_six_hours/<node_id>/<nic_name>',
              api_func='host_performance.r_traffic_last_six_hours', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/traffic/last_day/<node_id>',
+add_rule_api(host_performance.blueprint, '/traffic/last_day/<node_id>/<nic_name>',
              api_func='host_performance.r_traffic_last_day', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/traffic/last_seven_days/<node_id>',
+add_rule_api(host_performance.blueprint, '/traffic/last_seven_days/<node_id>/<nic_name>',
              api_func='host_performance.r_traffic_last_seven_days', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/disk_io/last_hour/<node_id>',
+add_rule_api(host_performance.blueprint, '/disk_io/last_hour/<node_id>/<path:mountpoint>',
              api_func='host_performance.r_disk_usage_io_last_hour', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/disk_io/last_six_hours/<node_id>',
+add_rule_api(host_performance.blueprint, '/disk_io/last_six_hours/<node_id>/<mountpoint>',
              api_func='host_performance.r_disk_usage_io_last_six_hours', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/disk_io/last_day/<node_id>',
+add_rule_api(host_performance.blueprint, '/disk_io/last_day/<node_id>/<mountpoint>',
              api_func='host_performance.r_disk_usage_io_last_day', methods=['GET'])
 
-add_rule_api(host_performance.blueprint, '/disk_io/last_seven_days/<node_id>',
+add_rule_api(host_performance.blueprint, '/disk_io/last_seven_days/<node_id>/<mountpoint>',
              api_func='host_performance.r_disk_usage_io_last_seven_days', methods=['GET'])
 
 

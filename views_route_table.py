@@ -36,3 +36,5 @@ add_rule_views(operate_rule.blueprints, '', views_func='operate_rule.show', meth
 add_rule_views(operate_rule.blueprint, '', views_func='operate_rule.create', methods=['POST'])
 
 add_rule_views(host.blueprints, '', views_func='host.show', methods=['GET'])
+add_rule_views(host.blueprint, '/detail/<node_id>', views_func='host.detail', methods=['GET'])
+
