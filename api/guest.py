@@ -149,9 +149,20 @@ def r_create():
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
+            lightest_host = None
+            for k, v in db.r.hgetall(app.config['hosts_info']).items():
+                v = json.loads(v)
+
+                if lightest_host is None:
+                    lightest_host = v
+
+                if float(lightest_host['system_load'][0]) / lightest_host['cpu'] > float(v['system_load'][0]) / v['cpu']:
+                    lightest_host = v
+
             create_vm_msg = {
-                'action': 'create_guest',
+                'action': 'create',
                 'uuid': guest.uuid,
+                'hostname': lightest_host['hostname'],
                 'name': guest.label,
                 'glusterfs_volume': config.glusterfs_volume,
                 'template_path': os_template.path,
@@ -160,7 +171,8 @@ def r_create():
                 'boot_jobs': _boot_jobs,
                 'passback_parameters': {'boot_jobs_id': boot_jobs_id}
             }
-            db.r.rpush(app.config['downstream_queue'], json.dumps(create_vm_msg, ensure_ascii=False))
+
+            Guest.emit_instruction(message=json.dumps(create_vm_msg, ensure_ascii=False))
 
         return ret
 

@@ -124,7 +124,7 @@ class EventProcessor(object):
         state = cls.message['type']
         data = cls.message['message']['data']
 
-        if action == 'create_guest':
+        if action == 'create':
             if state == ResponseState.success.value:
                 # 系统盘的 UUID 与其 Guest 的 UUID 相同
                 cls.disk.uuid = uuid
