@@ -149,6 +149,7 @@ def r_create():
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
+            # 负载最小的宿主机
             lightest_host = None
             for k, v in db.r.hgetall(app.config['hosts_info']).items():
                 v = json.loads(v)
@@ -156,7 +157,8 @@ def r_create():
                 if lightest_host is None:
                     lightest_host = v
 
-                if float(lightest_host['system_load'][0]) / lightest_host['cpu'] > float(v['system_load'][0]) / v['cpu']:
+                if float(lightest_host['system_load'][0]) / lightest_host['cpu'] > \
+                        float(v['system_load'][0]) / v['cpu']:
                     lightest_host = v
 
             create_vm_msg = {
