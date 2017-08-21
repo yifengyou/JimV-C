@@ -202,3 +202,153 @@ def r_disk_io_last_seven_days(uuid):
     return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=DiskIO, granularity='seven_days')
 
 
+@Utils.dumps2response
+def r_current_top_10():
+
+    # JimV 设计的 Guests 容量为 4000 个
+    volume = 4000
+    limit = volume
+    end_ts = ji.Common.ts() - 60
+    start_ts = end_ts - 60
+
+    # 避免落在时间边界上，导致过滤条件的范围落空
+    if start_ts % 60 == 0:
+        start_ts -= 1
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = {
+        'cpu_load': list(),
+        'rw_bytes': list(),
+        'rw_req': list(),
+        'rt_bytes': list(),
+        'rt_packets': list()
+    }
+
+    filter_str = ';'.join([':'.join(['timestamp', 'gt', start_ts.__str__()]),
+                           ':'.join(['timestamp', 'lt', end_ts.__str__()])])
+
+    rows, _ = CPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
+    rows.sort(key=lambda k: k['cpu_load'], reverse=True)
+
+    ret['data']['cpu_load'] = rows[0:10]
+
+    rows, _ = DiskIO.get_by_filter(limit=limit, filter_str=filter_str)
+    for i in range(rows.__len__()):
+        rows[i]['rw_bytes'] = rows[i]['rd_bytes'] + rows[i]['wr_bytes']
+        rows[i]['rw_req'] = rows[i]['rd_req'] + rows[i]['wr_req']
+
+    rows.sort(key=lambda k: k['rw_bytes'], reverse=True)
+    ret['data']['rw_bytes'] = rows[0:10]
+
+    rows.sort(key=lambda k: k['rw_req'], reverse=True)
+    ret['data']['rw_req'] = rows[0:10]
+
+    rows, _ = Traffic.get_by_filter(limit=limit, filter_str=filter_str)
+    for i in range(rows.__len__()):
+        rows[i]['rt_bytes'] = rows[i]['rx_bytes'] + rows[i]['tx_bytes']
+        rows[i]['rt_packets'] = rows[i]['rx_packets'] + rows[i]['tx_packets']
+
+    rows.sort(key=lambda k: k['rt_bytes'], reverse=True)
+    ret['data']['rt_bytes'] = rows[0:10]
+
+    rows.sort(key=lambda k: k['rt_packets'], reverse=True)
+    ret['data']['rt_packets'] = rows[0:10]
+
+    return ret
+
+
+@Utils.dumps2response
+def r_last_10_minutes_top_10():
+
+    _range = 10
+    volume = 4000
+    limit = volume * _range
+    end_ts = ji.Common.ts() - 60
+    start_ts = end_ts - 60 * _range
+
+    # 避免落在时间边界上，导致过滤条件的范围落空
+    if start_ts % 60 == 0:
+        start_ts -= 1
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = {
+        'cpu_load': list(),
+        'rw_bytes': list(),
+        'rw_req': list(),
+        'rt_bytes': list(),
+        'rt_packets': list()
+    }
+
+    filter_str = ';'.join([':'.join(['timestamp', 'gt', start_ts.__str__()]),
+                           ':'.join(['timestamp', 'lt', end_ts.__str__()])])
+
+    # cpu 负载
+    guests_uuid_mapping = dict()
+    rows, _ = CPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
+    for row in rows:
+        if row['guest_uuid'] not in guests_uuid_mapping:
+            guests_uuid_mapping[row['guest_uuid']] = {'cpu_load': 0, 'count': 0}
+
+        guests_uuid_mapping[row['guest_uuid']]['cpu_load'] += row['cpu_load']
+        guests_uuid_mapping[row['guest_uuid']]['count'] += 1
+
+    rows = list()
+    for k, v in guests_uuid_mapping.items():
+
+        # 忽略除数为 0 的情况
+        if v['cpu_load'] == 0:
+            continue
+
+        rows.append({'guest_uuid': k, 'cpu_load': v['cpu_load'] / v['count']})
+
+    rows.sort(key=lambda _k: _k['cpu_load'], reverse=True)
+
+    ret['data']['cpu_load'] = rows[0:10]
+
+    # 磁盘使用统计
+    guests_uuid_mapping.clear()
+    rows, _ = DiskIO.get_by_filter(limit=limit, filter_str=filter_str)
+    for row in rows:
+        if row['disk_uuid'] not in guests_uuid_mapping:
+            guests_uuid_mapping[row['disk_uuid']] = {'rw_bytes': 0, 'rw_req': 0}
+
+        guests_uuid_mapping[row['disk_uuid']]['rw_bytes'] += row['rd_bytes'] + row['wr_bytes']
+        guests_uuid_mapping[row['disk_uuid']]['rw_req'] += row['rd_req'] + row['wr_req']
+
+    rows = list()
+    for k, v in guests_uuid_mapping.items():
+        rows.append({'disk_uuid': k, 'rw_bytes': v['rw_bytes'] * 60 * _range, 'rw_req': v['rw_req'] * 60 * _range})
+
+    rows.sort(key=lambda _k: _k['rw_bytes'], reverse=True)
+    ret['data']['rw_bytes'] = rows[0:10]
+
+    rows.sort(key=lambda _k: _k['rw_req'], reverse=True)
+    ret['data']['rw_req'] = rows[0:10]
+
+    # 网络流量
+    guests_uuid_mapping.clear()
+    rows, _ = Traffic.get_by_filter(limit=limit, filter_str=filter_str)
+    for row in rows:
+        if row['guest_uuid'] not in guests_uuid_mapping:
+            guests_uuid_mapping[row['guest_uuid']] = {'rt_bytes': 0, 'rt_packets': 0}
+
+        guests_uuid_mapping[row['guest_uuid']]['rt_bytes'] += row['rx_bytes'] + row['tx_bytes']
+        guests_uuid_mapping[row['guest_uuid']]['rt_packets'] += row['rx_packets'] + row['tx_packets']
+
+    rows = list()
+    for k, v in guests_uuid_mapping.items():
+        rows.append({'guest_uuid': k, 'rt_bytes': v['rt_bytes'] * 60 * _range,
+                     'rt_packets': v['rt_packets'] * 60 * _range})
+
+    rows.sort(key=lambda _k: _k['rt_bytes'], reverse=True)
+    ret['data']['rt_bytes'] = rows[0:10]
+
+    rows.sort(key=lambda _k: _k['rt_packets'], reverse=True)
+    ret['data']['rt_packets'] = rows[0:10]
+
+    return ret
+
+
+

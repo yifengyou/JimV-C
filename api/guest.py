@@ -610,6 +610,43 @@ def r_content_search():
 
 
 @Utils.dumps2response
+def r_distribute_count():
+    from models import Guest
+    rows, count = Guest.get_all()
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'os_template_id': dict(),
+        'status': dict(),
+        'on_host': dict(),
+        'cpu_memory': dict()
+    }
+
+    for guest in rows:
+        if guest['os_template_id'] not in ret['data']['os_template_id']:
+            ret['data']['os_template_id'][guest['os_template_id']] = 0
+
+        if guest['status'] not in ret['data']['status']:
+            ret['data']['status'][guest['status']] = 0
+
+        if guest['on_host'] not in ret['data']['on_host']:
+            ret['data']['on_host'][guest['on_host']] = 0
+
+        cpu_memory = '_'.join([str(guest['cpu']), str(guest['memory'])])
+        if cpu_memory not in ret['data']['cpu_memory']:
+            ret['data']['cpu_memory'][cpu_memory] = 0
+
+        ret['data']['os_template_id'][guest['os_template_id']] += 1
+        ret['data']['status'][guest['status']] += 1
+        ret['data']['on_host'][guest['on_host']] += 1
+        ret['data']['cpu_memory'][cpu_memory] += 1
+
+    return ret
+
+
+@Utils.dumps2response
 def r_update(uuid):
 
     args_rules = [
