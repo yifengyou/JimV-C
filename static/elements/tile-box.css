@@ -47,7 +47,8 @@
     -moz-opacity: .70;
     filter: alpha(opacity: 70);
 }
-.tile-content-wrapper > .glyph-icon {
+.tile-content-wrapper > .glyph-icon,
+.tile-content-wrapper > .webhh {
     font-size: 35px;
     line-height: 70px;
     position: absolute;
@@ -84,19 +85,23 @@
     padding: 10px;
     text-align: center;
 }
-.tile-box-alt .tile-content-wrapper > .glyph-icon {
+.tile-box-alt .tile-content-wrapper > .glyph-icon,
+.tile-box-alt .tile-content-wrapper > .webhh {
     font-size: 65px;
     margin-top: -32px;
 }
 .tile-box-shortcut:hover .tile-content-wrapper > .glyph-icon,
+.tile-box-shortcut:hover .tile-content-wrapper > .webhh,
 a.tile-box.btn .tile-header .float-right,
-a.tile-box.btn .tile-content-wrapper > .glyph-icon {
+a.tile-box.btn .tile-content-wrapper > .glyph-icon,
+a.tile-box.btn .tile-content-wrapper > .webhh {
     -webkit-transition: all .2s ease-in-out;
     -moz-transition: all .2s ease-in-out;
     -ms-transition: all .2s ease-in-out;
     -o-transition: all .2s ease-in-out;
 }
-a.tile-box.btn:hover .tile-content-wrapper > .glyph-icon {
+a.tile-box.btn:hover .tile-content-wrapper > .glyph-icon,
+a.tile-box.btn:hover .tile-content-wrapper > .webhh {
     opacity: .70;
     -moz-opacity: .70;
     filter: alpha(opacity: 70);
@@ -131,13 +136,15 @@ a.tile-box.btn:hover .tile-header .float-right {
     padding: 0;
     min-height: 80px;
 }
-.tile-box-shortcut .tile-content-wrapper > .glyph-icon {
+.tile-box-shortcut .tile-content-wrapper > .glyph-icon,
+.tile-box-shortcut .tile-content-wrapper > .webhh {
     position: absolute;
     left: 15px;
     top: 30px;
 }
 
-.tile-box-shortcut:hover .tile-content-wrapper > .glyph-icon {
+.tile-box-shortcut:hover .tile-content-wrapper > .glyph-icon,
+.tile-box-shortcut:hover .tile-content-wrapper > .webhh {
     opacity: .80;
     -moz-opacity: .80;
     filter: alpha(opacity: 80);
