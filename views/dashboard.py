@@ -26,13 +26,21 @@ def show():
 
     host_url = request.host_url.rstrip('/')
 
-    guests_url = host_url + url_for('api_guests.r_get_by_filter')
+    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
+    guests_distribute_count_url = host_url + url_for('api_guests.r_distribute_count')
 
-    if args.__len__() > 0:
-        guests_url = guests_url + '?' + '&'.join(args)
+    hosts_ret = requests.get(url=hosts_url)
+    hosts_ret = json.loads(hosts_ret.content)
 
-    guests_ret = requests.get(url=guests_url)
-    guests_ret = json.loads(guests_ret.content)
+    guests_distribute_count_ret = requests.get(url=guests_distribute_count_url)
+    guests_distribute_count_ret = json.loads(guests_distribute_count_ret.content)
 
-    return render_template('dashboard.html', guests_ret=guests_ret, resource_path=resource_path)
+    hosts_sum = {'cpu': 0, 'memory': 0}
+
+    for host in hosts_ret['data']:
+        hosts_sum['cpu'] += host['cpu']
+        hosts_sum['memory'] += host['memory']
+
+    return render_template('dashboard.html', hosts_sum=hosts_sum, resource_path=resource_path,
+                           guests_distribute_count_ret=guests_distribute_count_ret)
 

@@ -68,7 +68,7 @@
                             <div class="tile-content-wrapper">
                                 <i class="webhh icon-cpu-processor"></i>
                                 <div style="font-size: 20px; margin-top: 18px; right: 10px; position: absolute;">
-                                    64 核
+                                    {{ hosts_sum.cpu }} 核
                                 </div>
                                 <div class="tile-header" style="opacity: .70;">
                                     宿主机 CPU 总计
@@ -81,7 +81,7 @@
                             <div class="tile-content-wrapper">
                                 <i class="webhh icon-ram"></i>
                                 <div style="font-size: 20px; margin-top: 18px; right: 10px; position: absolute;">
-                                    733 GB
+                                    {{ (hosts_sum.memory / 1024 / 1024 / 1024)|int }} GB
                                 </div>
                                 <div class="tile-header" style="opacity: .70;">
                                     宿主机内存总计
@@ -94,7 +94,7 @@
                             <div class="tile-content-wrapper">
                                 <i class="webhh icon-stampalt"></i>
                                 <div style="font-size: 20px; margin-top: 18px; right: 10px; position: absolute;">
-                                    64 核
+                                    {{ guests_distribute_count_ret.data.cpu }} 核
                                 </div>
                                 <div class="tile-header" style="opacity: .70;">
                                     虚拟机 CPU 总计
@@ -107,7 +107,7 @@
                             <div class="tile-content-wrapper">
                                 <i class="webhh icon-ruler"></i>
                                 <div style="font-size: 20px; margin-top: 18px; right: 10px; position: absolute;">
-                                    1233 GB
+                                    {{ guests_distribute_count_ret.data.memory }} GB
                                 </div>
                                 <div class="tile-header" style="opacity: .70;">
                                     虚拟机内存总计

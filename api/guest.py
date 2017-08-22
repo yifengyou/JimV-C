@@ -621,7 +621,10 @@ def r_distribute_count():
         'os_template_id': dict(),
         'status': dict(),
         'on_host': dict(),
-        'cpu_memory': dict()
+        'cpu_memory': dict(),
+        'cpu': 0,
+        'memory': 0,
+        'guests': rows.__len__()
     }
 
     for guest in rows:
@@ -642,6 +645,9 @@ def r_distribute_count():
         ret['data']['status'][guest['status']] += 1
         ret['data']['on_host'][guest['on_host']] += 1
         ret['data']['cpu_memory'][cpu_memory] += 1
+
+        ret['data']['cpu'] += guest['cpu']
+        ret['data']['memory'] += guest['memory']
 
     return ret
 
