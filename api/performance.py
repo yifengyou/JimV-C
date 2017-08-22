@@ -231,7 +231,11 @@ def r_current_top_10():
     rows, _ = CPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
     rows.sort(key=lambda k: k['cpu_load'], reverse=True)
 
-    ret['data']['cpu_load'] = rows[0:10]
+    for i in range(10):
+        if rows[i]['cpu_load'] == 0:
+            break
+
+        ret['data']['cpu_load'].append(rows[i])
 
     rows, _ = DiskIO.get_by_filter(limit=limit, filter_str=filter_str)
     for i in range(rows.__len__()):
@@ -239,10 +243,20 @@ def r_current_top_10():
         rows[i]['rw_req'] = rows[i]['rd_req'] + rows[i]['wr_req']
 
     rows.sort(key=lambda k: k['rw_bytes'], reverse=True)
-    ret['data']['rw_bytes'] = rows[0:10]
+
+    for i in range(10):
+        if rows[i]['rw_req'] == 0:
+            break
+
+        ret['data']['rw_bytes'].append(rows[i])
 
     rows.sort(key=lambda k: k['rw_req'], reverse=True)
-    ret['data']['rw_req'] = rows[0:10]
+
+    for i in range(10):
+        if rows[i]['rw_req'] == 0:
+            break
+
+        ret['data']['rw_req'].append(rows[i])
 
     rows, _ = Traffic.get_by_filter(limit=limit, filter_str=filter_str)
     for i in range(rows.__len__()):
@@ -250,18 +264,27 @@ def r_current_top_10():
         rows[i]['rt_packets'] = rows[i]['rx_packets'] + rows[i]['tx_packets']
 
     rows.sort(key=lambda k: k['rt_bytes'], reverse=True)
-    ret['data']['rt_bytes'] = rows[0:10]
+
+    for i in range(10):
+        if rows[i]['rt_packets'] == 0:
+            break
+
+        ret['data']['rt_bytes'].append(rows[i])
 
     rows.sort(key=lambda k: k['rt_packets'], reverse=True)
-    ret['data']['rt_packets'] = rows[0:10]
+
+    for i in range(10):
+        if rows[i]['rt_packets'] == 0:
+            break
+
+        ret['data']['rt_packets'].append(rows[i])
 
     return ret
 
 
 @Utils.dumps2response
-def r_last_10_minutes_top_10():
+def r_last_the_range_minutes_top_10(_range):
 
-    _range = 10
     volume = 4000
     limit = volume * _range
     end_ts = ji.Common.ts() - 60
@@ -292,7 +315,7 @@ def r_last_10_minutes_top_10():
             guests_uuid_mapping[row['guest_uuid']] = {'cpu_load': 0, 'count': 0}
 
         guests_uuid_mapping[row['guest_uuid']]['cpu_load'] += row['cpu_load']
-        guests_uuid_mapping[row['guest_uuid']]['count'] += 1
+        guests_uuid_mapping[row['guest_uuid']]['count'] += 1.0
 
     rows = list()
     for k, v in guests_uuid_mapping.items():
@@ -319,6 +342,11 @@ def r_last_10_minutes_top_10():
 
     rows = list()
     for k, v in guests_uuid_mapping.items():
+
+        # 过滤掉无操作的数据
+        if v['rw_req'] == 0:
+            continue
+
         rows.append({'disk_uuid': k, 'rw_bytes': v['rw_bytes'] * 60 * _range, 'rw_req': v['rw_req'] * 60 * _range})
 
     rows.sort(key=lambda _k: _k['rw_bytes'], reverse=True)
@@ -339,6 +367,11 @@ def r_last_10_minutes_top_10():
 
     rows = list()
     for k, v in guests_uuid_mapping.items():
+
+        # 过滤掉无流量的数据
+        if v['rt_packets'] == 0:
+            continue
+
         rows.append({'guest_uuid': k, 'rt_bytes': v['rt_bytes'] * 60 * _range,
                      'rt_packets': v['rt_packets'] * 60 * _range})
 
@@ -351,4 +384,22 @@ def r_last_10_minutes_top_10():
     return ret
 
 
+@Utils.dumps2response
+def r_last_10_minutes_top_10():
+    return r_last_the_range_minutes_top_10(_range=10)
+
+
+@Utils.dumps2response
+def r_last_hour_top_10():
+    return r_last_the_range_minutes_top_10(_range=60)
+
+
+@Utils.dumps2response
+def r_last_six_hours_top_10():
+    return r_last_the_range_minutes_top_10(_range=60 * 6)
+
+
+@Utils.dumps2response
+def r_last_day_top_10():
+    return r_last_the_range_minutes_top_10(_range=60 * 24)
 
