@@ -75,6 +75,7 @@ add_rule_api(guest.blueprints, '/_boot_jobs/<uuids>/<boot_jobs_id>', api_func='g
 add_rule_api(guest.blueprints, '/_boot_jobs/uuids', api_func='guest.r_get_uuids_of_all_had_boot_job', methods=['GET'])
 add_rule_api(guest.blueprints, '/_reset_password/<uuids>/<password>', api_func='guest.r_reset_password',
              methods=['PUT'])
+add_rule_api(guest.blueprints, '/_distribute_count', api_func='guest.r_distribute_count', methods=['GET'])
 
 # Disk操作
 add_rule_api(disk.blueprint, '', api_func='disk.r_create', methods=['POST'])
@@ -135,6 +136,21 @@ add_rule_api(performance.blueprint, '/disk_io/last_day/<uuid>',
 
 add_rule_api(performance.blueprint, '/disk_io/last_seven_days/<uuid>',
              api_func='performance.r_disk_io_last_seven_days', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/_current_top_10',
+             api_func='performance.r_current_top_10', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/_last_10_minutes_top_10',
+             api_func='performance.r_last_10_minutes_top_10', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/_last_hour_top_10',
+             api_func='performance.r_last_hour_top_10', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/_last_six_hours_top_10',
+             api_func='performance.r_last_six_hours_top_10', methods=['GET'])
+
+add_rule_api(performance.blueprint, '/_last_day_top_10',
+             api_func='performance.r_last_day_top_10', methods=['GET'])
 
 # Host 性能查询
 add_rule_api(host_performance.blueprint, '/cpu_memory', api_func='host_performance.r_cpu_memory_get_by_filter',
