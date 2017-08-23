@@ -84,11 +84,11 @@
                                 <div class="show_detail_link" style="display: none; position: absolute; z-index: 9999; margin-left: 246px; margin-top: 20px;">
                                     <a href="/host/detail/{{ item.node_id }}" style="color: white; background-color: black;">&nbsp;&nbsp;&nbsp;&nbsp;主机详情&nbsp;&nbsp;&nbsp;&nbsp;</a>
                                 </div>
-                                <span>{{ '%0.2f'| format(item.system_load[0] / item.cpu | round) }}</span>
+                                <span>{{ '%0.2f'| format(item.system_load[0] / item.cpu) }}</span>
                                 <i>当前系统负载</i>
                             </div>
                             <div class="bg-orange host-specs">
-                                <span>{{(((item.memory - item.memory_available) / item.memory | round) * 100) | int}}%</span>
+                                <span>{{(((item.memory - item.memory_available) / item.memory) * 100) | int}}%</span>
                                 <i>内存使用率</i>
                             </div>
                             <ul>

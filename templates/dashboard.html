@@ -140,6 +140,47 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header bg-green">
+                            网络流量
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td>流量</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in guests_current_top_10_ret.data.rt_bytes %}
+                                    {% if item.guest_uuid not in guests_mapping_by_uuid %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left">
+                                            <a href="/guest/detail/{{ item.guest_uuid }}">
+                                                {{ guests_mapping_by_uuid[item.guest_uuid].label }}/{{ guests_mapping_by_uuid[item.guest_uuid].remark }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <!-- 速率参考链接：https://en.wikipedia.org/wiki/Data_rate_units#Examples_of_bit_rates -->
+                                            {% if item.rt_bytes * 8 >= 1000**3 %}
+                                                {{ '%0.1f'| format(item.rt_bytes * 8 / 1000**3) }} Gbps
+                                            {% elif item.rt_bytes * 8 >= 1000**2 %}
+                                                {{ '%0.1f'| format(item.rt_bytes * 8 / 1000**2) }} Mbps
+                                            {% elif item.rt_bytes * 8 >= 1000 %}
+                                                {{ '%0.1f'| format(item.rt_bytes * 8 / 1000) }} kbps
+                                            {% else %}
+                                                {{ item.rt_bytes * 8 }} bps
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
