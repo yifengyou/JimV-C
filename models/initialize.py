@@ -125,3 +125,4 @@ dev_table = list()
 for i in range(26):
     dev_table.append('vd' + chr(97 + i))
 
+app.jinja_env.add_extension('jinja2.ext.loopcontrols')

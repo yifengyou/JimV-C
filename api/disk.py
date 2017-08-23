@@ -235,3 +235,33 @@ def r_update(uuid):
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
+
+@Utils.dumps2response
+def r_distribute_count():
+    from models import Disk
+    rows, count = Disk.get_all()
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'kind': {'system': 0, 'data_mounted': 0, 'data_idle': 0},
+        'total_size': 0,
+        'disks': rows.__len__()
+    }
+
+    for disk in rows:
+        if disk['sequence'] == 0:
+            ret['data']['kind']['system'] += 1
+
+        elif disk['sequence'] < 0:
+            ret['data']['kind']['data_idle'] += 1
+
+        else:
+            ret['data']['kind']['data_mounted'] += 1
+
+        ret['data']['total_size'] += disk['size']
+
+    return ret
+
+
