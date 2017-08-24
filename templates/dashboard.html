@@ -115,14 +115,14 @@
                                 <thead>
                                 <tr>
                                     <td style="width: 65%;">实例</td>
-                                    <td>负载</td>
+                                    <td style="width: 35%;">负载</td>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for item in guests_current_top_10_ret.data.cpu_load %}
                                     {% if item.guest_uuid not in guests_mapping_by_uuid %}{% continue %}{% endif %}
                                 <tr>
-                                    <td class="text-left">
+                                    <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                         <a href="/guest/detail/{{ item.guest_uuid }}">
                                             {{ guests_mapping_by_uuid[item.guest_uuid].label }}/{{ guests_mapping_by_uuid[item.guest_uuid].remark }}
                                         </a>
@@ -142,6 +142,83 @@
                 </div>
                 <div class="col-md-4">
                     <div class="content-box">
+                        <h3 class="content-box-header bg-black-opacity-alt">
+                            磁盘 IOPS
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T" style="table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">IOPS</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in guests_current_top_10_ret.data.rw_req %}
+                                    {% if item.disk_uuid not in disks_mapping_by_uuid %}{% continue %}{% endif %}
+                                    {% if disks_mapping_by_uuid[item.disk_uuid].guest_uuid not in guests_mapping_by_uuid %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/disk/detail/{{ item.disk_uuid }}">
+                                                {{ guests_mapping_by_uuid[disks_mapping_by_uuid[item.disk_uuid].guest_uuid].label }}/{{ disks_mapping_by_uuid[item.disk_uuid].remark }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{ item.rw_req }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header bg-black-opacity-alt">
+                            磁盘吞吐量
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T" style="table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">吞吐量</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in guests_current_top_10_ret.data.rw_bytes %}
+                                    {% if item.disk_uuid not in disks_mapping_by_uuid %}{% continue %}{% endif %}
+                                    {% if disks_mapping_by_uuid[item.disk_uuid].guest_uuid not in guests_mapping_by_uuid %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/disk/detail/{{ item.disk_uuid }}">
+                                                {{ guests_mapping_by_uuid[disks_mapping_by_uuid[item.disk_uuid].guest_uuid].label }}/{{ disks_mapping_by_uuid[item.disk_uuid].remark }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <!-- 速率参考链接：https://en.wikipedia.org/wiki/Data_rate_units#Examples_of_bit_rates -->
+                                            {% if item.rw_bytes >= 1024**3 %}
+                                                {{ '%0.1f'| format(item.rw_bytes / 1024**3) }} GBps
+                                            {% elif item.rw_bytes >= 1024**2 %}
+                                                {{ '%0.1f'| format(item.rw_bytes / 1024**2) }} MBps
+                                            {% elif item.rw_bytes >= 1024 %}
+                                                {{ '%0.1f'| format(item.rw_bytes / 1024) }} KBps
+                                            {% else %}
+                                                {{ item.rw_bytes }} Bps
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="content-box">
                         <h3 class="content-box-header bg-green">
                             网络流量
                         </h3>
@@ -150,14 +227,14 @@
                                 <thead>
                                 <tr>
                                     <td style="width: 65%;">实例</td>
-                                    <td>流量</td>
+                                    <td style="width: 35%;">流量</td>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for item in guests_current_top_10_ret.data.rt_bytes %}
                                     {% if item.guest_uuid not in guests_mapping_by_uuid %}{% continue %}{% endif %}
                                     <tr>
-                                        <td class="text-left">
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                             <a href="/guest/detail/{{ item.guest_uuid }}">
                                                 {{ guests_mapping_by_uuid[item.guest_uuid].label }}/{{ guests_mapping_by_uuid[item.guest_uuid].remark }}
                                             </a>
@@ -180,6 +257,10 @@
                             </table>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-4">
                 </div>
             </div>
         </div>
