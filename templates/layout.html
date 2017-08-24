@@ -29,6 +29,18 @@
             padding-top: .5rem !important;
             padding-bottom: .5rem !important;
         }
+
+        @font-face {
+            font-family: 'Baskerville';
+            src: url('/static/fonts/Baskerville/Baskerville-Italic.eot');
+            src: url('/static/fonts/Baskerville/Baskerville-Italic.eot?#iefix') format('embedded-opentype'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.woff2') format('woff2'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.woff') format('woff'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.ttf') format('truetype'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.svg#Baskerville-Italic') format('svg');
+            font-weight: normal;
+            font-style: italic;
+        }
     </style>
 
 
@@ -223,9 +235,8 @@
         <div id="page-wrapper">
             <div id="page-header" class="bg-gradient-9">
                 <div id="header-logo" class="logo-bg">
-                    <a href="/" class="logo-content-big" title="JimV">
+                    <a href="/" class="logo-content-big" title="JimV" style="font-family: Baskerville; font-size: 60px; color: #fff; text-decoration: none;">
                         JimV
-                        <span>可靠、精简、快速、最优</span>
                     </a>
                     <a id="close-sidebar" href="#" title="Close sidebar">
                         <i class="glyph-icon icon-angle-left"></i>

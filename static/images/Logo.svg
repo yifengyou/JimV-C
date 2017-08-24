@@ -5,37 +5,48 @@
       <rdf:Description rdf:about=""/>
    </rdf:RDF>
 </x:xmpmeta>
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <?xpacket end="w"?></metadata>
 <defs>
     <style>
-      .cls-1 {
+        @font-face {
+        font-family: 'Baskerville';
+        src: url('/static/fonts/Baskerville/Baskerville-Italic.eot');
+        src: url('/static/fonts/Baskerville/Baskerville-Italic.eot?#iefix') format('embedded-opentype'),
+        url('/static/fonts/Baskerville/Baskerville-Italic.woff2') format('woff2'),
+        url('/static/fonts/Baskerville/Baskerville-Italic.woff') format('woff'),
+        url('/static/fonts/Baskerville/Baskerville-Italic.ttf') format('truetype'),
+        url('/static/fonts/Baskerville/Baskerville-Italic.svg#Baskerville-Italic') format('svg');
+        font-weight: normal;
+        font-style: italic;
+        }
+        .cls-1 {
         font-size: 60px;
         fill: #fff;
         font-family: Baskerville;
         font-style: italic;
-      }
+        }
     </style>
-  </defs>
+</defs>
   <text id="JimV" class="cls-1" x="46" y="52">JimV</text>
 </svg>

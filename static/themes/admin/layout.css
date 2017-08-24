@@ -14,11 +14,14 @@
 }
 #header-logo .logo-content-big,
 .logo-content-small {
-    background: url('../../images/Logo.svg') no-repeat;
+    /* background: url('../../images/Logo.svg') no-repeat;
     text-indent: -999em;
     position: absolute;
     height: 80px;
-    left: 10px;
+    left: 10px; */
+    position: absolute;
+    left: 28%;
+    top: -8px;
 }
 .logo-content-small {
     width: 35px;
