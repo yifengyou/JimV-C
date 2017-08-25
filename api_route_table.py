@@ -196,4 +196,19 @@ add_rule_api(host_performance.blueprint, '/disk_io/last_day/<node_id>/<mountpoin
 add_rule_api(host_performance.blueprint, '/disk_io/last_seven_days/<node_id>/<mountpoint>',
              api_func='host_performance.r_disk_usage_io_last_seven_days', methods=['GET'])
 
+add_rule_api(host_performance.blueprint, '/_current_top_10',
+             api_func='host_performance.r_current_top_10', methods=['GET'])
+
+add_rule_api(host_performance.blueprint, '/_last_10_minutes_top_10',
+             api_func='host_performance.r_last_10_minutes_top_10', methods=['GET'])
+
+add_rule_api(host_performance.blueprint, '/_last_hour_top_10',
+             api_func='host_performance.r_last_hour_top_10', methods=['GET'])
+
+add_rule_api(host_performance.blueprint, '/_last_six_hours_top_10',
+             api_func='host_performance.r_last_six_hours_top_10', methods=['GET'])
+
+add_rule_api(host_performance.blueprint, '/_last_day_top_10',
+             api_func='host_performance.r_last_day_top_10', methods=['GET'])
+
 

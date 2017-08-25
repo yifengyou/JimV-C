@@ -221,3 +221,233 @@ def r_disk_usage_io_last_seven_days(node_id, mountpoint):
                                 granularity='seven_days')
 
 
+@Utils.dumps2response
+def r_current_top_10():
+
+    # JimV 设计的 Hosts 容量为 100 个
+    volume = 100
+    limit = volume
+    length = 10
+    end_ts = ji.Common.ts() - 60
+    start_ts = end_ts - 60
+
+    # 避免落在时间边界上，导致过滤条件的范围落空
+    if start_ts % 60 == 0:
+        start_ts -= 1
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = {
+        'cpu_load': list(),
+        'rw_bytes': list(),
+        'rw_req': list(),
+        'rt_bytes': list(),
+        'rt_packets': list()
+    }
+
+    filter_str = ';'.join([':'.join(['timestamp', 'gt', start_ts.__str__()]),
+                           ':'.join(['timestamp', 'lt', end_ts.__str__()])])
+
+    rows, _ = HostCPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
+    rows.sort(key=lambda k: k['cpu_load'], reverse=True)
+
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
+    for i in range(effective_range):
+        if rows[i]['cpu_load'] == 0:
+            break
+
+        ret['data']['cpu_load'].append(rows[i])
+
+    rows, _ = HostDiskUsageIO.get_by_filter(limit=limit, filter_str=filter_str)
+    for i in range(rows.__len__()):
+        rows[i]['rw_bytes'] = rows[i]['rd_bytes'] + rows[i]['wr_bytes']
+        rows[i]['rw_req'] = rows[i]['rd_req'] + rows[i]['wr_req']
+
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
+    rows.sort(key=lambda k: k['rw_bytes'], reverse=True)
+
+    for i in range(effective_range):
+        if rows[i]['rw_req'] == 0:
+            break
+
+        ret['data']['rw_bytes'].append(rows[i])
+
+    rows.sort(key=lambda k: k['rw_req'], reverse=True)
+
+    for i in range(effective_range):
+        if rows[i]['rw_req'] == 0:
+            break
+
+        ret['data']['rw_req'].append(rows[i])
+
+    rows, _ = HostTraffic.get_by_filter(limit=limit, filter_str=filter_str)
+    for i in range(rows.__len__()):
+        rows[i]['rt_bytes'] = rows[i]['rx_bytes'] + rows[i]['tx_bytes']
+        rows[i]['rt_packets'] = rows[i]['rx_packets'] + rows[i]['tx_packets']
+
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
+    rows.sort(key=lambda k: k['rt_bytes'], reverse=True)
+
+    for i in range(effective_range):
+        if rows[i]['rt_packets'] == 0:
+            break
+
+        ret['data']['rt_bytes'].append(rows[i])
+
+    rows.sort(key=lambda k: k['rt_packets'], reverse=True)
+
+    for i in range(effective_range):
+        if rows[i]['rt_packets'] == 0:
+            break
+
+        ret['data']['rt_packets'].append(rows[i])
+
+    return ret
+
+
+@Utils.dumps2response
+def r_last_the_range_minutes_top_10(_range):
+
+    volume = 100
+    limit = volume * _range
+    length = 10
+    end_ts = ji.Common.ts() - 60
+    start_ts = end_ts - 60 * _range
+
+    # 避免落在时间边界上，导致过滤条件的范围落空
+    if start_ts % 60 == 0:
+        start_ts -= 1
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = {
+        'cpu_load': list(),
+        'rw_bytes': list(),
+        'rw_req': list(),
+        'rt_bytes': list(),
+        'rt_packets': list()
+    }
+
+    filter_str = ';'.join([':'.join(['timestamp', 'gt', start_ts.__str__()]),
+                           ':'.join(['timestamp', 'lt', end_ts.__str__()])])
+
+    # cpu 负载
+    hosts_node_id_mapping = dict()
+    rows, _ = HostCPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
+    for row in rows:
+        if row['node_id'] not in hosts_node_id_mapping:
+            hosts_node_id_mapping[row['node_id']] = {'cpu_load': 0, 'count': 0}
+
+        hosts_node_id_mapping[row['node_id']]['cpu_load'] += row['cpu_load']
+        hosts_node_id_mapping[row['node_id']]['count'] += 1.0
+
+    rows = list()
+    for k, v in hosts_node_id_mapping.items():
+
+        # 忽略除数为 0 的情况
+        if v['cpu_load'] == 0:
+            continue
+
+        rows.append({'node_id': k, 'cpu_load': v['cpu_load'] / v['count']})
+
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
+    rows.sort(key=lambda _k: _k['cpu_load'], reverse=True)
+
+    ret['data']['cpu_load'] = rows[0:effective_range]
+
+    # 磁盘使用统计
+    hosts_node_id_mapping.clear()
+    rows, _ = HostDiskUsageIO.get_by_filter(limit=limit, filter_str=filter_str)
+    for row in rows:
+        disk_uuid = '_'.join([row['node_id'].__str__(), row['mountpoint']])
+        if disk_uuid not in hosts_node_id_mapping:
+            hosts_node_id_mapping[disk_uuid] = {'rw_bytes': 0, 'rw_req': 0}
+
+        hosts_node_id_mapping[disk_uuid]['rw_bytes'] += row['rd_bytes'] + row['wr_bytes']
+        hosts_node_id_mapping[disk_uuid]['rw_req'] += row['rd_req'] + row['wr_req']
+
+    rows = list()
+    for k, v in hosts_node_id_mapping.items():
+
+        # 过滤掉无操作的数据
+        if v['rw_req'] == 0:
+            continue
+
+        rows.append({'disk_uuid': k, 'rw_bytes': v['rw_bytes'] * 60 * _range, 'rw_req': v['rw_req'] * 60 * _range})
+
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
+    rows.sort(key=lambda _k: _k['rw_bytes'], reverse=True)
+    ret['data']['rw_bytes'] = rows[0:effective_range]
+
+    rows.sort(key=lambda _k: _k['rw_req'], reverse=True)
+    ret['data']['rw_req'] = rows[0:effective_range]
+
+    # 网络流量
+    hosts_node_id_mapping.clear()
+    rows, _ = HostTraffic.get_by_filter(limit=limit, filter_str=filter_str)
+    for row in rows:
+        nic_uuid = '_'.join([row['node_id'].__str__(), row['name']])
+        if nic_uuid not in hosts_node_id_mapping:
+            hosts_node_id_mapping[nic_uuid] = {'rt_bytes': 0, 'rt_packets': 0}
+
+        hosts_node_id_mapping[nic_uuid]['rt_bytes'] += row['rx_bytes'] + row['tx_bytes']
+        hosts_node_id_mapping[nic_uuid]['rt_packets'] += row['rx_packets'] + row['tx_packets']
+
+    rows = list()
+    for k, v in hosts_node_id_mapping.items():
+
+        # 过滤掉无流量的数据
+        if v['rt_packets'] == 0:
+            continue
+
+        rows.append({'nic_uuid': k, 'rt_bytes': v['rt_bytes'] * 60 * _range,
+                     'rt_packets': v['rt_packets'] * 60 * _range})
+
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
+    rows.sort(key=lambda _k: _k['rt_bytes'], reverse=True)
+    ret['data']['rt_bytes'] = rows[0:effective_range]
+
+    rows.sort(key=lambda _k: _k['rt_packets'], reverse=True)
+    ret['data']['rt_packets'] = rows[0:effective_range]
+
+    return ret
+
+
+@Utils.dumps2response
+def r_last_10_minutes_top_10():
+    return r_last_the_range_minutes_top_10(_range=10)
+
+
+@Utils.dumps2response
+def r_last_hour_top_10():
+    return r_last_the_range_minutes_top_10(_range=60)
+
+
+@Utils.dumps2response
+def r_last_six_hours_top_10():
+    return r_last_the_range_minutes_top_10(_range=60 * 6)
+
+
+@Utils.dumps2response
+def r_last_day_top_10():
+    return r_last_the_range_minutes_top_10(_range=60 * 24)
+
+

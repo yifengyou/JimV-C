@@ -208,6 +208,7 @@ def r_current_top_10():
     # JimV 设计的 Guests 容量为 4000 个
     volume = 4000
     limit = volume
+    length = 10
     end_ts = ji.Common.ts() - 60
     start_ts = end_ts - 60
 
@@ -231,7 +232,11 @@ def r_current_top_10():
     rows, _ = CPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
     rows.sort(key=lambda k: k['cpu_load'], reverse=True)
 
-    for i in range(10):
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
+    for i in range(effective_range):
         if rows[i]['cpu_load'] == 0:
             break
 
@@ -242,9 +247,13 @@ def r_current_top_10():
         rows[i]['rw_bytes'] = rows[i]['rd_bytes'] + rows[i]['wr_bytes']
         rows[i]['rw_req'] = rows[i]['rd_req'] + rows[i]['wr_req']
 
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
     rows.sort(key=lambda k: k['rw_bytes'], reverse=True)
 
-    for i in range(10):
+    for i in range(effective_range):
         if rows[i]['rw_req'] == 0:
             break
 
@@ -252,7 +261,7 @@ def r_current_top_10():
 
     rows.sort(key=lambda k: k['rw_req'], reverse=True)
 
-    for i in range(10):
+    for i in range(effective_range):
         if rows[i]['rw_req'] == 0:
             break
 
@@ -263,9 +272,13 @@ def r_current_top_10():
         rows[i]['rt_bytes'] = rows[i]['rx_bytes'] + rows[i]['tx_bytes']
         rows[i]['rt_packets'] = rows[i]['rx_packets'] + rows[i]['tx_packets']
 
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
     rows.sort(key=lambda k: k['rt_bytes'], reverse=True)
 
-    for i in range(10):
+    for i in range(effective_range):
         if rows[i]['rt_packets'] == 0:
             break
 
@@ -273,7 +286,7 @@ def r_current_top_10():
 
     rows.sort(key=lambda k: k['rt_packets'], reverse=True)
 
-    for i in range(10):
+    for i in range(effective_range):
         if rows[i]['rt_packets'] == 0:
             break
 
@@ -287,6 +300,7 @@ def r_last_the_range_minutes_top_10(_range):
 
     volume = 4000
     limit = volume * _range
+    length = 10
     end_ts = ji.Common.ts() - 60
     start_ts = end_ts - 60 * _range
 
@@ -326,9 +340,13 @@ def r_last_the_range_minutes_top_10(_range):
 
         rows.append({'guest_uuid': k, 'cpu_load': v['cpu_load'] / v['count']})
 
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
     rows.sort(key=lambda _k: _k['cpu_load'], reverse=True)
 
-    ret['data']['cpu_load'] = rows[0:10]
+    ret['data']['cpu_load'] = rows[0:effective_range]
 
     # 磁盘使用统计
     guests_uuid_mapping.clear()
@@ -349,11 +367,15 @@ def r_last_the_range_minutes_top_10(_range):
 
         rows.append({'disk_uuid': k, 'rw_bytes': v['rw_bytes'] * 60 * _range, 'rw_req': v['rw_req'] * 60 * _range})
 
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
     rows.sort(key=lambda _k: _k['rw_bytes'], reverse=True)
-    ret['data']['rw_bytes'] = rows[0:10]
+    ret['data']['rw_bytes'] = rows[0:effective_range]
 
     rows.sort(key=lambda _k: _k['rw_req'], reverse=True)
-    ret['data']['rw_req'] = rows[0:10]
+    ret['data']['rw_req'] = rows[0:effective_range]
 
     # 网络流量
     guests_uuid_mapping.clear()
@@ -375,11 +397,15 @@ def r_last_the_range_minutes_top_10(_range):
         rows.append({'guest_uuid': k, 'rt_bytes': v['rt_bytes'] * 60 * _range,
                      'rt_packets': v['rt_packets'] * 60 * _range})
 
+    effective_range = length
+    if rows.__len__() < length:
+        effective_range = rows.__len__()
+
     rows.sort(key=lambda _k: _k['rt_bytes'], reverse=True)
-    ret['data']['rt_bytes'] = rows[0:10]
+    ret['data']['rt_bytes'] = rows[0:effective_range]
 
     rows.sort(key=lambda _k: _k['rt_packets'], reverse=True)
-    ret['data']['rt_packets'] = rows[0:10]
+    ret['data']['rt_packets'] = rows[0:effective_range]
 
     return ret
 
