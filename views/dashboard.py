@@ -29,9 +29,15 @@ def show():
     guests_distribute_count_url = host_url + url_for('api_guests.r_distribute_count')
     disks_distribute_count_url = host_url + url_for('api_disks.r_distribute_count')
     guests_current_top_10_url = host_url + url_for('api_performance.r_current_top_10')
+    hosts_current_top_10_url = host_url + url_for('api_host_performance.r_current_top_10')
 
     hosts_ret = requests.get(url=hosts_url)
     hosts_ret = json.loads(hosts_ret.content)
+
+    # Host node_id 与 Host 的映射
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     guests_distribute_count_ret = requests.get(url=guests_distribute_count_url)
     guests_distribute_count_ret = json.loads(guests_distribute_count_ret.content)
@@ -85,6 +91,18 @@ def show():
     for disk in disks_ret['data']:
         disks_mapping_by_uuid[disk['uuid']] = disk
 
+    hosts_current_top_10_ret = requests.get(url=hosts_current_top_10_url)
+    hosts_current_top_10_ret = json.loads(hosts_current_top_10_ret.content)
+    hosts_current_top_10_ret['data']['memory_rate'] = hosts_current_top_10_ret['data']['cpu_load']
+
+    for i in range(hosts_current_top_10_ret['data']['memory_rate'].__len__()):
+        memory_total = hosts_mapping_by_node_id[hosts_current_top_10_ret['data']['memory_rate'][i]['node_id']]['memory']
+        memory_available = hosts_current_top_10_ret['data']['memory_rate'][i]['memory_available']
+        memory_used = memory_total - memory_available
+        hosts_current_top_10_ret['data']['memory_rate'][i]['memory_rate'] = int(memory_used / float(memory_total) * 100)
+
+    hosts_current_top_10_ret['data']['memory_rate'].sort(key=lambda _k: _k['memory_rate'], reverse=True)
+
     hosts_sum = {'cpu': 0, 'memory': 0}
 
     for host in hosts_ret['data']:
@@ -95,5 +113,7 @@ def show():
                            guests_distribute_count_ret=guests_distribute_count_ret,
                            disks_distribute_count_ret=disks_distribute_count_ret,
                            guests_current_top_10_ret=guests_current_top_10_ret,
-                           guests_mapping_by_uuid=guests_mapping_by_uuid, disks_mapping_by_uuid=disks_mapping_by_uuid)
+                           guests_mapping_by_uuid=guests_mapping_by_uuid, disks_mapping_by_uuid=disks_mapping_by_uuid,
+                           hosts_current_top_10_ret=hosts_current_top_10_ret,
+                           hosts_mapping_by_node_id=hosts_mapping_by_node_id)
 

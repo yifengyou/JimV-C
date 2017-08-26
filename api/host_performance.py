@@ -373,7 +373,8 @@ def r_last_the_range_minutes_top_10(_range):
     for row in rows:
         disk_uuid = '_'.join([row['node_id'].__str__(), row['mountpoint']])
         if disk_uuid not in hosts_node_id_mapping:
-            hosts_node_id_mapping[disk_uuid] = {'rw_bytes': 0, 'rw_req': 0}
+            hosts_node_id_mapping[disk_uuid] = {'rw_bytes': 0, 'rw_req': 0, 'node_id': row['node_id'],
+                                                'mountpoint': row['mountpoint']}
 
         hosts_node_id_mapping[disk_uuid]['rw_bytes'] += row['rd_bytes'] + row['wr_bytes']
         hosts_node_id_mapping[disk_uuid]['rw_req'] += row['rd_req'] + row['wr_req']
@@ -385,7 +386,8 @@ def r_last_the_range_minutes_top_10(_range):
         if v['rw_req'] == 0:
             continue
 
-        rows.append({'disk_uuid': k, 'rw_bytes': v['rw_bytes'] * 60 * _range, 'rw_req': v['rw_req'] * 60 * _range})
+        rows.append({'disk_uuid': k, 'rw_bytes': v['rw_bytes'] * 60 * _range, 'rw_req': v['rw_req'] * 60 * _range,
+                     'node_id': v['node_id'], 'mountpoint': v['mountpoint']})
 
     effective_range = length
     if rows.__len__() < length:
@@ -403,7 +405,8 @@ def r_last_the_range_minutes_top_10(_range):
     for row in rows:
         nic_uuid = '_'.join([row['node_id'].__str__(), row['name']])
         if nic_uuid not in hosts_node_id_mapping:
-            hosts_node_id_mapping[nic_uuid] = {'rt_bytes': 0, 'rt_packets': 0}
+            hosts_node_id_mapping[nic_uuid] = {'rt_bytes': 0, 'rt_packets': 0, 'node_id': row['node_id'],
+                                               'name': row['name']}
 
         hosts_node_id_mapping[nic_uuid]['rt_bytes'] += row['rx_bytes'] + row['tx_bytes']
         hosts_node_id_mapping[nic_uuid]['rt_packets'] += row['rx_packets'] + row['tx_packets']
@@ -416,7 +419,7 @@ def r_last_the_range_minutes_top_10(_range):
             continue
 
         rows.append({'nic_uuid': k, 'rt_bytes': v['rt_bytes'] * 60 * _range,
-                     'rt_packets': v['rt_packets'] * 60 * _range})
+                     'rt_packets': v['rt_packets'] * 60 * _range, 'node_id': v['node_id'], 'name': v['name']})
 
     effective_range = length
     if rows.__len__() < length:

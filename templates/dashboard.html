@@ -265,4 +265,198 @@
             </div>
         </div>
     </div>
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero">
+                宿主机 TOP <span style="font-size: 17px;">10</span>
+            </h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header btn-info">
+                            CPU
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">负载</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in hosts_current_top_10_ret.data.cpu_load %}
+                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/host/detail/{{ item.node_id }}">
+                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="progressbar-small progressbar" data-value="{{ item.cpu_load }}">
+                                                <div class="progressbar-value tooltip-button {% if item.cpu_load >= 85 %}bg-red{% elif item.cpu_load >= 65 %}bg-orange{% else %}bg-green{% endif %}" title="{{ item.cpu_load }}%">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header" style="background-color: #8e8e8e; color: #fff;">
+                            磁盘 IOPS
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T" style="table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">IOPS</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in hosts_current_top_10_ret.data.rw_req %}
+                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/disk/detail/{{ item.node_id }}/{{ item.mountpoint }}">
+                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.mountpoint }})
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{ item.rw_req }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header" style="background-color: #8e8e8e; color: #fff;">
+                            磁盘吞吐量
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T" style="table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">吞吐量</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in hosts_current_top_10_ret.data.rw_bytes %}
+                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/disk/detail/{{ item.node_id }}/{{ item.mountpoint }}">
+                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.mountpoint }})
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <!-- 速率参考链接：https://en.wikipedia.org/wiki/Data_rate_units#Examples_of_bit_rates -->
+                                            {% if item.rw_bytes >= 1024**3 %}
+                                                {{ '%0.1f'| format(item.rw_bytes / 1024**3) }} GBps
+                                            {% elif item.rw_bytes >= 1024**2 %}
+                                                {{ '%0.1f'| format(item.rw_bytes / 1024**2) }} MBps
+                                            {% elif item.rw_bytes >= 1024 %}
+                                                {{ '%0.1f'| format(item.rw_bytes / 1024) }} KBps
+                                            {% else %}
+                                                {{ item.rw_bytes }} Bps
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header bg-green">
+                            网络流量
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">流量</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in hosts_current_top_10_ret.data.rt_bytes %}
+                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/host/detail/{{ item.node_id }}">
+                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.name }})
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <!-- 速率参考链接：https://en.wikipedia.org/wiki/Data_rate_units#Examples_of_bit_rates -->
+                                            {% if item.rt_bytes * 8 >= 1000**3 %}
+                                                {{ '%0.1f'| format(item.rt_bytes * 8 / 1000**3) }} Gbps
+                                            {% elif item.rt_bytes * 8 >= 1000**2 %}
+                                                {{ '%0.1f'| format(item.rt_bytes * 8 / 1000**2) }} Mbps
+                                            {% elif item.rt_bytes * 8 >= 1000 %}
+                                                {{ '%0.1f'| format(item.rt_bytes * 8 / 1000) }} kbps
+                                            {% else %}
+                                                {{ item.rt_bytes * 8 }} bps
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header btn-warning">
+                            内存使用率
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">使用率</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in hosts_current_top_10_ret.data.memory_rate %}
+                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/host/detail/{{ item.node_id }}">
+                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{ item.memory_rate }}%
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}

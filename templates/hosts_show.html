@@ -81,7 +81,7 @@
                                 <i style="float: right;" class="glyph-icon icon-circle font-size-23 {% if item.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                             </h2>
                             <div class="bg-blue host-specs">
-                                <div class="show_detail_link" style="display: none; position: absolute; z-index: 9999; margin-left: 246px; margin-top: 20px;">
+                                <div class="show_detail_link" style="display: none; position: absolute; z-index: 9999; margin-top: 20px; right: 2%;">
                                     <a href="/host/detail/{{ item.node_id }}" style="color: white; background-color: black;">&nbsp;&nbsp;&nbsp;&nbsp;主机详情&nbsp;&nbsp;&nbsp;&nbsp;</a>
                                 </div>
                                 <span>{{ '%0.2f'| format(item.system_load[0] / item.cpu) }}</span>
