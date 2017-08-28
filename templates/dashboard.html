@@ -324,7 +324,7 @@
                                     {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
                                     <tr>
                                         <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                                            <a href="/disk/detail/{{ item.node_id }}/{{ item.mountpoint }}">
+                                            <a href="/host/detail/{{ item.node_id }}">
                                                 {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.mountpoint }})
                                             </a>
                                         </td>
@@ -356,7 +356,7 @@
                                     {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
                                     <tr>
                                         <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                                            <a href="/disk/detail/{{ item.node_id }}/{{ item.mountpoint }}">
+                                            <a href="/host/detail/{{ item.node_id }}">
                                                 {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.mountpoint }})
                                             </a>
                                         </td>
