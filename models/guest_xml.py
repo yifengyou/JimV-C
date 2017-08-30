@@ -4,6 +4,7 @@
 
 from models import Config, Disk
 from models import Guest
+from models import status
 
 
 __author__ = 'James Iter'
@@ -13,45 +14,6 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 class GuestXML(object):
-    """
-    <?xml version="1.0" encoding="utf-8"?>
-    <domain type="kvm">
-      <features>
-        <acpi/>
-        <apic/>
-      </features>
-      <name>10v022</name>
-      <vcpu>16</vcpu>
-      <memory unit="GiB">64</memory>
-      <os>
-        <boot dev="hd"/>
-        <type arch="x86_64">hvm</type>
-        <bootmenu timeout="3000" enable="yes"/>
-      </os>
-      <devices>
-        <interface type='network'>
-          <source network='net-br0'/>
-          <model type='virtio'/>
-        </interface>
-        <disk type='network' device='disk'>
-            <driver name='qemu' type='qcow2' cache='none'/>
-            <source protocol='gluster' name='gv0/VMs/disk_pool/10v01251/L_10v01251.qcow2'>
-                <host name='127.0.0.1' port='24007'/>
-            </source>
-            <target dev='vda' bus='virtio'/>
-        </disk>
-        <graphics passwd="000000" keymap="en-us" port="6002" type="vnc">
-          <listen network="net-br0" type="network"/>
-        </graphics>
-        <serial type='pty'>
-            <target port='0'/>
-        </serial>
-        <console type='pty'>
-            <target type='serial' port='0'/>
-        </console>
-      </devices>
-    </domain>
-    """
 
     def __init__(self, guest=None, disk=None, config=None):
         assert isinstance(guest, Guest)
@@ -129,15 +91,32 @@ class GuestXML(object):
 
         from initialize import dev_table
 
-        return """
+        if self.config.jimv_edition == status.JimVEdition.hyper_convergence.value:
+            dfs_protocol = 'ceph'
+            if self.config.dfs == status.DFS.glusterfs.value:
+                dfs_protocol = 'gluster'
+
+            disk_xml = """
                 <disk type='network' device='disk'>
                     <driver name='qemu' type='{0}' cache='none'/>
-                    <source protocol='gluster' name='{1}/{2}'>
+                    <source protocol='{1}' name='{2}/{3}'>
                         <host name='127.0.0.1' port='24007'/>
                     </source>
-                    <target dev='{3}' bus='virtio'/>
+                    <target dev='{4}' bus='virtio'/>
                 </disk>
-        """.format(self.disk.format, self.config.glusterfs_volume, self.disk.path, dev_table[self.disk.sequence])
+            """.format(self.disk.format, dfs_protocol, self.config.dfs_volume, self.disk.path,
+                       dev_table[self.disk.sequence])
+
+        else:
+            disk_xml = """
+                <disk type='file' device='disk'>
+                    <driver name='qemu' type='{0}' cache='none'/>
+                    <source file='{1}'/>
+                    <target dev='{2}' bus='virtio'/>
+                </disk>
+            """.format(self.disk.format, self.disk.path, dev_table[self.disk.sequence])
+
+        return disk_xml
 
     def get_graphics(self):
         return """

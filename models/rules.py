@@ -31,7 +31,9 @@ class Rules(Enum):
     BOOT_JOBS_ID = (REG_NUMBERS, 'boot_jobs_id')
 
     CONFIG_ID = (int, 'id')
-    GLUSTERFS_VOLUME = (basestring, 'glusterfs_volume')
+    JIMV_EDITION = (int, 'jimv_edition')
+    DFS = (int, 'dfs')
+    DFS_VOLUME = (basestring, 'dfs_volume')
     STORAGE_PATH = (basestring, 'storage_path')
     VM_NETWORK = (basestring, 'vm_network')
     VM_MANAGE_NETWORK = (basestring, 'vm_manage_network')

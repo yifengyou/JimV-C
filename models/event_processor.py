@@ -99,6 +99,7 @@ class EventProcessor(object):
                     cls.guest_migrate_info.create()
 
         cls.guest.update()
+        cls.disk.update_by_filter({'on_host': cls.guest.on_host}, filter_str='guest_uuid:eq:' + cls.guest.uuid)
 
     @classmethod
     def host_event_processor(cls):
@@ -123,6 +124,7 @@ class EventProcessor(object):
         uuid = cls.message['message']['uuid']
         state = cls.message['type']
         data = cls.message['message']['data']
+        hostname = cls.message['host']
 
         if action == 'create':
             if state == ResponseState.success.value:
@@ -169,6 +171,7 @@ class EventProcessor(object):
         elif action == 'create_disk':
             cls.disk.uuid = uuid
             cls.disk.get_by('uuid')
+            cls.disk.on_host = hostname
             if state == ResponseState.success.value:
                 cls.disk.state = DiskState.idle.value
 

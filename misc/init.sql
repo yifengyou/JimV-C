@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS disk(
     uuid CHAR(36) NOT NULL,
     path VARCHAR(255) NOT NULL,
     size INT UNSIGNED NOT NULL,
+    on_host VARCHAR(128) NOT NULL DEFAULT '',
     remark VARCHAR(255) NOT NULL DEFAULT '',
     sequence TINYINT NOT NULL,
     format CHAR(16) NOT NULL DEFAULT 'qcow2',
@@ -73,6 +74,7 @@ CREATE TABLE IF NOT EXISTS disk(
 
 ALTER TABLE disk ADD INDEX (size);
 ALTER TABLE disk ADD INDEX (guest_uuid);
+ALTER TABLE disk ADD INDEX (on_host);
 ALTER TABLE disk ADD INDEX (remark);
 
 
@@ -113,7 +115,9 @@ CREATE TABLE IF NOT EXISTS operate_rule(
 
 CREATE TABLE IF NOT EXISTS config(
     id BIGINT UNSIGNED NOT NULL DEFAULT 1,
-    glusterfs_volume VARCHAR(255) NOT NULL,
+    jimv_edition TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    dfs TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    dfs_volume VARCHAR(255) NOT NULL DEFAULT '',
     storage_path VARCHAR(255) NOT NULL,
     vm_network VARCHAR(255) NOT NULL,
     vm_manage_network VARCHAR(255) NOT NULL,
@@ -124,8 +128,6 @@ CREATE TABLE IF NOT EXISTS config(
     gateway CHAR(15) NOT NULL,
     dns1 CHAR(15) NOT NULL DEFAULT '223.5.5.5',
     dns2 CHAR(15) NOT NULL DEFAULT '8.8.8.8',
-    rsa_private text NOT NULL DEFAULT '',
-    rsa_public text NOT NULL DEFAULT '',
     PRIMARY KEY (id))
     ENGINE=InnoDB
     DEFAULT CHARSET=utf8;

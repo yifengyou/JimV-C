@@ -114,6 +114,7 @@ class Disk(ORM):
         self.size = None
         self.sequence = None
         self.state = DiskState.pending.value
+        self.on_host = ''
         self.format = 'qcow2'
         self.create_time = ji.Common.tus()
         self.guest_uuid = None
@@ -127,16 +128,17 @@ class Disk(ORM):
             'size': FilterFieldType.INT.value,
             'state': FilterFieldType.INT.value,
             'sequence': FilterFieldType.INT.value,
+            'on_host': FilterFieldType.STR.value,
             'guest_uuid': FilterFieldType.STR.value
         }
 
     @staticmethod
     def get_allow_update_keywords():
-        return []
+        return ['on_host']
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['remark', 'size', 'guest_uuid', 'uuid']
+        return ['remark', 'size', 'guest_uuid', 'uuid', 'on_host']
 
 
 class GuestMigrateInfo(ORM):

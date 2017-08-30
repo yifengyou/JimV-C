@@ -9,6 +9,7 @@ from IPy import IP, intToIp
 from initialize import app
 from models import Database as db
 from models import ORM
+from models import status
 
 
 __author__ = 'James Iter'
@@ -26,7 +27,9 @@ class Config(ORM):
         super(Config, self).__init__()
         # 配置条目的 id 只会是 1
         self.id = 1
-        self.glusterfs_volume = ''
+        self.jimv_edition = status.JimVEdition.standalone.value
+        self.dfs = status.DFS.ceph.value
+        self.dfs_volume = ''
         self.storage_path = ''
         self.vm_network = ''
         self.vm_manage_network = ''
@@ -37,8 +40,6 @@ class Config(ORM):
         self.gateway = ''
         self.dns1 = ''
         self.dns2 = ''
-        self.rsa_private = ''
-        self.rsa_public = ''
 
     @staticmethod
     def get_filter_keywords():

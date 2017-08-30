@@ -78,7 +78,7 @@ def r_create():
 
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
 
-            message = {'action': 'create_disk', 'glusterfs_volume': config.glusterfs_volume,
+            message = {'action': 'create_disk', 'glusterfs_volume': config.dfs_volume,
                        'image_path': disk.path, 'size': disk.size, 'uuid': disk.uuid}
 
             db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
@@ -129,7 +129,7 @@ def r_resize(uuid, size):
             config.id = 1
             config.get()
 
-            message['glusterfs_volume'] = config.glusterfs_volume
+            message['glusterfs_volume'] = config.dfs_volume
             message['image_path'] = disk.path
 
             db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
@@ -174,7 +174,7 @@ def r_delete(uuids):
             disk.get_by('uuid')
 
             message = {'action': 'delete_disk', 'uuid': disk.uuid,
-                       'glusterfs_volume': config.glusterfs_volume, 'image_path': disk.path}
+                       'glusterfs_volume': config.dfs_volume, 'image_path': disk.path}
             db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
 
         return ret

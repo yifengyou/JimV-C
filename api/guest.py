@@ -163,10 +163,12 @@ def r_create():
 
             create_vm_msg = {
                 'action': 'create',
+                'jimv_edition': config.jimv_edition,
+                'dfs': config.dfs,
+                'dfs_volume': config.dfs_volume,
                 'uuid': guest.uuid,
                 'hostname': lightest_host['hostname'],
                 'name': guest.label,
-                'glusterfs_volume': config.glusterfs_volume,
                 'template_path': os_template.path,
                 'disk': disk.__dict__,
                 'xml': guest_xml.get_domain(),
@@ -419,9 +421,19 @@ def r_delete(uuids):
             guest.uuid = uuid
             guest.get_by('uuid')
 
+        config = Config()
+        config.id = 1
+        config.get()
+
         # 执行删除操作
         for uuid in uuids.split(','):
-            message = {'action': 'delete_guest', 'uuid': uuid}
+            message = {
+                'action': 'delete_guest',
+                'uuid': uuid,
+                'jimv_edition': config.jimv_edition,
+                'dfs': config.dfs,
+                'dfs_volume': config.dfs_volume
+            }
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -484,18 +496,9 @@ def r_attach_disk(uuid, disk_uuid):
         config.id = 1
         config.get()
 
-        xml = """
-            <disk type='network' device='disk'>
-                <driver name='qemu' type='qcow2' cache='none'/>
-                <source protocol='gluster' name='{0}/Images/{1}.{2}'>
-                    <host name='127.0.0.1' port='24007'/>
-                </source>
-                <target dev='{3}' bus='virtio'/>
-            </disk>
-        """.format(config.glusterfs_volume, disk.uuid, disk.format,
-                   dev_table[disk.sequence])
+        guest_xml = GuestXML(guest=guest, disk=disk, config=config)
 
-        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': xml,
+        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': guest_xml.get_disk(),
                    'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence}}
         Guest.emit_instruction(message=json.dumps(message))
         disk.update()
@@ -542,18 +545,9 @@ def r_detach_disk(disk_uuid):
         config.id = 1
         config.get()
 
-        xml = """
-            <disk type='network' device='disk'>
-                <driver name='qemu' type='qcow2' cache='none'/>
-                <source protocol='gluster' name='{0}/Images/{1}.{2}'>
-                    <host name='127.0.0.1' port='24007'/>
-                </source>
-                <target dev='{3}' bus='virtio'/>
-            </disk>
-        """.format(config.glusterfs_volume, disk.uuid, disk.format,
-                   dev_table[disk.sequence])
+        guest_xml = GuestXML(guest=guest, disk=disk, config=config)
 
-        message = {'action': 'detach_disk', 'uuid': disk.guest_uuid, 'xml': xml,
+        message = {'action': 'detach_disk', 'uuid': disk.guest_uuid, 'xml': guest_xml.get_disk(),
                    'passback_parameters': {'disk_uuid': disk.uuid}}
         Guest.emit_instruction(message=json.dumps(message))
 
