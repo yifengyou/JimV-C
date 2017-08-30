@@ -31,7 +31,9 @@ def r_create():
     config = Config()
 
     args_rules = [
-        Rules.GLUSTERFS_VOLUME.value,
+        Rules.JIMV_EDITION.value,
+        Rules.DFS.value,
+        Rules.DFS_VOLUME.value,
         Rules.STORAGE_PATH.value,
         Rules.VM_NETWORK.value,
         Rules.VM_MANAGE_NETWORK.value,
@@ -41,13 +43,13 @@ def r_create():
         Rules.NETMASK.value,
         Rules.GATEWAY.value,
         Rules.DNS1.value,
-        Rules.DNS2.value,
-        Rules.RSA_PRIVATE.value,
-        Rules.RSA_PUBLIC.value
+        Rules.DNS2.value
     ]
 
     config.id = 1
-    config.glusterfs_volume = request.json.get('glusterfs_volume')
+    config.jimv_edition = request.json.get('jimv_edition')
+    config.dfs = request.json.get('dfs', 0)
+    config.dfs_volume = request.json.get('dfs_volume', '')
     config.storage_path = request.json.get('storage_path')
     config.vm_network = request.json.get('vm_network')
     config.vm_manage_network = request.json.get('vm_manage_network')
@@ -58,8 +60,6 @@ def r_create():
     config.gateway = request.json.get('gateway')
     config.dns1 = request.json.get('dns1')
     config.dns2 = request.json.get('dns2')
-    config.rsa_private = request.json.get('rsa_private')
-    config.rsa_public = request.json.get('rsa_public')
 
     try:
         ji.Check.previewing(args_rules, config.__dict__)
@@ -68,7 +68,6 @@ def r_create():
         config.generate_available_ip2set()
         config.generate_available_vnc_port()
         config.create()
-        g.config = None
 
         config.id = 1
         config.get()
@@ -88,9 +87,19 @@ def r_update():
     args_rules = [
     ]
 
-    if 'glusterfs_volume' in request.json:
+    if 'jimv_edition' in request.json:
         args_rules.append(
-            Rules.GLUSTERFS_VOLUME.value,
+            Rules.JIMV_EDITION.value,
+        )
+
+    if 'dfs' in request.json:
+        args_rules.append(
+            Rules.DFS.value,
+        )
+
+    if 'dfs_volume' in request.json:
+        args_rules.append(
+            Rules.DFS_VOLUME.value,
         )
 
     if 'storage_path' in request.json:
@@ -143,16 +152,6 @@ def r_update():
             Rules.DNS2.value,
         )
 
-    if 'rsa_private' in request.json:
-        args_rules.append(
-            Rules.RSA_PRIVATE.value,
-        )
-
-    if 'rsa_public' in request.json:
-        args_rules.append(
-            Rules.RSA_PUBLIC.value
-        )
-
     if args_rules.__len__() < 1:
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -163,7 +162,9 @@ def r_update():
         ji.Check.previewing(args_rules, request.json)
         config.get()
 
-        config.glusterfs_volume = request.json.get('glusterfs_volume', config.glusterfs_volume)
+        config.jimv_edition = request.json.get('jimv_edition', config.jimv_edition)
+        config.dfs = request.json.get('dfs', config.dfs)
+        config.dfs_volume = request.json.get('dfs_volume', config.dfs_volume)
         config.storage_path = request.json.get('storage_path', config.storage_path)
         config.vm_network = request.json.get('vm_network', config.vm_network)
         config.vm_manage_network = request.json.get('vm_manage_network', config.vm_manage_network)
@@ -174,8 +175,6 @@ def r_update():
         config.gateway = request.json.get('gateway', config.gateway)
         config.dns1 = request.json.get('dns1', config.dns1)
         config.dns2 = request.json.get('dns2', config.dns2)
-        config.rsa_private = request.json.get('rsa_private', config.rsa_private)
-        config.rsa_public = request.json.get('rsa_public', config.rsa_public)
 
         config.check_ip()
         config.generate_available_ip2set()
