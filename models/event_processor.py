@@ -164,9 +164,12 @@ class EventProcessor(object):
 
                 cls.guest.delete()
 
+                # TODO: 加入是否删除使用的数据磁盘开关，如果为True，则顺便删除使用的磁盘。否则解除该磁盘被使用的状态。
                 cls.disk.uuid = uuid
                 cls.disk.get_by('uuid')
                 cls.disk.delete()
+                cls.disk.update_by_filter({'guest_uuid': '', 'sequence': -1, 'state': DiskState.idle.value},
+                                          filter_str='guest_uuid:eq:' + cls.guest.uuid)
 
         elif action == 'create_disk':
             cls.disk.uuid = uuid

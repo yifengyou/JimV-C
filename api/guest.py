@@ -576,8 +576,13 @@ def r_migrate(uuids, destination_host):
             guest.uuid = uuid
             guest.get_by('uuid')
 
+        config = Config()
+        config.id = 1
+        config.get()
+
         for uuid in uuids.split(','):
-            message = {'action': 'migrate', 'uuid': uuid, 'duri': 'qemu+ssh://' + destination_host + '/system'}
+            message = {'action': 'migrate', 'jimv_edition': config.jimv_edition, 'uuid': uuid,
+                       'duri': 'qemu+ssh://' + destination_host + '/system'}
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
