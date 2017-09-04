@@ -137,13 +137,17 @@
             $('#edit_remark').val($(me.relatedTarget).prev().text());
         });
 
-        $('#mountable_guest').chosen({
-            "search_contains": true
-        });
-
         $('#mount_modal').on('show.bs.modal', function (me) {
+            var url = '/api/guests?page=1&page_size=10000';
+
+            // 单机版加入与磁盘同一宿主机的过滤
+            {% if show_on_host %}
+                var on_host = $(me.relatedTarget).parent().parent().parent().parent().prev().prev().prev().text();
+                url += '&filter=on_host:eq:' + on_host;
+            {% endif %}
+
             $.ajax({
-                url : '/api/guests?page=1&page_size=10000',
+                url : url,
                 type : 'GET',
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json',
@@ -151,15 +155,12 @@
                 },
                 success : function(data, textStatus, xhr) {
                     $('#mountable_guest').empty();
-                    $('#mountable_guest').append(
-                        $('<option>')
-                    );
                     $.each(data.data, function(k, v) {
                         $('#mountable_guest').append(
-                            $('<option>', {value: v['uuid'], text: v['label'] + '/' + v['remark']})
+                            $('<option>', {value: v['uuid'], text: v['label'], 'data-subtext': v['remark']})
                         );
                     });
-                    $('#mountable_guest').trigger("chosen:updated");
+                    $('#mountable_guest').selectpicker('refresh');
                 }
             });
         });
@@ -521,14 +522,13 @@
 </div>
 
 <div class="modal" id="mount_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">挂载至：</h4>
             </div>
             <div class="modal-body">
-                <select id="mountable_guest" name="mountable_host" title="可被挂载的 Guest" class="chosen-select" data-placeholder="挂载至 ...">
-                    <option></option>
+                <select class="selectpicker" data-show-subtext="true" id="mountable_guest" name="mountable_guest" title="挂载至 ...">
                 </select>
             </div>
             <div class="modal-footer">
