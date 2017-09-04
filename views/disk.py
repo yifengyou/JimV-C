@@ -158,11 +158,13 @@ def create():
         size = request.form.get('size')
         quantity = request.form.get('quantity')
         remark = request.form.get('remark')
+        on_host = request.form.get('on_host')
 
         payload = {
             "size": int(size),
             "quantity": int(quantity),
-            "remark": remark
+            "remark": remark,
+            "on_host": on_host
         }
 
         url = host_url + '/api/disk'
@@ -174,7 +176,15 @@ def create():
                                message='您所提交的资源正在创建中。根据所提交资源的数量，需要等待几到十几秒钟。页面将在10秒钟后自动跳转到实例列表页面！')
 
     else:
-        return render_template('disk_create.html')
+        config_url = host_url + url_for('api_config.r_get')
+        config_ret = requests.get(url=config_url)
+        config_ret = json.loads(config_ret.content)
+
+        show_on_host = False
+        if config_ret['data']['jimv_edition'] == JimVEdition.standalone.value:
+            show_on_host = True
+
+        return render_template('disk_create.html', show_on_host=show_on_host)
 
 
 def detail(uuid):
