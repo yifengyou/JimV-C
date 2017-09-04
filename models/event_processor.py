@@ -120,105 +120,108 @@ class EventProcessor(object):
 
     @classmethod
     def response_processor(cls):
+        _object = cls.message['message']['_object']
         action = cls.message['message']['action']
         uuid = cls.message['message']['uuid']
         state = cls.message['type']
         data = cls.message['message']['data']
         hostname = cls.message['host']
 
-        if action == 'create':
-            if state == ResponseState.success.value:
-                # 系统盘的 UUID 与其 Guest 的 UUID 相同
+        if _object == 'guest':
+            if action == 'create':
+                if state == ResponseState.success.value:
+                    # 系统盘的 UUID 与其 Guest 的 UUID 相同
+                    cls.disk.uuid = uuid
+                    cls.disk.get_by('uuid')
+                    cls.disk.guest_uuid = uuid
+                    cls.disk.state = DiskState.mounted.value
+                    # disk_info['virtual-size'] 的单位为Byte，需要除以 1024 的 3 次方，换算成单位为 GB 的值
+                    cls.disk.size = data['disk_info']['virtual-size'] / (1024 ** 3)
+                    cls.disk.update()
+
+                else:
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+                    cls.guest.status = GuestState.dirty.value
+                    cls.guest.update()
+
+            elif action == 'migrate':
+                pass
+
+            elif action == 'delete':
+                if state == ResponseState.success.value:
+                    cls.config.id = 1
+                    cls.config.get()
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+
+                    if IP(cls.config.start_ip).int() <= IP(cls.guest.ip).int() <= IP(cls.config.end_ip).int():
+                        if db.r.srem(app.config['ip_used_set'], cls.guest.ip):
+                            db.r.sadd(app.config['ip_available_set'], cls.guest.ip)
+
+                    if (cls.guest.vnc_port - cls.config.start_vnc_port) <= \
+                            (IP(cls.config.end_ip).int() - IP(cls.config.start_ip).int()):
+                        if db.r.srem(app.config['vnc_port_used_set'], cls.guest.vnc_port):
+                            db.r.sadd(app.config['vnc_port_available_set'], cls.guest.vnc_port)
+
+                    cls.guest.delete()
+
+                    # TODO: 加入是否删除使用的数据磁盘开关，如果为True，则顺便删除使用的磁盘。否则解除该磁盘被使用的状态。
+                    cls.disk.uuid = uuid
+                    cls.disk.get_by('uuid')
+                    cls.disk.delete()
+                    cls.disk.update_by_filter({'guest_uuid': '', 'sequence': -1, 'state': DiskState.idle.value},
+                                              filter_str='guest_uuid:eq:' + cls.guest.uuid)
+
+            elif action == 'attach_disk':
+                cls.disk.uuid = cls.message['message']['passback_parameters']['disk_uuid']
+                cls.disk.get_by('uuid')
+                if state == ResponseState.success.value:
+                    cls.disk.guest_uuid = uuid
+                    cls.disk.sequence = cls.message['message']['passback_parameters']['sequence']
+                    cls.disk.state = DiskState.mounted.value
+                    cls.disk.update()
+
+            elif action == 'detach_disk':
+                cls.disk.uuid = cls.message['message']['passback_parameters']['disk_uuid']
+                cls.disk.get_by('uuid')
+                if state == ResponseState.success.value:
+                    cls.disk.guest_uuid = ''
+                    cls.disk.sequence = -1
+                    cls.disk.state = DiskState.idle.value
+                    cls.disk.update()
+
+            elif action == 'boot':
+                boot_jobs_id = cls.message['message']['passback_parameters']['boot_jobs_id']
+
+                if state == ResponseState.success.value:
+                    cls.guest.uuid = uuid
+                    cls.guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id)
+
+        elif _object == 'disk':
+            if action == 'create':
                 cls.disk.uuid = uuid
                 cls.disk.get_by('uuid')
-                cls.disk.guest_uuid = uuid
-                cls.disk.state = DiskState.mounted.value
-                # disk_info['virtual-size'] 的单位为Byte，需要除以 1024 的 3 次方，换算成单位为 GB 的值
-                cls.disk.size = data['disk_info']['virtual-size'] / (1024 ** 3)
+                cls.disk.on_host = hostname
+                if state == ResponseState.success.value:
+                    cls.disk.state = DiskState.idle.value
+
+                else:
+                    cls.disk.state = DiskState.dirty.value
+
                 cls.disk.update()
 
-            else:
-                cls.guest.uuid = uuid
-                cls.guest.get_by('uuid')
-                cls.guest.status = GuestState.dirty.value
-                cls.guest.update()
+            elif action == 'resize':
+                if state == ResponseState.success.value:
+                    cls.disk.uuid = uuid
+                    cls.disk.get_by('uuid')
+                    cls.disk.size = cls.message['message']['passback_parameters']['size']
+                    cls.disk.update()
 
-        elif action == 'migrate':
-            pass
-
-        elif action == 'delete_guest':
-            if state == ResponseState.success.value:
-                cls.config.id = 1
-                cls.config.get()
-                cls.guest.uuid = uuid
-                cls.guest.get_by('uuid')
-
-                if IP(cls.config.start_ip).int() <= IP(cls.guest.ip).int() <= IP(cls.config.end_ip).int():
-                    if db.r.srem(app.config['ip_used_set'], cls.guest.ip):
-                        db.r.sadd(app.config['ip_available_set'], cls.guest.ip)
-
-                if (cls.guest.vnc_port - cls.config.start_vnc_port) <= \
-                        (IP(cls.config.end_ip).int() - IP(cls.config.start_ip).int()):
-                    if db.r.srem(app.config['vnc_port_used_set'], cls.guest.vnc_port):
-                        db.r.sadd(app.config['vnc_port_available_set'], cls.guest.vnc_port)
-
-                cls.guest.delete()
-
-                # TODO: 加入是否删除使用的数据磁盘开关，如果为True，则顺便删除使用的磁盘。否则解除该磁盘被使用的状态。
+            elif action == 'delete':
                 cls.disk.uuid = uuid
                 cls.disk.get_by('uuid')
                 cls.disk.delete()
-                cls.disk.update_by_filter({'guest_uuid': '', 'sequence': -1, 'state': DiskState.idle.value},
-                                          filter_str='guest_uuid:eq:' + cls.guest.uuid)
-
-        elif action == 'create_disk':
-            cls.disk.uuid = uuid
-            cls.disk.get_by('uuid')
-            cls.disk.on_host = hostname
-            if state == ResponseState.success.value:
-                cls.disk.state = DiskState.idle.value
-
-            else:
-                cls.disk.state = DiskState.dirty.value
-
-            cls.disk.update()
-
-        elif action == 'resize_disk':
-            if state == ResponseState.success.value:
-                cls.disk.uuid = uuid
-                cls.disk.get_by('uuid')
-                cls.disk.size = cls.message['message']['passback_parameters']['size']
-                cls.disk.update()
-
-        elif action == 'attach_disk':
-            cls.disk.uuid = cls.message['message']['passback_parameters']['disk_uuid']
-            cls.disk.get_by('uuid')
-            if state == ResponseState.success.value:
-                cls.disk.guest_uuid = uuid
-                cls.disk.sequence = cls.message['message']['passback_parameters']['sequence']
-                cls.disk.state = DiskState.mounted.value
-                cls.disk.update()
-
-        elif action == 'detach_disk':
-            cls.disk.uuid = cls.message['message']['passback_parameters']['disk_uuid']
-            cls.disk.get_by('uuid')
-            if state == ResponseState.success.value:
-                cls.disk.guest_uuid = ''
-                cls.disk.sequence = -1
-                cls.disk.state = DiskState.idle.value
-                cls.disk.update()
-
-        elif action == 'delete_disk':
-            cls.disk.uuid = uuid
-            cls.disk.get_by('uuid')
-            cls.disk.delete()
-
-        elif action == 'boot':
-            boot_jobs_id = cls.message['message']['passback_parameters']['boot_jobs_id']
-
-            if state == ResponseState.success.value:
-                cls.guest.uuid = uuid
-                cls.guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id)
 
         else:
             pass

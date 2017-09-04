@@ -89,7 +89,7 @@ def show():
     if page < int(ceil(page_length / 2.0)):
         for i in range(1, page_length + 1):
             pages.append(i)
-            if i == last_page:
+            if i == last_page or last_page == 0:
                 break
 
     elif last_page - page < page_length / 2:
@@ -101,7 +101,7 @@ def show():
     else:
         for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
             pages.append(i)
-            if i == last_page:
+            if i == last_page or last_page == 0:
                 break
 
     return render_template('os_templates_show.html', os_templates_ret=os_templates_ret,

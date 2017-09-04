@@ -57,6 +57,10 @@ own_state_branch = {
         'code': '41259',
         'zh-cn': u'Guest 暂时不可用'
     },
+    '41260': {
+        'code': '41260',
+        'zh-cn': u'Guest 与 磁盘不在同一宿主机上'
+    },
     '50050': {
         'code': '50050',
         'zh-cn': u'MySQL 链接或执行出错'

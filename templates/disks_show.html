@@ -381,7 +381,8 @@
                     <th>状态</th>
                     <th>大小</th>
                     <th>设备号</th>
-                    <th>所属 Guest</th>
+                    <th>所属虚拟机</th>
+                    <th style="{% if not show_on_host %}display: none;{% endif %}">所属宿主机</th>
                     <th>磁盘性别</th>
                     <th>创建时间</th>
                     <th>操作</th>
@@ -407,7 +408,9 @@
                     <td>{{ format_sequence_to_device_name(item.sequence) }}</td>
                     <td><a href="/guest/detail/{{ item.guest_uuid }}" {% if 'guest' not in item %}style="display: none"{% endif %}>{% if 'guest' in item %}
                         {{ item.guest.label }}/{{ item.guest.remark }}
-                    {% endif %}</a></td>
+                    {% endif %}</a>
+                    </td>
+                    <td style="{% if not show_on_host %}display: none;{% endif %}">{{ item.on_host }}</td>
                     <td>
                         {% if item.sequence == 0 %}
                             系统盘

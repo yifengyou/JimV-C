@@ -62,6 +62,7 @@ class Rules(Enum):
     DISK_UUID = (basestring, 'disk_uuid', (36, 36))
     DISK_SIZE = (int, 'size')
     DISK_SIZE_STR = (REG_NUMBER, 'size')
+    DISK_ON_HOST = (basestring, 'on_host', (1, 128))
 
     REMARK = (basestring, 'remark')
     USE_FOR = (int, 'use_for')

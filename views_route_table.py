@@ -3,7 +3,7 @@
 
 
 from models.utils import add_rule_views
-from views import guest, disk, log, os_template, boot_job, operate_rule, host, dashboard
+from views import guest, disk, log, os_template, boot_job, operate_rule, host, dashboard, config
 
 
 __author__ = 'James Iter'
@@ -11,6 +11,8 @@ __date__ = '2017/03/30'
 __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
+
+add_rule_views(config.blueprint, '/create', views_func='config.create', methods=['GET', 'POST'])
 
 add_rule_views(dashboard.blueprint, '', views_func='dashboard.show', methods=['GET'])
 

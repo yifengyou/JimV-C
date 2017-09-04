@@ -6,6 +6,7 @@ import json
 from flask import Blueprint, render_template, url_for, request
 import requests
 from math import ceil
+from models.status import JimVEdition
 
 
 __author__ = 'James Iter'
@@ -83,6 +84,9 @@ def show():
     host_url = request.host_url.rstrip('/')
 
     disks_url = host_url + url_for('api_disks.r_get_by_filter')
+
+    config_url = host_url + url_for('api_config.r_get')
+
     if keyword is not None:
         disks_url = host_url + url_for('api_disks.r_content_search')
         # 关键字检索，不支持显示域过滤
@@ -114,13 +118,20 @@ def show():
             if disk['guest_uuid'].__len__() == 36:
                 disks_ret['data'][i]['guest'] = guests_uuid_mapping[disk['guest_uuid']]
 
+    config_ret = requests.get(url=config_url)
+    config_ret = json.loads(config_ret.content)
+
+    show_on_host = False
+    if config_ret['data']['jimv_edition'] == JimVEdition.standalone.value:
+        show_on_host = True
+
     last_page = int(ceil(disks_ret['paging']['total'] / float(page_size)))
     page_length = 5
     pages = list()
     if page < int(ceil(page_length / 2.0)):
         for i in range(1, page_length + 1):
             pages.append(i)
-            if i == last_page:
+            if i == last_page or last_page == 0:
                 break
 
     elif last_page - page < page_length / 2:
@@ -132,12 +143,12 @@ def show():
     else:
         for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
             pages.append(i)
-            if i == last_page:
+            if i == last_page or last_page == 0:
                 break
 
     return render_template('disks_show.html', disks_ret=disks_ret, resource_path=resource_path, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
-                           last_page=last_page, show_area=show_area)
+                           last_page=last_page, show_area=show_area, config_ret=config_ret, show_on_host=show_on_host)
 
 
 def create():

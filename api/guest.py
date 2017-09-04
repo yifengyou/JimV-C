@@ -149,25 +149,14 @@ def r_create():
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
-            # 负载最小的宿主机
-            lightest_host = None
-            for k, v in db.r.hgetall(app.config['hosts_info']).items():
-                v = json.loads(v)
-
-                if lightest_host is None:
-                    lightest_host = v
-
-                if float(lightest_host['system_load'][0]) / lightest_host['cpu'] > \
-                        float(v['system_load'][0]) / v['cpu']:
-                    lightest_host = v
-
-            create_vm_msg = {
+            message = {
+                '_object': 'guest',
                 'action': 'create',
+                'uuid': guest.uuid,
                 'jimv_edition': config.jimv_edition,
                 'dfs': config.dfs,
                 'dfs_volume': config.dfs_volume,
-                'uuid': guest.uuid,
-                'hostname': lightest_host['hostname'],
+                'hostname': Guest.get_lightest_host()['hostname'],
                 'name': guest.label,
                 'template_path': os_template.path,
                 'disk': disk.__dict__,
@@ -176,7 +165,7 @@ def r_create():
                 'passback_parameters': {'boot_jobs_id': boot_jobs_id}
             }
 
-            Guest.emit_instruction(message=json.dumps(create_vm_msg, ensure_ascii=False))
+            Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
         return ret
 
@@ -200,7 +189,16 @@ def r_reboot(uuids):
             guest.get_by('uuid')
 
         for uuid in uuids.split(','):
-            message = {'action': 'reboot', 'uuid': uuid}
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'reboot',
+                'uuid': uuid,
+                'hostname': guest.on_host
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -227,7 +225,16 @@ def r_force_reboot(uuids):
             guest.get_by('uuid')
 
         for uuid in uuids.split(','):
-            message = {'action': 'force_reboot', 'uuid': uuid}
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'force_reboot',
+                'uuid': uuid,
+                'hostname': guest.on_host
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -254,7 +261,16 @@ def r_shutdown(uuids):
             guest.get_by('uuid')
 
         for uuid in uuids.split(','):
-            message = {'action': 'shutdown', 'uuid': uuid}
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'shutdown',
+                'uuid': uuid,
+                'hostname': guest.on_host
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -281,7 +297,16 @@ def r_force_shutdown(uuids):
             guest.get_by('uuid')
 
         for uuid in uuids.split(','):
-            message = {'action': 'force_shutdown', 'uuid': uuid}
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'force_shutdown',
+                'uuid': uuid,
+                'hostname': guest.on_host
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -313,6 +338,9 @@ def r_boot(uuids):
         config.get()
 
         for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
             _, boot_jobs_id = guest.get_boot_jobs()
 
             boot_jobs = list()
@@ -338,8 +366,15 @@ def r_boot(uuids):
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
-            message = {'action': 'boot', 'uuid': uuid, 'boot_jobs': boot_jobs,
-                       'passback_parameters': {'boot_jobs_id': boot_jobs_id}}
+            message = {
+                '_object': 'guest',
+                'action': 'boot',
+                'uuid': uuid,
+                'boot_jobs': boot_jobs,
+                'hostname': guest.on_host,
+                'passback_parameters': {'boot_jobs_id': boot_jobs_id}
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -366,7 +401,16 @@ def r_suspend(uuids):
             guest.get_by('uuid')
 
         for uuid in uuids.split(','):
-            message = {'action': 'suspend', 'uuid': uuid}
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'suspend',
+                'uuid': uuid,
+                'hostname': guest.on_host
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -393,7 +437,16 @@ def r_resume(uuids):
             guest.get_by('uuid')
 
         for uuid in uuids.split(','):
-            message = {'action': 'resume', 'uuid': uuid}
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'resume',
+                'uuid': uuid,
+                'hostname': guest.on_host
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -427,13 +480,19 @@ def r_delete(uuids):
 
         # 执行删除操作
         for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
             message = {
-                'action': 'delete_guest',
+                '_object': 'guest',
+                'action': 'delete',
                 'uuid': uuid,
                 'jimv_edition': config.jimv_edition,
                 'dfs': config.dfs,
-                'dfs_volume': config.dfs_volume
+                'dfs_volume': config.dfs_volume,
+                'hostname': guest.on_host
             }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()
@@ -463,6 +522,10 @@ def r_attach_disk(uuid, disk_uuid):
         disk.uuid = disk_uuid
         disk.get_by('uuid')
 
+        config = Config()
+        config.id = 1
+        config.get()
+
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
@@ -475,6 +538,12 @@ def r_attach_disk(uuid, disk_uuid):
         if guest.status in (status.GuestState.no_state.value, status.GuestState.dirty.value):
             ret['state'] = ji.Common.exchange_state(41259)
             return ret
+
+        # 判断 Guest 与 磁盘是否在同一宿主机上
+        if config.jimv_edition == status.JimVEdition.standalone.value:
+            if guest.on_host != disk.on_host:
+                ret['state'] = ji.Common.exchange_state(41260)
+                return ret
 
         # 通过检测未被使用的序列，来确定当前磁盘在目标 Guest 身上的序列
         disk.guest_uuid = guest.uuid
@@ -492,14 +561,17 @@ def r_attach_disk(uuid, disk_uuid):
 
         disk.state = DiskState.mounting.value
 
-        config = Config()
-        config.id = 1
-        config.get()
-
         guest_xml = GuestXML(guest=guest, disk=disk, config=config)
 
-        message = {'action': 'attach_disk', 'uuid': uuid, 'xml': guest_xml.get_disk(),
-                   'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence}}
+        message = {
+            '_object': 'guest',
+            'action': 'attach_disk',
+            'uuid': uuid,
+            'hostname': guest.on_host,
+            'xml': guest_xml.get_disk(),
+            'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence}
+        }
+
         Guest.emit_instruction(message=json.dumps(message))
         disk.update()
 
@@ -547,8 +619,15 @@ def r_detach_disk(disk_uuid):
 
         guest_xml = GuestXML(guest=guest, disk=disk, config=config)
 
-        message = {'action': 'detach_disk', 'uuid': disk.guest_uuid, 'xml': guest_xml.get_disk(),
-                   'passback_parameters': {'disk_uuid': disk.uuid}}
+        message = {
+            '_object': 'guest',
+            'action': 'detach_disk',
+            'uuid': disk.guest_uuid,
+            'hostname': guest.on_host,
+            'xml': guest_xml.get_disk(),
+            'passback_parameters': {'disk_uuid': disk.uuid}
+        }
+
         Guest.emit_instruction(message=json.dumps(message))
 
         disk.state = DiskState.unloading.value
@@ -581,8 +660,18 @@ def r_migrate(uuids, destination_host):
         config.get()
 
         for uuid in uuids.split(','):
-            message = {'action': 'migrate', 'jimv_edition': config.jimv_edition, 'uuid': uuid,
-                       'duri': 'qemu+ssh://' + destination_host + '/system'}
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'migrate',
+                'uuid': uuid,
+                'hostname': guest.on_host,
+                'jimv_edition': config.jimv_edition,
+                'duri': 'qemu+ssh://' + destination_host + '/system'
+            }
+
             Guest.emit_instruction(message=json.dumps(message))
 
         ret = dict()

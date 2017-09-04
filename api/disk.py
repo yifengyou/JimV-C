@@ -8,12 +8,12 @@ from uuid import uuid4
 import jimit as ji
 
 from models import Guest, DiskState
-from models.initialize import app, dev_table
-from models import Database as db
+from models.initialize import dev_table
 from models import Config
 from models import Disk
 from models import Rules
 from models import Utils
+from models.status import JimVEdition
 
 from base import Base
 
@@ -46,8 +46,16 @@ def r_create():
     args_rules = [
         Rules.DISK_SIZE.value,
         Rules.REMARK.value,
+        Rules.DISK_ON_HOST.value,
         Rules.QUANTITY.value
     ]
+
+    config = Config()
+    config.id = 1
+    config.get()
+
+    if config.jimv_edition == JimVEdition.hyper_convergence.value:
+        request.json['on_host'] = 'shared_storage'
 
     try:
         ji.Check.previewing(args_rules, request.json)
@@ -56,7 +64,8 @@ def r_create():
         ret['state'] = ji.Common.exchange_state(20000)
 
         size = request.json['size']
-        quantity = request.json.get('quantity')
+        quantity = request.json['quantity']
+        on_host = request.json['on_host']
 
         if size < 1:
             ret['state'] = ji.Common.exchange_state(41255)
@@ -69,19 +78,28 @@ def r_create():
             disk.size = size
             disk.uuid = uuid4().__str__()
             disk.remark = request.json.get('remark', '')
+            disk.on_host = on_host
             disk.sequence = -1
             disk.format = 'qcow2'
 
-            config = Config()
-            config.id = 1
-            config.get()
-
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
 
-            message = {'action': 'create_disk', 'glusterfs_volume': config.dfs_volume,
-                       'image_path': disk.path, 'size': disk.size, 'uuid': disk.uuid}
+            message = {
+                '_object': 'disk',
+                'action': 'create',
+                'uuid': disk.uuid,
+                'jimv_edition': config.jimv_edition,
+                'dfs': config.dfs,
+                'dfs_volume': config.dfs_volume,
+                'hostname': disk.on_host,
+                'image_path': disk.path,
+                'size': disk.size
+            }
 
-            db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
+            if disk.on_host == 'shared_storage':
+                message['hostname'] = Guest.get_lightest_host()['hostname']
+
+            Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
             disk.create()
 
@@ -106,11 +124,6 @@ def r_resize(uuid, size):
         disk.uuid = uuid
         disk.get_by('uuid')
 
-        used = True
-
-        if disk.guest_uuid.__len__() != 36:
-            used = False
-
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
@@ -118,21 +131,30 @@ def r_resize(uuid, size):
             ret['state'] = ji.Common.exchange_state(41257)
             return ret
 
-        message = {'action': 'resize_disk', 'size': int(size), 'guest_uuid': disk.guest_uuid,
-                   'disk_uuid': disk.uuid, 'passback_parameters': {'size': size}}
+        config = Config()
+        config.id = 1
+        config.get()
 
-        if used:
+        message = {
+            '_object': 'disk',
+            'action': 'resize',
+            'uuid': disk.uuid,
+            'guest_uuid': disk.guest_uuid,
+            'jimv_edition': config.jimv_edition,
+            'size': int(size),
+            'dfs_volume': config.dfs_volume,
+            'hostname': disk.on_host,
+            'image_path': disk.path,
+            'passback_parameters': {'size': size}
+        }
+
+        if disk.on_host == 'shared_storage':
+            message['hostname'] = Guest.get_lightest_host()['hostname']
+
+        if disk.guest_uuid.__len__() == 36:
             message['device_node'] = dev_table[disk.sequence]
-            Guest.emit_instruction(message=json.dumps(message))
-        else:
-            config = Config()
-            config.id = 1
-            config.get()
 
-            message['glusterfs_volume'] = config.dfs_volume
-            message['image_path'] = disk.path
-
-            db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
+        Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
         return ret
 
@@ -173,9 +195,20 @@ def r_delete(uuids):
             disk.uuid = uuid
             disk.get_by('uuid')
 
-            message = {'action': 'delete_disk', 'uuid': disk.uuid,
-                       'glusterfs_volume': config.dfs_volume, 'image_path': disk.path}
-            db.r.rpush(app.config['downstream_queue'], json.dumps(message, ensure_ascii=False))
+            message = {
+                '_object': 'disk',
+                'action': 'delete',
+                'uuid': disk.uuid,
+                'jimv_edition': config.jimv_edition,
+                'dfs_volume': config.dfs_volume,
+                'hostname': disk.on_host,
+                'image_path': disk.path
+            }
+
+            if disk.on_host == 'shared_storage':
+                message['hostname'] = Guest.get_lightest_host()['hostname']
+
+            Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
         return ret
 

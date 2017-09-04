@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+
+        .btn-ability {
+            margin-right: 16px;
+            height: 50px;
+            padding: 8px 50px;
+            margin-bottom: 30px;
+        }
+
+        .btn-ability-line {
+        }
+
+    </style>
+{% endblock head %}
+{% block body %}
+<script>
+    $(document).ready(function() {
+        $('#os_template').chosen({
+            "disable_search": true
+        });
+
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+    });
+
+    $(function() { "use strict";
+        $(".chosen-select").chosen();
+        $(".chosen-search").append('<i class="glyph-icon icon-search"></i>');
+        $(".chosen-single div").html('<i class="glyph-icon icon-caret-down"></i>');
+    });
+
+    $(function() { "use strict";
+        $("#quantity").TouchSpin({
+            max: 20,
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+</script>
+<div class="container" style="padding-top: 100px;">
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero" style="text-transform: unset;">
+                初始化 JimV
+            </h3>
+            <div class="example-box-wrapper">
+                <form class="form-horizontal bordered-row" action="/config/create" method="post">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">网桥(业务网络)</label>
+                        <div class="col-sm-3">
+                            <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" value="net-br0">
+                        </div>
+                        <label class="col-sm-2 control-label">网桥(管理网络)</label>
+                        <div class="col-sm-3">
+                            <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" value="net-br0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">起始 IP</label>
+                        <div class="col-sm-3">
+                            <input title="起始 IP" class="form-control" name="start_ip" type="text" value="10.10.0.1">
+                        </div>
+                        <label class="col-sm-2 control-label">截止 IP</label>
+                        <div class="col-sm-3">
+                            <input title="截止 IP" class="form-control" name="end_ip" type="text" value="10.10.15.253">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">子网掩码</label>
+                        <div class="col-sm-3">
+                            <input title="子网掩码" class="form-control" name="netmask" type="text" value="255.255.240.0">
+                        </div>
+                        <label class="col-sm-2 control-label">网关</label>
+                        <div class="col-sm-3">
+                            <input title="网关" class="form-control" name="gateway" type="text" value="10.10.15.254">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">DNS1</label>
+                        <div class="col-sm-3">
+                            <input title="DNS1" class="form-control" name="dns1" type="text" value="223.5.5.5">
+                        </div>
+                        <label class="col-sm-2 control-label">DNS2</label>
+                        <div class="col-sm-3">
+                            <input title="DNS2" class="form-control" name="dns2" type="text" value="8.8.8.8">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">起始 VNC 端口</label>
+                        <div class="col-sm-3">
+                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" value="15900">
+                        </div>
+                        <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
+                        <div class="col-sm-3">
+                            <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="Images">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-3 pull-right">
+                            <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
