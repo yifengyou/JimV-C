@@ -153,8 +153,7 @@ def r_create():
                 '_object': 'guest',
                 'action': 'create',
                 'uuid': guest.uuid,
-                'jimv_edition': config.jimv_edition,
-                'dfs': config.dfs,
+                'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
                 'hostname': Guest.get_lightest_host()['hostname'],
                 'name': guest.label,
@@ -487,8 +486,7 @@ def r_delete(uuids):
                 '_object': 'guest',
                 'action': 'delete',
                 'uuid': uuid,
-                'jimv_edition': config.jimv_edition,
-                'dfs': config.dfs,
+                'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
                 'hostname': guest.on_host
             }
@@ -540,7 +538,7 @@ def r_attach_disk(uuid, disk_uuid):
             return ret
 
         # 判断 Guest 与 磁盘是否在同一宿主机上
-        if config.jimv_edition == status.JimVEdition.standalone.value:
+        if config.storage_mode in [status.StorageMode.local.value, status.StorageMode.shared_mount.value]:
             if guest.on_host != disk.on_host:
                 ret['state'] = ji.Common.exchange_state(41260)
                 return ret
@@ -668,7 +666,7 @@ def r_migrate(uuids, destination_host):
                 'action': 'migrate',
                 'uuid': uuid,
                 'hostname': guest.on_host,
-                'jimv_edition': config.jimv_edition,
+                'storage_mode': config.storage_mode,
                 'duri': 'qemu+ssh://' + destination_host + '/system'
             }
 

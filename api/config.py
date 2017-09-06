@@ -28,11 +28,9 @@ blueprint = Blueprint(
 @Utils.dumps2response
 def r_create():
 
-    config = Config()
-
     args_rules = [
         Rules.JIMV_EDITION.value,
-        Rules.DFS.value,
+        Rules.STORAGE_MODE.value,
         Rules.DFS_VOLUME.value,
         Rules.STORAGE_PATH.value,
         Rules.VM_NETWORK.value,
@@ -46,9 +44,10 @@ def r_create():
         Rules.DNS2.value
     ]
 
+    config = Config()
     config.id = 1
-    config.jimv_edition = request.json.get('jimv_edition')
-    config.dfs = request.json.get('dfs', 0)
+    config.jimv_edition = request.json.get('jimv_edition', 0)
+    config.storage_mode = request.json.get('storage_mode', 0)
     config.dfs_volume = request.json.get('dfs_volume', '')
     config.storage_path = request.json.get('storage_path')
     config.vm_network = request.json.get('vm_network')
@@ -94,7 +93,7 @@ def r_update():
 
     if 'dfs' in request.json:
         args_rules.append(
-            Rules.DFS.value,
+            Rules.STORAGE_MODE.value,
         )
 
     if 'dfs_volume' in request.json:
@@ -163,7 +162,7 @@ def r_update():
         config.get()
 
         config.jimv_edition = request.json.get('jimv_edition', config.jimv_edition)
-        config.dfs = request.json.get('dfs', config.dfs)
+        config.storage_mode = request.json.get('dfs', config.storage_mode)
         config.dfs_volume = request.json.get('dfs_volume', config.dfs_volume)
         config.storage_path = request.json.get('storage_path', config.storage_path)
         config.vm_network = request.json.get('vm_network', config.vm_network)

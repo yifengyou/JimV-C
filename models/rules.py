@@ -32,7 +32,7 @@ class Rules(Enum):
 
     CONFIG_ID = (int, 'id')
     JIMV_EDITION = (int, 'jimv_edition')
-    DFS = (int, 'dfs')
+    STORAGE_MODE = (int, 'storage_mode')
     DFS_VOLUME = (basestring, 'dfs_volume')
     STORAGE_PATH = (basestring, 'storage_path')
     VM_NETWORK = (basestring, 'vm_network')

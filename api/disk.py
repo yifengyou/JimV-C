@@ -13,7 +13,7 @@ from models import Config
 from models import Disk
 from models import Rules
 from models import Utils
-from models.status import JimVEdition
+from models.status import StorageMode
 
 from base import Base
 
@@ -54,7 +54,8 @@ def r_create():
     config.id = 1
     config.get()
 
-    if config.jimv_edition == JimVEdition.hyper_convergence.value:
+    if config.storage_mode in [StorageMode.shared_mount.value, StorageMode.ceph.value,
+                               StorageMode.glusterfs.value]:
         request.json['on_host'] = 'shared_storage'
 
     try:
@@ -88,8 +89,7 @@ def r_create():
                 '_object': 'disk',
                 'action': 'create',
                 'uuid': disk.uuid,
-                'jimv_edition': config.jimv_edition,
-                'dfs': config.dfs,
+                'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
                 'hostname': disk.on_host,
                 'image_path': disk.path,
@@ -140,7 +140,7 @@ def r_resize(uuid, size):
             'action': 'resize',
             'uuid': disk.uuid,
             'guest_uuid': disk.guest_uuid,
-            'jimv_edition': config.jimv_edition,
+            'storage_mode': config.storage_mode,
             'size': int(size),
             'dfs_volume': config.dfs_volume,
             'hostname': disk.on_host,
@@ -199,7 +199,7 @@ def r_delete(uuids):
                 '_object': 'disk',
                 'action': 'delete',
                 'uuid': disk.uuid,
-                'jimv_edition': config.jimv_edition,
+                'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
                 'hostname': disk.on_host,
                 'image_path': disk.path

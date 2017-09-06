@@ -29,31 +29,11 @@
 {% block body %}
 <script>
     $(document).ready(function() {
-        $('#os_template').chosen({
-            "disable_search": true
-        });
-
         $('body').addClass('add-transition');
         $('.add-page-transition').on('click', function(){
             var transAttr = $(this).attr('data-transition');
             $('.add-transition').attr('class', 'add-transition');
             $('.add-transition').addClass(transAttr);
-        });
-    });
-
-    $(function() { "use strict";
-        $(".chosen-select").chosen();
-        $(".chosen-search").append('<i class="glyph-icon icon-search"></i>');
-        $(".chosen-single div").html('<i class="glyph-icon icon-caret-down"></i>');
-    });
-
-    $(function() { "use strict";
-        $("#quantity").TouchSpin({
-            max: 20,
-            min: 1,
-            verticalbuttons: true,
-            verticalupclass: 'glyph-icon icon-plus',
-            verticaldownclass: 'glyph-icon icon-minus'
         });
     });
 </script>
@@ -110,9 +90,28 @@
                         <div class="col-sm-3">
                             <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" value="15900">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">存储模式</label>
+                        <div class="col-sm-3">
+                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" value="15900">
+                        </div>
                         <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
                         <div class="col-sm-3">
                             <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="Images">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">分布式文件系统</label>
+                        <div class="col-sm-3">
+                            <select title="分布式文件系统" class="selectpicker" name="dfs">
+                                <option value="0">Ceph</option>
+                                <option value="1">Glusterfs</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label">分布式文件系统存储卷</label>
+                        <div class="col-sm-3">
+                            <input title="分布式文件系统存储卷" class="form-control" name="dfs_volume" type="text">
                         </div>
                     </div>
                     <div class="form-group">

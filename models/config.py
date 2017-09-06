@@ -28,7 +28,7 @@ class Config(ORM):
         # 配置条目的 id 只会是 1
         self.id = 1
         self.jimv_edition = status.JimVEdition.standalone.value
-        self.dfs = status.DFS.ceph.value
+        self.storage_mode = status.StorageMode.local.value
         self.dfs_volume = ''
         self.storage_path = ''
         self.vm_network = ''

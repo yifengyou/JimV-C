@@ -93,7 +93,7 @@ class GuestXML(object):
 
         if self.config.jimv_edition == status.JimVEdition.hyper_convergence.value:
             dfs_protocol = 'ceph'
-            if self.config.dfs == status.DFS.glusterfs.value:
+            if self.config.storage_mode == status.StorageMode.glusterfs.value:
                 dfs_protocol = 'gluster'
 
             disk_xml = """
