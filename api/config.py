@@ -91,7 +91,7 @@ def r_update():
             Rules.JIMV_EDITION.value,
         )
 
-    if 'dfs' in request.json:
+    if 'storage_mode' in request.json:
         args_rules.append(
             Rules.STORAGE_MODE.value,
         )
@@ -162,7 +162,7 @@ def r_update():
         config.get()
 
         config.jimv_edition = request.json.get('jimv_edition', config.jimv_edition)
-        config.storage_mode = request.json.get('dfs', config.storage_mode)
+        config.storage_mode = request.json.get('storage_mode', config.storage_mode)
         config.dfs_volume = request.json.get('dfs_volume', config.dfs_volume)
         config.storage_path = request.json.get('storage_path', config.storage_path)
         config.vm_network = request.json.get('vm_network', config.vm_network)
