@@ -91,8 +91,18 @@ class GuestXML(object):
 
         from initialize import dev_table
 
-        if self.config.jimv_edition == status.JimVEdition.hyper_convergence.value:
+        if self.config.storage_mode in [status.StorageMode.local.value, status.StorageMode.shared_mount.value]:
+            disk_xml = """
+                <disk type='file' device='disk'>
+                    <driver name='qemu' type='{0}' cache='none'/>
+                    <source file='{1}'/>
+                    <target dev='{2}' bus='virtio'/>
+                </disk>
+            """.format(self.disk.format, self.disk.path, dev_table[self.disk.sequence])
+
+        elif self.config.storage_mode in [status.StorageMode.ceph.value, status.StorageMode.glusterfs.value]:
             dfs_protocol = 'ceph'
+
             if self.config.storage_mode == status.StorageMode.glusterfs.value:
                 dfs_protocol = 'gluster'
 
@@ -108,13 +118,7 @@ class GuestXML(object):
                        dev_table[self.disk.sequence])
 
         else:
-            disk_xml = """
-                <disk type='file' device='disk'>
-                    <driver name='qemu' type='{0}' cache='none'/>
-                    <source file='{1}'/>
-                    <target dev='{2}' bus='virtio'/>
-                </disk>
-            """.format(self.disk.format, self.disk.path, dev_table[self.disk.sequence])
+            disk_xml = ''
 
         return disk_xml
 

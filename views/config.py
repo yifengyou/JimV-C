@@ -107,7 +107,7 @@ def create():
 
     if request.method == 'POST':
         payload = {
-            'jimv_edition': request.form.get('jimv_edition', 0),
+            'jimv_edition': int(request.form.get('jimv_edition', 0)),
             'storage_mode': int(request.form.get('storage_mode')),
             'dfs_volume': request.form.get('dfs_volume'),
             'storage_path': request.form.get('storage_path'),
