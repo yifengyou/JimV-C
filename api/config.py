@@ -46,15 +46,15 @@ def r_create():
 
     config = Config()
     config.id = 1
-    config.jimv_edition = request.json.get('jimv_edition', 0)
-    config.storage_mode = request.json.get('storage_mode', 0)
+    config.jimv_edition = int(request.json.get('jimv_edition', 0))
+    config.storage_mode = int(request.json.get('storage_mode', 0))
     config.dfs_volume = request.json.get('dfs_volume', '')
     config.storage_path = request.json.get('storage_path')
     config.vm_network = request.json.get('vm_network')
     config.vm_manage_network = request.json.get('vm_manage_network')
     config.start_ip = request.json.get('start_ip')
     config.end_ip = request.json.get('end_ip')
-    config.start_vnc_port = request.json.get('start_vnc_port')
+    config.start_vnc_port = int(request.json.get('start_vnc_port'))
     config.netmask = request.json.get('netmask')
     config.gateway = request.json.get('gateway')
     config.dns1 = request.json.get('dns1')
@@ -63,6 +63,13 @@ def r_create():
     try:
         ji.Check.previewing(args_rules, config.__dict__)
 
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        if config.exist():
+            ret['state'] = ji.Common.exchange_state(40901)
+            return ret
+
         config.check_ip()
         config.generate_available_ip2set()
         config.generate_available_vnc_port()
@@ -70,8 +77,6 @@ def r_create():
 
         config.id = 1
         config.get()
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = config.__dict__
         return ret
     except ji.PreviewingError, e:

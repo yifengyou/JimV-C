@@ -107,15 +107,15 @@ def create():
 
     if request.method == 'POST':
         payload = {
-            'jimv_edition': request.form.get('jimv_edition'),
-            'storage_mode': request.form.get('storage_mode'),
+            'jimv_edition': request.form.get('jimv_edition', 0),
+            'storage_mode': int(request.form.get('storage_mode')),
             'dfs_volume': request.form.get('dfs_volume'),
             'storage_path': request.form.get('storage_path'),
             'vm_network': request.form.get('vm_network'),
             'vm_manage_network': request.form.get('vm_manage_network'),
             'start_ip': request.form.get('start_ip'),
             'end_ip': request.form.get('end_ip'),
-            'start_vnc_port': request.form.get('start_vnc_port'),
+            'start_vnc_port': int(request.form.get('start_vnc_port')),
             'netmask': request.form.get('netmask'),
             'gateway': request.form.get('gateway'),
             'dns1': request.form.get('dns1'),

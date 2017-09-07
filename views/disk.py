@@ -6,7 +6,7 @@ import json
 from flask import Blueprint, render_template, url_for, request
 import requests
 from math import ceil
-from models.status import JimVEdition
+from models.status import StorageMode
 
 
 __author__ = 'James Iter'
@@ -122,7 +122,7 @@ def show():
     config_ret = json.loads(config_ret.content)
 
     show_on_host = False
-    if config_ret['data']['jimv_edition'] == JimVEdition.standalone.value:
+    if config_ret['data']['storage_mode'] == StorageMode.local.value:
         show_on_host = True
 
     last_page = int(ceil(disks_ret['paging']['total'] / float(page_size)))
@@ -181,7 +181,7 @@ def create():
         config_ret = json.loads(config_ret.content)
 
         show_on_host = False
-        if config_ret['data']['jimv_edition'] == JimVEdition.standalone.value:
+        if config_ret['data']['storage_mode'] == StorageMode.local.value:
             show_on_host = True
 
         return render_template('disk_create.html', show_on_host=show_on_host)

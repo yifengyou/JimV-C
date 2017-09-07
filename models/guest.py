@@ -151,7 +151,7 @@ class Disk(ORM):
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['on_host']
+        return ['on_host', 'sequence', 'state', 'guest_uuid']
 
     @staticmethod
     def get_allow_content_search_keywords():
