@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+    </style>
+{% endblock head %}
+{% block content %}
+    <script>
+        $(document).ready(function() {
+            $('body').addClass('add-transition');
+            $('.add-page-transition').on('click', function(){
+                var transAttr = $(this).attr('data-transition');
+                $('.add-transition').attr('class', 'add-transition');
+                $('.add-transition').addClass(transAttr);
+            });
+
+            $('#storage_mode').on('changed.bs.select', function (me) {
+                if ($('#storage_mode').val() == '2' || $('#storage_mode').val() == '3') {
+                    $('#dfs_volume_label').css('display', 'unset');
+                    $('#dfs_volume').css('display', 'unset');
+                } else {
+                    $('#dfs_volume_label').css('display', 'none');
+                    $('#dfs_volume').css('display', 'none');
+                }
+            });
+        });
+    </script>
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero" style="text-transform: unset;">
+                JimV系统配置
+            </h3>
+            <div class="example-box-wrapper">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">网桥(业务网络)</label>
+                        <div class="col-sm-3">
+                            <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" disabled value="{{ config_ret.data.vm_network }}">
+                        </div>
+                        <label class="col-sm-2 control-label">网桥(管理网络)</label>
+                        <div class="col-sm-3">
+                            <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" disabled value="{{ config_ret.data.vm_manage_network }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">起始 IP</label>
+                        <div class="col-sm-3">
+                            <input title="起始 IP" class="form-control" name="start_ip" type="text" disabled value="{{ config_ret.data.start_ip }}">
+                        </div>
+                        <label class="col-sm-2 control-label">截止 IP</label>
+                        <div class="col-sm-3">
+                            <input title="截止 IP" class="form-control" name="end_ip" type="text" disabled value="{{ config_ret.data.end_ip }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">子网掩码</label>
+                        <div class="col-sm-3">
+                            <input title="子网掩码" class="form-control" name="netmask" type="text" disabled value="{{ config_ret.data.netmask }}">
+                        </div>
+                        <label class="col-sm-2 control-label">网关</label>
+                        <div class="col-sm-3">
+                            <input title="网关" class="form-control" name="gateway" type="text" disabled value="{{ config_ret.data.gateway }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">DNS1</label>
+                        <div class="col-sm-3">
+                            <input title="DNS1" class="form-control" name="dns1" type="text" disabled value="{{ config_ret.data.dns1 }}">
+                        </div>
+                        <label class="col-sm-2 control-label">DNS2</label>
+                        <div class="col-sm-3">
+                            <input title="DNS2" class="form-control" name="dns2" type="text" disabled value="{{ config_ret.data.dns2 }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">起始 VNC 端口</label>
+                        <div class="col-sm-3">
+                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" disabled value="{{ config_ret.data.start_vnc_port }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">虚拟机磁盘存储模式</label>
+                        <div class="col-sm-3">
+                            <select id="storage_mode" title="虚拟机磁盘存储模式" class="selectpicker" name="storage_mode" data-width="100%" disabled>
+                                <option {% if config_ret.data.storage_mode == 0 %}selected{% endif %} value="0">本地存储</option>
+                                <option {% if config_ret.data.storage_mode == 1 %}selected{% endif %} value="1" data-subtext="NFS">挂载共享</option>
+                                <option {% if config_ret.data.storage_mode == 2 %}selected{% endif %} value="2">Ceph</option>
+                                <option {% if config_ret.data.storage_mode == 3 %}selected{% endif %} value="3">GlusterFS</option>
+                            </select>
+                        </div>
+                        <label id="dfs_volume_label" class="col-sm-2 control-label" style="display: {% if config_ret.data.storage_mode in [3] %}unset{% else %}none{% endif %};">分布式文件系统存储卷</label>
+                        <div class="col-sm-3">
+                            <input id="dfs_volume" title="分布式文件系统存储卷" class="form-control" name="dfs_volume" type="text" style="display: {% if config_ret.data.storage_mode in [3] %}unset{% else %}none{% endif %};" disabled value="{{ config_ret.data.dfs_volume }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
+                        <div class="col-sm-3">
+                            <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" disabled value="{{ config_ret.data.storage_path }}">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
