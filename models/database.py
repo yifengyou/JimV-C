@@ -35,7 +35,7 @@ class Database(object):
                 password=app.config["db_password"],
                 port=app.config["db_port"],
                 database=app.config["db_name"],
-                raise_on_warnings=app.config["debug"],
+                raise_on_warnings=app.config["DEBUG"],
                 pool_size=app.config["db_pool_size"],
                 charset=app.config["db_charset"]
             )

@@ -11,7 +11,7 @@ import json
 
 import os
 import threading
-from flask import g
+from flask import g, request, redirect, url_for, Response
 
 from models import Utils
 from models.event_processor import EventProcessor
@@ -19,6 +19,7 @@ from models.initialize import app, logger, q_ws, Init
 import api_route_table
 import views_route_table
 from models import Database as db
+from models import Config
 from api.boot_job import blueprint as boot_job_blueprint
 from api.boot_job import blueprints as boot_job_blueprints
 from api.operate_rule import blueprint as operate_rule_blueprint
@@ -39,6 +40,7 @@ from api.performance import blueprints as performance_blueprints
 from api.host_performance import blueprint as host_performance_blueprint
 from api.host_performance import blueprints as host_performance_blueprints
 
+from views.error_pages import *
 from views.config import blueprint as view_config_blueprint
 from views.dashboard import blueprint as view_dashboard_blueprint
 from views.guest import blueprint as view_guest_blueprint
@@ -87,14 +89,35 @@ def ws_engine_for_vnc():
         q_ws.task_done()
 
 
+def is_not_need_to_auth(endpoint):
+    not_auth_table = [
+        'api_config.r_get',
+        'api_config.r_create',
+        'v_config.create'
+    ]
+
+    if endpoint in not_auth_table:
+        return True
+
+    return False
+
+
 @app.before_request
 @Utils.dumps2response
 def r_before_request():
     try:
         g.ts = ji.Common.ts()
+        if not is_not_need_to_auth(request.endpoint) and request.blueprint is not None and request.method != 'OPTIONS':
+            g.config = Config()
+            g.config.id = 1
+            g.config.get()
 
     except ji.JITError, e:
         ret = json.loads(e.message)
+
+        if ret['state']['code'] == '404':
+            return redirect(location=url_for('v_config.create'), Response=Response)
+
         return ret
 
 
@@ -167,7 +190,7 @@ if __name__ == '__main__':
             for t in threads:
                 t.start()
 
-            app.run(host=app.config['jimv_listen'], port=app.config['jimv_port'], use_reloader=False, threaded=True)
+            app.run(host=app.config['listen'], port=app.config['port'], use_reloader=False, threaded=True)
 
             while True:
                 if Utils.exit_flag:

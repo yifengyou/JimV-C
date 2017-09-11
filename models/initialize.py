@@ -33,7 +33,31 @@ app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 class Init(object):
     config = {
-        'config_file': '/etc/jimvc.conf'
+        'config_file': '/etc/jimvc.conf',
+        'log_cycle': 'D',
+        'instruction_channel': 'C:Instruction',
+        'ip_available_set': 'S:IP:Available',
+        'ip_used_set': 'S:IP:Used',
+        'vnc_port_available_set': 'S:VNCPort:Available',
+        'vnc_port_used_set': 'S:VNCPort:Used',
+        'downstream_queue': 'Q:Downstream',
+        'upstream_queue': 'Q:Upstream',
+        'hosts_info': 'H:HostsInfo',
+        'guest_boot_jobs': 'S:GuestBootJobs',
+        'guest_boot_jobs_wait_time': 600,
+        'db_charset': 'utf8',
+        'db_pool_size': 10,
+        'DEBUG': False,
+        'jwt_algorithm': 'HS512',
+        'token_ttl': 604800,
+        'SESSION_TYPE': 'filesystem',
+        'SESSION_PERMANENT': True,
+        'SESSION_USE_SIGNER': True,
+        'SESSION_FILE_DIR': '/tmp/jimv',
+        'SESSION_FILE_THRESHOLD': 5000,
+        'SESSION_COOKIE_NAME': 'sid',
+        'SESSION_COOKIE_SECURE': False,
+        'PERMANENT_SESSION_LIFETIME': 604800
     }
 
     @classmethod
@@ -70,23 +94,19 @@ class Init(object):
 
     @classmethod
     def init_logger(cls):
-        cls.config['log_file_base'] = '/'.join([sys.path[0], cls.config['log_file_dir'], 'log'])
-        log_dir = os.path.dirname(cls.config['log_file_base'])
+        log_dir = os.path.dirname(cls.config['log_file_path'])
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir, 0755)
 
-        process_title = 'JimV-C'
-        log_file_path = '.'.join([cls.config['log_file_base'], process_title])
-        _logger = logging.getLogger(log_file_path)
+        _logger = logging.getLogger(cls.config['log_file_path'])
 
-        if cls.config['debug']:
-            cls.config['DEBUG'] = True
+        if cls.config['DEBUG']:
             _logger.setLevel(logging.DEBUG)
         else:
-            cls.config['DEBUG'] = False
             _logger.setLevel(logging.INFO)
 
-        fh = TimedRotatingFileHandler(log_file_path, when=cls.config['log_cycle'], interval=1, backupCount=7)
+        fh = TimedRotatingFileHandler(cls.config['log_file_path'], when=cls.config['log_cycle'],
+                                      interval=1, backupCount=7)
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s - %(lineno)s - %(message)s')
         fh.setFormatter(formatter)

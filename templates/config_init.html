@@ -13,6 +13,10 @@
         .form-control {
             border-radius: 0;
         }
+
+        .form-horizontal > .form-group {
+            margin: 0;
+        }
     </style>
 {% endblock head %}
 {% block body %}
@@ -36,90 +40,90 @@
         });
     });
 </script>
-<div class="container" style="padding-top: 100px;">
-    <div class="panel">
-        <div class="panel-body">
-            <h3 class="title-hero" style="text-transform: unset;">
-                初始化 JimV
-            </h3>
-            <div class="example-box-wrapper">
-                <form class="form-horizontal bordered-row" action="/config/create" method="post">
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">网桥(业务网络)</label>
-                        <div class="col-sm-3">
-                            <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" value="net-br0">
+    <div class="container" style="padding-top: 100px;">
+        <div class="panel">
+            <div class="panel-body">
+                <h3 class="title-hero" style="text-transform: unset;">
+                    初始化 JimV
+                </h3>
+                <div class="example-box-wrapper">
+                    <form class="form-horizontal bordered-row" action="/config/create" method="post">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">网桥(业务网络)</label>
+                            <div class="col-sm-3">
+                                <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" value="net-br0">
+                            </div>
+                            <label class="col-sm-2 control-label">网桥(管理网络)</label>
+                            <div class="col-sm-3">
+                                <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" value="net-br0">
+                            </div>
                         </div>
-                        <label class="col-sm-2 control-label">网桥(管理网络)</label>
-                        <div class="col-sm-3">
-                            <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" value="net-br0">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">起始 IP</label>
+                            <div class="col-sm-3">
+                                <input title="起始 IP" class="form-control" name="start_ip" type="text" value="10.10.0.1">
+                            </div>
+                            <label class="col-sm-2 control-label">截止 IP</label>
+                            <div class="col-sm-3">
+                                <input title="截止 IP" class="form-control" name="end_ip" type="text" value="10.10.15.253">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">起始 IP</label>
-                        <div class="col-sm-3">
-                            <input title="起始 IP" class="form-control" name="start_ip" type="text" value="10.10.0.1">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">子网掩码</label>
+                            <div class="col-sm-3">
+                                <input title="子网掩码" class="form-control" name="netmask" type="text" value="255.255.240.0">
+                            </div>
+                            <label class="col-sm-2 control-label">网关</label>
+                            <div class="col-sm-3">
+                                <input title="网关" class="form-control" name="gateway" type="text" value="10.10.15.254">
+                            </div>
                         </div>
-                        <label class="col-sm-2 control-label">截止 IP</label>
-                        <div class="col-sm-3">
-                            <input title="截止 IP" class="form-control" name="end_ip" type="text" value="10.10.15.253">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">DNS1</label>
+                            <div class="col-sm-3">
+                                <input title="DNS1" class="form-control" name="dns1" type="text" value="223.5.5.5">
+                            </div>
+                            <label class="col-sm-2 control-label">DNS2</label>
+                            <div class="col-sm-3">
+                                <input title="DNS2" class="form-control" name="dns2" type="text" value="8.8.8.8">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">子网掩码</label>
-                        <div class="col-sm-3">
-                            <input title="子网掩码" class="form-control" name="netmask" type="text" value="255.255.240.0">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">起始 VNC 端口</label>
+                            <div class="col-sm-3">
+                                <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" value="15900">
+                            </div>
                         </div>
-                        <label class="col-sm-2 control-label">网关</label>
-                        <div class="col-sm-3">
-                            <input title="网关" class="form-control" name="gateway" type="text" value="10.10.15.254">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">虚拟机磁盘存储模式</label>
+                            <div class="col-sm-3">
+                                <select id="storage_mode" title="虚拟机磁盘存储模式" class="selectpicker" name="storage_mode" data-width="100%">
+                                    <option value="0">本地存储</option>
+                                    <option value="1" data-subtext="NFS">挂载共享</option>
+                                    <option value="2">Ceph</option>
+                                    <option value="3">Glusterfs</option>
+                                </select>
+                            </div>
+                            <label id="dfs_volume_label" class="col-sm-2 control-label" style="display: none;">分布式文件系统存储卷</label>
+                            <div class="col-sm-3">
+                                <input id="dfs_volume" title="分布式文件系统存储卷" class="form-control" name="dfs_volume" type="text" style="display: none;">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">DNS1</label>
-                        <div class="col-sm-3">
-                            <input title="DNS1" class="form-control" name="dns1" type="text" value="223.5.5.5">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
+                            <div class="col-sm-3">
+                                <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="/Images">
+                            </div>
                         </div>
-                        <label class="col-sm-2 control-label">DNS2</label>
-                        <div class="col-sm-3">
-                            <input title="DNS2" class="form-control" name="dns2" type="text" value="8.8.8.8">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-3 pull-right">
+                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">初始化</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">起始 VNC 端口</label>
-                        <div class="col-sm-3">
-                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" value="15900">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">虚拟机磁盘存储模式</label>
-                        <div class="col-sm-3">
-                            <select id="storage_mode" title="虚拟机磁盘存储模式" class="selectpicker" name="storage_mode" data-width="100%">
-                                <option value="0">本地存储</option>
-                                <option value="1" data-subtext="NFS">挂载共享</option>
-                                <option value="2">Ceph</option>
-                                <option value="3">Glusterfs</option>
-                            </select>
-                        </div>
-                        <label id="dfs_volume_label" class="col-sm-2 control-label" style="display: none;">分布式文件系统存储卷</label>
-                        <div class="col-sm-3">
-                            <input id="dfs_volume" title="分布式文件系统存储卷" class="form-control" name="dfs_volume" type="text" style="display: none;">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
-                        <div class="col-sm-3">
-                            <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="/Images">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label"></label>
-                        <div class="col-sm-3 pull-right">
-                            <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">初始化</button>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock body %}

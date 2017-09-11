@@ -3,7 +3,7 @@
 
 
 import json
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, abort
 import requests
 
 
@@ -28,7 +28,7 @@ def show():
 
     # 检测 JimV 的配置是否已被初始化，只有未被初始化时，才展现初始化配置页面
     if config_ret['state']['code'] == '404':
-        return render_template('404.html'), 404
+        abort(404)
 
     return render_template('config_show.html', config_ret=config_ret)
 
@@ -70,5 +70,5 @@ def create():
         if config_ret['state']['code'] == '404':
             return render_template('config_init.html')
         else:
-            return render_template('404.html'), 404
+            abort(404)
 
