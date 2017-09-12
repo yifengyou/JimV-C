@@ -13,6 +13,7 @@ import re
 import getopt
 import jimit as ji
 import time
+import errno
 
 from jimvc_exception import PathNotExist
 from state_code import own_state_branch
@@ -85,7 +86,7 @@ class Init(object):
                 print "unhandled option"
 
         if not os.path.isfile(cls.config['config_file']):
-            raise PathNotExist(u'配置文件不存在, 请配置 --> ', cls.config['config_file'])
+            raise PathNotExist(u'配置文件不存在, 请指明配置文件路径')
 
         with open(cls.config['config_file'], 'r') as f:
             cls.config.update(json.load(f))
@@ -96,7 +97,20 @@ class Init(object):
     def init_logger(cls):
         log_dir = os.path.dirname(cls.config['log_file_path'])
         if not os.path.isdir(log_dir):
-            os.makedirs(log_dir, 0755)
+            try:
+                os.makedirs(log_dir, 0755)
+            except OSError as e:
+                # 如果配置文件中的日志目录无写入权限，则调整日志路径到本项目目录下
+                if e.errno != errno.EACCES:
+                    raise
+
+                cls.config['log_file_path'] = './logs/jimvc.log'
+                log_dir = os.path.dirname(cls.config['log_file_path'])
+
+                if not os.path.isdir(log_dir):
+                    os.makedirs(log_dir, 0755)
+
+                print u'日志路径自动调整为 ' + cls.config['log_file_path']
 
         _logger = logging.getLogger(cls.config['log_file_path'])
 
