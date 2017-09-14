@@ -6,12 +6,14 @@ import traceback
 import signal
 
 import time
+from datetime import timedelta
 import jimit as ji
 import json
 
 import os
 import threading
-from flask import g, request, redirect, url_for, Response
+from flask import g, request, redirect, url_for, Response, session
+from flask.ext.session import Session
 
 from models import Utils
 from models.event_processor import EventProcessor
@@ -20,6 +22,7 @@ import api_route_table
 import views_route_table
 from models import Database as db
 from models import Config
+from models import User
 from api.boot_job import blueprint as boot_job_blueprint
 from api.boot_job import blueprints as boot_job_blueprints
 from api.operate_rule import blueprint as operate_rule_blueprint
@@ -68,6 +71,11 @@ __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
 
+# 替换为Flask-Session
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=app.config['PERMANENT_SESSION_LIFETIME'])
+Session(app)
+
+
 def instantiation_ws_vnc(listen_port, target_host, target_port):
     # 用于 Web noVNC 代理
     ws = WebSocketProxy(listen_host="0.0.0.0", listen_port=listen_port, target_host=target_host,
@@ -94,7 +102,8 @@ def is_not_need_to_auth(endpoint):
     not_auth_table = [
         'api_config.r_get',
         'api_config.r_create',
-        'v_config.create'
+        'v_config.create',
+        'api_user.r_sign_in'
     ]
 
     if endpoint in not_auth_table:
@@ -113,13 +122,66 @@ def r_before_request():
             g.config.id = 1
             g.config.get()
 
+            token = session.get('token', '')
+            g.token = Utils.verify_token(token)
+
+            user = User()
+            user.id = g.token['uid']
+
+            try:
+                user.get()
+            except ji.PreviewingError, e:
+                # 如果该用户获取失败，则清除该用户对应的session。因为该用户可能已经被删除。
+                for key in session.keys():
+                    session.pop(key=key)
+                return json.loads(e.message)
+
     except ji.JITError, e:
         ret = json.loads(e.message)
 
         if ret['state']['code'] == '404':
             return redirect(location=url_for('v_config.create'), Response=Response)
 
+        if ret['state']['sub']['code'] in ['41208']:
+            return redirect(location=url_for('v_misc.login'), Response=Response)
+
         return ret
+
+
+@app.after_request
+@Utils.dumps2response
+def r_after_request(response):
+    try:
+        # https://developer.mozilla.org/en/HTTP_access_control
+        # (中文版) https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS#Access-Control-Allow-Credentials
+        # http://www.w3.org/TR/cors/
+        # 由于浏览器同源策略，凡是发送请求url的协议、域名、端口三者之间任意一与当前页面地址不同即为跨域。
+
+        if request.referrer is None:
+            # 跑测试脚本时，用该规则。
+            response.headers['Access-Control-Allow-Origin'] = '*'
+        else:
+            # 生产环境中，如果前后端分离。那么请指定具体的前端域名地址，不要用如下在开发环境中的便捷方式。
+            # -- Access-Control-Allow-Credentials为true，携带cookie时，不允许Access-Control-Allow-Origin为通配符，是浏览器对用户的一种安全保护。
+            # -- 至少能避免登录山寨网站，骗取用户相关信息。
+            response.headers['Access-Control-Allow-Origin'] = '/'.join(request.referrer.split('/')[:3])
+
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Methods'] = 'HEAD, GET, POST, DELETE, OPTIONS, PATCH, PUT'
+        response.headers['Access-Control-Allow-Headers'] = 'X-Request-With, Content-Type'
+        response.headers['Access-Control-Expose-Headers'] = 'Set-Cookie'
+
+        # 少于session生命周期一半时,自动对其续期
+        if not is_not_need_to_auth(request.endpoint) and hasattr(g, 'token') and \
+                        g.token['exp'] < (ji.Common.ts() + (app.config['token_ttl'] / 2)):
+            token = Utils.generate_token(g.token['uid'])
+            # 清除原有session，由新session代替
+            for key in session.keys():
+                session.pop(key=key)
+            session['token'] = token
+        return response
+    except ji.JITError, e:
+        return json.loads(e.message)
 
 
 # noinspection PyBroadException
@@ -167,6 +229,7 @@ try:
 
 except:
     logger.error(traceback.format_exc())
+
 
 if __name__ == '__main__':
     # noinspection PyBroadException

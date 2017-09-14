@@ -3,7 +3,7 @@
 
 
 import json
-from flask import Blueprint, render_template, url_for, request
+from flask import Blueprint, render_template, request
 import requests
 
 
@@ -25,16 +25,20 @@ def login():
 
     if request.method == 'POST':
         payload = {
-            'jimv_edition': int(request.form.get('jimv_edition', 0))
+            'login_name': request.form.get('login_name'),
+            'password': request.form.get('password')
         }
 
-        url = host_url + '/api/config'
+        url = host_url + '/api/user/_sign_in'
         headers = {'content-type': 'application/json'}
-        config_ret = requests.post(url, data=json.dumps(payload), headers=headers)
-        config_ret = json.loads(config_ret.content)
-        return render_template('success.html', go_back_url='/', timeout=5000, title='提交成功',
-                               message_title='初始化 JimV 请求已被接受',
-                               message='JimV 已被初始化。页面将在5秒钟后自动跳转到实例列表页面！')
+        ret = requests.post(url, data=json.dumps(payload), headers=headers)
+        ret = json.loads(ret.content)
+
+        if ret['state']['code'] == '200':
+            return
+
+        else:
+            pass
 
     else:
         return render_template('login.html')

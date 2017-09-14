@@ -4,6 +4,7 @@
 
 from models.utils import add_rule_api
 from api import config
+from api import user
 from api import guest
 from api import disk
 from api import boot_job
@@ -26,6 +27,9 @@ add_rule_api(config.blueprint, '', api_func='config.r_create', methods=['POST'])
 # 只有一条记录，所以不指定 id
 add_rule_api(config.blueprint, '', api_func='config.r_update', methods=['PATCH'])
 add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
+
+# 用户管理
+add_rule_api(user.blueprint, '/_sign_in', api_func='user.r_sign_in', methods=['POST'])
 
 # 系统启动作业配置操作
 add_rule_api(boot_job.blueprint, '', api_func='boot_job.r_create', methods=['POST'])

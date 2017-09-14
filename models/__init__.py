@@ -27,6 +27,10 @@ from orm import (
     ORM
 )
 
+from user import (
+    User
+)
+
 from config import (
     Config
 )
@@ -84,7 +88,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState',
-    'LogLevel', 'ORM', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
+    'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
     'EventProcessor', 'ResponseState', 'CPUMemory', 'Traffic', 'DiskIO', 'HostCPUMemory', 'HostTraffic',
     'HostDiskUsageIO'
 ]
