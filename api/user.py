@@ -68,3 +68,10 @@ def r_sign_in():
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
+
+@Utils.dumps2response
+def r_sign_out():
+    for key in session.keys():
+        session.pop(key=key)
+
+

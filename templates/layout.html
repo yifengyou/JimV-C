@@ -223,6 +223,19 @@
             }, 3000);
         }
 
+        function logout() {
+            $.ajax({
+                url: '/api/user/_sign_out',
+                type: 'GET',
+                dataType: 'json',
+                error: function () {
+                    alter_danger('注销失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    window.location.href="/";
+                }
+            })
+        }
     </script>
 
     {% endblock head %}
@@ -251,9 +264,9 @@
                 </div>
                 <div id="header-nav-left">
                     <div class="user-account-btn dropdown">
-                        <a href="#" title="My Account" class="user-profile clearfix" data-toggle="dropdown">
-                            <img width="28" src="{{ url_for('static', filename='images/icons/JimV-icon_144X144.png') }}" alt="Profile image">
-                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;James Iter</span>
+                        <a href="#" title="Admin" class="user-profile clearfix" data-toggle="dropdown">
+                            <img width="28" src="{{ url_for('static', filename='avatar/Burung-Pelatuk_144x144.png') }}" alt="Avatar">
+                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Admin</span>
                             <i class="glyph-icon icon-angle-down"></i>
                         </a>
                         <div class="dropdown-menu float-left">
@@ -261,43 +274,20 @@
                                 <div class="login-box clearfix">
                                     <div class="user-img">
                                         <a href="#" title="" class="change-img">Change photo</a>
-                                        <img src="" alt="">
+                                        <img src="{{ url_for('static', filename='avatar/Burung-Pelatuk_144x144.png') }}" alt="Avatar">
                                     </div>
                                     <div class="user-info">
                                         <span>
-                                            Thomas Barnes
-                                            <i>UX/UI developer</i>
+                                            Admin
+                                            <i>管理员</i>
                                         </span>
-                                        <a href="#" title="Edit profile">Edit profile</a>
-                                        <a href="#" title="View notifications">View notifications</a>
                                     </div>
                                 </div>
-                                <div class="divider"></div>
-                                <ul class="reset-ul mrg5B">
-                                    <li>
-                                        <a href="#">
-                                            <i class="glyph-icon float-right icon-caret-right"></i>
-                                            View login page example
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <i class="glyph-icon float-right icon-caret-right"></i>
-                                            View lockscreen example
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#">
-                                            <i class="glyph-icon float-right icon-caret-right"></i>
-                                            View account details
-                                        </a>
-                                    </li>
-                                </ul>
                                 <div class="pad5A button-pane button-pane-alt text-center">
-                                        <a href="#" class="btn display-block font-normal btn-danger">
-                                            <i class="glyph-icon icon-power-off"></i>
-                                            Logout
-                                        </a>
+                                    <a href="#" class="btn display-block font-normal btn-danger" onclick="logout();">
+                                        <i class="glyph-icon icon-power-off"></i>
+                                        安全退出
+                                    </a>
                                 </div>
                             </div>
                         </div>
