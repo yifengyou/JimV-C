@@ -57,6 +57,7 @@
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ url_for('static', filename='images/icons/JimV-icon_72X72.png') }}">
     <link rel="apple-touch-icon-precomposed" href="{{ url_for('static', filename='images/icons/JimV-icon_57X57.png') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/icons/JimV-icon_32X32.png') }}">
+    <link rel="Bookmark" href="favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
 
@@ -295,8 +296,8 @@
                 </div><!-- #header-nav-left -->
 
                 <div id="header-nav-right">
-                    <a class="header-btn" id="logout-btn" href="lockscreen-3.html" title="Lockscreen page example">
-                        <i class="glyph-icon icon-linecons-lock"></i>
+                    <a class="header-btn" id="logout-btn" href="#" title="安全退出" onclick="logout();">
+                        <i class="glyph-icon icon-power-off"></i>
                     </a>
                 </div><!-- #header-nav-right -->
             </div><!-- #page-header -->
