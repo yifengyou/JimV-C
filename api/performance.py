@@ -130,7 +130,7 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
         if granularity == 'day':
             ret['data'] = smooth_data(boundary=_boundary, interval=600, now_ts=ts, rows=_rows)
 
-        if granularity == 'seven_days':
+        elif granularity == 'seven_days':
             ret['data'] = smooth_data(boundary=_boundary, interval=600, now_ts=ts, rows=_rows)
 
         else:
