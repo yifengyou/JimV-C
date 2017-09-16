@@ -5,6 +5,7 @@
 import json
 from flask import Blueprint, render_template, url_for, request
 import requests
+import copy
 
 
 __author__ = 'James Iter'
@@ -93,7 +94,7 @@ def show():
 
     hosts_current_top_10_ret = requests.get(url=hosts_current_top_10_url, cookies=request.cookies)
     hosts_current_top_10_ret = json.loads(hosts_current_top_10_ret.content)
-    hosts_current_top_10_ret['data']['memory_rate'] = hosts_current_top_10_ret['data']['cpu_load']
+    hosts_current_top_10_ret['data']['memory_rate'] = copy.copy(hosts_current_top_10_ret['data']['cpu_load'])
 
     for i in range(hosts_current_top_10_ret['data']['memory_rate'].__len__()):
         memory_total = hosts_mapping_by_node_id[hosts_current_top_10_ret['data']['memory_rate'][i]['node_id']]['memory']
