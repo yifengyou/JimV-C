@@ -52,7 +52,7 @@ def show():
     if args.__len__() > 0:
         hosts_url = hosts_url + '?' + '&'.join(args)
 
-    hosts_ret = requests.get(url=hosts_url)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
     hosts_ret = json.loads(hosts_ret.content)
 
     return render_template('hosts_show.html', hosts_ret=hosts_ret, resource_path=resource_path, keyword=keyword)
@@ -63,7 +63,7 @@ def detail(node_id):
 
     _host_url = host_url + url_for('api_hosts.r_get', nodes_id=node_id)
 
-    host_ret = requests.get(url=_host_url)
+    host_ret = requests.get(url=_host_url, cookies=request.cookies)
     host_ret = json.loads(host_ret.content)
 
     return render_template('host_detail.html', node_id=node_id, host_ret=host_ret)

@@ -23,6 +23,7 @@ import views_route_table
 from models import Database as db
 from models import Config
 from models import User
+from api.user import blueprint as user_blueprint
 from api.boot_job import blueprint as boot_job_blueprint
 from api.boot_job import blueprints as boot_job_blueprints
 from api.operate_rule import blueprint as operate_rule_blueprint
@@ -103,6 +104,7 @@ def is_not_need_to_auth(endpoint):
         'api_config.r_get',
         'api_config.r_create',
         'v_config.create',
+        'v_misc.login',
         'api_user.r_sign_in'
     ]
 
@@ -189,6 +191,7 @@ try:
     db.init_conn_mysql()
     db.init_conn_redis()
 
+    app.register_blueprint(user_blueprint)
     app.register_blueprint(boot_job_blueprint)
     app.register_blueprint(boot_job_blueprints)
     app.register_blueprint(operate_rule_blueprint)

@@ -58,10 +58,10 @@ def show():
     if args.__len__() > 0:
         guests_url = guests_url + '?' + '&'.join(args)
 
-    guests_ret = requests.get(url=guests_url)
+    guests_ret = requests.get(url=guests_url, cookies=request.cookies)
     guests_ret = json.loads(guests_ret.content)
 
-    os_templates_ret = requests.get(url=os_templates_url)
+    os_templates_ret = requests.get(url=os_templates_url, cookies=request.cookies)
     os_templates_ret = json.loads(os_templates_ret.content)
     os_templates_mapping_by_id = dict()
     for os_template in os_templates_ret['data']:
@@ -77,7 +77,7 @@ def show():
     if guests_uuid.__len__() > 0:
         # 获取指定 Guest 的启动作业 ID
         guests_boot_jobs_url = host_url + url_for('api_guests.r_get_boot_jobs', uuids=','.join(guests_uuid))
-        guests_boot_jobs_ret = requests.get(url=guests_boot_jobs_url)
+        guests_boot_jobs_ret = requests.get(url=guests_boot_jobs_url, cookies=request.cookies)
 
         guests_boot_jobs_ret = json.loads(guests_boot_jobs_ret.content)
 
@@ -144,7 +144,7 @@ def create():
 
         url = host_url + '/api/guest'
         headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
         return render_template('success.html', go_back_url='/guests', timeout=10000, title='提交成功',
                                message_title='创建实例的请求已被接受',
@@ -152,7 +152,7 @@ def create():
 
     else:
         os_template_url = host_url + url_for('api_os_templates.r_get_by_filter')
-        os_template_ret = requests.get(url=os_template_url)
+        os_template_ret = requests.get(url=os_template_url, cookies=request.cookies)
         os_template_ret = json.loads(os_template_ret.content)
         return render_template('guest_create.html', os_template_data=os_template_ret['data'])
 
@@ -171,7 +171,7 @@ def vnc(uuid):
 
     guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
 
-    guest_ret = requests.get(url=guest_url)
+    guest_ret = requests.get(url=guest_url, cookies=request.cookies)
     guest_ret = json.loads(guest_ret.content)
 
     port = random.randrange(50000, 60000)
@@ -193,17 +193,17 @@ def detail(uuid):
 
     guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
 
-    guest_ret = requests.get(url=guest_url)
+    guest_ret = requests.get(url=guest_url, cookies=request.cookies)
     guest_ret = json.loads(guest_ret.content)
 
     os_template_url = host_url + url_for('api_os_templates.r_get', ids=guest_ret['data']['os_template_id'].__str__())
 
-    os_template_ret = requests.get(url=os_template_url)
+    os_template_ret = requests.get(url=os_template_url, cookies=request.cookies)
     os_template_ret = json.loads(os_template_ret.content)
 
     disks_url = host_url + url_for('api_disks.r_get_by_filter')
     disks_url = disks_url + '?filter=guest_uuid:in:' + guest_ret['data']['uuid']
-    disks_ret = requests.get(url=disks_url)
+    disks_ret = requests.get(url=disks_url, cookies=request.cookies)
     disks_ret = json.loads(disks_ret.content)
 
     return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,
@@ -221,17 +221,17 @@ def show_boot_job(uuid):
 
     guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
 
-    guest_ret = requests.get(url=guest_url)
+    guest_ret = requests.get(url=guest_url, cookies=request.cookies)
     guest_ret = json.loads(guest_ret.content)
 
     guest_boot_jobs_url = host_url + url_for('api_guests.r_get_boot_jobs', uuids=uuid)
-    guest_boot_jobs_ret = requests.get(url=guest_boot_jobs_url)
+    guest_boot_jobs_ret = requests.get(url=guest_boot_jobs_url, cookies=request.cookies)
     guest_boot_jobs_ret = json.loads(guest_boot_jobs_ret.content)
 
     boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter') + '?filter=id:in:' + \
         ','.join(guest_boot_jobs_ret['data']['boot_jobs'])
 
-    boot_jobs_ret = requests.get(url=boot_jobs_url)
+    boot_jobs_ret = requests.get(url=boot_jobs_url, cookies=request.cookies)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
     boot_jobs_mapping_by_id = dict()
     for boot_job in boot_jobs_ret['data']:
@@ -250,7 +250,7 @@ def show_guests_boot_jobs():
     # 获取所有有启动作业的 Guests uuid
     uuids_of_all_had_boot_job_url = host_url + url_for('api_guests.r_get_uuids_of_all_had_boot_job')
 
-    uuids_of_all_had_boot_job_ret = requests.get(url=uuids_of_all_had_boot_job_url)
+    uuids_of_all_had_boot_job_ret = requests.get(url=uuids_of_all_had_boot_job_url, cookies=request.cookies)
     uuids_of_all_had_boot_job_ret = json.loads(uuids_of_all_had_boot_job_ret.content)
     guests_uuid = uuids_of_all_had_boot_job_ret['data']
 
@@ -260,7 +260,7 @@ def show_guests_boot_jobs():
         # 获取指定 Guest 的启动作业 ID
         guests_boot_jobs_url = host_url + url_for('api_guests.r_get_boot_jobs',
                                                   uuids=','.join(guests_uuid[page_size * (page - 1): page_size * page]))
-        guests_boot_jobs_ret = requests.get(url=guests_boot_jobs_url)
+        guests_boot_jobs_ret = requests.get(url=guests_boot_jobs_url, cookies=request.cookies)
 
         guests_boot_jobs_ret = json.loads(guests_boot_jobs_ret.content)
 
@@ -279,7 +279,7 @@ def show_guests_boot_jobs():
     boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter') + '?filter=id:in:' + \
         ','.join(guests_boot_jobs_id)
 
-    boot_jobs_ret = requests.get(url=boot_jobs_url)
+    boot_jobs_ret = requests.get(url=boot_jobs_url, cookies=request.cookies)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
 
     # 启动作业 ID 与启动作业的映射
@@ -291,7 +291,7 @@ def show_guests_boot_jobs():
 
     guests_url = guests_url + '?filter=uuid:in:' + ','.join(guests_uuid[page_size * (page - 1): page_size * page])
 
-    guests_ret = requests.get(url=guests_url)
+    guests_ret = requests.get(url=guests_url, cookies=request.cookies)
     guests_ret = json.loads(guests_ret.content)
 
     # Guest uuid 与 Guest 的映射
@@ -300,7 +300,7 @@ def show_guests_boot_jobs():
         guests_mapping_by_uuid[guest['uuid']] = guest
 
     os_templates_url = host_url + url_for('api_os_templates.r_get_by_filter')
-    os_templates_ret = requests.get(url=os_templates_url)
+    os_templates_ret = requests.get(url=os_templates_url, cookies=request.cookies)
     os_templates_ret = json.loads(os_templates_ret.content)
 
     # 模板与模板 ID 的映射

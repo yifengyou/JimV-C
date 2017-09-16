@@ -56,6 +56,7 @@ class Rules(Enum):
     QUANTITY = (int, 'quantity')
     NAME = (basestring, 'name')
     PATH = (basestring, 'path')
+    LOGIN_NAME = (basestring, 'login_name')
     PASSWORD = (basestring, 'password')
     LEASE_TERM = (int, 'lease_term')
     DESTINATION_HOST = (basestring, 'destination_host', (5, 64))

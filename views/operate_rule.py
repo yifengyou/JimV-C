@@ -71,12 +71,12 @@ def show():
     if args.__len__() > 0:
         operate_rules_url = operate_rules_url + '?' + '&'.join(args)
 
-    operate_rules_ret = requests.get(url=operate_rules_url)
+    operate_rules_ret = requests.get(url=operate_rules_url, cookies=request.cookies)
     operate_rules_ret = json.loads(operate_rules_ret.content)
 
     system_level_ids = list()
 
-    boot_jobs_ret = requests.get(url=boot_jobs_url)
+    boot_jobs_ret = requests.get(url=boot_jobs_url, cookies=request.cookies)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
     boot_jobs_mapping_by_id = dict()
     for boot_job in boot_jobs_ret['data']:
@@ -140,7 +140,7 @@ def create():
 
         url = host_url + '/api/operate_rule'
         headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
         return render_template('success.html', go_back_url='/operate_rules', timeout=10000, title='提交成功',
                                message_title='添加启动作业操作细则的请求已被接受',

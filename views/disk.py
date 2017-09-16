@@ -95,7 +95,7 @@ def show():
     if args.__len__() > 0:
         disks_url = disks_url + '?' + '&'.join(args)
 
-    disks_ret = requests.get(url=disks_url)
+    disks_ret = requests.get(url=disks_url, cookies=request.cookies)
     disks_ret = json.loads(disks_ret.content)
 
     guest_uuids = list()
@@ -107,7 +107,7 @@ def show():
     if guest_uuids.__len__() > 0:
         guests_url = host_url + url_for('api_guests.r_get_by_filter')
         guests_url += '?filter=uuid:in:' + ','.join(guest_uuids)
-        guests_ret = requests.get(url=guests_url)
+        guests_ret = requests.get(url=guests_url, cookies=request.cookies)
         guests_ret = json.loads(guests_ret.content)
 
         guests_uuid_mapping = dict()
@@ -118,7 +118,7 @@ def show():
             if disk['guest_uuid'].__len__() == 36:
                 disks_ret['data'][i]['guest'] = guests_uuid_mapping[disk['guest_uuid']]
 
-    config_ret = requests.get(url=config_url)
+    config_ret = requests.get(url=config_url, cookies=request.cookies)
     config_ret = json.loads(config_ret.content)
 
     show_on_host = False
@@ -169,7 +169,7 @@ def create():
 
         url = host_url + '/api/disk'
         headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
         return render_template('success.html', go_back_url='/disks', timeout=10000, title='提交成功',
                                message_title='创建实例的请求已被接受',
@@ -177,7 +177,7 @@ def create():
 
     else:
         config_url = host_url + url_for('api_config.r_get')
-        config_ret = requests.get(url=config_url)
+        config_ret = requests.get(url=config_url, cookies=request.cookies)
         config_ret = json.loads(config_ret.content)
 
         show_on_host = False
@@ -192,7 +192,7 @@ def detail(uuid):
 
     disk_url = host_url + url_for('api_disks.r_get', uuids=uuid)
 
-    disk_ret = requests.get(url=disk_url)
+    disk_ret = requests.get(url=disk_url, cookies=request.cookies)
     disk_ret = json.loads(disk_ret.content)
 
     guest_ret = None
@@ -201,12 +201,12 @@ def detail(uuid):
     if disk_ret['data']['sequence'] != -1:
         guest_url = host_url + url_for('api_guests.r_get', uuids=disk_ret['data']['guest_uuid'])
 
-        guest_ret = requests.get(url=guest_url)
+        guest_ret = requests.get(url=guest_url, cookies=request.cookies)
         guest_ret = json.loads(guest_ret.content)
 
         os_template_url = host_url + url_for('api_os_templates.r_get', ids=guest_ret['data']['os_template_id'].__str__())
 
-        os_template_ret = requests.get(url=os_template_url)
+        os_template_ret = requests.get(url=os_template_url, cookies=request.cookies)
         os_template_ret = json.loads(os_template_ret.content)
 
     return render_template('disk_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,

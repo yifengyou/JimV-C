@@ -31,7 +31,7 @@ def login():
 
         url = host_url + '/api/user/_sign_in'
         headers = {'content-type': 'application/json'}
-        ret = requests.post(url, data=json.dumps(payload), headers=headers)
+        ret = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         ret = json.loads(ret.content)
 
         if ret['state']['code'] == '200':

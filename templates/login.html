@@ -32,9 +32,54 @@
     </style>
 {% endblock head %}
 {% block body %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+
+        $("#login_form").delegate('#login_submit', 'click', function() {
+            var fill_ok = true;
+            /*
+            if ($('#login_name').val().length < 1) {
+                fill_ok = false;
+                $('#login_name').parent().removeClass('has-success has-warning').addClass('has-error');
+                $('#login_name').next().removeClass('glyphicon-info-sign').addClass('glyphicon-remove');
+            }
+            if ($('#password').val().length < 1) {
+                fill_ok = false;
+                $('#password').parent().removeClass('has-success has-warning').addClass('has-error');
+                $('#password').next().removeClass('glyphicon-lock').addClass('glyphicon-remove');
+            }
+            */
+            if (fill_ok) {
+                $.ajax({
+                    url : '/api/user/_sign_in',
+                    type : 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data : JSON.stringify({login_name: $('#login_name').val(), password: $('#password').val()}),
+                    error : function(data, textStatus, xhr) {
+                        if (data.status === 401) {
+                            insert_warning_window($('#login_submit'), '<strong>登录失败: </strong>&nbsp;&nbsp;请查证账号、密码重新登录.');
+                        } else {
+                            insert_warning_window($('#login_submit'), data.responseText);
+                        }
+                    },
+                    success : function(data, textStatus, xhr) {
+                        window.location.href="/";
+                    }
+                });
+            }
+        });
+    });
+</script>
 <div class="center-vertical">
     <div class="center-content row wow">
-        <form action="" id="login-validation" class="col-md-4 col-sm-5 col-xs-11 col-lg-3 center-margin" method="POST">
+        <form id="login_form" class="col-md-4 col-sm-5 col-xs-11 col-lg-3 center-margin">
             <h3 class="text-center pad25B font-primary" style="font-family: 'Baskerville'; opacity: 0.83; font-size: -webkit-xxx-large;">JimV<span style="font-family: 'serif';"> Admin</span></h3>
             <div id="login-form" class="content-box bg-default">
                 <div class="content-box-wrapper pad20A">
@@ -43,7 +88,7 @@
                             <span class="input-group-addon addon-inside bg-gray">
                                 <i class="glyph-icon icon-user"></i>
                             </span>
-                            <input type="email" class="form-control" id="login_name" placeholder="用户名" value="admin" disabled>
+                            <input type="text" class="form-control" id="login_name" placeholder="用户名" value="admin" disabled>
                         </div>
                     </div>
                     <div class="form-group">
@@ -55,7 +100,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-block btn-primary">Login</button>
+                        <button id="login_submit" type="button" class="btn btn-block btn-primary">Login</button>
                     </div>
                 </div>
             </div>

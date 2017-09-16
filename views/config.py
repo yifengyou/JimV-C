@@ -23,7 +23,7 @@ blueprint = Blueprint(
 def show():
     host_url = request.host_url.rstrip('/')
     config_url = host_url + '/api/config'
-    config_ret = requests.get(url=config_url)
+    config_ret = requests.get(url=config_url, cookies=request.cookies)
     config_ret = json.loads(config_ret.content)
 
     # 检测 JimV 的配置是否已被初始化，只有未被初始化时，才展现初始化配置页面
@@ -55,7 +55,7 @@ def create():
 
         url = host_url + '/api/config'
         headers = {'content-type': 'application/json'}
-        config_ret = requests.post(url, data=json.dumps(payload), headers=headers)
+        config_ret = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         config_ret = json.loads(config_ret.content)
         return render_template('success.html', go_back_url='/', timeout=5000, title='提交成功',
                                message_title='初始化 JimV 请求已被接受',
@@ -63,7 +63,7 @@ def create():
 
     else:
         url = host_url + '/api/config'
-        config_ret = requests.get(url=url)
+        config_ret = requests.get(url=url, cookies=request.cookies)
         config_ret = json.loads(config_ret.content)
 
         # 检测 JimV 的配置是否已被初始化，只有未被初始化时，才展现初始化配置页面

@@ -60,7 +60,7 @@ def show():
     if args.__len__() > 0:
         logs_url = logs_url + '?' + '&'.join(args)
 
-    logs_ret = requests.get(url=logs_url)
+    logs_ret = requests.get(url=logs_url, cookies=request.cookies)
     logs_ret = json.loads(logs_ret.content)
 
     last_page = int(ceil(logs_ret['paging']['total'] / float(page_size)))

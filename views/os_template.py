@@ -74,10 +74,10 @@ def show():
     if args.__len__() > 0:
         os_templates_url = os_templates_url + '?' + '&'.join(args)
 
-    os_templates_ret = requests.get(url=os_templates_url)
+    os_templates_ret = requests.get(url=os_templates_url, cookies=request.cookies)
     os_templates_ret = json.loads(os_templates_ret.content)
 
-    boot_jobs_ret = requests.get(url=boot_job_url)
+    boot_jobs_ret = requests.get(url=boot_job_url, cookies=request.cookies)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
     boot_jobs_mapping_by_id = dict()
     for boot_job in boot_jobs_ret['data']:
@@ -129,7 +129,7 @@ def create():
 
         url = host_url + '/api/os_template'
         headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
         return render_template('success.html', go_back_url='/os_templates', timeout=10000, title='提交成功',
                                message_title='添加模板的请求已被接受',

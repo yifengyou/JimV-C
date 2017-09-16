@@ -21,6 +21,9 @@ CREATE TABLE IF NOT EXISTS user(
 ALTER TABLE user ADD INDEX (login_name);
 ALTER TABLE user ADD INDEX (mobile_phone);
 ALTER TABLE user ADD INDEX (email);
+INSERT INTO user (login_name, password, create_time) VALUES
+    ('admin', 'ji_pbkdf2$sha1$1000$b8UzawEs5kJ68TmbqQEqD07jgZGCYJsa$d3593420edee742499a974f2f377e5b220927dc7', UNIX_TIMESTAMP(NOW()) * 1000000);
+# password jimv.pswd.com
 
 
 CREATE TABLE IF NOT EXISTS guest(

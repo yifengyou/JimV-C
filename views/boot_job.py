@@ -69,7 +69,7 @@ def show():
     if args.__len__() > 0:
         boot_jobs_url = boot_jobs_url + '?' + '&'.join(args)
 
-    boot_jobs_ret = requests.get(url=boot_jobs_url)
+    boot_jobs_ret = requests.get(url=boot_jobs_url, cookies=request.cookies)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
 
     for i, boot_job in enumerate(boot_jobs_ret['data']):
@@ -120,7 +120,7 @@ def create():
 
         url = host_url + '/api/boot_job'
         headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        r = requests.post(url, data=json.dumps(payload), cookies=request.cookies, headers=headers)
         j_r = json.loads(r.content)
         return render_template('success.html', go_back_url='/boot_jobs', timeout=10000, title='提交成功',
                                message_title='添加启动作业的请求已被接受',
