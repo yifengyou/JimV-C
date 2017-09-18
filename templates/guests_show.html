@@ -586,6 +586,21 @@
         }
         $('#add_boot_job_modal').modal('hide');
     }
+
+    var show_real_password = false;
+    function change_display_password(me) {
+        if (show_real_password) {
+            show_real_password = false;
+            $(me).removeClass("icon-elusive-eye").addClass("icon-elusive-eye-off");
+            $('.real_password').toggle();
+            $('.unreal_password').toggle();
+        } else {
+            show_real_password = true;
+            $(me).removeClass("icon-elusive-eye-off").addClass("icon-elusive-eye");
+            $('.unreal_password').toggle();
+            $('.real_password').toggle();
+        }
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -617,7 +632,7 @@
                     <th>计算节点</th>
                     <th>配置</th>
                     <th>IP</th>
-                    <th>密码</th>
+                    <th width="150px;">密码&nbsp;&nbsp;<a href="#" class="glyph-icon icon-elusive-eye-off" onclick="change_display_password(this);" style="color: #014c8c;"></a></th>
                     <th>创建时间</th>
                     <th>操作</th>
                 </tr>
@@ -643,7 +658,7 @@
                     <td>{{ item.on_host }}</td>
                     <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>
                     <td>{{ item.ip }}</td>
-                    <td>{{ item.password }}</td>
+                    <td><span class="unreal_password">******</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
                     <td>
                         <div class="dropdown inline-block">
