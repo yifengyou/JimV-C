@@ -31,6 +31,7 @@ add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
 # 用户管理
 add_rule_api(user.blueprint, '/_sign_in', api_func='user.r_sign_in', methods=['POST'])
 add_rule_api(user.blueprint, '/_sign_out', api_func='user.r_sign_out', methods=['GET'])
+add_rule_api(user.blueprint, '/_change_password', api_func='user.r_change_password', methods=['POST'])
 
 # 系统启动作业配置操作
 add_rule_api(boot_job.blueprint, '', api_func='boot_job.r_create', methods=['POST'])

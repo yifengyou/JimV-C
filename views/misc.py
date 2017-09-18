@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import json
-from flask import Blueprint, render_template, request
-import requests
+from flask import Blueprint, render_template
 
 
 __author__ = 'James Iter'
@@ -22,4 +20,8 @@ blueprint = Blueprint(
 
 def login():
     return render_template('login.html')
+
+
+def change_password():
+    return render_template('change_password.html')
 

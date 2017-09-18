@@ -271,7 +271,7 @@
                             <i class="glyph-icon icon-angle-down"></i>
                         </a>
                         <div class="dropdown-menu float-left">
-                            <div class="box-sm">
+                            <div class="box-xs">
                                 <div class="login-box clearfix">
                                     <div class="user-img">
                                         <a href="#" title="" class="change-img">Change photo</a>
@@ -284,6 +284,14 @@
                                         </span>
                                     </div>
                                 </div>
+                                <div class="divider"></div>
+                                <ul class="reset-ul mrg5B" style="text-align: center;">
+                                    <li>
+                                        <a href="{{ url_for('v_misc.change_password') }}">
+                                            修改密码
+                                        </a>
+                                    </li>
+                                </ul>
                                 <div class="pad5A button-pane button-pane-alt text-center">
                                     <a href="#" class="btn display-block font-normal btn-danger" onclick="logout();">
                                         <i class="glyph-icon icon-power-off"></i>

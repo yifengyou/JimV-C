@@ -39,12 +39,12 @@ user_base = Base(the_class=User, the_blueprint=blueprint, the_blueprints=bluepri
 @Utils.dumps2response
 def r_sign_in():
 
-    user = User()
-
     args_rules = [
         Rules.LOGIN_NAME.value,
         Rules.PASSWORD.value
     ]
+
+    user = User()
     user.login_name = request.json.get('login_name')
     user.password = request.json.get('password')
 
@@ -74,4 +74,38 @@ def r_sign_out():
     for key in session.keys():
         session.pop(key=key)
 
+
+@Utils.dumps2response
+def r_change_password():
+
+    args_rules = [
+        Rules.ID.value
+    ]
+
+    user = User()
+    user.id = g.token.get('uid', 0).__str__()
+
+    try:
+        ji.Check.previewing(args_rules, user.__dict__)
+        user.get()
+
+        old_password = request.json.get('old_password', '')
+
+        if not ji.Security.ji_pbkdf2_check(password=old_password, password_hash=user.password):
+            ret = dict()
+            ret['state'] = ji.Common.exchange_state(40101)
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': 鉴权失败'])
+            raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+
+        args_rules = [
+            Rules.PASSWORD.value
+        ]
+
+        user.password = request.json.get('password')
+
+        ji.Check.previewing(args_rules, user.__dict__)
+        user.password = ji.Security.ji_pbkdf2(user.password)
+        user.update()
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
 
