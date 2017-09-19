@@ -69,4 +69,8 @@ own_state_branch = {
         'code': '50350',
         'zh-cn': u'无可用IP地址，请联系 JimV 管理员'
     },
+    '50351': {
+        'code': '50351',
+        'zh-cn': u'无可用计算节点，请联系 JimV 管理员'
+    },
 }

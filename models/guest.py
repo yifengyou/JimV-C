@@ -116,6 +116,28 @@ class Guest(ORM):
 
         return lightest_host
 
+    @staticmethod
+    def get_available_hosts():
+
+        from models import Host
+
+        hosts = list()
+
+        for k, v in db.r.hgetall(app.config['hosts_info']).items():
+            v = json.loads(v)
+
+            v = Host.alive_check(v)
+
+            if not v['alive']:
+                continue
+
+            v['system_load_per_cpu'] = float(v['system_load'][0]) / v['cpu']
+            hosts.append(v)
+
+        hosts.sort(key=lambda _k: _k['system_load_per_cpu'])
+
+        return hosts
+
 
 class Disk(ORM):
 

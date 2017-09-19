@@ -88,6 +88,12 @@ def r_create():
             ret['state'] = ji.Common.exchange_state(50350)
             return ret
 
+        available_hosts = Guest.get_available_hosts()
+
+        if available_hosts.__len__() == 0:
+            ret['state'] = ji.Common.exchange_state(50351)
+            return ret
+
         quantity = request.json.get('quantity')
 
         while quantity:
@@ -118,7 +124,7 @@ def r_create():
 
             disk = Disk()
             disk.uuid = guest.uuid
-            disk.remark = guest.label + '_SystemImage'
+            disk.remark = guest.label.__str__() + '_SystemImage'
             disk.format = 'qcow2'
             disk.sequence = 0
             disk.size = 0
@@ -149,13 +155,16 @@ def r_create():
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
+            # 在可用计算节点中平均分配任务
+            chosen_host = available_hosts[quantity % available_hosts.__len__()]
+
             message = {
                 '_object': 'guest',
                 'action': 'create',
                 'uuid': guest.uuid,
                 'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
-                'hostname': Guest.get_lightest_host()['hostname'],
+                'hostname': chosen_host['hostname'],
                 'name': guest.label,
                 'template_path': os_template.path,
                 'disk': disk.__dict__,

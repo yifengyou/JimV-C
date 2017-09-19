@@ -3,11 +3,11 @@
 
 
 import json
-from flask import Blueprint, request, g
+from flask import Blueprint, request
 import jimit as ji
 
 from models import Database as db
-from models import Utils, Rules
+from models import Utils, Rules, Host
 from models.initialize import app
 
 
@@ -30,21 +30,6 @@ blueprints = Blueprint(
 )
 
 
-def alive_check(v):
-    """
-    JimV-C 2 秒更新一次宿主机信息，这里以 5 秒内没收到更新，作为判断宿主机是否在线的标准
-    """
-
-    if 'timestamp' not in v:
-        return v
-
-    v['alive'] = False
-    if v['timestamp'] + 5 >= g.ts:
-        v['alive'] = True
-
-    return v
-
-
 @Utils.dumps2response
 def r_get(nodes_id):
 
@@ -63,7 +48,7 @@ def r_get(nodes_id):
             node_id = nodes_id
             if db.r.hexists(app.config['hosts_info'], node_id):
                 v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
-                v = alive_check(v)
+                v = Host.alive_check(v)
                 v['node_id'] = node_id
                 ret['data'] = v
 
@@ -71,7 +56,7 @@ def r_get(nodes_id):
             for node_id in nodes_id.split(','):
                 if db.r.hexists(app.config['hosts_info'], node_id):
                     v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
-                    v = alive_check(v)
+                    v = Host.alive_check(v)
                     v['node_id'] = node_id
                     ret['data'].append(v)
 
@@ -90,7 +75,7 @@ def r_get_by_filter():
         ret['data'] = list()
         for k, v in db.r.hgetall(app.config['hosts_info']).items():
             v = json.loads(v)
-            v = alive_check(v)
+            v = Host.alive_check(v)
             v['node_id'] = k
             ret['data'].append(v)
 
@@ -118,7 +103,7 @@ def r_content_search():
         for k, v in db.r.hgetall(app.config['hosts_info']).items():
             v = json.loads(v)
             if -1 != v['hostname'].find(keyword):
-                v = alive_check(v)
+                v = Host.alive_check(v)
                 v['node_id'] = k
                 ret['data'].append(v)
 

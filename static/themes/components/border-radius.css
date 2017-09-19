@@ -91,7 +91,7 @@ div[id^='uniform-'] span,
 .dropdown-submenu.float-left > .dropdown-menu,
 .nav-list,
 .nav-list-horizontal-alt li a {
-    border-radius: 3px;
+    border-radius: 0;
 }
 .ui-datepicker-title,
 .panel > .list-group:first-child .list-group-item:first-child,

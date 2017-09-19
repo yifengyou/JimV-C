@@ -69,6 +69,10 @@ from performance import (
     DiskIO
 )
 
+from host import (
+    Host
+)
+
 from host_performance import (
     HostCPUMemory,
     HostTraffic,
@@ -90,7 +94,7 @@ __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState',
     'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
     'EventProcessor', 'ResponseState', 'CPUMemory', 'Traffic', 'DiskIO', 'HostCPUMemory', 'HostTraffic',
-    'HostDiskUsageIO'
+    'HostDiskUsageIO', 'Host'
 ]
 
 
