@@ -42,40 +42,36 @@
         });
 
         $("#login_form").delegate('#login_submit', 'click', function() {
-            var fill_ok = true;
-            /*
-            if ($('#login_name').val().length < 1) {
-                fill_ok = false;
-                $('#login_name').parent().removeClass('has-success has-warning').addClass('has-error');
-                $('#login_name').next().removeClass('glyphicon-info-sign').addClass('glyphicon-remove');
-            }
-            if ($('#password').val().length < 1) {
-                fill_ok = false;
-                $('#password').parent().removeClass('has-success has-warning').addClass('has-error');
-                $('#password').next().removeClass('glyphicon-lock').addClass('glyphicon-remove');
-            }
-            */
-            if (fill_ok) {
-                $.ajax({
-                    url : '/api/user/_sign_in',
-                    type : 'POST',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    data : JSON.stringify({login_name: $('#login_name').val(), password: $('#password').val()}),
-                    error : function(data, textStatus, xhr) {
-                        if (data.status === 401) {
-                            insert_warning_window($('#login_submit'), '<strong>登录失败: </strong>&nbsp;&nbsp;请查证账号、密码重新登录.');
-                        } else {
-                            insert_warning_window($('#login_submit'), data.responseText);
-                        }
-                    },
-                    success : function(data, textStatus, xhr) {
-                        window.location.href="/";
-                    }
-                });
+            login();
+
+        });
+
+        $("body").keydown(function() {
+            if (event.keyCode == "13") {//keyCode=13是回车键
+                login();
             }
         });
     });
+
+    function login() {
+        $.ajax({
+            url : '/api/user/_sign_in',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data : JSON.stringify({login_name: $('#login_name').val(), password: $('#password').val()}),
+            error : function(data, textStatus, xhr) {
+                if (data.status === 401) {
+                    insert_warning_window($('#login_submit'), '<strong>登录失败: </strong>&nbsp;&nbsp;请查证账号、密码重新登录.');
+                } else {
+                    insert_warning_window($('#login_submit'), data.responseText);
+                }
+            },
+            success : function(data, textStatus, xhr) {
+                window.location.href="/";
+            }
+        });
+    }
 </script>
 <div class="center-vertical">
     <div class="center-content row wow">
@@ -96,7 +92,7 @@
                             <span class="input-group-addon addon-inside bg-gray">
                                 <i class="glyph-icon icon-lock"></i>
                             </span>
-                            <input type="password" class="form-control" id="password" placeholder="密码">
+                            <input type="password" class="form-control" id="password" placeholder="默认密码:jimv.pswd.com">
                         </div>
                     </div>
                     <div class="form-group">
