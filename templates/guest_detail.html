@@ -937,7 +937,7 @@
                             <td>
                                 <span class="guest-label">状态:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_guest_status(guest_ret.data.status)|safe }}
+                                {{ format_guest_status(guest_ret.data.status, guest_ret.data.progress)|safe }}
                                 </span>
                             </td>
                         </tr>
