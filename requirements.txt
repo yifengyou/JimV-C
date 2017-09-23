@@ -9,3 +9,4 @@ gunicorn
 eventlet
 redis
 websockify
+flask-socketio

@@ -147,59 +147,59 @@ def utility_processor():
     def format_datetime_by_tus(tus, fmt='%y-%m-%d %H:%M'):
         return time.strftime(fmt, time.localtime(tus/1000/1000))
 
-    def format_guest_status(status):
+    def format_guest_status(_status, progress):
         from status import GuestState
 
         color = 'FF645B'
         icon = 'glyph-icon icon-bolt'
         desc = '未知状态'
 
-        if status == GuestState.running.value:
+        if _status == GuestState.running.value:
             color = '00BB00'
             icon = 'glyph-icon icon-circle'
             desc = '运行中'
 
-        elif status == GuestState.no_state.value:
+        elif _status in [GuestState.no_state.value, GuestState.creating.value]:
             color = 'FFC543'
             icon = 'glyph-icon icon-spinner'
-            desc = '创建中'
+            desc = ' '.join(['创建中', str(progress)+'%'])
 
-        elif status == GuestState.blocked.value:
+        elif _status == GuestState.blocked.value:
             color = '3D4245'
             icon = 'glyph-icon icon-minus-square'
             desc = '被阻塞'
 
-        elif status == GuestState.paused.value:
+        elif _status == GuestState.paused.value:
             color = 'B7B904'
             icon = 'glyph-icon icon-pause'
             desc = '暂停'
 
-        elif status == GuestState.shutdown.value:
+        elif _status == GuestState.shutdown.value:
             color = '4E5356'
             icon = 'glyph-icon icon-terminal'
             desc = '关闭'
 
-        elif status == GuestState.shutoff.value:
+        elif _status == GuestState.shutoff.value:
             color = 'FFC543'
             icon = 'glyph-icon icon-plug'
             desc = '断电'
 
-        elif status == GuestState.crashed.value:
+        elif _status == GuestState.crashed.value:
             color = '9E2927'
             icon = 'glyph-icon icon-question'
             desc = '已崩溃'
 
-        elif status == GuestState.pm_suspended.value:
+        elif _status == GuestState.pm_suspended.value:
             color = 'FCFF07'
             icon = 'glyph-icon icon-anchor'
             desc = '悬挂'
 
-        elif status == GuestState.migrating.value:
+        elif _status == GuestState.migrating.value:
             color = '1CF5E7'
             icon = 'glyph-icon icon-space-shuttle'
             desc = '迁移中'
 
-        elif status == GuestState.dirty.value:
+        elif _status == GuestState.dirty.value:
             color = 'FF0707'
             icon = 'glyph-icon icon-remove'
             desc = '创建失败，待清理'

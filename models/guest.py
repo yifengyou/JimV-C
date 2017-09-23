@@ -33,6 +33,7 @@ class Guest(ORM):
         self.os_template_id = None
         self.create_time = ji.Common.tus()
         self.status = GuestState.no_state.value
+        self.progress = 0
         self.on_host = ''
         self.cpu = None
         self.memory = None

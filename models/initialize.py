@@ -4,6 +4,7 @@
 
 from multiprocessing import JoinableQueue
 from flask import Flask
+from flask_socketio import SocketIO
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import json
@@ -150,6 +151,7 @@ config = Init.load_config()
 logger = Init.init_logger()
 
 app.config = dict(app.config, **config)
+socketio = SocketIO(app)
 
 ji.index_state['branch'] = dict(ji.index_state['branch'], **own_state_branch)
 

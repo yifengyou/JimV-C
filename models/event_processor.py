@@ -98,8 +98,14 @@ class EventProcessor(object):
 
                     cls.guest_migrate_info.create()
 
+        elif cls.guest.status == GuestState.creating.value:
+            cls.guest.progress = cls.message['message']['progress']
+
         cls.guest.update()
-        cls.disk.update_by_filter({'on_host': cls.guest.on_host}, filter_str='guest_uuid:eq:' + cls.guest.uuid)
+
+        # 限定特殊情况下更新磁盘所属 Guest，避免迁移、创建时频繁被无意义的更新
+        if cls.guest.status in [GuestState.running.value, GuestState.shutoff.value]:
+            cls.disk.update_by_filter({'on_host': cls.guest.on_host}, filter_str='guest_uuid:eq:' + cls.guest.uuid)
 
     @classmethod
     def host_event_processor(cls):

@@ -17,7 +17,7 @@ from flask.ext.session import Session
 
 from models import Utils
 from models.event_processor import EventProcessor
-from models.initialize import app, logger, q_ws, Init
+from models.initialize import socketio, logger, q_ws, Init
 import api_route_table
 import views_route_table
 from models import Database as db
