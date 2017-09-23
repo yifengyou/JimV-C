@@ -146,7 +146,16 @@ def create():
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
-        return render_template('success.html', go_back_url='/guests', timeout=10000, title='提交成功',
+
+        guests_url = host_url + url_for('api_guests.r_get_by_filter')
+        guests_ret = requests.get(url=guests_url, cookies=request.cookies)
+        guests_ret = json.loads(guests_ret.content)
+        page_size = 10
+        last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
+
+        return render_template('success.html',
+                               go_back_url='/guests?page={0}&page_size={1}'.format(last_page, page_size),
+                               timeout=10000, title='提交成功',
                                message_title='创建实例的请求已被接受',
                                message='您所提交的资源正在创建中。根据所提交资源的大小，需要等待几到十几分钟。页面将在10秒钟后自动跳转到实例列表页面！')
 
