@@ -134,6 +134,11 @@ def r_create():
 
             guest_xml = GuestXML(guest=guest, disk=disk, config=config)
             guest.xml = guest_xml.get_domain()
+
+            # 在可用计算节点中平均分配任务
+            chosen_host = available_hosts[quantity % available_hosts.__len__()]
+
+            guest.on_host = chosen_host['hostname']
             guest.create()
 
             # 替换占位符为有效内容
@@ -155,16 +160,13 @@ def r_create():
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
-            # 在可用计算节点中平均分配任务
-            chosen_host = available_hosts[quantity % available_hosts.__len__()]
-
             message = {
                 '_object': 'guest',
                 'action': 'create',
                 'uuid': guest.uuid,
                 'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
-                'hostname': chosen_host['hostname'],
+                'hostname': guest.on_host,
                 'name': guest.label,
                 'template_path': os_template.path,
                 'disk': disk.__dict__,
