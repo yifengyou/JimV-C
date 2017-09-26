@@ -176,7 +176,7 @@
                     </td>
                     <td>{{ format_datetime_by_ts(item.timestamp) }}</td>
                     <td>{{ item.host }}</td>
-                    <td>{{ item.message }}</td>
+                    <td>{{ item.message }}<a href="#" data-toggle="tooltip" data-placement="left" style="color: royalblue;{% if item.full_message is none or item.full_message|length < 256 %}display: none;{% endif %}" title="{{ item.full_message }}">More</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>

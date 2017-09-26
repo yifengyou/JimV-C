@@ -43,7 +43,8 @@ class EventProcessor(object):
     @classmethod
     def log_processor(cls):
         cls.log.set(type=cls.message['type'], timestamp=cls.message['timestamp'], host=cls.message['host'],
-                    message=cls.message['message'])
+                    message=cls.message['message'],
+                    full_message='' if cls.message['message'].__len__() < 255 else cls.message['message'])
 
         cls.log.create()
 

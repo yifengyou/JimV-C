@@ -24,12 +24,14 @@ class Log(ORM):
         self.timestamp = kwargs.get('timestamp', 0)
         self.host = kwargs.get('host', None)
         self.message = kwargs.get('message', None)
+        self.full_message = kwargs.get('full_message', None)
 
     def set(self, **kwargs):
         self.type = kwargs.get('type', None)
         self.timestamp = kwargs.get('timestamp', 0)
         self.host = kwargs.get('host', None)
         self.message = kwargs.get('message', None)
+        self.full_message = kwargs.get('full_message', None)
 
     @staticmethod
     def get_filter_keywords():

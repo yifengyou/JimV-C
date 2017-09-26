@@ -163,6 +163,7 @@ CREATE TABLE IF NOT EXISTS log(
     timestamp BIGINT UNSIGNED NOT NULL,
     host CHAR(15),
     message VARCHAR(255) NOT NULL DEFAULT '',
+    full_message TEXT,
     PRIMARY KEY (id))
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
