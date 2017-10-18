@@ -43,7 +43,7 @@
         .tr-selected td,
         .tr-selected {
             color: #000 !important;
-            background: #fffdf4 !important;
+            background: #fafaff !important;
         }
     </style>
 
@@ -296,7 +296,7 @@
                             </div>
                         </td>
                         <td><span class="{{ os_templates_mapping_by_id[guests_mapping_by_uuid[uuid].os_template_id].icon }}"></span></td>
-                        <td>{{ format_guest_status(guests_mapping_by_uuid[uuid].status)|safe }}</td>
+                        <td>{{ format_guest_status(guests_mapping_by_uuid[uuid].status, guests_mapping_by_uuid[uuid].progress)|safe }}</td>
                         <td>{{ guests_mapping_by_uuid[uuid].ip }}</td>
                         <td>
                             <div class="dropdown inline-block">

@@ -25,9 +25,12 @@ class GuestXML(object):
         self.config = config
 
     def get_domain(self):
+        # clock 参考链接：https://libvirt.org/formatdomain.html#elementsTime
+        # Windows Guest 设为 localtime，非 Windows Guest 都设为 utc
         return """<?xml version="1.0" encoding="utf-8"?>
             <domain type="kvm">
             {0}
+            <clock offset='utc'/>
             {1}
             {2}
             {3}
@@ -76,8 +79,9 @@ class GuestXML(object):
                 {1}
                 {2}
                 {3}
+                {4}
             </devices>
-        """.format(self.get_interface(), self.get_disk(), self.get_graphics(), self.get_console())
+        """.format(self.get_interface(), self.get_disk(), self.get_graphics(), self.get_console(), self.get_channel())
 
     def get_interface(self):
         return """
@@ -138,5 +142,14 @@ class GuestXML(object):
             <console type='pty'>
                 <target type='serial' port='0'/>
             </console>
+        """
+
+    @staticmethod
+    def get_channel():
+        return """
+            <channel type='unix'>
+                <source mode='bind'/>
+                <target type='virtio' name='org.qemu.guest_agent.0'/>
+            </channel>
         """
 
