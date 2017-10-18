@@ -141,6 +141,38 @@ class Init(object):
             time.sleep(10)
             db.r.publish(app.config['instruction_channel'], message=json.dumps({'action': 'ping'}))
 
+    @staticmethod
+    def clear_expire_monitor_log():
+        from models import CPUMemory, Traffic, DiskIO, HostCPUMemory, HostTraffic, HostDiskUsageIO
+        from models import Utils
+
+        already_clear = False
+
+        while True:
+            if Utils.exit_flag:
+                print 'Thread clear_expire_monitor_log say bye-bye'
+                return
+
+            time.sleep(10)
+
+            # 每天凌晨3点30分执行，清除15天前的监控记录
+            if 12600 < ji.Common.ts() % 86400 < 12620 and not already_clear:
+                boundary = ji.Common.ts() - 86400 * 15
+                filter_str = 'timestamp:lt:' + boundary.__str__()
+
+                CPUMemory.delete_by_filter(filter_str=filter_str)
+                Traffic.delete_by_filter(filter_str=filter_str)
+                DiskIO.delete_by_filter(filter_str=filter_str)
+
+                HostCPUMemory.delete_by_filter(filter_str=filter_str)
+                HostTraffic.delete_by_filter(filter_str=filter_str)
+                HostDiskUsageIO.delete_by_filter(filter_str=filter_str)
+
+                already_clear = True
+
+            if already_clear and ji.Common.ts() % 86400 > 12620:
+                already_clear = False
+
 
 q_ws = JoinableQueue()
 # 预编译效率更高

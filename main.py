@@ -255,6 +255,9 @@ if __name__ == '__main__':
             t_ = threading.Thread(target=Init.pub_sub_ping_pong, args=())
             threads.append(t_)
 
+            t_ = threading.Thread(target=Init.clear_expire_monitor_log, args=())
+            threads.append(t_)
+
             for t in threads:
                 t.start()
 
