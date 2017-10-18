@@ -76,7 +76,7 @@
                 <div class="row">
                     {% for item in hosts_ret.data %}
                     <div class="col-md-4" onmouseover="panel_onmouseover(this);" onmouseout="panel_onmouseout(this);">
-                        <div class="host-box content-box">
+                        <div class="host-box content-box {% if not item.alive %}panel-gray{% endif %}">
                             <h2 class="bg-black host-title">{{ item.hostname }}
                                 <i style="float: right;" class="glyph-icon icon-circle font-size-23 {% if item.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                             </h2>
@@ -91,7 +91,7 @@
                                 <span>{{(((item.memory - item.memory_available) / item.memory) * 100) | int}}%</span>
                                 <i>内存使用率</i>
                             </div>
-                            <ul>
+                            <ul {% if not item.alive %}class="bg-gray"{% endif %}>
                                 <li>CPU: {{ item.cpu }} 核</li>
                                 <li>内存: {{ (item.memory / 1024 / 1024 / 1024)|int }} GB</li>
                                 <!--<li><i class="glyph-icon icon-circle font-size-23 {% if item.alive == true %}font-green{% else %}font-red{% endif %}"></i></li>-->
