@@ -147,6 +147,7 @@ class Init(object):
         from models import Utils
 
         already_clear = False
+        the_time = '03:30'
 
         while True:
             if Utils.exit_flag:
@@ -156,7 +157,7 @@ class Init(object):
             time.sleep(10)
 
             # 每天凌晨3点30分执行，清除15天前的监控记录
-            if 12600 < ji.Common.ts() % 86400 < 12620 and not already_clear:
+            if ji.JITime.now_time()[:5] == the_time and not already_clear:
                 boundary = ji.Common.ts() - 86400 * 15
                 filter_str = 'timestamp:lt:' + boundary.__str__()
 
@@ -170,7 +171,7 @@ class Init(object):
 
                 already_clear = True
 
-            if already_clear and ji.Common.ts() % 86400 > 12620:
+            if already_clear and ji.JITime.now_time()[:5] != the_time:
                 already_clear = False
 
 
