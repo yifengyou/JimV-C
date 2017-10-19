@@ -655,7 +655,7 @@
                             </a>
                         </div>
                     </td>
-                    <td><span class="{{ os_templates_mapping_by_id[item.os_template_id].icon }}"></span></td>
+                    <td><span class="{{ os_templates_mapping_by_id[item.os_template_id].icon }}" title="{{ os_templates_mapping_by_id[item.os_template_id].label }}"></span></td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
                     <td>{{ item.on_host }}</td>
                     <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>
