@@ -469,8 +469,9 @@
     }
 
     function delete_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         remove([uuid]);
+        $('#delete_modal').modal('hide');
     }
 
     function migrate_go() {
@@ -576,6 +577,7 @@
         if (uuids) {
             remove(uuids);
         }
+        $('#batch_delete_modal').modal('hide');
     }
 
     function batch_add_boot_job() {
@@ -715,7 +717,11 @@
                                 </li>
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [4, 5, 6, 255] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="delete_at(this);">删除</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#delete_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                        删除
+                                    </a>
                                 </li>
                             </ul>
                         </div>
@@ -743,7 +749,7 @@
                                         </button>
                                         <ul class="dropdown-menu" style="width: 60px;">
                                             <li>
-                                                <a href="javascript:;" onclick="batch_delete();">删除</a>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#batch_delete_modal">删除</a>
                                             </li>
                                             <li class="divider"></li>
                                             <li>
@@ -894,6 +900,44 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input id="instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+
+<div class="modal" id="delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>删除的虚拟机将无法找回，上面数据将永久消失。你确定要删除该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="delete_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量删除虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>删除的虚拟机将无法找回，上面数据将永久消失。您确定要执行批量删除选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_delete();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>
