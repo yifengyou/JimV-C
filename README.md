@@ -23,7 +23,7 @@
     - [[过滤器操作符原语](docs/filter_primitive.md)](#过滤器操作符原语)
     - [[状态列表](docs/enum.md)](#状态列表)
     - [[配置](docs/config.md)](#配置)
-    - [[实例初始化操作簇](docs/os_init.md)](#实例初始化操作簇)
+    - [[实例初始化操作簇](docs/boot_job.md)](#实例初始化操作簇)
     - [[系统模板](docs/os_template.md)](#系统模板)
     - [[Guest](docs/guest.md)](#guest)
     - [[磁盘](docs/disk.md)](#磁盘)

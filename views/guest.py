@@ -125,7 +125,7 @@ def create():
         if not isinstance(ability, basestring):
             pass
 
-        m = re.search('^(\d)c(\d)g$', ability.lower())
+        m = re.search('^(\d+)c(\d+)g$', ability.lower())
         if m is None:
             pass
 

@@ -119,6 +119,7 @@ class EventProcessor(object):
             'memory_available': cls.message['message']['memory_available'],
             'interfaces': cls.message['message']['interfaces'],
             'disks': cls.message['message']['disks'],
+            'boot_time': cls.message['message']['boot_time'],
             'timestamp': ji.Common.ts()
         }
 

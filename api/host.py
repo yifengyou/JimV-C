@@ -60,6 +60,9 @@ def r_get(nodes_id):
                     v['node_id'] = node_id
                     ret['data'].append(v)
 
+            if ret['data'].__len__() > 1:
+                ret['data'].sort(key=lambda _k: _k['boot_time'])
+
         return ret
 
     except ji.PreviewingError, e:
@@ -78,6 +81,9 @@ def r_get_by_filter():
             v = Host.alive_check(v)
             v['node_id'] = k
             ret['data'].append(v)
+
+        if ret['data'].__len__() > 1:
+            ret['data'].sort(key=lambda _k: _k['boot_time'])
 
         return ret
 
@@ -106,6 +112,9 @@ def r_content_search():
                 v = Host.alive_check(v)
                 v['node_id'] = k
                 ret['data'].append(v)
+
+        if ret['data'].__len__() > 1:
+            ret['data'].sort(key=lambda _k: _k['boot_time'])
 
         return ret
 
