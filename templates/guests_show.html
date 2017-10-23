@@ -434,38 +434,45 @@
     }
 
     function boot_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         boot([uuid]);
+        $('#boot_modal').modal('hide');
     }
 
     function reboot_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         reboot([uuid]);
+        $('#reboot_modal').modal('hide');
     }
 
     function force_reboot_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         force_reboot([uuid]);
+        $('#force_reboot_modal').modal('hide');
     }
 
     function shutdown_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         shutdown([uuid]);
+        $('#shutdown_modal').modal('hide');
     }
 
     function force_shutdown_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         force_shutdown([uuid]);
+        $('#force_shutdown_modal').modal('hide');
     }
 
     function suspend_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         suspend([uuid]);
+        $('#suspend_modal').modal('hide');
     }
 
     function resume_at(me) {
-        var uuid = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        var uuid = $('#instance_uuid').val();
         resume([uuid]);
+        $('#resume_modal').modal('hide');
     }
 
     function delete_at(me) {
@@ -528,6 +535,7 @@
         if (uuids) {
             boot(uuids);
         }
+        $('#batch_boot_modal').modal('hide');
     }
 
     function batch_reboot() {
@@ -535,6 +543,7 @@
         if (uuids) {
             reboot(uuids);
         }
+        $('#batch_reboot_modal').modal('hide');
     }
 
     function batch_force_reboot() {
@@ -542,6 +551,7 @@
         if (uuids) {
             force_reboot(uuids);
         }
+        $('#batch_force_reboot_modal').modal('hide');
     }
 
     function batch_shutdown() {
@@ -549,6 +559,7 @@
         if (uuids) {
             shutdown(uuids);
         }
+        $('#batch_shutdown_modal').modal('hide');
     }
 
     function batch_force_shutdown() {
@@ -556,6 +567,7 @@
         if (uuids) {
             force_shutdown(uuids);
         }
+        $('#batch_force_shutdown_modal').modal('hide');
     }
 
     function batch_suspend() {
@@ -563,6 +575,7 @@
         if (uuids) {
             suspend(uuids);
         }
+        $('#batch_suspend_modal').modal('hide');
     }
 
     function batch_resume() {
@@ -570,6 +583,7 @@
         if (uuids) {
             resume(uuids);
         }
+        $('#batch_resume_modal').modal('hide');
     }
 
     function batch_delete() {
@@ -670,26 +684,60 @@
                             <div class="small-badge bg-red" style="display: {% if guests_boot_jobs_ret.data[item.uuid].boot_jobs|length < 1 %} none {% else %} inline-flex{% endif %};"></div>
                             <ul class="dropdown-menu">
                                 <li class="{% if item.status not in [4, 5, 6] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="boot_at(this);">启动</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#boot_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#boot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       启动
+                                    </a>
+                                </li>
                                 </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="reboot_at(this);">重启</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#reboot_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#reboot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       重启
+                                    </a>
                                 </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="force_reboot_at(this);">强制重启</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#force_reboot_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#force_reboot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       强制重启
+                                    </a>
+                                </li>
                                 </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="shutdown_at(this);">停止</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#shutdown_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#shutdown_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       停止
+                                    </a>
+                                </li>
                                 </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="force_shutdown_at(this);">强制停止</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#force_shutdown_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#force_shutdown_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       强制停止
+                                    </a>
+                                </li>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="suspend_at(this);">暂停</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#suspend_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#suspend_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       暂停
+                                    </a>
+                                </li>
                                 </li>
                                 <li class="{% if item.status not in [3] %} disabled {% endif %}">
-                                    <a href="javascript:;" onclick="resume_at(this);">恢复</a>
+                                    <a href="javascript:;" data-toggle="modal" data-target="#resume_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#resume_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       恢复
+                                    </a>
+                                </li>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="">
@@ -738,11 +786,11 @@
                         <th>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">启动</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_reboot();">重启</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_shutdown();">停止</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_suspend();">暂停</button>
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_resume();">恢复</button>
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_boot_modal">启动</button>
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_reboot_modal">重启</button>
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_shutdown_modal">停止</button>
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_suspend_modal">暂停</button>
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_resume_modal">恢复</button>
                                     <div class="dropup inline-block">
                                         <button href="javascript:;" class="dropdown-toggle btn btn-default btn-shortcut disabled" data-toggle="dropdown">
                                             更多
@@ -772,10 +820,10 @@
                                             </li>
                                             <li class="divider"></li>
                                             <li>
-                                                <a href="javascript:;" onclick="batch_force_shutdown();">强制停止</a>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#batch_force_shutdown_modal">强制停止</a>
                                             </li>
                                             <li>
-                                                <a href="javascript:;" onclick="batch_force_reboot();">强制重启</a>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#batch_force_reboot_modal">强制重启</a>
                                             </li>
                                         </ul>
                                     </div>
@@ -863,7 +911,7 @@
                 <div class="form-group">
                     <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
                     <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
-                    <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="New password">
+                    <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="新密码">
                 </div>
             </div>
             <div class="modal-footer">
@@ -937,6 +985,258 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="batch_delete();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="reboot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">重启虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要重启该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="reboot_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="reboot_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_reboot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量重启虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要执行批量重启选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_reboot();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="force_reboot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">强制重启虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要强制重启该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="force_reboot_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="force_reboot_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_force_reboot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量强制重启虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要执行批量强制重启选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_force_reboot();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="shutdown_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">停止虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要停止该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="shutdown_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="shutdown_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_shutdown_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量停止虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要执行批量停止选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_shutdown();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="force_shutdown_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">强制停止虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要强制停止该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="force_shutdown_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="force_shutdown_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_force_shutdown_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量强制停止虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要执行批量强制停止选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_force_shutdown();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="suspend_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">暂停虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要暂停该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="suspend_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="suspend_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_suspend_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量暂停虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要执行批量暂停选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_suspend();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="resume_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">恢复暂停的虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要恢复暂停的该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="resume_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="resume_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_resume_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量恢复暂停的虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要执行批量恢复暂停的选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_resume();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="boot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">启动虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要启动该虚拟机吗？</p>
+                <h3 style="color: orangered;" id="boot_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="boot_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_boot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量启动虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要执行批量启动选择的虚拟机吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_boot();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
