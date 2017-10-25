@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import Blueprint, request, g, make_response
+from flask import Blueprint, g, make_response
 from flask import request
 from flask import session
 import json
 import jimit as ji
 
+from models.initialize import app
 from api.base import Base
 from models import User
 from models import Utils
@@ -106,6 +107,80 @@ def r_change_password():
         ji.Check.previewing(args_rules, user.__dict__)
         user.password = ji.Security.ji_pbkdf2(user.password)
         user.update()
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_reset_password(token):
+
+    args_rules = [
+        Rules.TOKEN.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'token': token})
+
+        token = Utils.verify_token(token, audience='r_reset_password')
+
+        user = User()
+        user.id = token['uid']
+        user.get()
+
+        args_rules = [
+            Rules.PASSWORD.value
+        ]
+
+        user.password = request.json.get('password')
+
+        ji.Check.previewing(args_rules, user.__dict__)
+        user.password = ji.Security.ji_pbkdf2(user.password)
+        user.update()
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_send_reset_password_email(login_name):
+
+    args_rules = [
+        Rules.LOGIN_NAME.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'login_name': login_name})
+
+        user = User()
+        try:
+            user.login_name = login_name
+            user.get_by('login_name')
+
+        except ji.PreviewingError, e:
+            # 如果 login_name 没有找到，则尝试从email里面查找
+            # 因为用户可能会把登录名理解成email
+            user.email = login_name
+            user.get_by('email')
+
+        host_url = request.host_url.rstrip('/')
+        # 5 分钟有效期
+        token = Utils.generate_token(uid=user.id, ttl=300, audience='r_reset_password')
+
+        reset_password_url = '/'.join([host_url, 'reset_password', token])
+
+        smtp_server = ji.NetUtils.smtp_init(host=app.config['smtp_host'], port=app.config.get('smtp_port', None),
+                                            login_name=app.config['smtp_user'], password=app.config['smtp_password'],
+                                            tls=app.config['smtp_starttls'])
+
+        ji.NetUtils.send_mail(smtp_server=smtp_server, sender=app.config['smtp_user'],
+                              receivers=[user.email], title=u'重置登录密码',
+                              message=u'请复制以下地址到浏览器中打开：' + reset_password_url)
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = {'email': user.email}
+
+        return ret
+
     except ji.PreviewingError, e:
         return json.loads(e.message)
 

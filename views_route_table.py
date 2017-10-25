@@ -17,6 +17,8 @@ add_rule_views(config.blueprint, '/create', views_func='config.create', methods=
 
 add_rule_views(misc.blueprint, 'login', views_func='misc.login', methods=['GET'])
 add_rule_views(misc.blueprint, 'change_password', views_func='misc.change_password', methods=['GET'])
+add_rule_views(misc.blueprint, 'recover_password', views_func='misc.recover_password', methods=['GET', 'POST'])
+add_rule_views(misc.blueprint, 'reset_password', views_func='misc.reset_password', methods=['GET'])
 
 add_rule_views(dashboard.blueprint, '', views_func='dashboard.show', methods=['GET'])
 

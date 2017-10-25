@@ -17,7 +17,7 @@ from flask.ext.session import Session
 
 from models import Utils
 from models.event_processor import EventProcessor
-from models.initialize import socketio, logger, q_ws, Init
+from models.initialize import logger, q_ws, Init
 import api_route_table
 import views_route_table
 from models import Database as db
@@ -105,7 +105,11 @@ def is_not_need_to_auth(endpoint):
         'api_config.r_create',
         'v_config.create',
         'v_misc.login',
-        'api_user.r_sign_in'
+        'v_misc.recover_password',
+        'v_misc.reset_password',
+        'api_user.r_sign_in',
+        'api_user.r_reset_password',
+        'api_user.r_send_reset_password_email'
     ]
 
     if endpoint in not_auth_table:

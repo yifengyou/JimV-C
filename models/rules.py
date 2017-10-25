@@ -78,3 +78,5 @@ class Rules(Enum):
     OPERATE_RULE_CONTENT = (basestring, 'content')
     OPERATE_RULE_COMMAND = (basestring, 'command')
 
+    TOKEN = (basestring, 'token')
+

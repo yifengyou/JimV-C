@@ -87,21 +87,30 @@ class Utils(object):
         return _superuser
 
     @staticmethod
-    def generate_token(uid):
+    def generate_token(uid, ttl=app.config['token_ttl'], audience=None):
         payload = {
             'iat': ji.Common.ts(),                                                  # 创建于
             'nbf': ji.Common.ts(),                                                  # 在此之前不可用
-            'exp': ji.Common.ts() + app.config['token_ttl'],                        # 过期时间
+            'exp': ji.Common.ts() + ttl,                        # 过期时间
             'uid': uid
         }
+
+        if audience is not None:
+            payload['aud'] = audience
+
         return jwt.encode(payload=payload, key=app.config['jwt_secret'], algorithm=app.config['jwt_algorithm'])
 
     @staticmethod
-    def verify_token(token):
+    def verify_token(token, audience=None):
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
         try:
-            payload = jwt.decode(jwt=token, key=app.config['jwt_secret'], algorithms=app.config['jwt_algorithm'])
+            if audience is None:
+                payload = jwt.decode(jwt=token, key=app.config['jwt_secret'], algorithms=app.config['jwt_algorithm'])
+            else:
+                payload = jwt.decode(jwt=token, key=app.config['jwt_secret'], algorithms=app.config['jwt_algorithm'],
+                                     audience=audience)
+
             return payload
         except jwt.InvalidTokenError, e:
             logger.error(e.message)
