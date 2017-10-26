@@ -38,14 +38,27 @@
     });
 
     function refresh() {
-        keyword = $('#content_search').val();
-        page = $('#pagination li.active a').text();
-        page_size = $('#page_size').val();
-        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
-        if (keyword.length > 0) {
-            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
-        }
-        window.location.href=cur_url;
+        window.location.href=resource_path;
+    }
+
+    function remove(uuids) {
+        $.ajax({
+            url : '/api/hosts/' + uuids.join(','),
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('计算节点删除指令发送失败！');
+            },
+            success : function() {
+                alter_success('计算节点删除指令发送成功！');
+            }
+        });
+    }
+
+    function delete_at(me) {
+        var node_id = $(me).prev().text();
+        remove([node_id]);
+        refresh()
     }
 
     function panel_onmouseover(me) {
@@ -83,6 +96,12 @@
                             <div class="bg-blue host-specs">
                                 <div class="show_detail_link" style="display: none; position: absolute; z-index: 9999; margin-top: 20px; right: 2%;">
                                     <a href="/host/detail/{{ item.node_id }}" style="color: white; background-color: black;">&nbsp;&nbsp;&nbsp;&nbsp;主机详情&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                </div>
+                                <div style="{% if item.alive == true %}display: none;{% endif %}position: absolute; z-index: 9999; margin-top: 0; top: 56px; right: 0; left: 0;">
+                                    <span style="color: white; background-color: black; font-size: 13px; display: block; color: #2d2d2d; background-color: #cbcbcb;">&nbsp;&nbsp;&nbsp;&nbsp;最后在线时间: {{ format_datetime_by_tus(item.timestamp * 1000 * 1000) }}&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="display: none;">{{ item.node_id }}</span>
+                                        <a href="javascript:;" onclick="delete_at(this);" style="color: black;">删除该计算节点</a>
+                                    </span>
                                 </div>
                                 <span>{{ '%0.2f'| format(item.system_load[0] / item.cpu) }}</span>
                                 <i>当前系统负载</i>

@@ -124,7 +124,6 @@ class EventProcessor(object):
         }
 
         db.r.hset(app.config['hosts_info'], key=key, value=json.dumps(value, ensure_ascii=False))
-        db.r.expire(app.config['hosts_info'], 10)
 
     @classmethod
     def response_processor(cls):

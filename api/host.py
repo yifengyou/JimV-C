@@ -121,3 +121,42 @@ def r_content_search():
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
+
+@Utils.dumps2response
+def r_delete(nodes_id):
+
+    args_rules = [
+        Rules.IDS.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {args_rules[0][1]: nodes_id})
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = list()
+
+        if -1 == nodes_id.find(','):
+            node_id = nodes_id
+            if db.r.hexists(app.config['hosts_info'], node_id):
+                v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
+                v['node_id'] = node_id
+                ret['data'] = v
+                db.r.hdel(app.config['hosts_info'], node_id)
+
+        else:
+            for node_id in nodes_id.split(','):
+                if db.r.hexists(app.config['hosts_info'], node_id):
+                    v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
+                    v['node_id'] = node_id
+                    ret['data'].append(v)
+                    db.r.hdel(app.config['hosts_info'], node_id)
+
+            if ret['data'].__len__() > 1:
+                ret['data'].sort(key=lambda _k: _k['boot_time'])
+
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
