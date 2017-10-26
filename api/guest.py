@@ -504,6 +504,16 @@ def r_delete(uuids):
 
             Guest.emit_instruction(message=json.dumps(message))
 
+            # 删除创建失败的 Guest
+            if guest.status == status.GuestState.dirty.value:
+                disk = Disk()
+                disk.uuid = guest.uuid
+                disk.get_by('uuid')
+
+                if disk.state == status.DiskState.pending.value:
+                    disk.delete()
+                    guest.delete()
+
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
