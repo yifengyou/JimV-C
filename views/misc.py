@@ -49,6 +49,35 @@ def recover_password():
         return render_template('recover_password.html')
 
 
-def reset_password():
-    return render_template('reset_password.html')
+def reset_password(token):
+    host_url = request.host_url.rstrip('/')
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+
+        payload = {
+            "password": password
+        }
+        url = host_url + '/api/user/_reset_password/' + token
+
+        headers = {'content-type': 'application/json'}
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        j_r = json.loads(r.content)
+
+        if j_r['state']['code'] == '200':
+            return render_template('success.html',
+                                   go_back_url='/login',
+                                   timeout=10000, title=u'提交成功',
+                                   message_title=u'重置密码成功',
+                                   message=u'页面将在10秒钟后自动跳转到登录页面！')
+
+        else:
+            return render_template('failure.html',
+                                   go_back_url='/login',
+                                   timeout=10000, title=u'提交失败',
+                                   message_title=u'重置密码失败',
+                                   message=j_r['state']['sub']['zh-cn'] + u'，页面将在10秒钟后自动跳转到登录页面！')
+
+    else:
+        return render_template('reset_password.html', token=token)
 

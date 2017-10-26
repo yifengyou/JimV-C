@@ -136,7 +136,7 @@ def r_reset_password(token):
         ji.Check.previewing(args_rules, user.__dict__)
         user.password = ji.Security.ji_pbkdf2(user.password)
         user.update()
-    except ji.PreviewingError, e:
+    except (ji.PreviewingError, ji.JITError), e:
         return json.loads(e.message)
 
 
