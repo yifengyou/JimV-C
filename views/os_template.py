@@ -116,12 +116,14 @@ def create():
     if request.method == 'POST':
         label = request.form.get('label')
         path = request.form.get('path')
+        os_type = request.form.get('os_type')
         icon = request.form.get('icon')
         boot_job_id = request.form.get('boot_job_id')
 
         payload = {
             "label": label,
             "path": path,
+            "os_type": int(os_type),
             "active": True,
             "icon": icon,
             "boot_job_id": int(boot_job_id)

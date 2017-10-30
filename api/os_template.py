@@ -44,12 +44,14 @@ def r_create():
         Rules.LABEL.value,
         Rules.PATH.value,
         Rules.ACTIVE.value,
+        Rules.OS_TYPE.value,
         Rules.ICON.value,
         Rules.BOOT_JOB_ID_EXT.value
     ]
 
     os_template.label = request.json.get('label')
     os_template.path = request.json.get('path')
+    os_template.os_type = request.json.get('os_type')
     os_template.active = request.json.get('active')
     os_template.icon = request.json.get('icon')
     os_template.boot_job_id = request.json.get('boot_job_id', 0)
@@ -92,6 +94,11 @@ def r_update(_id):
             Rules.PATH.value,
         )
 
+    if 'os_type' in request.json:
+        args_rules.append(
+            Rules.OS_TYPE.value,
+        )
+
     if 'active' in request.json:
         args_rules.append(
             Rules.ACTIVE.value,
@@ -121,6 +128,7 @@ def r_update(_id):
         os_template.get()
         os_template.label = request.json.get('label', os_template.label)
         os_template.path = request.json.get('path', os_template.path)
+        os_template.os_type = request.json.get('os_type', os_template.os_type)
         os_template.active = request.json.get('active', os_template.active)
         os_template.icon = request.json.get('icon', os_template.icon)
         os_template.boot_job_id = request.json.get('boot_job_id', os_template.boot_job_id)

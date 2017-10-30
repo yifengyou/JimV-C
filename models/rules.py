@@ -68,6 +68,7 @@ class Rules(Enum):
     REMARK = (basestring, 'remark')
     USE_FOR = (int, 'use_for')
     LABEL = (basestring, 'label')
+    OS_TYPE = (int, 'os_type')
     ACTIVE = (bool, 'active')
     ICON = (basestring, 'icon')
 

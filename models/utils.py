@@ -6,7 +6,6 @@ from functools import wraps
 
 import commands
 
-import time
 from flask import make_response, g, request
 from flask.wrappers import Response
 from werkzeug.utils import import_string, cached_property
@@ -272,7 +271,31 @@ def utility_processor():
         return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
             icon=icon, color=color, desc=desc)
 
+    def format_os_type_id_to_name(os_type):
+        from models import OSType
+        if os_type == OSType.linux.value:
+            return u'Linux'
+
+        elif os_type == OSType.windows.value:
+            return u'Windows'
+
+        elif os_type == OSType.bsd.value:
+            return u'BSD'
+
+        elif os_type == OSType.aix.value:
+            return u'AIX'
+
+        elif os_type == OSType.hp_unix.value:
+            return u'HP-UNIX'
+
+        elif os_type == OSType.unknown.value:
+            return u'Unknown'
+
+        else:
+            return u'Unknown'
+
     return dict(format_price=format_price, format_datetime_by_tus=format_datetime_by_tus,
                 format_datetime_by_ts=format_datetime_by_ts, format_guest_status=format_guest_status,
-                format_sequence_to_device_name=format_sequence_to_device_name, format_disk_state=format_disk_state)
+                format_sequence_to_device_name=format_sequence_to_device_name, format_disk_state=format_disk_state,
+                format_os_type_id_to_name=format_os_type_id_to_name)
 

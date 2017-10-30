@@ -39,10 +39,6 @@ from guest import (
     Guest, Disk
 )
 
-from guest_xml import (
-    GuestXML
-)
-
 from boot_job import (
     BootJob, OperateRule
 )
@@ -56,7 +52,12 @@ from status import (
     GuestState,
     ResponseState,
     DiskState,
-    LogLevel
+    LogLevel,
+    OSType
+)
+
+from guest_xml import (
+    GuestXML
 )
 
 from log import (
@@ -91,7 +92,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 __all__ = [
-    'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState',
+    'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState', 'OSType',
     'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
     'EventProcessor', 'ResponseState', 'CPUMemory', 'Traffic', 'DiskIO', 'HostCPUMemory', 'HostTraffic',
     'HostDiskUsageIO', 'Host'

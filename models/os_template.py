@@ -22,6 +22,7 @@ class OSTemplate(ORM):
         self.id = 0
         self.label = None
         self.path = None
+        self.os_type = None
         self.active = None
         self.icon = None
         self.boot_job_id = None
@@ -32,15 +33,16 @@ class OSTemplate(ORM):
             'id': FilterFieldType.INT.value,
             'label': FilterFieldType.STR.value,
             'path': FilterFieldType.STR.value,
+            'os_type': FilterFieldType.INT.value,
             'active': FilterFieldType.BOOL.value,
             'boot_job_id': FilterFieldType.INT.value
         }
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['active', 'boot_job_id']
+        return ['active', 'boot_job_id', 'os_type']
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['label', 'path']
+        return ['label', 'path', 'os_type']
 

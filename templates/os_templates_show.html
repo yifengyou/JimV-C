@@ -152,9 +152,14 @@
             refresh_os_template_boot_job_selectpicker($('#update_boot_job_id'));
         });
 
-        $('#update_icon_modal').on('show.bs.modal', function (me) {
+        $('#update_os_type_modal').on('show.bs.modal', function (me) {
             $('#os_template_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().text());
-            $('#update_icon_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().text());
+            $('#update_os_type_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().text());
+        });
+
+        $('#update_icon_modal').on('show.bs.modal', function (me) {
+            $('#os_template_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().prev().text());
+            $('#update_icon_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().prev().text());
         });
     });
 
@@ -349,6 +354,24 @@
         });
     }
 
+    function update_os_type(id) {
+        $.ajax({
+            url : '/api/os_template/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                os_type: parseInt($('#update_os_type').val())
+            }),
+            error : function() {
+                alter_danger('变更操作系统类型指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更操作系统类型指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
     function update_icon(id) {
         $.ajax({
             url : '/api/os_template/' + id,
@@ -389,6 +412,12 @@
         $('#update_boot_job_modal').modal('hide');
     }
 
+    function update_os_type_at(me) {
+        var id = $('#os_template_id').val();
+        update_os_type(id);
+        $('#update_os_type_modal').modal('hide');
+    }
+
     function update_icon_at(me) {
         var id = $('#os_template_id').val();
         update_icon(id);
@@ -422,6 +451,7 @@
                     <th width="180px;">名称</th>
                     <th>状态</th>
                     <th width="500px;">路径</th>
+                    <th>操作系统类型</th>
                     <th>ICON</th>
                     <th>初始化作业</th>
                     <th>操作</th>
@@ -453,6 +483,11 @@
                                 <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
                             </a>
                         </div>
+                    </td>
+                    <td>
+                        <a href="javascript:;" data-toggle="modal" data-target="#update_os_type_modal">
+                            {{ format_os_type_id_to_name(item.os_type) }}
+                        </a>
                     </td>
                     <td>
                         <a href="javascript:;" data-toggle="modal" data-target="#update_icon_modal">
@@ -643,6 +678,19 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;操作系统类型</label>
+                            <div class="col-sm-6">
+                                <select id="os_type" name="os_type" title="操作系统类型" class="selectpicker">
+                                    <option value="0" selected>Linux</option>
+                                    <option value="1">Windows</option>
+                                    <option value="2">BSD</option>
+                                    <option value="3">AIX</option>
+                                    <option value="4">HP-UNIX</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label"><span class="glyph-icon icon-file-code-o"></span>&nbsp;&nbsp;初始化作业</label>
                             <div class="col-sm-6">
                                 <select id="boot_job_id" name="boot_job_id" title="实例的启动作业" class="selectpicker">
@@ -690,6 +738,43 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="update_boot_job_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="update_os_type_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更操作系统类型：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;操作系统类型</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_os_type_instance_desc"></h3>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-8">
+                            <select id="update_os_type" name="os_type" title="操作系统类型" class="selectpicker">
+                                <option value="0" selected>Linux</option>
+                                <option value="1">Windows</option>
+                                <option value="2">BSD</option>
+                                <option value="3">AIX</option>
+                                <option value="4">HP-UNIX</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_os_type_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

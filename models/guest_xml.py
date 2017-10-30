@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from models import Config, Disk
+from models import Config, Disk, OSTemplate, OSType
 from models import Guest
 from models import status
 
@@ -15,7 +15,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 class GuestXML(object):
 
-    def __init__(self, guest=None, disk=None, config=None):
+    def __init__(self, guest=None, disk=None, config=None, os_type=None):
         assert isinstance(guest, Guest)
         assert isinstance(disk, Disk)
         assert isinstance(config, Config)
@@ -23,23 +23,22 @@ class GuestXML(object):
         self.guest = guest
         self.disk = disk
         self.config = config
+        self.os_type = os_type
 
     def get_domain(self):
-        # clock 参考链接：https://libvirt.org/formatdomain.html#elementsTime
-        # Windows Guest 设为 localtime，非 Windows Guest 都设为 utc
         return """<?xml version="1.0" encoding="utf-8"?>
             <domain type="kvm">
             {0}
-            <clock offset='utc'/>
             {1}
             {2}
             {3}
             {4}
             {5}
             {6}
+            {7}
             </domain>
-        """.format(self.get_features(), self.get_name(), self.get_uuid(), self.get_vcpu(), self.get_memory(),
-                   self.get_os(), self.get_devices())
+        """.format(self.get_features(), self.get_clock(), self.get_name(), self.get_uuid(), self.get_vcpu(),
+                   self.get_memory(), self.get_os(), self.get_devices())
 
     @staticmethod
     def get_features():
@@ -49,6 +48,16 @@ class GuestXML(object):
                 <apic/>
             </features>
         """
+
+    def get_clock(self):
+        # clock 参考链接：https://libvirt.org/formatdomain.html#elementsTime
+        # Windows Guest 设为 localtime，非 Windows Guest 都设为 utc
+        offset = 'utc'
+
+        if self.os_type == OSType.windows.value:
+            offset = 'localtime'
+
+        return """<clock offset='{0}'/>""".format(offset)
 
     def get_name(self):
         return """<name>{0}</name>""".format(self.guest.label)

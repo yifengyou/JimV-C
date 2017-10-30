@@ -132,7 +132,7 @@ def r_create():
             disk.guest_uuid = ''
             disk.create()
 
-            guest_xml = GuestXML(guest=guest, disk=disk, config=config)
+            guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template.os_type)
             guest.xml = guest_xml.get_domain()
 
             # 在可用计算节点中平均分配任务
@@ -169,6 +169,7 @@ def r_create():
                 'hostname': guest.on_host,
                 'name': guest.label,
                 'template_path': os_template.path,
+                'os_type': os_template.os_type,
                 'disk': disk.__dict__,
                 'xml': guest_xml.get_domain(),
                 'boot_jobs': _boot_jobs,
