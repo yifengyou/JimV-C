@@ -14,6 +14,7 @@ import os
 import threading
 from flask import g, request, redirect, url_for, Response, session
 from flask.ext.session import Session
+from werkzeug.debug import get_current_traceback
 
 from models import Utils
 from models.event_processor import EventProcessor
@@ -188,6 +189,13 @@ def r_after_request(response):
         return response
     except ji.JITError, e:
         return json.loads(e.message)
+
+
+@app.teardown_request
+def teardown_request(exception):
+    if exception:
+        _traceback = get_current_traceback()
+        logger.error(_traceback.plaintext)
 
 
 # noinspection PyBroadException

@@ -49,7 +49,7 @@ class Init(object):
         'guest_boot_jobs_wait_time': 600,
         'db_charset': 'utf8',
         'db_pool_size': 10,
-        'DEBUG': True,
+        'DEBUG': False,
         'jwt_algorithm': 'HS512',
         'token_ttl': 604800,
         'SESSION_TYPE': 'filesystem',
