@@ -31,27 +31,27 @@
             <div class="example-box-wrapper">
                 <div class="row">
                     <div class="col-md-2">
-                        <a href="/hosts" title="宿主机 CPU 总计" class="tile-box tile-box-shortcut btn-info">
+                        <a href="/hosts" title="计算节点 CPU 总计" class="tile-box tile-box-shortcut btn-info">
                             <div class="tile-content-wrapper">
                                 <i class="webhh icon-cpu-processor"></i>
                                 <div style="font-size: 20px; margin-top: 18px; right: 10px; position: absolute;">
                                     {{ hosts_sum.cpu }} 核
                                 </div>
                                 <div class="tile-header" style="opacity: .70;">
-                                    宿主机 CPU 总计
+                                    计算节点 CPU 总计
                                 </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-2">
-                        <a href="/hosts" title="宿主机内存总计" class="tile-box tile-box-shortcut btn-warning">
+                        <a href="/hosts" title="计算节点内存总计" class="tile-box tile-box-shortcut btn-warning">
                             <div class="tile-content-wrapper">
                                 <i class="webhh icon-ram"></i>
                                 <div style="font-size: 20px; margin-top: 18px; right: 10px; position: absolute;">
                                     {{ (hosts_sum.memory / 1024 / 1024 / 1024)|int }} GB
                                 </div>
                                 <div class="tile-header" style="opacity: .70;">
-                                    宿主机内存总计
+                                    计算节点内存总计
                                 </div>
                             </div>
                         </a>
@@ -268,7 +268,7 @@
     <div class="panel">
         <div class="panel-body">
             <h3 class="title-hero">
-                宿主机 TOP <span style="font-size: 17px;">10</span>
+                计算节点 TOP <span style="font-size: 17px;">10</span>
             </h3>
             <div class="row">
                 <div class="col-md-4">

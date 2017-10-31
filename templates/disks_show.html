@@ -140,7 +140,7 @@
         $('#mount_modal').on('show.bs.modal', function (me) {
             var url = '/api/guests?page=1&page_size=10000';
 
-            // 单机版加入与磁盘同一宿主机的过滤
+            // 单机版加入与磁盘同一计算节点的过滤
             {% if show_on_host %}
                 var on_host = $(me.relatedTarget).parent().parent().parent().parent().prev().prev().prev().text();
                 url += '&filter=on_host:eq:' + on_host;
@@ -383,7 +383,7 @@
                     <th>大小</th>
                     <th>设备号</th>
                     <th>所属虚拟机</th>
-                    <th style="{% if not show_on_host %}display: none;{% endif %}">所属宿主机</th>
+                    <th style="{% if not show_on_host %}display: none;{% endif %}">所属计算节点</th>
                     <th>磁盘性别</th>
                     <th>创建时间</th>
                     <th>操作</th>
