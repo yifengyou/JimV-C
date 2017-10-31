@@ -36,9 +36,10 @@ class GuestXML(object):
             {5}
             {6}
             {7}
+            {8}
             </domain>
-        """.format(self.get_features(), self.get_clock(), self.get_name(), self.get_uuid(), self.get_vcpu(),
-                   self.get_memory(), self.get_os(), self.get_devices())
+        """.format(self.get_features(), self.get_cpu_mode(), self.get_clock(), self.get_name(), self.get_uuid(),
+                   self.get_vcpu(), self.get_memory(), self.get_os(), self.get_devices())
 
     @staticmethod
     def get_features():
@@ -48,6 +49,10 @@ class GuestXML(object):
                 <apic/>
             </features>
         """
+
+    @staticmethod
+    def get_cpu_mode():
+        return """<cpu mode='host-passthrough'/>"""
 
     def get_clock(self):
         # clock 参考链接：https://libvirt.org/formatdomain.html#elementsTime
