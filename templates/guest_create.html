@@ -35,22 +35,48 @@
 {% block body %}
 <script>
     $(document).ready(function() {
-        $('#os_template').chosen({
-            "disable_search": true
-        });
-
         $('body').addClass('add-transition');
         $('.add-page-transition').on('click', function(){
             var transAttr = $(this).attr('data-transition');
             $('.add-transition').attr('class', 'add-transition');
             $('.add-transition').addClass(transAttr);
         });
-    });
 
-    $(function() { "use strict";
-        $(".chosen-select").chosen();
-        $(".chosen-search").append('<i class="glyph-icon icon-search"></i>');
-        $(".chosen-single div").html('<i class="glyph-icon icon-caret-down"></i>');
+        $('#create_guest_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            fields: {
+                ability: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                },
+                os_template_id: {
+                    validators: {
+                        // choice: {
+                        //     min: 1,
+                        //     max: 1
+                        //     // message: ''
+                        // },
+                        notEmpty: {
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                data.fv.disableSubmitButtons(true);
+            }
+        });
     });
 
     $(function() { "use strict";
@@ -78,69 +104,68 @@
                 </span>
             </a>
             <div class="example-box-wrapper">
-                <form class="form-horizontal bordered-row" action="/guests/create" method="post">
+                <form id="create_guest_form" class="form-horizontal bordered-row" action="/guests/create" method="post">
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-gauge"></span>&nbsp;&nbsp;运算能力</label>
                         <div class="col-sm-10">
                             <div class="btn-ability-line" data-toggle="buttons">
-                                <a href="#" class="btn btn-default btn-ability">
+                                <label class="btn btn-default btn-ability">
                                     <input title="1 CPU 1GB Memory" name="ability" type="radio" value="1c1g">1&nbsp;&nbsp;核&nbsp;&nbsp;1&nbsp;&nbsp;GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="1 CPU 2GB Memory" name="ability" type="radio" value="1c2g">1&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="2 CPU 2GB Memory" name="ability" type="radio" value="2c2g">2&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="2 CPU 4GB Memory" name="ability" type="radio" value="2c4g">2&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="4 CPU 4GB Memory" name="ability" type="radio" value="4c4g">4&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="4 CPU 8GB Memory" name="ability" type="radio" value="4c8g">4&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="8 CPU 8GB Memory" name="ability" type="radio" value="8c8g">8&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="8 CPU 16GB Memory" name="ability" type="radio" value="8c16g">8&nbsp;&nbsp;核&nbsp;&nbsp;16GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="1 CPU 16GB Memory" name="ability" type="radio" value="1c16g">1&nbsp;&nbsp;核&nbsp;&nbsp;16GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="4 CPU 32GB Memory" name="ability" type="radio" value="4c32g">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="4 CPU 64GB Memory" name="ability" type="radio" value="4c64g">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="8 CPU 64GB Memory" name="ability" type="radio" value="8c64g">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="16 CPU 16GB Memory" name="ability" type="radio" value="16c16g">16核&nbsp;&nbsp;16GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="24 CPU 24GB Memory" name="ability" type="radio" value="24c24g">24核&nbsp;&nbsp;24GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="32 CPU 32GB Memory" name="ability" type="radio" value="32c32g">32核&nbsp;&nbsp;32GB
-                                </a>
-                                <a href="#" class="btn btn-default btn-ability">
+                                </label>
+                                <label class="btn btn-default btn-ability">
                                     <input title="64 CPU 64GB Memory" name="ability" type="radio" value="64c64g">64核&nbsp;&nbsp;64GB
-                                </a>
+                                </label>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;系统模板</label>
                         <div class="col-sm-6">
-                            <select id="os_template" name="os_template_id" class="chosen-select" data-placeholder="请选择系统模板...">
-                                <option></option>
+                            <select id="os_template" name="os_template_id" title="请选择系统模板..." class="selectpicker" data-width="100%">
                                 {% for item in os_template_data %}
-                                <option value="{{ item.id }}">{{ item.label }}</option>
+                                    <option value="{{ item.id }}" data-icon="{{ item.icon }}">&nbsp;&nbsp;{{ item.label }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -179,7 +204,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label"></label>
                         <div class="col-sm-3 pull-right">
-                            <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                            <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
                         </div>
                     </div>
                 </form>
