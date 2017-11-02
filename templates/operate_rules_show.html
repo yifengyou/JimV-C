@@ -176,6 +176,46 @@
                 );
             }
         });
+
+        $('#add_operate_rule_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                boot_job_id: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                },
+                kind: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                },
+                sequence: {
+                    validators: {
+                        between: {
+                            min: 1,
+                            max: 20
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                data.fv.disableSubmitButtons(true);
+            }
+        });
     });
 
     function refresh() {
@@ -578,7 +618,7 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form class="form-horizontal bordered-row" action="/operate_rule" method="post">
+                    <form id="add_operate_rule_form" class="form-horizontal bordered-row" action="/operate_rule" method="post">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;启动作业</label>
@@ -610,7 +650,7 @@
                         <div class="form-group">
                             <div class="col-sm-4"></div>
                             <div class="col-sm-6 pull-right">
-                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
                                 <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
                             </div>
                         </div>
