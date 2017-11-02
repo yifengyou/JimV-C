@@ -161,6 +161,62 @@
             $('#os_template_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().prev().text());
             $('#update_icon_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().prev().text());
         });
+
+        $('#add_os_template_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                label: {
+                    validators: {
+                        notEmpty: {},
+                        stringLength: {
+                            min: 2,
+                            max: 255
+                        }
+                    }
+                },
+                icon: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                },
+                path: {
+                    validators: {
+                        notEmpty: {},
+                        stringLength: {
+                            min: 2,
+                            max: 255
+                        }
+                    }
+                },
+                os_type: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                },
+                boot_job_id: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                data.fv.disableSubmitButtons(true);
+            }
+        })
     });
 
     function refresh() {
@@ -644,7 +700,7 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form class="form-horizontal bordered-row" action="/os_template" method="post">
+                    <form id="add_os_template_form" class="form-horizontal bordered-row" action="/os_template" method="post">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板名称</label>
@@ -700,7 +756,7 @@
                         <div class="form-group">
                             <div class="col-sm-4"></div>
                             <div class="col-sm-6 pull-right">
-                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
                                 <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
                             </div>
                         </div>
