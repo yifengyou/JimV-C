@@ -97,7 +97,15 @@ def r_create():
             }
 
             if disk.on_host == 'shared_storage':
-                message['hostname'] = Guest.get_lightest_host()['hostname']
+                available_hosts = Guest.get_available_hosts()
+
+                if available_hosts.__len__() == 0:
+                    ret['state'] = ji.Common.exchange_state(50351)
+                    return ret
+
+                # 在可用计算节点中平均分配任务
+                chosen_host = available_hosts[quantity % available_hosts.__len__()]
+                message['hostname'] = chosen_host['hostname']
 
             Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 

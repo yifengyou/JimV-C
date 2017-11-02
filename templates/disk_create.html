@@ -42,6 +42,48 @@
         {% else %}
             $('#on_host_form').remove();
         {% endif %}
+
+        $('#create_disk_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            fields: {
+                size: {
+                    validators: {
+                        between: {
+                            min: 1,
+                            max: 10240
+                        }
+                    }
+                },
+                quantity: {
+                    validators: {
+                        between: {
+                            min: 1,
+                            max: 20
+                        }
+                    }
+                },
+                remark: {
+                    validators: {
+                        stringLength: {
+                            max: 64
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                data.fv.disableSubmitButtons(true);
+            }
+        })
     });
 
     $(function() { "use strict";
@@ -100,7 +142,7 @@
                 </span>
             </a>
             <div class="example-box-wrapper">
-                <form class="form-horizontal bordered-row" action="/disks/create" method="post">
+                <form id="create_disk_form" class="form-horizontal bordered-row" action="/disks/create" method="post">
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-hdd"></span>&nbsp;&nbsp;磁盘大小 (GB)</label>
                         <div class="col-sm-6">
@@ -135,7 +177,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label"></label>
                         <div class="col-sm-3 pull-right">
-                            <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
+                            <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">创建</button>
                         </div>
                     </div>
                 </form>
