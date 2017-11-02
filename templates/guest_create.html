@@ -61,12 +61,39 @@
                 },
                 os_template_id: {
                     validators: {
-                        // choice: {
-                        //     min: 1,
-                        //     max: 1
-                        //     // message: ''
-                        // },
                         notEmpty: {
+                        }
+                    }
+                },
+                quantity: {
+                    validators: {
+                        between: {
+                            min: 1,
+                            max: 20
+                        }
+                    }
+                },
+                password: {
+                    validators: {
+                        identical: {
+                            field: 'confirm_password'
+                        },
+                        stringLength: {
+                            max: 128
+                        }
+                    }
+                },
+                confirm_password: {
+                    validators: {
+                        identical: {
+                            field: 'password'
+                        }
+                    }
+                },
+                remark: {
+                    validators: {
+                        stringLength: {
+                            max: 64
                         }
                     }
                 }
@@ -189,7 +216,7 @@
                             <div class="row form-group">
                                 <label class="col-sm-2 control-label">确认密码：</label>
                                 <div class="col-sm-6">
-                                    <input type="password" title="确认实例密码" class="form-control" id="confirm_password">
+                                    <input type="password" name="confirm_password" title="确认实例密码" class="form-control" id="confirm_password">
                                 </div>
                             </div>
                             <div style="height: 10px;"></div>
