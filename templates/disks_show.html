@@ -173,7 +173,7 @@
 
     function refresh() {
         keyword = $('#content_search').val();
-        page = $('#pagination li.active a').text();
+        page = 1;
         page_size = $('#page_size').val();
         show_area = $('#show_area').val();
         cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
@@ -479,15 +479,15 @@
                                     <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
                                         <ul id="pagination" class="pagination">
                                             <li class="{% if page == 1 %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
+                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% if show_area %}&show_area={{ show_area }}{% endif %}">«</a>
                                             </li>
                                             {% for item in pages %}
                                             <li class="{% if item == page %} active {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
+                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% if show_area %}&show_area={{ show_area }}{% endif %}">{{ item }}</a>
                                             </li>
                                             {% endfor %}
                                             <li class="{% if page == last_page %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
+                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}{% if show_area %}&show_area={{ show_area }}{% endif %}">»</a>
                                             </li>
                                         </ul>
                                     </div>

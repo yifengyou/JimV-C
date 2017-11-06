@@ -30,7 +30,12 @@ blueprints = Blueprint(
 
 def show():
     args = list()
-    page = int(request.args.get('page', 1))
+
+    page = request.args.get('page', 1)
+    if page == '':
+        page = 1
+    page = int(page)
+
     page_size = int(request.args.get('page_size', 10))
     keyword = request.args.get('keyword', None)
     show_area = request.args.get('show_area', 'unmount')
