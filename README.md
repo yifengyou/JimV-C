@@ -59,10 +59,11 @@
 |计算节点性能统计|✓|
 |CPU超分|✓|
 |内存超分|✓|
-|热迁移|✓|
-|批量创建|✓|
+|磁盘超配|✓|
 |云盘管理|✓|
 |云盘热挂载|✓|
+|热迁移|✓|
+|批量创建|✓|
 |RESTful 风格的 API|✓|
 |Virtio设备|✓|
 |Guest 暂停/恢复|✓|
@@ -144,27 +145,27 @@ cp /opt/JimV-C/jimvc.conf /etc/jimvc.conf
 **提示：**
 > 下表中凸显的配置项，需要用户根据自己的环境手动修改。
 
-| 配置项               | 默认值                   | 说明              |
-|:--------------------|:------------------------|:-----------------|
-| listen              | 127.0.0.1               | JimV-C 侦听的地址 |
-| port                | 8008                    | JimV-C 侦听的端口 |
-| db_name             | jimv                    | 数据库名称        |
-| db_host             | localhost               | 数据库地址        |
-| db_port             | 3306                    | 数据库端口        |
-| db_user             | jimv                    | 连接数控的用户名   |
-| **`db_password`**   | jimv.pswd.com           | 连接数控的密码     |
-| redis_host          | localhost               | redis数据库地址   |
-| redis_port          | 2501                    | redis数据库端口   |
-| **`redis_password`**                         || redis数据库密码   |
-| redis_dbid          | 0                       | 连接的redis数据库  |
-| log_file_path       | /var/log/jimv/jimvc.log | 日志存储路径       |
-| **`jwt_secret`**                             || token安全码       |
-| **`SECRET_KEY`**    |                         | session安全码     |
-| **`smtp_host`**                              || SMTP 服务器地址   |
-| smtp_port           | 25                      | SMTP 服务器端口   |
-| **`smtp_user`**                              || SMTP 用户         |
-| **`smtp_password`**                          || SMTP 密码         |
-| **`smtp_starttls`** | true                    | SMTP 是否开启 TLS |
+| 配置项             | 默认值                   | 说明              |
+|:------------------|:------------------------|:-----------------|
+| listen            | 127.0.0.1               | JimV-C 侦听的地址 |
+| port              | 8008                    | JimV-C 侦听的端口 |
+| db_name           | jimv                    | 数据库名称        |
+| db_host           | localhost               | 数据库地址        |
+| db_port           | 3306                    | 数据库端口        |
+| db_user           | jimv                    | 连接数控的用户名   |
+| **`db_password`** | jimv.pswd.com           | 连接数控的密码     |
+| redis_host        | localhost               | redis数据库地址   |
+| redis_port        | 2501                    | redis数据库端口   |
+| **`redis_password`**                       || redis数据库密码   |
+| redis_dbid        | 0                       | 连接的redis数据库  |
+| log_file_path     | /var/log/jimv/jimvc.log | 日志存储路径       |
+| **`jwt_secret`**                           || token安全码       |
+| **`SECRET_KEY`**  |                         | session安全码     |
+| **`smtp_host`**                            || SMTP 服务器地址   |
+| smtp_port         | 25                      | SMTP 服务器端口   |
+| **`smtp_user`**                            || SMTP 用户         |
+| **`smtp_password`**                        || SMTP 密码         |
+| smtp_starttls     | true                    | SMTP 是否开启 TLS |
 
 
 ### 启动服务
