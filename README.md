@@ -8,6 +8,7 @@
 
 # 目录
 - [项目描述](#项目描述)
+- [功能指标](#功能指标)
 - [未来计划](#未来计划)
 - [安装](#安装)
     - [创建web用户](#创建web用户)
@@ -37,8 +38,34 @@
 
 ## 项目描述
 
-> JimV-C 是 JimV 的控制节点。JimV 是一个轻量级的 KVM 虚拟化环境管理平台。
-> * 纯 HTTP 的交互方式；
+> 计算机硬件越来越白菜价，性能越来越强劲，企业电子信息化方面的业务越来越多，"互联网+"、大数据的浪潮已经掀起，物联网、AI的趋势正在形成。
+> 因为上述的一切，虚拟化技术被处于一个软化硬件，揉和硬件与业务系统这么一个核心角色。
+> 虚拟化技术虽然已经被普及了很久，但多数企业依然仅仅是把它当做独立的虚拟硬件来使用。在资源的科学分配、高效利用、自动化管理方面，还差那么几步。
+> JimV 是一个，结构清晰简单，易于部署、维护、使用的低门槛企业私有云管理平台。相比于业界知名的 OpenStack、OpenNebula...，JimV 不需要庞大的维护团队。
+
+
+## 功能指标
+|功能|JimV|
+|:-|:-:|
+|部署复杂度|低|
+|维护复杂度|低|
+|KVM虚拟化|√|
+|本地存储|√|
+|共享挂载点|√|
+|GlusterFS|√|
+|Windows Guest|√|
+|Linux Guest|√|
+|Guest 性能统计|√|
+|计算节点性能统计|√|
+|CPU超分|√|
+|内存超分|√|
+|热迁移|√|
+|批量创建|√|
+|云盘管理|√|
+|云盘热挂载|√|
+|RESTful 风格的 API|√|
+|Virtio设备|√|
+|Guest 暂停/恢复|√|
 
 
 ## 未来计划
@@ -47,11 +74,20 @@
 >* 增加计算资源变配功能
 >* 增加过期资源自动回收机制
 >* 增加模板上传功能
->* 日志处理机制
+>* 增加磁盘IO限额管理功能
+>* 增加磁盘吞吐量限额管理功能
+>* 增加网络流量限额管理功能
+>* 增加 tag 功能
+>* 增加替换 IP 功能
+>* 多租户
+>* 用户操作轨迹
 >* 用户管理功能
 >* 参照gitlab，打包出 CentOS yum 一语安装仓库
->* 加入移动端的支持；
 >* 支持快照
+>* 支持在线镜像商城
+>* 国际化
+>* SSH 公钥管理、注入功能
+>* 加入移动端的支持
 
 
 ## 安装
@@ -101,42 +137,35 @@ mysql -u jimv -pyour_jimv_db_password -e 'show databases'
 
 ### 修改配置文件
 
-配置文件路径：`sites/JimV-C/config.json` <br> **提示：**
+配置文件的默认读取路径：`/etc/jimvc.conf`
+``` bash
+cp /opt/JimV-C/jimvc.conf /etc/jimvc.conf
+```
+**提示：**
 > 下表中凸显的配置项，需要用户根据自己的环境手动修改。
 
-| 配置项                      | 默认值                | 说明                                          |
-|:---------------------------|:---------------------|:---------------------------------------------|
-| db_name                    | jimv                 | 数据库名称                                    |
-| db_host                    | localhost            | 数据库地址                                    |
-| db_port                    | 3306                 | 数据库端口                                    |
-| db_user                    | jimv                 | 连接数控的用户名                               |
-| **`db_password`**          | jimv.pswd.com        | 连接数控的密码                                 |
-| db_pool_size               | 10                   | 连接池                                        |
-| db_charset                 | utf8                 | 默认字符集                                    |
-| redis_host                 | localhost            | redis数据库地址                               |
-| redis_port                 | 2501                 | redis数据库端口                               |
-| **`redis_password`**                             || redis数据库密码                               |
-| redis_dbid                 | 0                    | 连接的redis数据库                              |
-| debug                      | false                | 是否为调试模式                                 |
-| log_cycle                  | D                    | 日志轮转周期                                   |
-| token_ttl                  | 604800               | token有效期                                   |
-| **`jwt_secret`**                                 || token安全码                                   |
-| jwt_algorithm              | HS512                | token哈希算法                                 |
-| SESSION_TYPE               | filesystem           | session存放类型                               |
-| SESSION_PERMANENT          | true                 | session是否持久化存储                          |
-| SESSION_USE_SIGNER         | true                 | session是否使用并校验签名                       |
-| SESSION_FILE_DIR           | ../cache             | session存放路径                               |
-| SESSION_FILE_THRESHOLD     | 1000                 | 存放的session超过该数量，之前的将被删除           |
-| SESSION_COOKIE_NAME        | sid                  | session id在客户端cookie中的存放名称            |
-| SESSION_COOKIE_SECURE      | false                | cookie的传输是否只在https的环境中进行            |
-| **`SECRET_KEY`**           |                      | session安全码                                 |
-| PERMANENT_SESSION_LIFETIME | 604800               | cookie在客户端的持久化时间。该值需与token_ttl相同 |
-| vm_create_queue            | Q:VMCreate           | 创建虚拟机的队列                               |
-| host_event_report_queue    | Q:HostEvent          | 宿主机事件上抛队列                              |
-| ip_available_set           | S\:IP:Available      | 虚拟化环境中可用 IP 集合                        |
-| ip_used_set                | S\:IP:Used           | 虚拟化环境中已用 IP 地址集合                    |
-| vnc_port_available_set     | S\:VNCPort:Available | 虚拟化环境中可用 VNC 端口集合                   |
-| vnc_port_used_set          | S\:VNCPort:Used      | 虚拟化环境中已用 VNC 端口集合                   |
+| 配置项               | 默认值                   | 说明              |
+|:--------------------|:------------------------|:-----------------|
+| listen              | 127.0.0.1               | JimV-C 侦听的地址 |
+| port                | 8008                    | JimV-C 侦听的端口 |
+| db_name             | jimv                    | 数据库名称        |
+| db_host             | localhost               | 数据库地址        |
+| db_port             | 3306                    | 数据库端口        |
+| db_user             | jimv                    | 连接数控的用户名   |
+| **`db_password`**   | jimv.pswd.com           | 连接数控的密码     |
+| redis_host          | localhost               | redis数据库地址   |
+| redis_port          | 2501                    | redis数据库端口   |
+| **`redis_password`**                         || redis数据库密码   |
+| redis_dbid          | 0                       | 连接的redis数据库  |
+| log_file_path       | /var/log/jimv/jimvc.log | 日志存储路径       |
+| **`jwt_secret`**                             || token安全码       |
+| **`SECRET_KEY`**    |                         | session安全码     |
+| **`smtp_host`**                              || SMTP 服务器地址   |
+| smtp_port           | 25                      | SMTP 服务器端口   |
+| **`smtp_user`**                              || SMTP 用户         |
+| **`smtp_password`**                          || SMTP 密码         |
+| **`smtp_starttls`** | true                    | SMTP 是否开启 TLS |
+
 
 ### 启动服务
 
@@ -191,7 +220,7 @@ gunicorn -c gunicorn_config.py main:app
         }
 
         location @inner {
-            proxy_pass         http://127.0.0.1:8001;
+            proxy_pass         http://127.0.0.1:8008;
             proxy_redirect     off;
             proxy_set_header   Host             $host;
             proxy_set_header   X-Real-IP        $remote_addr;
@@ -220,7 +249,6 @@ gunicorn -c gunicorn_config.py main:app
 ### [Guest](docs/guest.md)
 
 ### [磁盘](docs/disk.md)
-
 
 
 ## 流程图
