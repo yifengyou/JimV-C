@@ -41,7 +41,7 @@
 > 计算机硬件越来越白菜价，性能越来越强劲，企业电子信息化方面的业务越来越多，"互联网+"、大数据的浪潮已经掀起，物联网、AI的趋势正在形成。
 > 因为上述的一切，虚拟化技术被处于一个软化硬件，揉和硬件与业务系统这么一个核心角色。
 > 虚拟化技术虽然已经被普及了很久，但多数企业依然仅仅是把它当做独立的虚拟硬件来使用。在资源的科学分配、高效利用、自动化管理方面，还差那么几步。
-> JimV 是一个，结构清晰简单，易于部署、维护、使用的低门槛企业私有云管理平台。相比于业界知名的 OpenStack、OpenNebula...，JimV 不需要庞大的维护团队。
+> JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门槛企业私有云管理平台。相比于业界知名的 OpenStack、OpenNebula...，JimV 不需要庞大的维护团队。
 
 
 ## 功能指标
@@ -72,8 +72,8 @@
 ## 未来计划
 
 >* 增加计费功能
->* 增加计算资源变配功能
->* 增加过期资源自动回收机制
+>* 增加 Guest 变配功能
+>* 增加过期 Guest 自动回收机制
 >* 增加模板上传功能
 >* 增加磁盘IO限额管理功能
 >* 增加磁盘吞吐量限额管理功能
@@ -131,7 +131,7 @@ git clone https://github.com/mysql/mysql-connector-python.git; cd ~/mysql-connec
 # 建立 JimV 数据库专属用户
 mysql -u root -pyour_db_password -e 'grant all on jimv.* to jimv@localhost identified by "your_jimv_db_password"; flush privileges'
 # 初始化数据库
-mysql -u jimv -pyour_jimv_db_password < sites/jimv/misc/init.sql
+mysql -u jimv -pyour_jimv_db_password < ~/sites/JimV-C/misc/init.sql
 # 确认是否初始化成功
 mysql -u jimv -pyour_jimv_db_password -e 'show databases'
 ```
@@ -140,7 +140,7 @@ mysql -u jimv -pyour_jimv_db_password -e 'show databases'
 
 配置文件的默认读取路径：`/etc/jimvc.conf`
 ``` bash
-cp /opt/JimV-C/jimvc.conf /etc/jimvc.conf
+sudo cp ~/sites/JimV-C/jimvc.conf /etc/jimvc.conf
 ```
 **提示：**
 > 下表中凸显的配置项，需要用户根据自己的环境手动修改。
@@ -204,7 +204,7 @@ gunicorn -c gunicorn_config.py main:app
         ssl_ciphers AESGCM:ALL:!DH:!EXPORT:!RC4:+HIGH:!MEDIUM:!LOW:!aNULL:!eNULL;
         ssl_prefer_server_ciphers on;
 
-        root /home/www/sites/jimv/html;
+        root /home/www/sites/JimV-C;
 
         # 拒绝访问隐藏文件(如：.git、.svn等目录)
         location ~ /\..* {
