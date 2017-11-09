@@ -32,6 +32,6 @@ accesslog = '/'.join([log_file_dir, 'access.log'])
 errorlog = '/'.join([log_file_dir, 'error.log'])
 loglevel = 'info'
 
-pidfile = '/run/jimv/jimv.pid'
+pidfile = '/run/jimv/jimvc.pid'
 
 
