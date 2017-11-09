@@ -11,14 +11,17 @@
 - [功能指标](#功能指标)
 - [未来计划](#未来计划)
 - [安装](#安装)
-    - [创建web用户](#创建web用户)
+    - [安装必要软件](#安装必要软件)
+    - [部署 MariaDB](#部署-mariadb)
+    - [部署 Redis](#部署-redis)
+    - [创建 Web 用户](#创建-web-用户)
     - [创建站点发布目录](#创建站点发布目录)
     - [克隆JimV-C项目](#克隆jimv-c项目)
     - [安装所需库](#安装所需库)
     - [初始化JimV MySQL数据库](#初始化jimv-mysql数据库)
     - [修改配置文件](#修改配置文件)
     - [启动服务](#启动服务)
-    - [Nginx 参考配置](#nginx-参考配置)
+    - [部署 Nginx](#部署-nginx)
 - [API](#api)
     - [[状态码参考列表](docs/state_code.md)](#状态码参考列表)
     - [[过滤器操作符原语](docs/filter_primitive.md)](#过滤器操作符原语)
@@ -29,7 +32,6 @@
     - [[Guest](docs/guest.md)](#guest)
     - [[磁盘](docs/disk.md)](#磁盘)
 - [流程图](#流程图)
-- [Web端](#web端)
 - [问题反馈](#问题反馈)
 - [项目成员](#项目成员)
 - [Web端程序截图](#web端程序截图)
@@ -45,6 +47,7 @@
 
 
 ## 功能指标
+
 |功能|JimV|
 |:-|:-:|
 |部署复杂度|低|
@@ -75,7 +78,7 @@
 >* 增加 Guest 变配功能
 >* 增加过期 Guest 自动回收机制
 >* 增加模板上传功能
->* 增加磁盘IO限额管理功能
+>* 增加磁盘 IO 限额管理功能
 >* 增加磁盘吞吐量限额管理功能
 >* 增加网络流量限额管理功能
 >* 增加 tag 功能
@@ -83,7 +86,7 @@
 >* 多租户
 >* 用户操作轨迹
 >* 用户管理功能
->* 参照gitlab，打包出 CentOS yum 一语安装仓库
+>* 参照 gitlab，打包出 CentOS yum 一语安装仓库
 >* 支持快照
 >* 支持在线镜像商城
 >* 国际化
@@ -93,10 +96,75 @@
 
 ## 安装
 
-### 创建web用户
+### 安装必要软件
+
+``` bash
+yum install screen python2-pip -y
+pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/
+pip install virtualenv -i https://mirrors.aliyun.com/pypi/simple/
+```
+
+### 部署 MariaDB
+``` bash
+# 安装 MariaDB
+yum install mariadb mariadb-server -y
+
+# 配置 MariaDB
+mkdir -p /etc/systemd/system/mariadb.service.d
+echo '[Service]' > /etc/systemd/system/mariadb.service.d/limits.conf
+echo 'LimitNOFILE=65535' >> /etc/systemd/system/mariadb.service.d/limits.conf
+systemctl --system daemon-reload
+
+sed -i '/\[mysqld\]/a\bind-address = 127.0.0.1' /etc/my.cnf
+sed -i '/\[mysqld\]/a\log-bin' /etc/my.cnf
+sed -i '/\[mysqld\]/a\expire_logs_days = 1' /etc/my.cnf
+sed -i '/\[mysqld\]/a\innodb_file_per_table' /etc/my.cnf
+sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/my.cnf
+
+# 启动并使其随机启动
+systemctl enable mariadb.service
+systemctl start mariadb.service
+
+# 初始化 MariaDB
+mysql_secure_installation << EOF
+
+Y
+your_root_db_password
+your_root_db_password
+Y
+Y
+Y
+Y
+EOF
+
+# 测试是否部署成功
+mysql -u root -pyour_root_db_password -e 'show databases'
+```
+
+### 部署 Redis
+``` bash
+# 安装 Redis
+yum install redis -y
+
+# 配置 Redis
+echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
+sysctl -p
+sed -i '@^daemonize no@daemonize yes@g' /etc/redis.conf
+sed -i 's@^bind 127.0.0.1@bind 0.0.0.0@g' /etc/redis.conf
+sed -i 's@^appendonly no@appendonly yes@g' /etc/redis.conf
+echo 'requirepass your_jimv_redis_passwordddddddddddddddddddddddddddddddddddddddddddddddddddddddd' >> /etc/redis.conf
+
+# 启动并使其随机启动
+systemctl enable redis.service
+systemctl start redis.service
+```
+
+### 创建 Web 用户
 
 ```bash
 useradd -m www
+echo "www:www.pswd.com" | chpasswd
+echo "www ALL = (root) ALL" >> /etc/sudoers.d/www; chmod 0440 /etc/sudoers.d/www
 ```
 
 ### 创建站点发布目录
@@ -117,19 +185,22 @@ git clone https://github.com/jamesiter/JimV-C.git ~/sites/JimV-C
 ```bash
 # 创建 python 虚拟环境
 virtualenv --system-site-packages venv
+
 # 导入 python 虚拟环境
 source ~/venv/bin/activate
+
+# 使切入 www 用户时自动导入 python 虚拟环境
+echo '. ~/venv/bin/activate' >> .bashrc
+
 # 安装JimV-C所需扩展库
-pip install -r ~/sites/JimV-C/requirements.txt
-# 安装Python连接MySQL的适配器
-git clone https://github.com/mysql/mysql-connector-python.git; cd ~/mysql-connector-python; python setup.py install; cd ..; rm -rf mysql-connector-python
+pip install -r ~/sites/JimV-C/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 ```
 
 ### 初始化JimV MySQL数据库
 
 ```bash
 # 建立 JimV 数据库专属用户
-mysql -u root -pyour_db_password -e 'grant all on jimv.* to jimv@localhost identified by "your_jimv_db_password"; flush privileges'
+mysql -u root -pyour_root_db_password -e 'grant all on jimv.* to jimv@localhost identified by "your_jimv_db_password"; flush privileges'
 # 初始化数据库
 mysql -u jimv -pyour_jimv_db_password < ~/sites/JimV-C/misc/init.sql
 # 确认是否初始化成功
@@ -153,9 +224,9 @@ sudo cp ~/sites/JimV-C/jimvc.conf /etc/jimvc.conf
 | db_host           | localhost               | 数据库地址        |
 | db_port           | 3306                    | 数据库端口        |
 | db_user           | jimv                    | 连接数控的用户名   |
-| **`db_password`** | jimv.pswd.com           | 连接数控的密码     |
+| **`db_password`** | your_jimv_db_password   | 连接数控的密码     |
 | redis_host        | localhost               | redis数据库地址   |
-| redis_port        | 2501                    | redis数据库端口   |
+| redis_port        | 6379                    | redis数据库端口   |
 | **`redis_password`**                       || redis数据库密码   |
 | redis_dbid        | 0                       | 连接的redis数据库  |
 | log_file_path     | /var/log/jimv/jimvc.log | 日志存储路径       |
@@ -171,13 +242,28 @@ sudo cp ~/sites/JimV-C/jimvc.conf /etc/jimvc.conf
 ### 启动服务
 
 ```bash
+sudo mkdir -p /var/log/jimv
+sudo chown www.www /var/log/jimv
 # 进入JimV-C目录
 cd ~/sites/JimV-C
 # 启动JimV-C
 gunicorn -c gunicorn_config.py main:app
 ```
 
-### Nginx 参考配置
+### 部署 Nginx
+
+``` bash
+# 安装 Nginx
+yum install nginx -y
+
+# 配置 Nginx
+sed -i 's@^user nginx;@user www;@g' /etc/nginx/nginx.conf
+chown -R www.www /var/log/nginx
+
+# 启动并使其随机启动
+systemctl enable nginx.service
+systemctl start nginx.service
+```
 
 ```nginx
     gzip on;
@@ -253,11 +339,6 @@ gunicorn -c gunicorn_config.py main:app
 
 
 ## 流程图
-
-
-## Web端
-
-[Web端项目地址](https://github.com/jamesiter/JimV-C-web)
 
 
 ## 问题反馈
