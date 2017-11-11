@@ -65,12 +65,12 @@ class Init(object):
     def load_config(cls):
 
         def usage():
-            print "Usage:%s [-c] [--config]" % sys.argv[0]
+            print "Usage:%s [-f] [--config_file]" % sys.argv[0]
 
         opts = None
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hc:',
-                                       ['help', 'config='])
+                                       ['help', 'config_file='])
         except getopt.GetoptError as e:
             print str(e)
             usage()
@@ -80,7 +80,7 @@ class Init(object):
             if k in ("-h", "--help"):
                 usage()
                 exit()
-            elif k in ("-c", "--config"):
+            elif k in ("-f", "--config_file"):
                 cls.config['config_file'] = v
             else:
                 print "unhandled option"
