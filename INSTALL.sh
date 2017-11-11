@@ -10,6 +10,7 @@
 #
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
+export NGINX_JIMV='curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/misc/nginx_jimv.conf >> /etc/nginx/nginx.conf'
 export RDB_PSWD='your_rdb_root_password'
 export RDB_JIMV_PSWD='your_rdb_jimv_password'
 export REDIS_PSWD='your_jimv_redis_passwordddddddddddddddddddddddddddddddddddddddddddddddddddddddd'
@@ -36,7 +37,7 @@ function check_precondition() {
 }
 
 function prepare() {
-    yum install python2-pip git -y
+    yum install epel-release python2-pip git -y
     pip install --upgrade pip -i ${PYPI}
     pip install virtualenv -i ${PYPI}
 }
@@ -94,6 +95,22 @@ function install_Redis() {
     systemctl start redis.service
 }
 
+function install_Nginx() {
+    # 安装 Nginx
+    yum install nginx -y
+
+    # 配置 Nginx
+    mkdir -p /etc/jimv/keys
+    chown -R www.www /var/lib/nginx
+    sed -i 's@user nginx.*$@user www;@' /etc/nginx/nginx.conf
+    sed -i '/^.*server {/,$d' /etc/nginx/nginx.conf
+    curl ${NGINX_JIMV} >> /etc/nginx/nginx.conf
+
+    # 启动并使其随机启动
+    systemctl enable nginx.service
+    systemctl start nginx.service
+}
+
 function create_web_user() {
     useradd -m www
 }
@@ -120,6 +137,14 @@ function install_dependencies_library() {
     su - www -c "pip install -r ~/sites/JimV-C/requirements.txt -i ${PYPI}"
 }
 
+function fit_www_user_permission() {
+    mkdir -p /var/log/jimv
+    chown www.www /var/log/jimv
+
+    mkdir -p /run/jimv
+    chown www.www /run/jimv
+}
+
 function initialization_db() {
     # 建立 JimV 数据库专属用户
     mysql -u root -p${RDB_PSWD} -e "grant all on jimv.* to jimv@localhost identified by \"${RDB_JIMV_PSWD}\"; flush privileges"
@@ -143,10 +168,19 @@ function generate_config_file() {
 }
 
 function start() {
-    mkdir -p /var/log/jimv
-    chown www.www /var/log/jimv
-
-    mkdir -p /run/jimv
-    chown www.www /run/jimv
+    check_precondition
+    prepare
+    create_web_user
+    create_web_sites_directory
+    clone_and_checkout_JimV-C
+    fit_www_user_permission
+    install_MariaDB
+    install_Redis
+    install_Nginx
+    install_dependencies_library
+    initialization_db
+    generate_config_file
 }
+
+start
 
