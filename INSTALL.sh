@@ -11,14 +11,51 @@
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
 export NGINX_JIMV='curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/misc/nginx_jimv.conf >> /etc/nginx/nginx.conf'
-export RDB_PSWD='your_rdb_root_password'
-export RDB_JIMV_PSWD='your_rdb_jimv_password'
-export REDIS_PSWD='your_jimv_redis_passwordddddddddddddddddddddddddddddddddddddddddddddddddddddddd'
-export JWT_SECRET='kcMsj4qj0EAvAvj3nlFlPZd2x7P9kBBQ$deae64883a03982913e6c5f0ba265c2c5dfd0cfx'
-export SECRET_KEY='QSYI73re6x553wmcNwT9tk4OCNK9OUS9xNUulDShEcvRw00YhCKaqHhEGYOGKOSB'
 export SMTP_HOST=''
 export SMTP_USER=''
 export SMTP_PASSWORD=''
+
+ARGS=`getopt -o h --long rdb_root_password:,rdb_jimv_password:,redis_password:,jwt_secret:,secret_key:,help -n 'INSTALL.sh' -- "$@"`
+
+eval set -- "${ARGS}"
+
+while true
+do
+    case "$1" in
+        --rdb_root_password)
+            export RDB_ROOT_PSWD=$2
+            shift 2
+            ;;
+        --rdb_jimv_password)
+            export RDB_JIMV_PSWD=$2
+            shift 2
+            ;;
+        --redis_password)
+            export REDIS_PSWD=$2
+            shift 2
+            ;;
+        --jwt_secret)
+            export JWT_SECRET=$2
+            shift 2
+            ;;
+        --secret_key)
+            export SECRET_KEY=$2
+            shift 2
+            ;;
+        -h|--help)
+            echo 'INSTALL.sh [-h|--help|--rdb_root_password|--rdb_jimv_password|--redis_password|--jwt_secret|--secret_key]'
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Internal error!"
+            exit 1
+            ;;
+    esac
+done
 
 function check_precondition() {
     source /etc/os-release
@@ -37,6 +74,27 @@ function check_precondition() {
 }
 
 function prepare() {
+
+    if [ ! ${RDB_ROOT_PSWD} -o ${#RDB_ROOT_PSWD} -eq 0 ]; then
+        export RDB_ROOT_PSWD=`./misc/gen_pswd.sh`
+    fi
+
+    if [ ! ${RDB_JIMV_PSWD} -o ${#RDB_JIMV_PSWD} -eq 0 ]; then
+        export RDB_JIMV_PSWD=`./misc/gen_pswd.sh`
+    fi
+
+    if [ ! ${REDIS_PSWD} -o ${#REDIS_PSWD} -eq 0 ]; then
+        export REDIS_PSWD=`./misc/gen_pswd.sh 128`
+    fi
+
+    if [ ! ${JWT_SECRET} -o ${#JWT_SECRET} -eq 0 ]; then
+        export JWT_SECRET=`./misc/gen_pswd.sh 128`
+    fi
+
+    if [ ! ${SECRET_KEY} -o ${#SECRET_KEY} -eq 0 ]; then
+        export SECRET_KEY=`./misc/gen_pswd.sh 128`
+    fi
+
     yum install epel-release python2-pip git -y
     pip install --upgrade pip -i ${PYPI}
     pip install virtualenv -i ${PYPI}
@@ -66,8 +124,8 @@ function install_MariaDB() {
 mysql_secure_installation << EOF
 
 Y
-${RDB_PSWD}
-${RDB_PSWD}
+${RDB_ROOT_PSWD}
+${RDB_ROOT_PSWD}
 Y
 Y
 Y
@@ -75,7 +133,7 @@ Y
 EOF
 
     # 测试是否部署成功
-    mysql -u root -p${RDB_PSWD} -e 'show databases'
+    mysql -u root -p${RDB_ROOT_PSWD} -e 'show databases'
 }
 
 function install_Redis() {
@@ -133,7 +191,7 @@ function install_dependencies_library() {
     # 使切入 www 用户时自动导入 python 虚拟环境
     su - www -c "echo '. ~/venv/bin/activate' >> .bashrc"
 
-    # 安装JimV-C所需扩展库
+    # 安装 JimV-C 所需扩展库
     su - www -c "pip install -r ~/sites/JimV-C/requirements.txt -i ${PYPI}"
 }
 
@@ -147,7 +205,7 @@ function fit_www_user_permission() {
 
 function initialization_db() {
     # 建立 JimV 数据库专属用户
-    mysql -u root -p${RDB_PSWD} -e "grant all on jimv.* to jimv@localhost identified by \"${RDB_JIMV_PSWD}\"; flush privileges"
+    mysql -u root -p${RDB_ROOT_PSWD} -e "grant all on jimv.* to jimv@localhost identified by \"${RDB_JIMV_PSWD}\"; flush privileges"
 
     # 初始化数据库
     su - www -c "mysql -u jimv -p${RDB_JIMV_PSWD} < ~/sites/JimV-C/misc/init.sql"
@@ -167,7 +225,15 @@ function generate_config_file() {
     sed -i "s/\"smtp_password\".*$/\"smtp_password\": \"${SMTP_PASSWORD}\",/" /etc/jimvc.conf
 }
 
-function start() {
+function display_summary_information() {
+    echo
+    echo "=== Summary information"
+    echo "RDB root password: [${RDB_ROOT_PSWD}]"
+    echo "RDB jimv password: [${RDB_JIMV_PSWD}]"
+    echo "Redis password: [${REDIS_PSWD}]"
+}
+
+function deploy() {
     check_precondition
     prepare
     create_web_user
@@ -180,7 +246,8 @@ function start() {
     install_dependencies_library
     initialization_db
     generate_config_file
+    display_summary_information
 }
 
-start
+deploy
 
