@@ -80,6 +80,7 @@ function prepare() {
 
     if [ ! -e ${GENERATE_PASSWORD_SCRIPT_TMP_PATH} ]; then
         curl ${JIMVC_REPOSITORY_URL}'/'${EDITION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
+        chmod +x ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
     fi
 
     if [ ! ${RDB_ROOT_PSWD} ] || [ ${#RDB_ROOT_PSWD} -eq 0 ]; then
