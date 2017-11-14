@@ -20,7 +20,7 @@ if [ `id -u` -eq 0 ]; then
 
     su - www -c "cd ~/sites/JimV-C; gunicorn -c gunicorn_config.py main:app"
 
-elif [ `whoami` -eq 'www' ]; then
+elif [ `whoami` = 'www' ]; then
 
     cd ~/sites/JimV-C; gunicorn -c gunicorn_config.py main:app
 
