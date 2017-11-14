@@ -10,7 +10,10 @@
 #
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
-export NGINX_JIMV='curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/misc/nginx_jimv.conf >> /etc/nginx/nginx.conf'
+export JIMVC_REPOSITORY_URL='https://raw.githubusercontent.com/jamesiter/JimV-C'
+export EDITION='master'
+export NGINX_JIMV='curl '${JIMVC_REPOSITORY_URL}'/'${EDITION}'/misc/nginx_jimv.conf >> /etc/nginx/nginx.conf'
+export GENERATE_PASSWORD_SCRIPT_TMP_PATH='/tmp/gen_pswd.sh'
 export SMTP_HOST=''
 export SMTP_USER=''
 export SMTP_PASSWORD=''
@@ -75,25 +78,31 @@ function check_precondition() {
 
 function prepare() {
 
-    if [ ! ${RDB_ROOT_PSWD} -o ${#RDB_ROOT_PSWD} -eq 0 ]; then
-        export RDB_ROOT_PSWD=`./misc/gen_pswd.sh`
+    if [ ! -e ${GENERATE_PASSWORD_SCRIPT_TMP_PATH} ]; then
+        curl ${JIMVC_REPOSITORY_URL}'/'${EDITION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
     fi
 
-    if [ ! ${RDB_JIMV_PSWD} -o ${#RDB_JIMV_PSWD} -eq 0 ]; then
-        export RDB_JIMV_PSWD=`./misc/gen_pswd.sh`
+    if [ ! ${RDB_ROOT_PSWD} ] || [ ${#RDB_ROOT_PSWD} -eq 0 ]; then
+        export RDB_ROOT_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH}`
     fi
 
-    if [ ! ${REDIS_PSWD} -o ${#REDIS_PSWD} -eq 0 ]; then
-        export REDIS_PSWD=`./misc/gen_pswd.sh 128`
+    if [ ! ${RDB_JIMV_PSWD} ] || [ ${#RDB_JIMV_PSWD} -eq 0 ]; then
+        export RDB_JIMV_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH}`
     fi
 
-    if [ ! ${JWT_SECRET} -o ${#JWT_SECRET} -eq 0 ]; then
-        export JWT_SECRET=`./misc/gen_pswd.sh 128`
+    if [ ! ${REDIS_PSWD} ] || [ ${#REDIS_PSWD} -eq 0 ]; then
+        export REDIS_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
     fi
 
-    if [ ! ${SECRET_KEY} -o ${#SECRET_KEY} -eq 0 ]; then
-        export SECRET_KEY=`./misc/gen_pswd.sh 128`
+    if [ ! ${JWT_SECRET} ] || [ ${#JWT_SECRET} -eq 0 ]; then
+        export JWT_SECRET=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
     fi
+
+    if [ ! ${SECRET_KEY} ] || [ ${#SECRET_KEY} -eq 0 ]; then
+        export SECRET_KEY=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
+    fi
+
+    rm -f ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
 
     yum install epel-release python2-pip git -y
     pip install --upgrade pip -i ${PYPI}
