@@ -104,3 +104,6 @@ class Config(ORM):
             i += 1
             db.r.sadd(app.config['vnc_port_available_set'], self.start_vnc_port + i)
 
+    def update_global_config(self):
+        db.r.hmset(app.config['global_config'], self.__dict__)
+

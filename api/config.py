@@ -74,6 +74,7 @@ def r_create():
         config.generate_available_ip2set()
         config.generate_available_vnc_port()
         config.create()
+        config.update_global_config()
 
         config.id = 1
         config.get()
@@ -184,6 +185,7 @@ def r_update():
         config.generate_available_ip2set()
         config.generate_available_vnc_port()
         config.update()
+        config.update_global_config()
 
         config.get()
 

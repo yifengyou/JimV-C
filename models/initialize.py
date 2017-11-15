@@ -37,6 +37,7 @@ class Init(object):
         'config_file': '/etc/jimvc.conf',
         'log_cycle': 'D',
         'instruction_channel': 'C:Instruction',
+        'global_config': 'H:GlobalConfig',
         'ip_available_set': 'S:IP:Available',
         'ip_used_set': 'S:IP:Used',
         'vnc_port_available_set': 'S:VNCPort:Available',

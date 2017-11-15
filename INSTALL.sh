@@ -241,6 +241,9 @@ function display_summary_information() {
     echo "RDB root password: [${RDB_ROOT_PSWD}]"
     echo "RDB jimv password: [${RDB_JIMV_PSWD}]"
     echo "Redis password: [${REDIS_PSWD}]"
+    echo "======================="
+    echo
+    echo "Now, you can run JimV-C use command '/home/www/sites/JimV-C/startup.sh'."
 }
 
 function deploy() {
