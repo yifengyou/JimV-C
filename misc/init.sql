@@ -303,3 +303,62 @@ ALTER TABLE host_disk_usage_io ADD INDEX (timestamp);
 ALTER TABLE host_disk_usage_io ADD INDEX (node_id, mountpoint, timestamp);
 
 
+INSERT INTO boot_job (name, use_for, remark) VALUES ('Reset password for Linux', 1, '重置 Linux 平台管理员密码。');
+INSERT INTO boot_job (name, use_for, remark) VALUES ('CentOS-Systemd', 0, '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。');
+INSERT INTO boot_job (name, use_for, remark) VALUES ('CentOS-SysV', 0, '用作 Redhat SysV 系列的系统初始化。初始化操作依据 CentOS 6.8 来实现。');
+INSERT INTO boot_job (name, use_for, remark) VALUES ('Gentoo-OpenRC', 0, '用作 Gentoo OpenRC 系列的系统初始化。');
+INSERT INTO boot_job (name, use_for, remark) VALUES ('Windows', 0, '用作 MS-Windos 系列的系统初始化。初始化操作依据 Windows 2012 来实现。');
+
+-- For Reset password for Linux
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (1, 0, 0, '', '', 'echo "root:{PASSWORD}" | chpasswd');
+
+-- For CentOS-Systemd
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (2, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}
+nameserver {DNS2}', '');
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (2, 1, 0, '/etc/sysconfig/network-scripts/ifcfg-eth0', 'DEVICE=eth0
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO="static"
+IPADDR={IP}
+NETMASK={NETMASK}
+GATEWAY={GATEWAY}
+DNS1={DNS1}
+DNS2={DNS2}
+IPV6INIT=no
+NAME=eth0', '');
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (2, 1, 0, '/etc/hostname', '{HOSTNAME}', '');
+
+-- For CentOS-SysV
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (3, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}
+nameserver {DNS2}', '');
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (3, 1, 0, '/etc/sysconfig/network-scripts/ifcfg-eth0', 'DEVICE=eth0
+TYPE=Ethernet
+ONBOOT=yes
+BOOTPROTO="static"
+IPADDR={IP}
+NETMASK={NETMASK}
+GATEWAY={GATEWAY}
+IPV6INIT=no
+NAME=eth0', '');
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (3, 1, 0, '/etc/sysconfig/network', 'NETWORKING=yes
+HOSTNAME="{HOSTNAME}"', '');
+
+-- For Gentoo-OpenRC
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (4, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}
+nameserver {DNS2}', '');
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (4, 1, 0, '/etc/conf.d/net', 'config_eth0="{IP}/{NETMASK}"
+routes_eth0="default via {GATEWAY}"', '');
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (4, 1, 0, '/etc/conf.d/hostname', 'hostname="{HOSTNAME}"', '');
+
+-- For Windows
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (5, 1, 1, '/Windows/jimv_init.bat', 'netsh interface ip set address name="Ethernet" source=static {IP} {NETMASK} {GATEWAY}
+netsh interface ip set dns "Ethernet" static {DNS1} primary
+netsh interface ip add dns "Ethernet" {DNS2}
+wmic computersystem where name="%COMPUTERNAME%" call rename name="{HOSTNAME}"
+net user Administrator {PASSWORD}
+timeout 3 > NUL
+sc delete JimVInit
+del C:\\Windows\\jimv_init.bat
+timeout 2 > NUL
+shutdown -r -t 0', '');
+

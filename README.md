@@ -14,16 +14,7 @@
     - [单机版一键安装](#单机版一键安装)
     - [JimV-C 一键安装](#jimv-c-一键安装)
     - [[JimV-C 手动安装](docs/install.md)](#jimv-c-手动安装)
-- [API](#api)
-    - [[状态码参考列表](docs/state_code.md)](#状态码参考列表)
-    - [[过滤器操作符原语](docs/filter_primitive.md)](#过滤器操作符原语)
-    - [[状态列表](docs/enum.md)](#状态列表)
-    - [[配置](docs/config.md)](#配置)
-    - [[实例初始化操作簇](docs/boot_job.md)](#实例初始化操作簇)
-    - [[系统模板](docs/os_template.md)](#系统模板)
-    - [[Guest](docs/guest.md)](#guest)
-    - [[磁盘](docs/disk.md)](#磁盘)
-- [流程图](#流程图)
+- [架构流程图](#架构流程图)
 - [问题反馈](#问题反馈)
 - [项目成员](#项目成员)
 - [Web端程序截图](#web端程序截图)
@@ -34,8 +25,9 @@
 
 > 计算机硬件越来越白菜价，性能越来越强劲，企业电子信息化方面的业务越来越多，"互联网+"、大数据的浪潮已经掀起，物联网、AI的趋势正在形成。
 > 因为上述的一切，虚拟化技术被处于一个软化硬件，揉和硬件与业务系统这么一个核心角色。
-> 虚拟化技术虽然已经被普及了很久，但多数企业依然仅仅是把它当做独立的虚拟硬件来使用。在资源的科学分配、高效利用、自动化管理方面，还差那么几步。
-> JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门槛企业私有云管理平台。相比于业界知名的 OpenStack、OpenNebula...，JimV 不需要庞大的维护团队。
+> 虚拟化技术虽然已经被普及了很久，但多数企业依然仅仅是把它当做独立的虚拟硬件来使用。在资源的科学分配、高效利用、自动化管理方面，还差些许。
+> JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门槛企业私有云管理平台。
+> 相比于业界知名的 OpenStack、OpenNebula...，JimV 没有很多的零部件，不需要庞大的维护团队。
 
 
 ## 功能指标
@@ -75,6 +67,7 @@
 >* 增加网络流量限额管理功能
 >* 增加 tag 功能
 >* 增加替换 IP 功能
+>* 增加对 Ceph 的支持
 >* 多租户
 >* 用户操作轨迹
 >* 用户管理功能
@@ -105,28 +98,7 @@ curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash
 ### [JimV-C 手动安装](docs/install.md)
 
 
-## API
-
-> 默认数据交互格式 Content-Type: application/json
-
-### [状态码参考列表](docs/state_code.md)
-
-### [过滤器操作符原语](docs/filter_primitive.md)
-
-### [状态列表](docs/enum.md)
-
-### [配置](docs/config.md)
-
-### [实例初始化操作簇](docs/boot_job.md)
-
-### [系统模板](docs/os_template.md)
-
-### [Guest](docs/guest.md)
-
-### [磁盘](docs/disk.md)
-
-
-## 流程图
+## 架构流程图
 
 
 ## 问题反馈
@@ -150,4 +122,5 @@ E-Mail: james.iter.cn@gmail.com
 
 ## Demo
 
-[demo.jimv.org](https://demo.jimv.org) <br> 管理员账密 `admin`:`admin`
+[demo.jimv.io](https://demo.jimv.io) <br> 管理员账密 `admin`:`jimv.pswd.com`
+
