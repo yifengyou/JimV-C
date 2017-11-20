@@ -351,7 +351,7 @@ routes_eth0="default via {GATEWAY}"', '');
 INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (4, 1, 0, '/etc/conf.d/hostname', 'hostname="{HOSTNAME}"', '');
 
 -- For Windows
-INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (5, 1, 1, '/Windows/jimv_init.bat', 'netsh interface ip set address name="Ethernet" source=static {IP} {NETMASK} {GATEWAY}
+INSERT INTO operate_rule (boot_job_id, kind, sequence, path, content, command) VALUES (5, 1, 0, '/Windows/jimv_init.bat', 'netsh interface ip set address name="Ethernet" source=static {IP} {NETMASK} {GATEWAY}
 netsh interface ip set dns "Ethernet" static {DNS1} primary
 netsh interface ip add dns "Ethernet" {DNS2}
 wmic computersystem where name="%COMPUTERNAME%" call rename name="{HOSTNAME}"

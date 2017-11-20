@@ -42,6 +42,7 @@
 - [ ] 制作适用于 JimV 的 CentOS 7、Windows 2012 模板镜像
 - [ ] 制作模板镜像的 BT 链接，并展现到模板镜像的下载页面
 - [ ] 解决数据库重连隐患(当数据库[MySQL|Redis]重启后)
+- [ ] 考虑开辟一个单独的消息处理线程。所有业务消息都塞到进程中的队列内，由该线程统一处理。这样可以更好的处理数据库重连问题。
 - [ ] 去除非 Debug 模式下的调试信息
 - [ ] 实现 CentOS 7 单机版一建安装脚本(包括全新的数据库安装、配置、部署)
 - [ ] 融入 Systemd
@@ -61,5 +62,7 @@
 - [ ] 避免计算节点主机名相同的情况
 - [ ] 考虑用管理接口的 IP 地址来区别计算节点，而不是用主机名
 - [ ] 考虑 vm_network，vm_manage_network 改名为 vm_network_bridge，vm_manage_network_bridge
+- [ ] 通过 sysctl 隔离出 vnc 使用的端口，避免被冲突。参见 net.ipv4.ip_local_reserved_ports
+- [ ] 考虑热更新、升级的问题
 
 
