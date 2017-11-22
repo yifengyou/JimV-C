@@ -105,7 +105,8 @@ function prepare() {
 
     rm -f ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
 
-    yum install epel-release python2-pip git -y
+    yum install epel-release -y
+    yum install python2-pip git -y
     pip install --upgrade pip -i ${PYPI}
     pip install virtualenv -i ${PYPI}
 }
