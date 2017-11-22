@@ -154,7 +154,7 @@ function install_Redis() {
     # 配置 Redis
     echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
     sysctl -p
-    sed -i '@^daemonize no@daemonize yes@g' /etc/redis.conf
+    sed -i 's@^daemonize no@daemonize yes@g' /etc/redis.conf
     sed -i 's@^bind 127.0.0.1@bind 0.0.0.0@g' /etc/redis.conf
     sed -i 's@^appendonly no@appendonly yes@g' /etc/redis.conf
     echo "requirepass ${REDIS_PSWD}" >> /etc/redis.conf
