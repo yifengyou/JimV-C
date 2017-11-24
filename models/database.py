@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
+import traceback
+
 import mysql.connector
 import mysql.connector.pooling
 import redis
@@ -68,8 +70,11 @@ class Database(object):
                 _cnx.close()
 
         while True:
-            time.sleep(5)
-            ping(label='', _cnxpool=cls.cnxpool)
+            try:
+                time.sleep(5)
+                ping(label='', _cnxpool=cls.cnxpool)
+            except:
+                logger.error(traceback.format_exc())
 
     @classmethod
     def init_conn_redis(cls):
@@ -106,4 +111,18 @@ class Database(object):
                                       retry_on_timeout=True)
 
         cls.r.client_setname(ji.Common.get_hostname())
+
+    @classmethod
+    def keepalived_redis(cls):
+        while True:
+            try:
+                time.sleep(5)
+                cls.r.ping()
+
+            except redis.exceptions.ConnectionError as e:
+                logger.error(e.message)
+                cls.init_conn_redis()
+
+            except:
+                logger.error(traceback.format_exc())
 

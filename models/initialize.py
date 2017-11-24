@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
+import traceback
 from multiprocessing import JoinableQueue
 from flask import Flask
 import logging
@@ -134,12 +135,16 @@ class Init(object):
         from models import Utils
 
         while True:
-            if Utils.exit_flag:
-                print 'Thread pub_sub_ping_pong say bye-bye'
-                return
+            try:
+                if Utils.exit_flag:
+                    print 'Thread pub_sub_ping_pong say bye-bye'
+                    return
 
-            time.sleep(10)
-            db.r.publish(app.config['instruction_channel'], message=json.dumps({'action': 'ping'}))
+                time.sleep(10)
+                db.r.publish(app.config['instruction_channel'], message=json.dumps({'action': 'ping'}))
+
+            except:
+                logger.error(traceback.format_exc())
 
     @staticmethod
     def clear_expire_monitor_log():
@@ -150,29 +155,33 @@ class Init(object):
         the_time = '03:30'
 
         while True:
-            if Utils.exit_flag:
-                print 'Thread clear_expire_monitor_log say bye-bye'
-                return
+            try:
+                if Utils.exit_flag:
+                    print 'Thread clear_expire_monitor_log say bye-bye'
+                    return
 
-            time.sleep(10)
+                time.sleep(10)
 
-            # 每天凌晨3点30分执行，清除15天前的监控记录
-            if ji.JITime.now_time()[:5] == the_time and not already_clear:
-                boundary = ji.Common.ts() - 86400 * 15
-                filter_str = 'timestamp:lt:' + boundary.__str__()
+                # 每天凌晨3点30分执行，清除15天前的监控记录
+                if ji.JITime.now_time()[:5] == the_time and not already_clear:
+                    boundary = ji.Common.ts() - 86400 * 15
+                    filter_str = 'timestamp:lt:' + boundary.__str__()
 
-                CPUMemory.delete_by_filter(filter_str=filter_str)
-                Traffic.delete_by_filter(filter_str=filter_str)
-                DiskIO.delete_by_filter(filter_str=filter_str)
+                    CPUMemory.delete_by_filter(filter_str=filter_str)
+                    Traffic.delete_by_filter(filter_str=filter_str)
+                    DiskIO.delete_by_filter(filter_str=filter_str)
 
-                HostCPUMemory.delete_by_filter(filter_str=filter_str)
-                HostTraffic.delete_by_filter(filter_str=filter_str)
-                HostDiskUsageIO.delete_by_filter(filter_str=filter_str)
+                    HostCPUMemory.delete_by_filter(filter_str=filter_str)
+                    HostTraffic.delete_by_filter(filter_str=filter_str)
+                    HostDiskUsageIO.delete_by_filter(filter_str=filter_str)
 
-                already_clear = True
+                    already_clear = True
 
-            if already_clear and ji.JITime.now_time()[:5] != the_time:
-                already_clear = False
+                if already_clear and ji.JITime.now_time()[:5] != the_time:
+                    already_clear = False
+
+            except:
+                logger.error(traceback.format_exc())
 
 
 q_ws = JoinableQueue()

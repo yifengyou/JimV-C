@@ -39,9 +39,10 @@
 - [x] 系统模板加入是否为 Windows 类系统的标记
 - [x] 系统模板为 Windows 时，时钟偏移值设定为 localtime，否则为 utc
 - [x] 初始化时，生成默认的启动作业及其细则，方便用户直接使用
-- [ ] 制作适用于 JimV 的 CentOS 7、Windows 2012 模板镜像
-- [ ] 制作模板镜像的 BT 链接，并展现到模板镜像的下载页面
-- [ ] 解决数据库重连隐患(当数据库[MySQL|Redis]重启后)
+- [x] 制作适用于 JimV 的 CentOS 7 Mini 模板镜像
+- [ ] 制作适用于 JimV 的 Windows 2012 模板镜像
+- [x] 制作模板镜像的 BT 链接，并展现到模板镜像的下载页面
+- [x] 解决数据库重连隐患(当数据库[MySQL|Redis]重启后)
 - [ ] 考虑开辟一个单独的消息处理线程。所有业务消息都塞到进程中的队列内，由该线程统一处理。这样可以更好的处理数据库重连问题。
 - [ ] 去除非 Debug 模式下的调试信息
 - [ ] 实现 CentOS 7 单机版一建安装脚本(包括全新的数据库安装、配置、部署)
@@ -65,5 +66,6 @@
 - [ ] 考虑 vm_network，vm_manage_network 改名为 vm_network_bridge，vm_manage_network_bridge
 - [ ] 通过 sysctl 隔离出 vnc 使用的端口，避免被冲突。参见 net.ipv4.ip_local_reserved_ports
 - [ ] 考虑热更新、升级的问题
+- [ ] 加入清除老旧日志的功能
 
 
