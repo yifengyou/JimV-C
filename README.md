@@ -17,7 +17,7 @@
 - [架构流程图](#架构流程图)
 - [问题反馈](#问题反馈)
 - [项目成员](#项目成员)
-- [Web端程序截图](#web端程序截图)
+- [JimV 控制平台截图展示](#jimv-控制平台截图展示)
 - [Demo](#demo)
 
 
@@ -115,9 +115,9 @@ E-Mail: james.iter.cn@gmail.com
 </pre>
 
 
-## Web端程序截图
+## JimV 控制平台截图展示
 
-[Web端程序截图](docs/screenshot.md)
+[JimV 控制平台截图展示](docs/screenshot.md)
 
 
 ## Demo
