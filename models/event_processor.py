@@ -325,7 +325,10 @@ class EventProcessor(object):
     def launch(cls):
         while True:
             if Utils.exit_flag:
-                print 'Thread EventProcessor say bye-bye'
+                msg = 'Thread EventProcessor say bye-bye'
+                print msg
+                logger.info(msg=msg)
+
                 return
 
             try:

@@ -137,7 +137,9 @@ class Init(object):
         while True:
             try:
                 if Utils.exit_flag:
-                    print 'Thread pub_sub_ping_pong say bye-bye'
+                    msg = 'Thread pub_sub_ping_pong say bye-bye'
+                    print msg
+                    logger.info(msg=msg)
                     return
 
                 time.sleep(10)
@@ -157,7 +159,9 @@ class Init(object):
         while True:
             try:
                 if Utils.exit_flag:
-                    print 'Thread clear_expire_monitor_log say bye-bye'
+                    msg = 'Thread clear_expire_monitor_log say bye-bye'
+                    print msg
+                    logger.info(msg=msg)
                     return
 
                 time.sleep(10)

@@ -49,7 +49,7 @@ class Database(object):
             else:
                 e_msg = err.msg
 
-            print(e_msg)
+            logger.error(e_msg)
             exit(err.errno)
 
     @classmethod
