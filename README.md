@@ -122,5 +122,7 @@ E-Mail: james.iter.cn@gmail.com
 
 ## Demo
 
-[demo.jimv.io](https://demo.jimv.io) <br> 管理员账密 `admin`:`jimv.pswd.com`
+[demo.jimv.io](https://demo.jimv.io) <br>
+[jimv.iit.im](https://jimv.iit.im) <br>
+管理员账密 `admin`:`jimv.pswd.com`
 
