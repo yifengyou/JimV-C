@@ -109,8 +109,9 @@ curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash
 
 ### 配置需求
 **JimV-C**
+
 |条目|指标|备注|
-|:-|:-:|:-:|
+|:-|:-:|:-|
 |操作系统| >= CentOS 7.4 | 版本过低，所依赖库的功能跟不上。|
 |CPU| >= 8| 除了 JimV-C 本身的几个功能线程外，MariaDB、Redis 均需要一定量的计算资源。|
 |内存| >= 16GB | 供 JimV-C、MariaDB、Redis 使用。|
@@ -120,8 +121,9 @@ curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash
 |业务网络| N | 无需通过业务网络和虚拟机接触。|
 
 **JimV-N**
+
 |条目|指标|备注|
-|:-|:-:|:-:|
+|:-|:-:|:-|
 |操作系统| >= CentOS 7.4 | 版本过低，所依赖库的功能跟不上。|
 |CPU| >= 32 | 数量直接决定所能承载虚拟机的多少。|
 |内存| >= 64GB | - |
@@ -133,8 +135,9 @@ curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash
 |网卡| >= 10Gb x 2端口 x 2网卡 | 网络带宽一般以峰值需求为参考线。高质量的网络可以让使用人员，有更广阔的操作空间。|
 
 **交换机**
+
 |条目|指标|备注|
-|:-|:-:|:-:|
+|:-|:-:|:-|
 |数量| 2 | 计算节点上两网卡、两端口相互交叉连接到两个交换机上。以实现网络高可用。|
 |LACP| Y | 配合计算节点做 模式4(802.3ad) 的 bonding。|
 |接入端口| >= 10Gb | 与计算节点网卡做好匹配。|
