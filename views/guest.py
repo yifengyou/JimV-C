@@ -190,7 +190,8 @@ def vnc(uuid):
 
         port = random.randrange(50000, 60000)
 
-    payload = {'listen_port': port, 'target_host': '103.47.139.194', 'target_port': guest_ret['data']['vnc_port']}
+    payload = {'listen_port': port, 'target_host': guest_ret['data']['on_host'],
+               'target_port': guest_ret['data']['vnc_port']}
     q_ws.put(json.dumps(payload, ensure_ascii=False))
     q_ws.join()
 

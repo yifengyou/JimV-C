@@ -180,7 +180,14 @@ curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash
 
 
 ### 计算节点命名
+|环境编号|环境类型|环境中计算节点序列|域|
+|:-|:-|:-|:-|
+|数字|k:KVM|数字| - |
+|1|k|01|jimv.io|
+|1|k|02|jimv.io|
+|1|k|n|jimv.io|
 
+>**备注:** 数字域的宽度是可变的，可从1~n，n可以是非个位数，如99、999(如: 1k01.jimv.io, 1k001.jimv.io)。
 
 ## 问题反馈
 
