@@ -143,6 +143,7 @@ def r_delete(nodes_id):
                 v['node_id'] = node_id
                 ret['data'] = v
                 db.r.hdel(app.config['hosts_info'], node_id)
+                db.r.srem(app.config['compute_nodes_hostname_key'], v['hostname'])
 
         else:
             for node_id in nodes_id.split(','):
@@ -151,6 +152,7 @@ def r_delete(nodes_id):
                     v['node_id'] = node_id
                     ret['data'].append(v)
                     db.r.hdel(app.config['hosts_info'], node_id)
+                    db.r.srem(app.config['compute_nodes_hostname_key'], v['hostname'])
 
             if ret['data'].__len__() > 1:
                 ret['data'].sort(key=lambda _k: _k['boot_time'])

@@ -46,6 +46,7 @@ class Init(object):
         'downstream_queue': 'Q:Downstream',
         'upstream_queue': 'Q:Upstream',
         'hosts_info': 'H:HostsInfo',
+        'compute_nodes_hostname_key': 'S:ComputeNodesHostname',
         'guest_boot_jobs': 'S:GuestBootJobs',
         'guest_boot_jobs_wait_time': 600,
         'db_charset': 'utf8',

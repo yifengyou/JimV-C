@@ -62,11 +62,12 @@
 - [ ] 初始化页面检测 redis、mysql 是否准备好
 - [ ] 日志里面加入操作轨迹
 - [ ] 计算节点页面，展现每个计算节点上功能线程的状态
-- [ ] 避免计算节点主机名相同的情况
+- [x] 避免计算节点主机名相同的情况
 - [ ] 考虑用管理接口的 IP 地址来区别计算节点，而不是用主机名
 - [ ] 考虑 vm_network，vm_manage_network 改名为 vm_network_bridge，vm_manage_network_bridge
 - [ ] 通过 sysctl 隔离出 vnc 使用的端口，避免被冲突。参见 net.ipv4.ip_local_reserved_ports
 - [ ] 考虑热更新、升级的问题
 - [ ] 加入清除老旧日志的功能
+- [ ] 忽略 guestfs- 为首的日志
 
 

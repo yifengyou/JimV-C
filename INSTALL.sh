@@ -111,6 +111,17 @@ function prepare() {
     pip install virtualenv -i ${PYPI}
 }
 
+function clear_up_environment() {
+    systemctl stop firewalld
+    systemctl disable firewalld
+    systemctl stop NetworkManager
+    systemctl disable NetworkManager
+
+    sed -i 's@SELINUX=enforcing@SELINUX=disabled@g' /etc/sysconfig/selinux
+    sed -i 's@SELINUX=enforcing@SELINUX=disabled@g' /etc/selinux/config
+    setenforce 0
+}
+
 function install_MariaDB() {
     # 安装 MariaDB
     yum install mariadb mariadb-server -y
@@ -188,7 +199,7 @@ function create_web_sites_directory() {
     su - www -c "mkdir ~/sites"
 }
 
-function clone_and_checkout_JimV-C() {
+function clone_and_checkout_JimVC() {
     su - www -c "git clone https://github.com/jamesiter/JimV-C.git ~/sites/JimV-C"
 }
 
@@ -249,10 +260,11 @@ function display_summary_information() {
 
 function deploy() {
     check_precondition
+    clear_up_environment
     prepare
     create_web_user
     create_web_sites_directory
-    clone_and_checkout_JimV-C
+    clone_and_checkout_JimVC
     fit_www_user_permission
     install_MariaDB
     install_Redis
