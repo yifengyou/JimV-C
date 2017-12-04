@@ -245,47 +245,54 @@ try:
 except:
     logger.error(traceback.format_exc())
 
+threads = []
+# noinspection PyBroadException
+try:
+    signal.signal(signal.SIGTERM, Utils.signal_handle)
+    signal.signal(signal.SIGINT, Utils.signal_handle)
+
+    pid = os.fork()
+    if pid == 0:
+        ws_engine_for_vnc()
+
+    else:
+        # 父进程退出时，会清理所有提前退出的子进程的环境。所以这里无需对子进程做等待操作。
+        # 即：即使子进程提前退出，且因父进程没有做wait处理，使其变成了僵尸进程。但当父进程退出时，会对因其所产生的僵尸进程做统一清理操作。
+
+        t_ = threading.Thread(target=EventProcessor.launch, args=())
+        threads.append(t_)
+
+        t_ = threading.Thread(target=Init.pub_sub_ping_pong, args=())
+        threads.append(t_)
+
+        t_ = threading.Thread(target=Init.clear_expire_monitor_log, args=())
+        threads.append(t_)
+
+        for t in threads:
+            t.start()
+
+except:
+    logger.error(traceback.format_exc())
+    exit(-1)
+
 
 if __name__ == '__main__':
     # noinspection PyBroadException
     try:
-        signal.signal(signal.SIGTERM, Utils.signal_handle)
-        signal.signal(signal.SIGINT, Utils.signal_handle)
 
-        pid = os.fork()
-        if pid == 0:
-            ws_engine_for_vnc()
+        app.run(host=app.config['listen'], port=app.config['port'], use_reloader=False, threaded=True)
 
-        else:
-            # 父进程退出时，会清理所有提前退出的子进程的环境。所以这里无需对子进程做等待操作。
-            # 即：即使子进程提前退出，且因父进程没有做wait处理，使其变成了僵尸进程。但当父进程退出时，会对因其所产生的僵尸进程做统一清理操作。
+        while True:
+            if Utils.exit_flag:
+                # 主线程即将结束
+                break
+            time.sleep(1)
 
-            threads = []
-            t_ = threading.Thread(target=EventProcessor.launch, args=())
-            threads.append(t_)
+        # 等待子线程结束
+        for t in threads:
+            t.join()
 
-            t_ = threading.Thread(target=Init.pub_sub_ping_pong, args=())
-            threads.append(t_)
-
-            t_ = threading.Thread(target=Init.clear_expire_monitor_log, args=())
-            threads.append(t_)
-
-            for t in threads:
-                t.start()
-
-            app.run(host=app.config['listen'], port=app.config['port'], use_reloader=False, threaded=True)
-
-            while True:
-                if Utils.exit_flag:
-                    # 主线程即将结束
-                    break
-                time.sleep(1)
-
-            # 等待子线程结束
-            for t in threads:
-                t.join()
-
-            print 'Main say bye-bye!'
+        print 'Main say bye-bye!'
 
     except:
         logger.error(traceback.format_exc())

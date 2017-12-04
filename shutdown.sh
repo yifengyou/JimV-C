@@ -19,7 +19,7 @@ if [ -f '/run/jimv/jimvc.pid' ]; then
 
     if [ -f '/run/jimv/jimvc.pid' ]; then
 
-        kill -9 `cat /run/jimv/jimvc.pid`
+        killall -9 gunicorn
         rm -f /run/jimv/jimvc.pid
         echo 'JimV-C is forced to terminate.';
         exit 1

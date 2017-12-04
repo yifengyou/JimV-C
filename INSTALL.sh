@@ -252,6 +252,7 @@ function display_summary_information() {
     echo "=== Summary information"
     echo "RDB root password: [${RDB_ROOT_PSWD}]"
     echo "RDB jimv password: [${RDB_JIMV_PSWD}]"
+    echo "Redis port: [6379]"
     echo "Redis password: [${REDIS_PSWD}]"
     echo "======================="
     echo

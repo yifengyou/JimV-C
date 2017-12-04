@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
+import traceback
 import json
 import time
 from IPy import IP
@@ -323,6 +324,7 @@ class EventProcessor(object):
 
     @classmethod
     def launch(cls):
+        logger.info(msg='Thread EventProcessor is launched.')
         while True:
             if Utils.exit_flag:
                 msg = 'Thread EventProcessor say bye-bye'
@@ -362,5 +364,6 @@ class EventProcessor(object):
                     pass
 
             except Exception as e:
-                logger.error(e.message)
+                logger.error(traceback.format_exc())
+                exit(1)
 
