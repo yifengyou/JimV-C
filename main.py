@@ -90,7 +90,7 @@ def ws_engine_for_vnc():
     logger.info(msg='VNC ws engine is launched.')
 
     while True:
-        payload = db.r.lpop(app.config['ipc'])
+        payload = db.r.lpop(app.config['ipc_queue'])
 
         if payload is None:
             time.sleep(1)

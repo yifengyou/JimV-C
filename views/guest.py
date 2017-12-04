@@ -194,7 +194,7 @@ def vnc(uuid):
 
     payload = {'listen_port': port, 'target_host': guest_ret['data']['on_host'],
                'target_port': guest_ret['data']['vnc_port']}
-    db.r.rpush(config['ipc'], json.dumps(payload, ensure_ascii=False))
+    db.r.rpush(config['ipc_queue'], json.dumps(payload, ensure_ascii=False))
     time.sleep(1)
 
     return render_template('vnc_lite.html', port=port, password=guest_ret['data']['vnc_password'])
