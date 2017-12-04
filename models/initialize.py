@@ -3,7 +3,6 @@
 
 
 import traceback
-from multiprocessing import JoinableQueue
 from flask import Flask
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -45,6 +44,7 @@ class Init(object):
         'vnc_port_used_set': 'S:VNCPort:Used',
         'downstream_queue': 'Q:Downstream',
         'upstream_queue': 'Q:Upstream',
+        'ipc_queue': 'Q:IPC',
         'hosts_info': 'H:HostsInfo',
         'compute_nodes_hostname_key': 'S:ComputeNodesHostname',
         'guest_boot_jobs': 'S:GuestBootJobs',
@@ -135,10 +135,11 @@ class Init(object):
         from models import Database as db
         from models import Utils
 
+        logger.info(msg='PS PING PONG engine is launched.')
         while True:
             try:
                 if Utils.exit_flag:
-                    msg = 'Thread pub_sub_ping_pong say bye-bye'
+                    msg = 'Thread PS PING PONG engine say bye-bye'
                     print msg
                     logger.info(msg=msg)
                     return
@@ -157,10 +158,11 @@ class Init(object):
         already_clear = False
         the_time = '03:30'
 
+        logger.info(msg='Clear expire log monitor is launched.')
         while True:
             try:
                 if Utils.exit_flag:
-                    msg = 'Thread clear_expire_monitor_log say bye-bye'
+                    msg = 'Thread clear expire monitor log say bye-bye'
                     print msg
                     logger.info(msg=msg)
                     return
@@ -189,7 +191,6 @@ class Init(object):
                 logger.error(traceback.format_exc())
 
 
-q_ws = JoinableQueue()
 # 预编译效率更高
 regex_sql_str = re.compile('\\\+"')
 regex_dsl_str = re.compile('^\w+:\w+:[\S| ]+$')

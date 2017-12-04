@@ -9,7 +9,9 @@ import requests
 from math import ceil
 import re
 import socket
-from models.initialize import q_ws
+import time
+from models import Database as db
+from models.initialize import config
 
 
 __author__ = 'James Iter'
@@ -192,8 +194,8 @@ def vnc(uuid):
 
     payload = {'listen_port': port, 'target_host': guest_ret['data']['on_host'],
                'target_port': guest_ret['data']['vnc_port']}
-    q_ws.put(json.dumps(payload, ensure_ascii=False))
-    q_ws.join()
+    db.r.rpush(config['ipc'], json.dumps(payload, ensure_ascii=False))
+    time.sleep(1)
 
     return render_template('vnc_lite.html', port=port, password=guest_ret['data']['vnc_password'])
 

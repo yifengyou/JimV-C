@@ -18,7 +18,7 @@ from werkzeug.debug import get_current_traceback
 
 from models import Utils
 from models.event_processor import EventProcessor
-from models.initialize import logger, q_ws, Init
+from models.initialize import logger, Init
 import api_route_table
 import views_route_table
 from models import Database as db
@@ -86,8 +86,16 @@ def instantiation_ws_vnc(listen_port, target_host, target_port):
 
 
 def ws_engine_for_vnc():
+
+    logger.info(msg='VNC ws engine is launched.')
+
     while True:
-        payload = q_ws.get()
+        payload = db.r.lpop(app.config['ipc'])
+
+        if payload is None:
+            time.sleep(1)
+            continue
+
         payload = json.loads(payload)
 
         c_pid = os.fork()
@@ -97,7 +105,6 @@ def ws_engine_for_vnc():
         # 因为 WebSocketProxy 使用了 daemon 参数，所以当执行到 ws.start_server() 时，会退出其所在的子进程，
         # 故而这里设置wait来处理结束的子进程的环境，避免出现僵尸进程。
         os.wait()
-        q_ws.task_done()
 
 
 def is_not_need_to_auth(endpoint):
