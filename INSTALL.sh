@@ -111,6 +111,12 @@ function prepare() {
     pip install virtualenv -i ${PYPI}
 }
 
+function set_ntp() {
+    timedatectl set-timezone Asia/Shanghai
+    timedatectl set-ntp true
+    timedatectl status
+}
+
 function clear_up_environment() {
     systemctl stop firewalld
     systemctl disable firewalld
@@ -263,6 +269,7 @@ function deploy() {
     check_precondition
     clear_up_environment
     prepare
+    set_ntp
     create_web_user
     create_web_sites_directory
     clone_and_checkout_JimVC
