@@ -11,7 +11,7 @@
 - [功能指标](#功能指标)
 - [未来计划](#未来计划)
 - [安装](#安装)
-    - [JimV-C 一键安装](#jimv-c-一键安装)
+    - [JimV-C 快速安装](#jimv-c-快速安装)
     - [[JimV-C 手动安装](docs/install.md)](#jimv-c-手动安装)
 - [架构图](#架构图)
 - [[规划与建议](docs/suggest.md)](#规划与建议)
@@ -82,9 +82,13 @@
 
 ## 安装
 
-### JimV-C 一键安装
+### JimV-C 快速安装
 > 在一台服务器上仅部署 JimV-C。与其它部署 JimV-N 的计算节点一起协同工作。
 
+1. [配置 `/etc/hosts` 文件](docs/install.md#配置-etchosts-文件)
+2. [服务器间实现SSH-KEY互通(为热迁移做铺垫)](docs/install.md#服务器间实现ssh-key互通为热迁移做铺垫)
+3. [同步 `/etc/hosts` 文件](docs/install.md#同步-etchosts-文件)
+4. 通过在线脚本自动安装 JimV-C
 ``` bash
 curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash -
 ```

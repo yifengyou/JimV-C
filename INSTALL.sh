@@ -255,14 +255,15 @@ function generate_config_file() {
 
 function display_summary_information() {
     echo
-    echo "=== Summary information"
-    echo "RDB root password: [${RDB_ROOT_PSWD}]"
-    echo "RDB jimv password: [${RDB_JIMV_PSWD}]"
-    echo "Redis port: [6379]"
-    echo "Redis password: [${REDIS_PSWD}]"
+    echo "=== 信息汇总"
+    echo "MariaDB root 密码: [${RDB_ROOT_PSWD}]"
+    echo "MariaDB jimv 密码: [${RDB_JIMV_PSWD}]"
+    echo "Redis 端口: [6379]"
+    echo "Redis 密码: [${REDIS_PSWD}]"
     echo "======================="
     echo
-    echo "Now, you can run JimV-C use command '/home/www/sites/JimV-C/startup.sh'."
+    echo "记录下上面信息，安装 JimV-N 时需要用到。"
+    echo "现在可以通过命令 '/home/www/sites/JimV-C/startup.sh' 启动 JimV-C。"
 }
 
 function deploy() {
