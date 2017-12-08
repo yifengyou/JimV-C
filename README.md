@@ -89,9 +89,16 @@
 2. [服务器间实现SSH-KEY互通(为热迁移做铺垫)](docs/install.md#服务器间实现ssh-key互通为热迁移做铺垫)
 3. [同步 `/etc/hosts` 文件](docs/install.md#同步-etchosts-文件)
 4. 通过在线脚本自动安装 JimV-C
-``` bash
-curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash -
-```
+    ``` bash
+    curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash -
+    ```
+5. [安装部署 JimV-N](https://github.com/jamesiter/JimV-N#%E5%AE%89%E8%A3%85)
+6. [获取系统镜像模板](https://pan.baidu.com/s/1qYmNwK0)
+7. 上传系统镜像模板
+   > 存放系统镜像模板，到所有计算节点可以访问到的路径(如果是单个计算节点，可以存放到 /opt/template_images 目录下。如果是多个计算节点，可以通过 NFS 共享该目录。)。
+8. 创建虚拟机模板
+   > 在 JimV-C 控制面板中，添加虚拟机模板。
+9. 享受简单、快速开创虚拟机实例的快乐。。。。。
 
 ### [JimV-C 手动安装](docs/install.md)
 
