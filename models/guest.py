@@ -72,7 +72,7 @@ class Guest(ORM):
 
     def add_boot_jobs(self, boot_jobs_id):
         if not isinstance(boot_jobs_id, list):
-            raise
+            raise ValueError('The boot_jobs_id must be a list.')
 
         key = self.get_boot_jobs_key()
         db.r.sadd(key, *boot_jobs_id)
@@ -83,7 +83,7 @@ class Guest(ORM):
 
     def delete_boot_jobs(self, boot_jobs_id):
         if not isinstance(boot_jobs_id, list):
-            raise
+            raise ValueError('The boot_jobs_id must be a list.')
 
         key = self.get_boot_jobs_key()
         db.r.srem(key, *boot_jobs_id)

@@ -57,7 +57,7 @@ rm -f ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
 ## 安装必要软件
 
 ``` bash
-yum install epel-release python2-pip git -y
+yum install epel-release python2-pip git psmisc -y
 pip install --upgrade pip -i ${PYPI}
 pip install virtualenv -i ${PYPI}
 ```
