@@ -30,7 +30,7 @@
         });
 
         $('#storage_mode').on('changed.bs.select', function (me) {
-            if ($('#storage_mode').val() == '2' || $('#storage_mode').val() == '3') {
+            if ($('#storage_mode').val() === '2' || $('#storage_mode').val() === '3') {
                 $('#dfs_volume_label').css('display', 'unset');
                 $('#dfs_volume').css('display', 'unset');
             } else {
@@ -39,6 +39,55 @@
             }
         });
     });
+
+    function hdd_type_select(me) {
+        var hdd_type = $(me).val();
+
+        if (hdd_type === 'sas') {
+            $('#iops_base').val('1000');
+            $('#iops_pre_unit').val('6');
+            $('#iops_cap').val('2000');
+            $('#iops_max').val('3000');
+            $('#iops_max_length').val('20');
+            // 200 MiB
+            $('#bps_base').val('209715200');
+            // 0.1 MiB
+            $('#bps_pre_unit').val('104857');
+            // 500 MiB
+            $('#bps_cap').val('524288000');
+            // 1 GiB
+            $('#bps_max').val('1073741824');
+            $('#bps_max_length').val('10')
+
+        } else if (hdd_type === 'ssd') {
+            $('#iops_base').val('1000');
+            $('#iops_pre_unit').val('30');
+            $('#iops_cap').val('10000');
+            $('#iops_max').val('20000');
+            $('#iops_max_length').val('20');
+            $('#bps_base').val('209715200');
+            $('#bps_pre_unit').val('104857');
+            $('#bps_cap').val('524288000');
+            $('#bps_max').val('1073741824');
+            $('#bps_max_length').val('10')
+
+        } else {
+            $('#iops_base').val('100');
+            $('#iops_pre_unit').val('0');
+            $('#iops_cap').val('100');
+            $('#iops_max').val('200');
+            $('#iops_max_length').val('20');
+            // 30 MiB
+            $('#bps_base').val('31457280');
+            // 0.1 MiB
+            $('#bps_pre_unit').val('104857');
+            // 50 MiB
+            $('#bps_cap').val('52428800');
+            // 100 MiB
+            $('#bps_max').val('104857600');
+            $('#bps_max_length').val('10')
+        }
+    }
 </script>
     <div class="container" style="padding-top: 100px;">
         <div class="panel">
@@ -113,6 +162,23 @@
                             <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
                             <div class="col-sm-3">
                                 <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="/Images">
+                            </div>
+                            <!-- HDD for Hard Disk Drive -->
+                            <label id="hdd_type_label" class="col-sm-2 control-label">磁盘类型</label>
+                            <div class="col-sm-3">
+                                <label>STAT<input class="form-control" name="hdd_type" type="radio" value="stat" onclick="hdd_type_select(this)" /></label>
+                                <label>SAS<input class="form-control" name="hdd_type" type="radio" checked value="sas" onclick="hdd_type_select(this)" /></label>
+                                <label>SSD<input class="form-control" name="hdd_type" type="radio" value="ssd" onclick="hdd_type_select(this)" /></label>
+                                <input class="form-control" id="iops_base" name="iops_base" type="hidden" value="1000" />
+                                <input class="form-control" id="iops_pre_unit" name="iops_pre_unit" type="hidden" value="6" />
+                                <input class="form-control" id="iops_cap" name="iops_cap" type="hidden" value="2000" />
+                                <input class="form-control" id="iops_max" name="iops_max" type="hidden" value="3000" />
+                                <input class="form-control" id="iops_max_length" name="iops_max_length" type="hidden" value="20" />
+                                <input class="form-control" id="bps_base" name="bps_base" type="hidden" value="209715200" />
+                                <input class="form-control" id="bps_pre_unit" name="bps_pre_unit" type="hidden" value="104857" />
+                                <input class="form-control" id="bps_cap" name="bps_cap" type="hidden" value="524288000" />
+                                <input class="form-control" id="bps_max" name="bps_max" type="hidden" value="1073741824" />
+                                <input class="form-control" id="bps_max_length" name="bps_max_length" type="hidden" value="10" />
                             </div>
                         </div>
                         <div class="form-group">

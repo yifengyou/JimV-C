@@ -158,6 +158,16 @@ class Disk(ORM):
         self.format = 'qcow2'
         self.create_time = ji.Common.tus()
         self.guest_uuid = None
+        self.iops = 0
+        self.iops_rd = 0
+        self.iops_wr = 0
+        self.iops_max = 0
+        self.iops_max_length = 0
+        self.bps = 0
+        self.bps_rd = 0
+        self.bps_wr = 0
+        self.bps_max = 0
+        self.bps_max_length = 0
 
     @staticmethod
     def get_filter_keywords():
