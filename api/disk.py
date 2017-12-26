@@ -82,28 +82,8 @@ def r_create():
             disk.on_host = on_host
             disk.sequence = -1
             disk.format = 'qcow2'
-
-            disk.iops = config.iops_base + config.iops_pre_unit * disk.size
-
-            if disk.iops > config.iops_cap:
-                disk.iops = config.iops_cap
-
-            disk.iops_max = config.iops_max
-            disk.iops_max_length = config.iops_max_length
-            disk.iops_rd = 0
-            disk.iops_wr = 0
-
-            disk.bps = config.bps_base + config.bps_pre_unit * disk.size
-
-            if disk.bps > config.bps_cap:
-                disk.bps = config.bps_cap
-
-            disk.bps_max = config.bps_max
-            disk.bps_max_length = config.bps_max_length
-            disk.bps_rd = 0
-            disk.bps_wr = 0
-
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
+            disk.quota(config=config)
 
             message = {
                 '_object': 'disk',

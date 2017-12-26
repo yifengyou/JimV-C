@@ -169,6 +169,31 @@ class Disk(ORM):
         self.bps_max = 0
         self.bps_max_length = 0
 
+    def quota(self, config=None):
+
+        from models import Config
+        assert isinstance(config, Config)
+
+        self.iops = config.iops_base + config.iops_pre_unit * self.size
+
+        if self.iops > config.iops_cap:
+            self.iops = config.iops_cap
+
+        self.iops_max = config.iops_max
+        self.iops_max_length = config.iops_max_length
+        self.iops_rd = 0
+        self.iops_wr = 0
+
+        self.bps = config.bps_base + config.bps_pre_unit * self.size
+
+        if self.bps > config.bps_cap:
+            self.bps = config.bps_cap
+
+        self.bps_max = config.bps_max
+        self.bps_max_length = config.bps_max_length
+        self.bps_rd = 0
+        self.bps_wr = 0
+
     @staticmethod
     def get_filter_keywords():
         return {
