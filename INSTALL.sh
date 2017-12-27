@@ -117,6 +117,17 @@ function set_ntp() {
     timedatectl status
 }
 
+function custom_repository_origin() {
+    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+    mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
+    mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.backup
+    curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+    curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
+    yum clean all
+    rm -rf /var/cache/yum
+    yum makecache
+}
+
 function clear_up_environment() {
     systemctl stop firewalld
     systemctl disable firewalld
@@ -271,6 +282,7 @@ function deploy() {
     clear_up_environment
     prepare
     set_ntp
+    custom_repository_origin
     create_web_user
     create_web_sites_directory
     clone_and_checkout_JimVC
