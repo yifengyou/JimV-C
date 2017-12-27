@@ -204,7 +204,9 @@ class EventProcessor(object):
 
                 if state == ResponseState.success.value:
                     cls.guest.uuid = uuid
-                    cls.guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id)
+
+                    if boot_jobs_id.__len__() > 0:
+                        cls.guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id)
 
         elif _object == 'disk':
             if action == 'create':
