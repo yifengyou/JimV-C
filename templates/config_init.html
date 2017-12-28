@@ -161,14 +161,19 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
                             <div class="col-sm-3">
-                                <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="/Images">
+                                <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="/opt/Images">
                             </div>
                             <!-- HDD for Hard Disk Drive -->
                             <label id="hdd_type_label" class="col-sm-2 control-label">磁盘类型</label>
-                            <div class="col-sm-3">
+                            <div class="col-sm-1">
                                 <label>STAT<input class="form-control" name="hdd_type" type="radio" value="stat" onclick="hdd_type_select(this)" /></label>
+                            </div>
+                            <div class="col-sm-1">
                                 <label>SAS<input class="form-control" name="hdd_type" type="radio" checked value="sas" onclick="hdd_type_select(this)" /></label>
+                            </div>
+                            <div class="col-sm-1">
                                 <label>SSD<input class="form-control" name="hdd_type" type="radio" value="ssd" onclick="hdd_type_select(this)" /></label>
+                            </div>
                                 <input class="form-control" id="iops_base" name="iops_base" type="hidden" value="1000" />
                                 <input class="form-control" id="iops_pre_unit" name="iops_pre_unit" type="hidden" value="6" />
                                 <input class="form-control" id="iops_cap" name="iops_cap" type="hidden" value="2000" />
