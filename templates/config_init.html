@@ -45,14 +45,14 @@
 
         if (hdd_type === 'sas') {
             $('#iops_base').val('1000');
-            $('#iops_pre_unit').val('6');
+            $('#iops_pre_unit').val('1');
             $('#iops_cap').val('2000');
             $('#iops_max').val('3000');
             $('#iops_max_length').val('20');
             // 200 MiB
             $('#bps_base').val('209715200');
-            // 0.1 MiB
-            $('#bps_pre_unit').val('104857');
+            // 0.3 MiB
+            $('#bps_pre_unit').val('314572');
             // 500 MiB
             $('#bps_cap').val('524288000');
             // 1 GiB
@@ -66,7 +66,8 @@
             $('#iops_max').val('20000');
             $('#iops_max_length').val('20');
             $('#bps_base').val('209715200');
-            $('#bps_pre_unit').val('104857');
+            // 1 MiB
+            $('#bps_pre_unit').val('1048576');
             $('#bps_cap').val('524288000');
             $('#bps_max').val('1073741824');
             $('#bps_max_length').val('10')
@@ -175,12 +176,12 @@
                                 <label>SSD<input class="form-control" name="hdd_type" type="radio" value="ssd" onclick="hdd_type_select(this)" /></label>
                             </div>
                                 <input class="form-control" id="iops_base" name="iops_base" type="hidden" value="1000" />
-                                <input class="form-control" id="iops_pre_unit" name="iops_pre_unit" type="hidden" value="6" />
+                                <input class="form-control" id="iops_pre_unit" name="iops_pre_unit" type="hidden" value="1" />
                                 <input class="form-control" id="iops_cap" name="iops_cap" type="hidden" value="2000" />
                                 <input class="form-control" id="iops_max" name="iops_max" type="hidden" value="3000" />
                                 <input class="form-control" id="iops_max_length" name="iops_max_length" type="hidden" value="20" />
                                 <input class="form-control" id="bps_base" name="bps_base" type="hidden" value="209715200" />
-                                <input class="form-control" id="bps_pre_unit" name="bps_pre_unit" type="hidden" value="104857" />
+                                <input class="form-control" id="bps_pre_unit" name="bps_pre_unit" type="hidden" value="314572" />
                                 <input class="form-control" id="bps_cap" name="bps_cap" type="hidden" value="524288000" />
                                 <input class="form-control" id="bps_max" name="bps_max" type="hidden" value="1073741824" />
                                 <input class="form-control" id="bps_max_length" name="bps_max_length" type="hidden" value="10" />

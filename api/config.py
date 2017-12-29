@@ -70,14 +70,14 @@ def r_create():
     config.dns1 = request.json.get('dns1')
     config.dns2 = request.json.get('dns2')
     config.iops_base = int(request.json.get('iops_base', 1000))
-    config.iops_pre_unit = int(request.json.get('iops_pre_unit', 6))
+    config.iops_pre_unit = int(request.json.get('iops_pre_unit', 1))
     config.iops_cap = int(request.json.get('iops_cap', 2000))
     config.iops_max = int(request.json.get('iops_max', 3000))
     config.iops_max_length = int(request.json.get('iops_max_length', 20))
     # 200 MiB
     config.bps_base = int(request.json.get('bps_base', 1024 * 1024 * 200))
-    # 0.1 MiB
-    config.bps_pre_unit = int(request.json.get('bps_pre_unit', 1024 * 1024 / 10))
+    # 0.3 MiB
+    config.bps_pre_unit = int(request.json.get('bps_pre_unit', 1024 * 1024 * 0.3))
     # 500 MiB
     config.bps_cap = int(request.json.get('bps_cap', 1024 * 1024 * 500))
     # 1 GiB

@@ -52,14 +52,14 @@ def create():
             'dns1': request.form.get('dns1'),
             'dns2': request.form.get('dns2'),
             'iops_base': int(request.form.get('iops_base', 1000)),
-            'iops_pre_unit': int(request.form.get('iops_pre_unit', 6)),
+            'iops_pre_unit': int(request.form.get('iops_pre_unit', 1)),
             'iops_cap': int(request.form.get('iops_cap', 2000)),
             'iops_max': int(request.form.get('iops_max', 3000)),
             'iops_max_length': int(request.form.get('iops_max_length', 20)),
             # 200 MiB
             'bps_base': int(request.form.get('bps_base', 1024 * 1024 * 200)),
-            # 0.1 MiB
-            'bps_pre_unit': int(request.form.get('bps_pre_unit', 1024 * 1024 / 10)),
+            # 0.3 MiB
+            'bps_pre_unit': int(request.form.get('bps_pre_unit', 1024 * 1024 * 0.3)),
             # 500 MiB
             'bps_cap': int(request.form.get('bps_cap', 1024 * 1024 * 500)),
             # 1 GiB
