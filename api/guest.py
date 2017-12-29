@@ -241,7 +241,7 @@ def r_force_reboot(uuids):
         for uuid in uuids.split(','):
             guest.uuid = uuid
             guest.get_by('uuid')
-            disks = Disk.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
+            disks, _ = Disk.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
 
             message = {
                 '_object': 'guest',
@@ -382,7 +382,7 @@ def r_boot(uuids):
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
-            disks = Disk.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
+            disks, _ = Disk.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
 
             message = {
                 '_object': 'guest',
