@@ -11,14 +11,12 @@
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
 export JIMVC_REPOSITORY_URL='https://raw.githubusercontent.com/jamesiter/JimV-C'
-export EDITION='master'
-export NGINX_JIMV_URL=${JIMVC_REPOSITORY_URL}'/'${EDITION}'/misc/nginx_jimv.conf'
 export GENERATE_PASSWORD_SCRIPT_TMP_PATH='/tmp/gen_pswd.sh'
 export SMTP_HOST=''
 export SMTP_USER=''
 export SMTP_PASSWORD=''
 
-ARGS=`getopt -o h --long rdb_root_password:,rdb_jimv_password:,redis_password:,jwt_secret:,secret_key:,help -n 'INSTALL.sh' -- "$@"`
+ARGS=`getopt -o h --long rdb_root_password:,rdb_jimv_password:,redis_password:,jwt_secret:,secret_key:,version:,help -n 'INSTALL.sh' -- "$@"`
 
 eval set -- "${ARGS}"
 
@@ -45,8 +43,12 @@ do
             export SECRET_KEY=$2
             shift 2
             ;;
+        --version)
+            export JIMV_VERSION=$2
+            shift 2
+            ;;
         -h|--help)
-            echo 'INSTALL.sh [-h|--help|--rdb_root_password|--rdb_jimv_password|--redis_password|--jwt_secret|--secret_key]'
+            echo 'INSTALL.sh [-h|--help|--rdb_root_password|--rdb_jimv_password|--redis_password|--jwt_secret|--secret_key|--version]'
             exit 0
             ;;
         --)
@@ -78,8 +80,12 @@ function check_precondition() {
 
 function prepare() {
 
+    if [ ! ${JIMV_VERSION} ] || [ ${#JIMV_VERSION} -eq 0 ]; then
+        export JIMV_VERSION='master'
+    fi
+
     if [ ! -e ${GENERATE_PASSWORD_SCRIPT_TMP_PATH} ]; then
-        curl ${JIMVC_REPOSITORY_URL}'/'${EDITION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
+        curl ${JIMVC_REPOSITORY_URL}'/'${JIMV_VERSION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
         chmod +x ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
     fi
 
@@ -115,17 +121,6 @@ function set_ntp() {
     timedatectl set-timezone Asia/Shanghai
     timedatectl set-ntp true
     timedatectl status
-}
-
-function custom_repository_origin() {
-    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-    mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
-    mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.backup
-    curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-    curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
-    yum clean all
-    rm -rf /var/cache/yum
-    yum makecache
 }
 
 function clear_up_environment() {
@@ -193,6 +188,8 @@ function install_Redis() {
 }
 
 function install_Nginx() {
+    export NGINX_JIMV_URL=${JIMVC_REPOSITORY_URL}'/'${JIMV_VERSION}'/misc/nginx_jimv.conf'
+
     # 安装 Nginx
     yum install nginx -y
 
@@ -218,6 +215,7 @@ function create_web_sites_directory() {
 
 function clone_and_checkout_JimVC() {
     su - www -c "git clone https://github.com/jamesiter/JimV-C.git ~/sites/JimV-C"
+    su - www -c "cd ~/sites/JimV-C && git checkout ${JIMV_VERSION}"
 }
 
 function install_dependencies_library() {
@@ -282,7 +280,6 @@ function deploy() {
     clear_up_environment
     prepare
     set_ntp
-    custom_repository_origin
     create_web_user
     create_web_sites_directory
     clone_and_checkout_JimVC
