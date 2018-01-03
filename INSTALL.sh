@@ -262,6 +262,13 @@ function generate_config_file() {
     sed -i "s/\"smtp_password\".*$/\"smtp_password\": \"${SMTP_PASSWORD}\",/" /etc/jimvc.conf
 }
 
+function generate_pid_directory_ad_reboot() {
+    chmod +x /etc/rc.d/rc.local
+    echo '' >> /etc/rc.d/rc.local
+    echo 'mkdir /run/jimv' >> /etc/rc.d/rc.local
+    echo 'chown www.www /run/jimv' >> /etc/rc.d/rc.local
+}
+
 function display_summary_information() {
     echo
     echo "=== 信息汇总"
@@ -289,6 +296,7 @@ function deploy() {
     install_Nginx
     install_dependencies_library
     initialization_db
+    generate_pid_directory_ad_reboot
     generate_config_file
     display_summary_information
 }
