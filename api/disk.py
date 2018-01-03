@@ -82,8 +82,8 @@ def r_create():
             disk.on_host = on_host
             disk.sequence = -1
             disk.format = 'qcow2'
-
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
+            disk.quota(config=config)
 
             message = {
                 '_object': 'disk',

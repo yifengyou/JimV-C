@@ -40,6 +40,16 @@ class Config(ORM):
         self.gateway = ''
         self.dns1 = ''
         self.dns2 = ''
+        self.iops_base = 0
+        self.iops_pre_unit = 0
+        self.iops_cap = 0
+        self.iops_max = 0
+        self.iops_max_length = 0
+        self.bps_base = 0
+        self.bps_pre_unit = 0
+        self.bps_cap = 0
+        self.bps_max = 0
+        self.bps_max_length = 0
 
     @staticmethod
     def get_filter_keywords():

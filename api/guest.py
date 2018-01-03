@@ -130,6 +130,7 @@ def r_create():
             disk.size = 0
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
             disk.guest_uuid = ''
+            disk.quota(config=config)
             disk.create()
 
             guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template.os_type)
@@ -171,6 +172,8 @@ def r_create():
                 'template_path': os_template.path,
                 'os_type': os_template.os_type,
                 'disk': disk.__dict__,
+                # disk 将被废弃，由 disks 代替，暂时保留它的目的，是为了保持与 JimV-N 的兼容性
+                'disks': [disk.__dict__],
                 'xml': guest_xml.get_domain(),
                 'boot_jobs': _boot_jobs,
                 'passback_parameters': {'boot_jobs_id': boot_jobs_id}
@@ -238,12 +241,14 @@ def r_force_reboot(uuids):
         for uuid in uuids.split(','):
             guest.uuid = uuid
             guest.get_by('uuid')
+            disks, _ = Disk.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
 
             message = {
                 '_object': 'guest',
                 'action': 'force_reboot',
                 'uuid': uuid,
-                'hostname': guest.on_host
+                'hostname': guest.on_host,
+                'disks': disks
             }
 
             Guest.emit_instruction(message=json.dumps(message))
@@ -377,13 +382,16 @@ def r_boot(uuids):
                     replace('{DNS1}', config.dns1). \
                     replace('{DNS2}', config.dns2)
 
+            disks, _ = Disk.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
+
             message = {
                 '_object': 'guest',
                 'action': 'boot',
                 'uuid': uuid,
                 'boot_jobs': boot_jobs,
                 'hostname': guest.on_host,
-                'passback_parameters': {'boot_jobs_id': boot_jobs_id}
+                'passback_parameters': {'boot_jobs_id': boot_jobs_id},
+                'disks': disks
             }
 
             Guest.emit_instruction(message=json.dumps(message))
@@ -589,7 +597,8 @@ def r_attach_disk(uuid, disk_uuid):
             'uuid': uuid,
             'hostname': guest.on_host,
             'xml': guest_xml.get_disk(),
-            'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence}
+            'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence},
+            'disks': [disk.__dict__]
         }
 
         Guest.emit_instruction(message=json.dumps(message))
