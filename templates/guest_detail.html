@@ -74,6 +74,12 @@
         }
     }
 
+    var dev_table = [];
+
+    for (var i = 1; i <= 26; i++) {
+        dev_table.push('vd' + String.fromCharCode(0x60+i));
+    }
+
     function render_cpu_chart(uuid, granularity) {
         var url = '/api/performance/cpu_memory/last_hour/' + uuid;
         if (granularity === 'hour') {
@@ -958,11 +964,26 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <span class="guest-label">磁盘&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                <span class="guest-desc">
-                                <a href="/disks?guest_uuid={{ guest_ret.data.uuid }}" style="color: #0275d8;">{{ disks_ret.data|length }}</a>
-                                </span>
+                            <td style="padding: 0;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td colspan="4">
+                                            <span class="guest-label">磁盘&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                    <a href="/disks?guest_uuid={{ guest_ret.data.uuid }}" style="color: #0275d8;">{{ disks_ret.data|length }}</a>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr class="guest-label">
+                                        <th width="20%" rowspan="2">设备路径</th><th width="20%" rowspan="2">磁盘大小</th><th width="40%" colspan="2" style="padding: 0 9px; text-align: center;">磁盘限额</th>
+                                    </tr>
+                                    <tr class="guest-label">
+                                        <th width="20%" style="padding: 0 9px; text-align: center;">IOPS</th><th width="20%" style="padding: 0 9px; text-align: center;">BPS</th>
+                                    </tr>
+                                    {% for disk in disks_ret.data %}
+                                        <tr class="guest-desc"><th>{{ disk.device }}</th><th>{{ disk.size }} GB</th><th style="text-align: center;">{{ disk.iops }}</th><th style="text-align: center;">{{ (disk.bps / 1024 / 1024) | int }} MiB</th></tr>
+                                    {% endfor %}
+                                </table>
                             </td>
                         </tr>
                         <tr>
