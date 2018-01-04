@@ -224,17 +224,42 @@ def r_delete(uuids):
         return json.loads(e.message)
 
 
+def add_device(func):
+    from functools import wraps
+
+    @wraps(func)
+    def _add_device(*args, **kwargs):
+        ret = func(*args, **kwargs)
+        if ret['data'].__len__() > 0:
+            if isinstance(ret['data'], list):
+                for i, item in enumerate(ret['data']):
+                    ret['data'][i][u'device'] = u'/dev/' + dev_table[item['sequence']]
+
+            elif isinstance(ret['data'], dict):
+                ret['data'][u'device'] = u'/dev/' + dev_table[ret['data']['sequence']]
+
+            else:
+                raise json.dumps(ret)
+
+        return ret
+
+    return _add_device
+
+
 @Utils.dumps2response
+@add_device
 def r_get(uuids):
     return disk_base.get(ids=uuids, ids_rule=Rules.UUIDS.value, by_field='uuid')
 
 
 @Utils.dumps2response
+@add_device
 def r_get_by_filter():
     return disk_base.get_by_filter()
 
 
 @Utils.dumps2response
+@add_device
 def r_content_search():
     return disk_base.content_search()
 
