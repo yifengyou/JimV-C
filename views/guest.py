@@ -218,8 +218,12 @@ def detail(uuid):
     disks_ret = requests.get(url=disks_url, cookies=request.cookies)
     disks_ret = json.loads(disks_ret.content)
 
+    url = host_url + '/api/config'
+    config_ret = requests.get(url=url, cookies=request.cookies)
+    config_ret = json.loads(config_ret.content)
+
     return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,
-                           disks_ret=disks_ret)
+                           disks_ret=disks_ret, config_ret=config_ret)
 
 
 def success():

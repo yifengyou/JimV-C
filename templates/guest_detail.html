@@ -887,6 +887,22 @@
         render_traffic_chart(uuid, 'hour');
         render_disks_chart(uuid, 'hour')
         // render_memory_chart(uuid, 'hour');
+
+        $("#disks_table thead").on('click', ".all_selector", function() {
+            if ($("#disks_table thead .all_selector").is(':checked')) {
+                $("#disks_table tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $("#disks_table .all_selector").prop('checked', true);
+            } else {
+                $("#disks_table tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $("#disks_table .all_selector").prop('checked', false);
+            }
+
+            select_item_action();
+        });
+
+        $("#disks_table tbody tr").on('click', "input[type='checkbox']", function() {
+            select_item_action();
+        });
     });
     
     function refresh_render_with_specify_granularity(granularity) {
@@ -894,6 +910,107 @@
         render_traffic_chart(uuid, granularity);
         render_disks_chart(uuid, granularity)
     }
+
+    function get_selected_element(checked) {
+        if (checked === null) {
+            checked = true;
+        }
+
+        if (checked) {
+            return $('#disks_table tbody :checked');
+        } else {
+
+            return $('#disks_table tbody input:not(:checked)');
+        }
+    }
+
+    function shortcut_bar_enable() {
+        var selected_element = get_selected_element(true);
+
+        if (selected_element.length > 0) {
+            $('#disks_table .btn-shortcut').toggleClass('disabled', false);
+        } else {
+            $('#disks_table .btn-shortcut').toggleClass('disabled', true);
+        }
+    }
+
+    function select_item_action() {
+        shortcut_bar_enable();
+    }
+
+    function get_selected_uuids() {
+        var selected_element = get_selected_element(true);
+        var uuids = [];
+
+        selected_element.each(function(i, e) {
+            var uuid = $(e).parent().prev().text();
+            uuids.push(uuid);
+        });
+
+        return uuids;
+    }
+
+    function get_checked_uuids() {
+        var uuids = get_selected_uuids();
+
+        if (uuids.length < 1) {
+            alter_warning('未选择任何可操作的实例！');
+            return false;
+        }
+
+        return uuids;
+    }
+
+    function refresh() {
+        window.location.href=window.location.pathname;
+    }
+
+    function update_disk_quota(uuids) {
+        $.ajax({
+            url : '/api/disks/' + uuids.join(','),
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                iops: parseInt($('#iops').val()),
+                bps: parseInt($('#bps').val()) * 1024 * 1024
+            }),
+            error : function() {
+                alter_danger('变更磁盘性能配额指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更磁盘性能配额指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function change_disk_quota() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            update_disk_quota(uuids);
+        }
+        $('#change_disk_quota_modal').modal('hide');
+    }
+
+    $(function() { "use strict";
+        $("#iops").TouchSpin({
+            max: {{ config_ret.data.iops_cap }},
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#bps").TouchSpin({
+            max: {{ config_ret.data.bps_cap / 1024 / 1024 | int }},
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
 </script>
 <div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
     <div class="panel">
@@ -965,29 +1082,35 @@
                         </tr>
                         <tr>
                             <td style="padding: 0;">
-                                <table style="width: 100%;">
+                                <table id="disks_table" style="width: 100%;">
+                                    <thead>
                                     <tr>
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             <span class="guest-label">磁盘&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
                                                     <a href="/disks?guest_uuid={{ guest_ret.data.uuid }}" style="color: #0275d8;">{{ disks_ret.data|length }}</a>
                                             </span>
-                                            <button class="btn btn-xs btn-default disabled" style="float: right;">变更配额</button>
+                                            <button class="btn btn-xs btn-default btn-shortcut disabled" style="float: right;" data-toggle="modal" data-target="#change_disk_quota_modal">变更配额</button>
                                         </td>
                                     </tr>
                                     <tr class="guest-label">
+                                        <th rowspan="2" style="display: none;">磁盘 UUID</th>
                                         <th rowspan="2" width="5%"><input class="all_selector" title="选取所有" type="checkbox"></th>
-                                        <th width="20%" rowspan="2">设备路径</th><th width="20%" rowspan="2">磁盘大小</th><th width="40%" colspan="2" style="padding: 0 9px; text-align: center;">磁盘限额</th>
+                                        <th width="20%" rowspan="2">设备路径</th><th width="20%" rowspan="2">磁盘大小</th><th width="40%" colspan="2" style="padding: 0 9px; text-align: center;">磁盘配额</th>
                                     </tr>
                                     <tr class="guest-label">
                                         <th width="20%" style="padding: 0 9px; text-align: center;">IOPS</th><th width="20%" style="padding: 0 9px; text-align: center;">BPS</th>
                                     </tr>
+                                    </thead>
+                                    <tbody>
                                     {% for disk in disks_ret.data %}
                                         <tr class="guest-desc">
+                                            <td style="display: none;">{{ disk.uuid }}</td>
                                             <td><input title="选中" type="checkbox"></td>
                                             <th>{{ disk.device }}</th><th>{{ disk.size }} GB</th><th style="text-align: center;">{{ disk.iops }}</th><th style="text-align: center;">{{ (disk.bps / 1024 / 1024) | int }} MiB</th>
                                         </tr>
                                     {% endfor %}
+                                    </tbody>
                                 </table>
                             </td>
                         </tr>
@@ -1071,6 +1194,36 @@
                     <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
                     <div id="disks_chart"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="change_disk_quota_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更磁盘配额：</h4>
+            </div>
+            <div class="modal-body" style="padding-left: 8%;">
+                <form id="change_disk_quota_form" class="form-horizontal">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;IOPS</label>
+                        <div class="col-sm-3">
+                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ config_ret.data.iops_base }}" name="iops">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;BPS(MiB)</label>
+                        <div class="col-sm-3">
+                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ config_ret.data.bps_base / 1024 / 1024 | int }}" name="bps">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="change_disk_quota();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>
