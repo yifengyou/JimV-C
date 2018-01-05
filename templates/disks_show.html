@@ -199,7 +199,7 @@
         var remark = $('#edit_remark').val();
         $('#edit_remark_modal').modal('hide');
         $.ajax({
-            url : '/api/disk/' + uuid,
+            url : '/api/disks/' + uuid,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
