@@ -90,7 +90,7 @@ add_rule_api(guest.blueprints, '/_distribute_count', api_func='guest.r_distribut
 add_rule_api(disk.blueprint, '', api_func='disk.r_create', methods=['POST'])
 add_rule_api(disk.blueprint, '/_disk_resize/<uuid>/<size>', api_func='disk.r_resize', methods=['PUT'])
 add_rule_api(disk.blueprints, '/<uuids>', api_func='disk.r_delete', methods=['DELETE'])
-add_rule_api(disk.blueprint, '/<uuid>', api_func='disk.r_update', methods=['PATCH'])
+add_rule_api(disk.blueprints, '/<uuids>', api_func='disk.r_update', methods=['PATCH'])
 add_rule_api(disk.blueprints, '/<uuids>', api_func='disk.r_get', methods=['GET'])
 add_rule_api(disk.blueprints, '', api_func='disk.r_get_by_filter', methods=['GET'])
 add_rule_api(disk.blueprints, '/_search', api_func='disk.r_content_search', methods=['GET'])

@@ -265,10 +265,14 @@ def r_content_search():
 
 
 @Utils.dumps2response
-def r_update(uuid):
+def r_update(uuids):
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = list()
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUIDS.value
     ]
 
     if 'remark' in request.json:
@@ -276,28 +280,93 @@ def r_update(uuid):
             Rules.REMARK.value
         )
 
+    if 'iops' in request.json:
+        args_rules.append(
+            Rules.IOPS.value
+        )
+
+    if 'iops_max' in request.json:
+        args_rules.append(
+            Rules.IOPS_MAX.value
+        )
+
+    if 'iops_max_length' in request.json:
+        args_rules.append(
+            Rules.IOPS_MAX_LENGTH.value
+        )
+
+    if 'bps' in request.json:
+        args_rules.append(
+            Rules.BPS.value
+        )
+
+    if 'bps_max' in request.json:
+        args_rules.append(
+            Rules.BPS_MAX.value
+        )
+
+    if 'bps_max_length' in request.json:
+        args_rules.append(
+            Rules.BPS_MAX_LENGTH.value
+        )
+
     if args_rules.__len__() < 2:
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    request.json['uuid'] = uuid
+    request.json['uuids'] = uuids
 
     try:
         ji.Check.previewing(args_rules, request.json)
+
         disk = Disk()
-        disk.uuid = uuid
-        disk.get_by('uuid')
 
-        disk.remark = request.json.get('remark', disk.remark)
+        # 检测所指定的 UUDIs 磁盘都存在
+        for uuid in uuids.split(','):
+            disk.uuid = uuid
+            disk.get_by('uuid')
 
-        disk.update()
-        disk.get()
+        for uuid in uuids.split(','):
+            disk.uuid = uuid
+            disk.get_by('uuid')
+            disk.remark = request.json.get('remark', disk.remark)
+            disk.iops = request.json.get('iops', disk.iops)
+            disk.iops_rd = request.json.get('iops_rd', disk.iops_rd)
+            disk.iops_wr = request.json.get('iops_wr', disk.iops_wr)
+            disk.iops_max = request.json.get('iops_max', disk.iops_max)
+            disk.iops_max_length = request.json.get('iops_max_length', disk.iops_max_length)
+            disk.bps = request.json.get('bps', disk.bps)
+            disk.bps_rd = request.json.get('bps_rd', disk.bps_rd)
+            disk.bps_wr = request.json.get('bps_wr', disk.bps_wr)
+            disk.bps_max = request.json.get('bps_max', disk.bps_max)
+            disk.bps_max_length = request.json.get('bps_max_length', disk.bps_max_length)
+            disk.update()
+            disk.get()
 
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = disk.__dict__
+            if disk.sequence >= 0:
+                message = {
+                    '_object': 'disk',
+                    'action': 'quota',
+                    'guest_uuid': disk.guest_uuid,
+                    'hostname': disk.on_host,
+                    'sequence': disk.sequence,
+                    'iops': disk.iops,
+                    'iops_rd': disk.iops_rd,
+                    'iops_wr': disk.iops_wr,
+                    'iops_max': disk.iops_max,
+                    'iops_max_length': disk.iops_max_length,
+                    'bps': disk.bps,
+                    'bps_rd': disk.bps_rd,
+                    'bps_wr': disk.bps_wr,
+                    'bps_max': disk.bps_max,
+                    'bps_max_length': disk.bps_max_length
+                }
+
+                Guest.emit_instruction(message=json.dumps(message))
+
+            ret['data'].append(disk.__dict__)
+
         return ret
+
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
