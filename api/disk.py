@@ -285,6 +285,16 @@ def r_update(uuids):
             Rules.IOPS.value
         )
 
+    if 'iops_rd' in request.json:
+        args_rules.append(
+            Rules.IOPS_RD.value
+        )
+
+    if 'iops_wr' in request.json:
+        args_rules.append(
+            Rules.IOPS_WR.value
+        )
+
     if 'iops_max' in request.json:
         args_rules.append(
             Rules.IOPS_MAX.value
@@ -298,6 +308,16 @@ def r_update(uuids):
     if 'bps' in request.json:
         args_rules.append(
             Rules.BPS.value
+        )
+
+    if 'bps_rd' in request.json:
+        args_rules.append(
+            Rules.BPS_RD.value
+        )
+
+    if 'bps_wr' in request.json:
+        args_rules.append(
+            Rules.BPS_WR.value
         )
 
     if 'bps_max' in request.json:
@@ -314,6 +334,13 @@ def r_update(uuids):
         return ret
 
     request.json['uuids'] = uuids
+
+    need_update_quota = False
+    need_update_quota_parameters = ['iops', 'iops_rd', 'iops_wr', 'iops_max', 'iops_max_length',
+                                    'bps', 'bps_rd', 'bps_wr', 'bps_max', 'bps_max_length']
+
+    if filter(lambda p: p in request.json, need_update_quota_parameters).__len__() > 0:
+        need_update_quota = True
 
     try:
         ji.Check.previewing(args_rules, request.json)
@@ -342,23 +369,28 @@ def r_update(uuids):
             disk.update()
             disk.get()
 
-            if disk.sequence >= 0:
+            if disk.sequence >= 0 and need_update_quota:
                 message = {
                     '_object': 'disk',
                     'action': 'quota',
+                    'uuid': disk.uuid,
                     'guest_uuid': disk.guest_uuid,
                     'hostname': disk.on_host,
-                    'sequence': disk.sequence,
-                    'iops': disk.iops,
-                    'iops_rd': disk.iops_rd,
-                    'iops_wr': disk.iops_wr,
-                    'iops_max': disk.iops_max,
-                    'iops_max_length': disk.iops_max_length,
-                    'bps': disk.bps,
-                    'bps_rd': disk.bps_rd,
-                    'bps_wr': disk.bps_wr,
-                    'bps_max': disk.bps_max,
-                    'bps_max_length': disk.bps_max_length
+                    'disks': [
+                        {
+                            'sequence': disk.sequence,
+                            'iops': disk.iops,
+                            'iops_rd': disk.iops_rd,
+                            'iops_wr': disk.iops_wr,
+                            'iops_max': disk.iops_max,
+                            'iops_max_length': disk.iops_max_length,
+                            'bps': disk.bps,
+                            'bps_rd': disk.bps_rd,
+                            'bps_wr': disk.bps_wr,
+                            'bps_max': disk.bps_max,
+                            'bps_max_length': disk.bps_max_length
+                        }
+                    ]
                 }
 
                 Guest.emit_instruction(message=json.dumps(message))

@@ -75,7 +75,11 @@ class Rules(Enum):
     DISK_SIZE_STR = (REG_NUMBER, 'size')
     DISK_ON_HOST = (basestring, 'on_host', (1, 128))
     IOPS = (int, 'iops')
+    IOPS_RD = (int, 'iops_rd')
+    IOPS_WR = (int, 'iops_wr')
     BPS = (int, 'bps')
+    BPS_RD = (int, 'bps_rd')
+    BPS_WR = (int, 'bps_wr')
 
     REMARK = (basestring, 'remark')
     USE_FOR = (int, 'use_for')
