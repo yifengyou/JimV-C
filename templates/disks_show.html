@@ -349,6 +349,55 @@
         remove(disk_uuid);
         $('#delete_modal').modal('hide');
     }
+
+    function get_selected_uuids() {
+        var selected_element = get_selected_element(true);
+        var uuids = [];
+
+        selected_element.each(function(i, e) {
+            var uuid = $(e).parent().prev().text();
+            uuids.push(uuid);
+        });
+
+        return uuids;
+    }
+
+    function get_checked_uuids() {
+        var uuids = get_selected_uuids();
+
+        if (uuids.length < 1) {
+            alter_warning('未选择任何可操作的实例！');
+            return false;
+        }
+
+        return uuids;
+    }
+
+    function batch_remark_update() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            var remark = $('#batch_edit_remark').val();
+            $.ajax({
+                url : '/api/disks/' + uuids.join(','),
+                type : 'PATCH',
+                contentType: "application/json; charset=utf-8",
+                data : JSON.stringify({
+                    remark: remark
+                }),
+                error : function() {
+                    alter_danger('磁盘备注更新失败！');
+                },
+                success : function() {
+                    alter_success('磁盘备注更新成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+        $('#batch_remark_modal').modal('hide');
+    }
+
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -380,8 +429,10 @@
                     <th><input class="all_selector" title="选取所有" type="checkbox"></th>
                     <th width="280px;">UUID</th>
                     <th>状态</th>
-                    <th>大小</th>
                     <th>设备号</th>
+                    <th>大小</th>
+                    <th>IOPS</th>
+                    <th>BPS</th>
                     <th>所属虚拟机</th>
                     <th style="{% if not show_on_host %}display: none;{% endif %}">所属计算节点</th>
                     <th>磁盘性别</th>
@@ -392,6 +443,7 @@
                 <tbody>
                 {% for item in disks_ret.data %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                    <td style="display: none;">{{ item.uuid }}</td>
                     <td><input title="选中" type="checkbox"></td>
                     <td>
                         <div>
@@ -405,8 +457,10 @@
                         </div>
                     </td>
                     <td>{{ format_disk_state(item.state)|safe }}</td>
-                    <td>{{ item.size }} GB</td>
                     <td>{{ format_sequence_to_device_name(item.sequence) }}</td>
+                    <td>{{ item.size }} GB</td>
+                    <td>{{ item.iops }}</td>
+                    <td>{{ (item.bps / 1024 / 1024) | int }} MiB</td>
                     <td><a href="/guest/detail/{{ item.guest_uuid }}" {% if 'guest' not in item %}style="display: none"{% endif %}>{% if 'guest' in item %}
                         {{ item.guest.label }}/{{ item.guest.remark }}
                     {% endif %}</a>
@@ -465,7 +519,8 @@
                         <th>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <button class="btn btn-default btn-shortcut disabled" onclick="batch_boot();">备注</button>
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_remark_modal">备注</button>
+                                    <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_change_disk_quota_modal">变更配额</button>
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
                                     共有{{ disks_ret.paging.total }}条，每页显示：
@@ -570,6 +625,23 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_remark_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量备注虚拟机：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="batch_edit_remark" title="批量备注" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_remark_update();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
