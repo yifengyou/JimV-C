@@ -203,6 +203,10 @@ def detail(uuid):
     guest_ret = None
     os_template_ret = None
 
+    config_url = host_url + url_for('api_config.r_get')
+    config_ret = requests.get(url=config_url, cookies=request.cookies)
+    config_ret = json.loads(config_ret.content)
+
     if disk_ret['data']['sequence'] != -1:
         guest_url = host_url + url_for('api_guests.r_get', uuids=disk_ret['data']['guest_uuid'])
 
@@ -215,6 +219,6 @@ def detail(uuid):
         os_template_ret = json.loads(os_template_ret.content)
 
     return render_template('disk_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,
-                           disk_ret=disk_ret)
+                           disk_ret=disk_ret, config_ret=config_ret)
 
 
