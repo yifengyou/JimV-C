@@ -2,6 +2,22 @@
 {% block head %}
     {{ super() }}
     <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        #batch_change_disk_quota_form label {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
         .table {
             font-size: 12px;
             border-width: 1px;
@@ -169,6 +185,8 @@
             $('#content_search').val('');
             refresh();
         });
+
+        register_iops_bps_event();
     });
 
     function refresh() {
@@ -398,6 +416,166 @@
         $('#batch_remark_modal').modal('hide');
     }
 
+    function batch_change_disk_quota() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            $.ajax({
+                url : '/api/disks/' + uuids.join(','),
+                type : 'PATCH',
+                contentType: "application/json; charset=utf-8",
+                data : JSON.stringify({
+                    iops: parseInt($('#iops').val()),
+                    iops_rd: parseInt($('#iops_rd').val()),
+                    iops_wr: parseInt($('#iops_wr').val()),
+                    iops_max: parseInt($('#iops_max').val()),
+                    iops_max_length: parseInt($('#iops_max_length').val()),
+                    bps: parseInt($('#bps').val()) * 1024 * 1024,
+                    bps_rd: parseInt($('#bps_rd').val()) * 1024 * 1024,
+                    bps_wr: parseInt($('#bps_wr').val()) * 1024 * 1024,
+                    bps_max: parseInt($('#bps_max').val()) * 1024 * 1024,
+                    bps_max_length: parseInt($('#bps_max_length').val())
+                }),
+                error : function() {
+                    alter_danger('磁盘备注更新失败！');
+                },
+                success : function() {
+                    alter_success('磁盘备注更新成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+        $('#batch_change_disk_quota_modal').modal('hide');
+    }
+
+   $(function() { "use strict";
+        $("#iops").TouchSpin({
+            max: {{ config_ret.data.iops_cap }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#iops_rd").TouchSpin({
+            max: {{ config_ret.data.iops_cap }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#iops_wr").TouchSpin({
+            max: {{ config_ret.data.iops_cap }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#iops_max").TouchSpin({
+            max: {{ config_ret.data.iops_max }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#iops_max_length").TouchSpin({
+            max: {{ config_ret.data.iops_max_length }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#bps").TouchSpin({
+            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#bps_rd").TouchSpin({
+            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#bps_wr").TouchSpin({
+            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#bps_max").TouchSpin({
+            max: {{ (config_ret.data.bps_max / 1024 / 1024) | int }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
+        $("#bps_max_length").TouchSpin({
+            max: {{ config_ret.data.bps_max_length }},
+            min: 0,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    function register_iops_bps_event() {
+        $('#iops').on('change', function(){
+            $("#iops_rd").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_wr').val()});
+            $("#iops_wr").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_rd').val()});
+        });
+
+        $('#iops_rd').on('change', function(){
+            $("#iops_wr").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_rd').val()});
+        });
+
+        $('#iops_wr').on('change', function(){
+            $("#iops_rd").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_wr').val()});
+        });
+
+        $('#bps').on('change', function(){
+            $("#bps_rd").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_wr').val()});
+            $("#bps_wr").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_rd').val()});
+        });
+
+        $('#bps_rd').on('change', function(){
+            $("#bps_wr").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_rd').val()});
+        });
+
+        $('#bps_wr').on('change', function(){
+            $("#bps_rd").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_wr').val()});
+        });
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -642,6 +820,102 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="batch_remark_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="batch_change_disk_quota_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量变更磁盘配额：</h4>
+            </div>
+            <div class="modal-body" style="padding-left: 8%;">
+                <form id="batch_change_disk_quota_form" class="form-horizontal bordered-row">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            &nbsp;&nbsp;IOPS
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ config_ret.data.iops_base }}" name="iops">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS(MiB)</label>
+                        <div class="col-sm-3">
+                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ (config_ret.data.bps_base / 1024 / 1024) | int }}" name="bps">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            &nbsp;&nbsp;IOPS 读
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_rd" title="IOPS_RD" class="form-control" type="text" value="0" name="iops_rd">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 读 (MiB)</label>
+                        <div class="col-sm-3">
+                            <input id="bps_rd" title="BPS_RD" class="form-control" type="text" value="0" name="bps_rd">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            &nbsp;&nbsp;IOPS 写
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_wr" title="IOPS_WR" class="form-control" type="text" value="0" name="iops_wr">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 写 (MiB)</label>
+                        <div class="col-sm-3">
+                            <input id="bps_wr" title="BPS_WR" class="form-control" type="text" value="0" name="bps_wr">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            <span class="glyph-icon icon-bitbucket" style="margin-left: -4px;"></span>
+                            &nbsp;&nbsp;IOPS 桶宽
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_max" title="IOPS_MAX" class="form-control" type="text" value="{{ config_ret.data.iops_max }}" name="iops_max">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶宽 (MiB)</label>
+                        <div class="col-sm-3">
+                            <input id="bps_max" title="BPS_MAX" class="form-control" type="text" value="{{ (config_ret.data.bps_max / 1024 / 1024) | int }}" name="bps_max">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            <span class="glyph-icon icon-bitbucket" style="margin-left: -4px;"></span>
+                            &nbsp;&nbsp;IOPS 桶高 (秒)
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_max_length" title="IOPS_MAX_LENGTH" class="form-control" type="text" value="{{ config_ret.data.iops_max_length }}" name="iops_max_length">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶高 (秒)</label>
+                        <div class="col-sm-3">
+                            <input id="bps_max_length" title="BPS_MAX_LENGTH" class="form-control" type="text" value="{{ config_ret.data.bps_max_length }}" name="bps_max_length">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_change_disk_quota();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
