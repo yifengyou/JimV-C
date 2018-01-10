@@ -136,7 +136,7 @@
         });
 
         $('#edit_remark_modal').on('show.bs.modal', function (me) {
-            $('#instance_uuid').val($(me.relatedTarget).parent().parent().prev().prev().text());
+            $('#edit_remark_instance_uuid').val($(me.relatedTarget).parent().parent().prev().prev().text());
             $('#edit_remark').val($(me.relatedTarget).prev().text());
         });
 
@@ -216,7 +216,7 @@
     }
 
     function remark_update(me) {
-        var uuid = $('#instance_uuid').val();
+        var uuid = $('#edit_remark_instance_uuid').val();
         var remark = $('#edit_remark').val();
         $('#edit_remark_modal').modal('hide');
         $.ajax({
@@ -870,7 +870,7 @@
                 <h4 class="modal-title">编辑实例名称：</h4>
             </div>
             <div class="modal-body">
-                <input id="instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+                <input id="edit_remark_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
                 <input id="edit_remark" title="实例名称" class="form-control" name="remark">
             </div>
             <div class="modal-footer">

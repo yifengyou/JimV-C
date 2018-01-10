@@ -1004,7 +1004,7 @@
 
     $(function() { "use strict";
         $("#bps").TouchSpin({
-            max: {{ config_ret.data.bps_cap / 1024 / 1024 | int }},
+            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
             min: 1,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -1208,12 +1208,12 @@
             <div class="modal-body" style="padding-left: 8%;">
                 <form id="change_disk_quota_form" class="form-horizontal">
                     <div class="form-group" style="margin-bottom: 0;">
-                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;IOPS</label>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>&nbsp;&nbsp;IOPS</label>
                         <div class="col-sm-3">
                             <input id="iops" title="IOPS" class="form-control" type="text" value="{{ config_ret.data.iops_base }}" name="iops">
                         </div>
                         <span class="col-sm-1"></span>
-                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;BPS(MiB)</label>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS(MiB)</label>
                         <div class="col-sm-3">
                             <input id="bps" title="BPS" class="form-control" type="text" value="{{ config_ret.data.bps_base / 1024 / 1024 | int }}" name="bps">
                         </div>
