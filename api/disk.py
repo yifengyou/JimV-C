@@ -135,7 +135,7 @@ def r_resize(uuid, size):
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        if disk.size >= size:
+        if disk.size >= int(size):
             ret['state'] = ji.Common.exchange_state(41257)
             return ret
 
@@ -143,17 +143,22 @@ def r_resize(uuid, size):
         config.id = 1
         config.get()
 
+        disk.size = int(size)
+        disk.quota(config=config)
+        # 将在事件返回层(models/event_processor.py:224 附近)，更新数据库中 disk 对象
+
         message = {
             '_object': 'disk',
             'action': 'resize',
             'uuid': disk.uuid,
             'guest_uuid': disk.guest_uuid,
             'storage_mode': config.storage_mode,
-            'size': int(size),
+            'size': disk.size,
             'dfs_volume': config.dfs_volume,
             'hostname': disk.on_host,
             'image_path': disk.path,
-            'passback_parameters': {'size': size}
+            'disks': [disk.__dict__],
+            'passback_parameters': {'size': disk.size}
         }
 
         if disk.on_host == 'shared_storage':
@@ -376,21 +381,7 @@ def r_update(uuids):
                     'uuid': disk.uuid,
                     'guest_uuid': disk.guest_uuid,
                     'hostname': disk.on_host,
-                    'disks': [
-                        {
-                            'sequence': disk.sequence,
-                            'iops': disk.iops,
-                            'iops_rd': disk.iops_rd,
-                            'iops_wr': disk.iops_wr,
-                            'iops_max': disk.iops_max,
-                            'iops_max_length': disk.iops_max_length,
-                            'bps': disk.bps,
-                            'bps_rd': disk.bps_rd,
-                            'bps_wr': disk.bps_wr,
-                            'bps_max': disk.bps_max,
-                            'bps_max_length': disk.bps_max_length
-                        }
-                    ]
+                    'disks': [disk.__dict__]
                 }
 
                 Guest.emit_instruction(message=json.dumps(message))

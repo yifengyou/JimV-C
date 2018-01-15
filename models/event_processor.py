@@ -34,6 +34,7 @@ class EventProcessor(object):
     guest_migrate_info = GuestMigrateInfo()
     disk = Disk()
     config = Config()
+    config.id = 1
     cpu_memory = CPUMemory()
     traffic = Traffic()
     disk_io = DiskIO()
@@ -158,7 +159,6 @@ class EventProcessor(object):
 
             elif action == 'delete':
                 if state == ResponseState.success.value:
-                    cls.config.id = 1
                     cls.config.get()
                     cls.guest.uuid = uuid
                     cls.guest.get_by('uuid')
@@ -223,9 +223,11 @@ class EventProcessor(object):
 
             elif action == 'resize':
                 if state == ResponseState.success.value:
+                    cls.config.get()
                     cls.disk.uuid = uuid
                     cls.disk.get_by('uuid')
                     cls.disk.size = cls.message['message']['passback_parameters']['size']
+                    cls.disk.quota(config=cls.config)
                     cls.disk.update()
 
             elif action == 'delete':

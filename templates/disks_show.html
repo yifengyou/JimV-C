@@ -312,6 +312,9 @@
             },
             success : function() {
                 alter_success('实例扩容指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
             }
         });
     }
@@ -338,7 +341,7 @@
     }
 
     function unmount_at(me) {
-        var disk_uuid = $($(me).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text;
+        var disk_uuid = $($(me).parent().parent().parent().parent().parent().children()[0]).text();
         unmount(disk_uuid);
     }
 
@@ -350,16 +353,8 @@
     }
 
     function reset_resize_value(me) {
-        var min = $(me).parent().parent().parent().parent().parent().children()[3].textContent.split(' ')[0];
-        $(function() { "use strict";
-            $("#size").TouchSpin({
-                max: 10240,
-                min: min,
-                verticalbuttons: true,
-                verticalupclass: 'glyph-icon icon-plus',
-                verticaldownclass: 'glyph-icon icon-minus'
-            });
-        });
+        var min = $(me).parent().parent().parent().parent().parent().children()[5].textContent.split(' ')[0];
+        $("#size").trigger("touchspin.updatesettings", {min: min});
     }
 
     function delete_at(me) {
@@ -449,7 +444,17 @@
         $('#batch_change_disk_quota_modal').modal('hide');
     }
 
-   $(function() { "use strict";
+    $(function() { "use strict";
+        $("#size").TouchSpin({
+            max: 10240,
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    $(function() { "use strict";
         $("#iops").TouchSpin({
             max: {{ config_ret.data.iops_cap }},
             min: 0,
@@ -576,6 +581,7 @@
             $("#bps_rd").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_wr').val()});
         });
     }
+
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -660,7 +666,7 @@
                             <ul class="dropdown-menu">
                                 <li class="{% if item.state not in [1] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#mount_modal"
-                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);">
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());">
                                         挂载
                                     </a>
                                 </li>
@@ -670,15 +676,15 @@
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
                                 <li class="{% if item.state not in [1, 2] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#resize_modal"
-                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);reset_resize_value(this);">
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());reset_resize_value(this);">
                                         磁盘扩容
                                     </a>
                                 </li>
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
                                 <li class="{% if item.state not in [1, 255] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
-                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[1]).find('div a')[0].text);
-                                       $('#delete_instance_desc').text($('#instance_uuid').val().split('-')[0] + '/' + $($(this).parent().parent().parent().parent().parent().children()[1]).find('div p')[0].textContent)">
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                       $('#delete_instance_desc').text($('#instance_uuid').val().split('-')[0] + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
                                         删除
                                     </a>
                                 </li>
