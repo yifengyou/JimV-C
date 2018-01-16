@@ -174,7 +174,11 @@ class Disk(ORM):
         from models import Config
         assert isinstance(config, Config)
 
-        self.iops = config.iops_base + config.iops_pre_unit * self.size
+        # 系统盘 IOPS 默认不计算增益
+        if self.sequence != 0:
+            self.iops = config.iops_base + config.iops_pre_unit * self.size
+        else:
+            self.iops = config.iops_base
 
         if self.iops > config.iops_cap:
             self.iops = config.iops_cap
@@ -184,7 +188,11 @@ class Disk(ORM):
         self.iops_rd = 0
         self.iops_wr = 0
 
-        self.bps = config.bps_base + config.bps_pre_unit * self.size
+        # 系统盘 BPS 默认不计算增益
+        if self.sequence != 0:
+            self.bps = config.bps_base + config.bps_pre_unit * self.size
+        else:
+            self.bps = config.bps_base
 
         if self.bps > config.bps_cap:
             self.bps = config.bps_cap

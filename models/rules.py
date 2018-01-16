@@ -80,6 +80,7 @@ class Rules(Enum):
     BPS = (int, 'bps')
     BPS_RD = (int, 'bps_rd')
     BPS_WR = (int, 'bps_wr')
+    INFLUENCE_CURRENT_GUEST = (bool, 'influence_current_guest')
 
     REMARK = (basestring, 'remark')
     USE_FOR = (int, 'use_for')

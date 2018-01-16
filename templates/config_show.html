@@ -48,7 +48,11 @@
 
             register_iops_bps_event();
         });
-        
+
+        function refresh() {
+            window.location.href=window.location.pathname;
+        }
+
         function select_this(me) {
             $(me).parent().parent().children().removeClass('active');
             $(me).parent().addClass('active');
@@ -195,6 +199,36 @@
 
             $('#bps_wr').on('change', function () {
                 $("#bps_rd").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_wr').val()});
+            });
+        }
+
+        function update_quota() {
+            $.ajax({
+                url : '/api/config/_quota',
+                type : 'PATCH',
+                contentType: "application/json; charset=utf-8",
+                data : JSON.stringify({
+                    iops_base: parseInt($('#iops_base').val()),
+                    iops_pre_unit: parseInt($('#iops_pre_unit').val()),
+                    iops_cap: parseInt($('#iops_cap').val()),
+                    iops_max: parseInt($('#iops_max').val()),
+                    iops_max_length: parseInt($('#iops_max_length').val()),
+                    bps_base: parseInt($('#bps_base').val()) * 1024 * 1024,
+                    bps_pre_unit: parseFloat($('#bps_pre_unit').val()) * 1024 * 1024,
+                    bps_cap: parseInt($('#bps_cap').val()) * 1024 * 1024,
+                    bps_max: parseInt($('#bps_max').val()) * 1024 * 1024,
+                    bps_max_length: parseInt($('#bps_max_length').val()),
+                    influence_current_guest: $('#influence_current_guest').prop('checked')
+                }),
+                error : function() {
+                    alter_danger('性能配额更新失败！');
+                },
+                success : function() {
+                    alter_success('性能配额更新成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
             });
         }
 
@@ -355,10 +389,20 @@
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <div class="col-sm-6">
+                            <label>
+                                <input id="influence_current_guest" type="checkbox" name="influence_current_guest">
+                                同时更新已存在的实例
+                            </label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div style="padding: 0; text-align: right;">
+                                <button type="button" class="btn btn-sm btn-primary" style="right: 10%;" onclick="update_quota();">更新</button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
-                <div style="padding: 15px; text-align: right; border-top: 1px solid #dfe8f1;">
-                    <button type="button" class="btn btn-sm btn-primary" style="right: 10%;" onclick="batch_change_disk_quota();">更新</button>
-                </div>
             </div>
         </div>
     </div>

@@ -26,6 +26,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 add_rule_api(config.blueprint, '', api_func='config.r_create', methods=['POST'])
 # 只有一条记录，所以不指定 id
 add_rule_api(config.blueprint, '', api_func='config.r_update', methods=['PATCH'])
+add_rule_api(config.blueprint, '/_quota', api_func='config.r_update_quota', methods=['PATCH'])
 add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
 
 # 用户管理
