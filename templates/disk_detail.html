@@ -469,7 +469,7 @@
         $('#change_disk_quota_modal').modal('hide');
     }
 
-   $(function() { "use strict";
+    $(function() { "use strict";
         $("#iops").TouchSpin({
             max: {{ config_ret.data.iops_cap }},
             min: 0,
@@ -513,6 +513,7 @@
         $("#iops_max_length").TouchSpin({
             max: {{ config_ret.data.iops_max_length }},
             min: 0,
+            postfix: '秒',
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
             verticaldownclass: 'glyph-icon icon-minus'
@@ -523,6 +524,7 @@
         $("#bps").TouchSpin({
             max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
             min: 0,
+            postfix: 'MiB',
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
             verticaldownclass: 'glyph-icon icon-minus'
@@ -533,6 +535,7 @@
         $("#bps_rd").TouchSpin({
             max: {{ ((config_ret.data.bps_cap - disk_ret.data.bps_wr) / 1024 / 1024) | int }},
             min: 0,
+            postfix: 'MiB',
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
             verticaldownclass: 'glyph-icon icon-minus'
@@ -543,6 +546,7 @@
         $("#bps_wr").TouchSpin({
             max: {{ ((config_ret.data.bps_cap - disk_ret.data.bps_rd) / 1024 / 1024) | int }},
             min: 0,
+            postfix: 'MiB',
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
             verticaldownclass: 'glyph-icon icon-minus'
@@ -553,6 +557,7 @@
         $("#bps_max").TouchSpin({
             max: {{ (config_ret.data.bps_max / 1024 / 1024) | int }},
             min: 0,
+            postfix: 'MiB',
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
             verticaldownclass: 'glyph-icon icon-minus'
@@ -563,6 +568,7 @@
         $("#bps_max_length").TouchSpin({
             max: {{ config_ret.data.bps_max_length }},
             min: 0,
+            postfix: '秒',
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
             verticaldownclass: 'glyph-icon icon-minus'
@@ -782,7 +788,7 @@
                             <input id="iops" title="IOPS" class="form-control" type="text" value="{{ disk_ret.data.iops }}" name="iops">
                         </div>
                         <span class="col-sm-1"></span>
-                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS(MiB)</label>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS</label>
                         <div class="col-sm-3">
                             <input id="bps" title="BPS" class="form-control" type="text" value="{{ (disk_ret.data.bps / 1024 / 1024) | int }}" name="bps">
                         </div>
@@ -794,12 +800,12 @@
                             &nbsp;&nbsp;IOPS 读
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_rd" title="IOPS_RD" class="form-control" type="text" value="{{ disk_ret.data.iops_rd }}" name="iops_rd">
+                            <input id="iops_rd" title="IOPS 读" class="form-control" type="text" value="{{ disk_ret.data.iops_rd }}" name="iops_rd">
                         </div>
                         <span class="col-sm-1"></span>
-                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 读 (MiB)</label>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 读</label>
                         <div class="col-sm-3">
-                            <input id="bps_rd" title="BPS_RD" class="form-control" type="text" value="{{ (disk_ret.data.bps_rd / 1024 / 1024) | int }}" name="bps_rd">
+                            <input id="bps_rd" title="BPS 读" class="form-control" type="text" value="{{ (disk_ret.data.bps_rd / 1024 / 1024) | int }}" name="bps_rd">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -809,12 +815,12 @@
                             &nbsp;&nbsp;IOPS 写
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_wr" title="IOPS_WR" class="form-control" type="text" value="{{ disk_ret.data.iops_wr }}" name="iops_wr">
+                            <input id="iops_wr" title="IOPS 写" class="form-control" type="text" value="{{ disk_ret.data.iops_wr }}" name="iops_wr">
                         </div>
                         <span class="col-sm-1"></span>
-                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 写 (MiB)</label>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 写</label>
                         <div class="col-sm-3">
-                            <input id="bps_wr" title="BPS_WR" class="form-control" type="text" value="{{ (disk_ret.data.bps_wr / 1024 / 1024) | int }}" name="bps_wr">
+                            <input id="bps_wr" title="BPS 写" class="form-control" type="text" value="{{ (disk_ret.data.bps_wr / 1024 / 1024) | int }}" name="bps_wr">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -825,12 +831,12 @@
                             &nbsp;&nbsp;IOPS 桶宽
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max" title="IOPS_MAX" class="form-control" type="text" value="{{ disk_ret.data.iops_max }}" name="iops_max">
+                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ disk_ret.data.iops_max }}" name="iops_max">
                         </div>
                         <span class="col-sm-1"></span>
-                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶宽 (MiB)</label>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶宽</label>
                         <div class="col-sm-3">
-                            <input id="bps_max" title="BPS_MAX" class="form-control" type="text" value="{{ (disk_ret.data.bps_max / 1024 / 1024) | int }}" name="bps_max">
+                            <input id="bps_max" title="BPS 桶宽" class="form-control" type="text" value="{{ (disk_ret.data.bps_max / 1024 / 1024) | int }}" name="bps_max">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -838,15 +844,15 @@
                         <label class="col-sm-2 control-label">
                             <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
                             <span class="glyph-icon icon-bitbucket" style="margin-left: -4px;"></span>
-                            &nbsp;&nbsp;IOPS 桶高 (秒)
+                            &nbsp;&nbsp;IOPS 桶高
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max_length" title="IOPS_MAX_LENGTH" class="form-control" type="text" value="{{ disk_ret.data.iops_max_length }}" name="iops_max_length">
+                            <input id="iops_max_length" title="IOPS 桶高" class="form-control" type="text" value="{{ disk_ret.data.iops_max_length }}" name="iops_max_length">
                         </div>
                         <span class="col-sm-1"></span>
-                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶高 (秒)</label>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶高</label>
                         <div class="col-sm-3">
-                            <input id="bps_max_length" title="BPS_MAX_LENGTH" class="form-control" type="text" value="{{ disk_ret.data.bps_max_length }}" name="bps_max_length">
+                            <input id="bps_max_length" title="BPS 桶高" class="form-control" type="text" value="{{ disk_ret.data.bps_max_length }}" name="bps_max_length">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
