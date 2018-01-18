@@ -213,8 +213,7 @@ def detail(uuid):
     os_template_ret = requests.get(url=os_template_url, cookies=request.cookies)
     os_template_ret = json.loads(os_template_ret.content)
 
-    disks_url = host_url + url_for('api_disks.r_get_by_filter')
-    disks_url = disks_url + '?filter=guest_uuid:in:' + guest_ret['data']['uuid']
+    disks_url = host_url + url_for('api_disks.r_get_by_filter', filter='guest_uuid:in:' + guest_ret['data']['uuid'])
     disks_ret = requests.get(url=disks_url, cookies=request.cookies)
     disks_ret = json.loads(disks_ret.content)
 
@@ -244,8 +243,8 @@ def show_boot_job(uuid):
     guest_boot_jobs_ret = requests.get(url=guest_boot_jobs_url, cookies=request.cookies)
     guest_boot_jobs_ret = json.loads(guest_boot_jobs_ret.content)
 
-    boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter') + '?filter=id:in:' + \
-        ','.join(guest_boot_jobs_ret['data']['boot_jobs'])
+    boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter',
+                                       filter='id:in:' + ','.join(guest_boot_jobs_ret['data']['boot_jobs']))
 
     boot_jobs_ret = requests.get(url=boot_jobs_url, cookies=request.cookies)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
@@ -292,8 +291,8 @@ def show_guests_boot_jobs():
     guests_boot_jobs_id = list(set(guests_boot_jobs_id))
 
     # 获取指定启动作业ID 的启动作业
-    boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter') + '?filter=id:in:' + \
-        ','.join(guests_boot_jobs_id)
+    boot_jobs_url = host_url + url_for('api_boot_jobs.r_get_by_filter',
+                                       filter='id:in:' + ','.join(guests_boot_jobs_id))
 
     boot_jobs_ret = requests.get(url=boot_jobs_url, cookies=request.cookies)
     boot_jobs_ret = json.loads(boot_jobs_ret.content)
@@ -303,9 +302,8 @@ def show_guests_boot_jobs():
     for boot_job in boot_jobs_ret['data']:
         boot_jobs_mapping_by_id[boot_job['id']] = boot_job
 
-    guests_url = host_url + url_for('api_guests.r_get_by_filter')
-
-    guests_url = guests_url + '?filter=uuid:in:' + ','.join(guests_uuid[page_size * (page - 1): page_size * page])
+    guests_url = host_url + url_for('api_guests.r_get_by_filter',
+                                    filter='uuid:in:' + ','.join(guests_uuid[page_size * (page - 1): page_size * page]))
 
     guests_ret = requests.get(url=guests_url, cookies=request.cookies)
     guests_ret = json.loads(guests_ret.content)

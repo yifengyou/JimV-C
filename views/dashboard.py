@@ -26,7 +26,8 @@ def show():
 
     host_url = request.host_url.rstrip('/')
 
-    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
+    # alive 的布尔值 True，在 url 中传输前，会自动转换为字符串 'True'
+    hosts_url = host_url + url_for('api_hosts.r_get_by_filter', alive=True)
     guests_distribute_count_url = host_url + url_for('api_guests.r_distribute_count')
     disks_distribute_count_url = host_url + url_for('api_disks.r_distribute_count')
     guests_current_top_10_url = host_url + url_for('api_performance.r_current_top_10')
@@ -49,8 +50,6 @@ def show():
     guests_current_top_10_ret = requests.get(url=guests_current_top_10_url, cookies=request.cookies)
     guests_current_top_10_ret = json.loads(guests_current_top_10_ret.content)
 
-    guests_url = host_url + url_for('api_guests.r_get_by_filter')
-
     guests_uuid = list()
 
     for k, v in guests_current_top_10_ret['data'].items():
@@ -61,7 +60,7 @@ def show():
             if item['guest_uuid'] not in guests_uuid:
                 guests_uuid.append(item['guest_uuid'])
 
-    guests_url = guests_url + '?filter=uuid:in:' + ','.join(guests_uuid)
+    guests_url = host_url + url_for('api_guests.r_get_by_filter', filter='uuid:in:' + ','.join(guests_uuid))
 
     guests_ret = requests.get(url=guests_url, cookies=request.cookies)
     guests_ret = json.loads(guests_ret.content)
@@ -70,8 +69,6 @@ def show():
     guests_mapping_by_uuid = dict()
     for guest in guests_ret['data']:
         guests_mapping_by_uuid[guest['uuid']] = guest
-
-    disks_url = host_url + url_for('api_disks.r_get_by_filter')
 
     disks_uuid = list()
     for k, v in guests_current_top_10_ret['data'].items():
@@ -82,7 +79,7 @@ def show():
             if item['disk_uuid'] not in disks_uuid:
                 disks_uuid.append(item['disk_uuid'])
 
-    disks_url = disks_url + '?filter=uuid:in:' + ','.join(disks_uuid)
+    disks_url = host_url + url_for('api_disks.r_get_by_filter', filter='uuid:in:' + ','.join(disks_uuid))
 
     disks_ret = requests.get(url=disks_url, cookies=request.cookies)
     disks_ret = json.loads(disks_ret.content)

@@ -76,10 +76,26 @@ def r_get_by_filter():
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = list()
+
+        alive = None
+
+        if 'alive' in request.args:
+            alive = request.args['alive']
+
+            if str(alive).lower() in ['false', '0']:
+                alive = False
+
+            else:
+                alive = True
+
         for k, v in db.r.hgetall(app.config['hosts_info']).items():
             v = json.loads(v)
             v = Host.alive_check(v)
             v['node_id'] = k
+
+            if alive is not None and alive is not v['alive']:
+                continue
+
             ret['data'].append(v)
 
         if ret['data'].__len__() > 1:

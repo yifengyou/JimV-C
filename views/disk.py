@@ -110,8 +110,7 @@ def show():
             guest_uuids.append(disk['guest_uuid'])
 
     if guest_uuids.__len__() > 0:
-        guests_url = host_url + url_for('api_guests.r_get_by_filter')
-        guests_url += '?filter=uuid:in:' + ','.join(guest_uuids)
+        guests_url = host_url + url_for('api_guests.r_get_by_filter', filter='uuid:in:' + ','.join(guest_uuids))
         guests_ret = requests.get(url=guests_url, cookies=request.cookies)
         guests_ret = json.loads(guests_ret.content)
 
