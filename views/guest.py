@@ -123,6 +123,8 @@ def create():
         quantity = request.form.get('quantity')
         password = request.form.get('password')
         remark = request.form.get('remark')
+        allocation_by_random = 'allocation_by_random' in request.form
+        on_host = request.form.get('on_host')
 
         if not isinstance(ability, basestring):
             pass
@@ -144,10 +146,14 @@ def create():
             "lease_term": 100
         }
 
+        if not allocation_by_random:
+            payload['on_host'] = on_host
+
         url = host_url + '/api/guest'
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
+        # TODO: 状态码返回非200时，转到失败页面。
 
         guests_url = host_url + url_for('api_guests.r_get_by_filter')
         guests_ret = requests.get(url=guests_url, cookies=request.cookies)
@@ -163,9 +169,15 @@ def create():
 
     else:
         os_template_url = host_url + url_for('api_os_templates.r_get_by_filter')
+        hosts_url = host_url + url_for('api_hosts.r_get_by_filter', alive=True)
+
         os_template_ret = requests.get(url=os_template_url, cookies=request.cookies)
         os_template_ret = json.loads(os_template_ret.content)
-        return render_template('guest_create.html', os_template_data=os_template_ret['data'])
+
+        hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+        hosts_ret = json.loads(hosts_ret.content)
+
+        return render_template('guest_create.html', os_template_ret=os_template_ret, hosts_ret=hosts_ret)
 
 
 def port_is_opened(port):

@@ -59,6 +59,11 @@ def r_create():
         Rules.LEASE_TERM.value
     ]
 
+    if 'on_host' in request.json:
+        args_rules.append(
+            Rules.GUEST_ON_HOST.value,
+        )
+
     try:
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -88,9 +93,14 @@ def r_create():
             ret['state'] = ji.Common.exchange_state(50350)
             return ret
 
+        on_host = request.json.get('on_host', None)
         available_hosts = Guest.get_available_hosts()
 
         if available_hosts.__len__() == 0:
+            ret['state'] = ji.Common.exchange_state(50351)
+            return ret
+
+        if on_host is not None and on_host not in [host['hostname'] for host in available_hosts]:
             ret['state'] = ji.Common.exchange_state(50351)
             return ret
 
@@ -131,6 +141,7 @@ def r_create():
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
             disk.guest_uuid = ''
             disk.quota(config=config)
+            # disk.on_host 由 guest 事件处理机更新。涉及迁移时，其所属 on_host 会变更。参见 models/event_processory.py:111 附近。
             disk.create()
 
             guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template.os_type)
@@ -138,8 +149,11 @@ def r_create():
 
             # 在可用计算节点中平均分配任务
             chosen_host = available_hosts[quantity % available_hosts.__len__()]
-
             guest.on_host = chosen_host['hostname']
+
+            if on_host is not None:
+                guest.on_host = on_host
+
             guest.create()
 
             # 替换占位符为有效内容

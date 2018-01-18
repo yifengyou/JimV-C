@@ -69,6 +69,7 @@ class Rules(Enum):
     LOGIN_NAME = (basestring, 'login_name')
     PASSWORD = (basestring, 'password')
     LEASE_TERM = (int, 'lease_term')
+    GUEST_ON_HOST = (basestring, 'on_host', (1, 128))
     DESTINATION_HOST = (basestring, 'destination_host', (5, 64))
     DISK_UUID = (basestring, 'disk_uuid', (36, 36))
     DISK_SIZE = (int, 'size')

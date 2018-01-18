@@ -122,6 +122,7 @@ class EventProcessor(object):
             'interfaces': cls.message['message']['interfaces'],
             'disks': cls.message['message']['disks'],
             'boot_time': cls.message['message']['boot_time'],
+            'randomable': True,
             'timestamp': ji.Common.ts()
         }
 
