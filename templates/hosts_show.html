@@ -68,6 +68,22 @@
     function panel_onmouseout(me) {
         $(me).find(".show_detail_link").css('display','none');
     }
+
+    function nonrandom_click_handler(hostname, nonrandom) {
+        $.ajax({
+            url : '/api/hosts/' + hostname + '/' + (! nonrandom),
+            type : 'PUT',
+            error : function() {
+                alter_danger('计算节点随机分配模式指令发送失败！');
+            },
+            success : function() {
+                alter_success('计算节点随机分配模式指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
 </script>
     <div class="panel">
         <div class="panel-body">
@@ -92,6 +108,7 @@
                         <div class="host-box content-box {% if not item.alive %}panel-gray{% endif %}">
                             <h2 class="bg-black host-title">{{ item.hostname }}
                                 <i style="float: right;" class="glyph-icon icon-circle font-size-23 {% if item.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                <a href="javascript:;" onclick="nonrandom_click_handler('{{ item.hostname }}', {{ item.nonrandom | lower }});" title="{% if item.nonrandom == true %}加入{% else %}取消{% endif %}自动分配" style="float: left; margin-top: 8%;" class="glyph-icon icon-elusive-shuffle font-size-12 {% if item.nonrandom == true %}font-gray{% else %}font-green{% endif %}"></a>
                             </h2>
                             <div class="bg-blue host-specs">
                                 <div class="show_detail_link" style="display: none; position: absolute; z-index: 9999; margin-top: 20px; right: 2%;">

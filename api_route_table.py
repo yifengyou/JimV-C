@@ -103,11 +103,12 @@ add_rule_api(log.blueprints, '/<ids>', api_func='log.r_get', methods=['GET'])
 add_rule_api(log.blueprints, '', api_func='log.r_get_by_filter', methods=['GET'])
 add_rule_api(log.blueprints, '/_search', api_func='log.r_content_search', methods=['GET'])
 
-# 宿主机查询
+# 计算节点操作
 add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_get', methods=['GET'])
 add_rule_api(host.blueprints, '', api_func='host.r_get_by_filter', methods=['GET'])
 add_rule_api(host.blueprints, '/_search', api_func='host.r_content_search', methods=['GET'])
 add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_delete', methods=['DELETE'])
+add_rule_api(host.blueprints, '/<hosts_name>/<random>', api_func='host.r_nonrandom', methods=['PUT'])
 
 # Guest 性能查询
 add_rule_api(performance.blueprint, '/cpu_memory', api_func='performance.r_cpu_memory_get_by_filter', methods=['GET'])

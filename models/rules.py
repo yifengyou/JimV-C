@@ -16,6 +16,7 @@ class Rules(Enum):
     REG_NUMBER = 'regex:^\d{1,17}$'
     REG_NUMBERS = 'regex:^(\d{1,17})(,\d{1,17})*$'
     REG_UUIDS = 'regex:^([\w-]{36})(,[\w-]{36})*$'
+    REG_HOSTS_NAME = 'regex:^([\S-]{1,128})(,[\S-]{1,128})*$'
     REG_IP = 'regex:^((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))$'
 
     OFFSET = (REG_NUMBER, 'offset')
@@ -28,6 +29,7 @@ class Rules(Enum):
 
     ID = (REG_NUMBER, 'id')
     IDS = (REG_NUMBERS, 'ids')
+    HOSTS_NAME = (REG_HOSTS_NAME, 'hosts_name')
     BOOT_JOBS_ID = (REG_NUMBERS, 'boot_jobs_id')
 
     CONFIG_ID = (int, 'id')

@@ -117,38 +117,6 @@ class Guest(ORM):
 
         return lightest_host
 
-    @staticmethod
-    def get_available_hosts(randomable=None):
-        """
-        :param randomable: {None, True, False}
-            None for all;
-            True for host can be allocation guest by random;
-            False on the contrary.
-        :return:
-        """
-
-        from models import Host
-
-        hosts = list()
-
-        for k, v in db.r.hgetall(app.config['hosts_info']).items():
-            v = json.loads(v)
-
-            v = Host.alive_check(v)
-
-            if not v['alive']:
-                continue
-
-            if randomable is not None and v['randomable'] != randomable:
-                continue
-
-            v['system_load_per_cpu'] = float(v['system_load'][0]) / v['cpu']
-            hosts.append(v)
-
-        hosts.sort(key=lambda _k: _k['system_load_per_cpu'])
-
-        return hosts
-
 
 class Disk(ORM):
 

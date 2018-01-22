@@ -31,6 +31,34 @@ blueprints = Blueprint(
 
 
 @Utils.dumps2response
+def r_nonrandom(hosts_name, random):
+
+    args_rules = [
+        Rules.HOSTS_NAME.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {args_rules[0][1]: hosts_name})
+
+        if str(random).lower() in ['false', '0']:
+            random = False
+
+        else:
+            random = True
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        Host.set_allocation_mode(hosts_name=hosts_name.split(','), random=random)
+
+        ret['data'] = Host.get_all()
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
 def r_get(nodes_id):
 
     args_rules = [
@@ -88,18 +116,11 @@ def r_get_by_filter():
             else:
                 alive = True
 
-        for k, v in db.r.hgetall(app.config['hosts_info']).items():
-            v = json.loads(v)
-            v = Host.alive_check(v)
-            v['node_id'] = k
-
-            if alive is not None and alive is not v['alive']:
+        for host in Host.get_all():
+            if alive is not None and alive is not host['alive']:
                 continue
 
-            ret['data'].append(v)
-
-        if ret['data'].__len__() > 1:
-            ret['data'].sort(key=lambda _k: _k['boot_time'])
+            ret['data'].append(host)
 
         return ret
 
@@ -122,15 +143,9 @@ def r_content_search():
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = list()
 
-        for k, v in db.r.hgetall(app.config['hosts_info']).items():
-            v = json.loads(v)
-            if -1 != v['hostname'].find(keyword):
-                v = Host.alive_check(v)
-                v['node_id'] = k
-                ret['data'].append(v)
-
-        if ret['data'].__len__() > 1:
-            ret['data'].sort(key=lambda _k: _k['boot_time'])
+        for host in Host.get_all():
+            if -1 != host['hostname'].find(keyword):
+                ret['data'].append(host)
 
         return ret
 

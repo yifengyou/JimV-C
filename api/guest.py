@@ -10,7 +10,7 @@ from uuid import uuid4
 import jimit as ji
 
 from api.base import Base
-from models import DiskState
+from models import DiskState, Host
 from models import OperateRule
 from models.initialize import app, dev_table
 from models import Database as db
@@ -94,7 +94,13 @@ def r_create():
             return ret
 
         on_host = request.json.get('on_host', None)
-        available_hosts = Guest.get_available_hosts()
+
+        # 默认只取可随机分配虚拟机的 hosts
+        available_hosts = Host.get_available_hosts(nonrandom=False)
+
+        # 当指定了 host 时，取全部活着的 hosts
+        if on_host is not None:
+            available_hosts = Host.get_available_hosts(nonrandom=None)
 
         if available_hosts.__len__() == 0:
             ret['state'] = ji.Common.exchange_state(50351)
