@@ -123,6 +123,7 @@ class EventProcessor(object):
             'disks': cls.message['message']['disks'],
             'boot_time': cls.message['message']['boot_time'],
             'nonrandom': False,
+            'threads_status': cls.message['message']['threads_status'],
             'timestamp': ji.Common.ts()
         }
 

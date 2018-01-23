@@ -63,7 +63,6 @@
 - [ ] 日志里面加入操作轨迹
 - [ ] 计算节点页面，展现每个计算节点上功能线程的状态
 - [x] 避免计算节点主机名相同的情况
-- [ ] 考虑用管理接口的 IP 地址来区别计算节点，而不是用主机名
 - [ ] 考虑 vm_network，vm_manage_network 改名为 vm_network_bridge，vm_manage_network_bridge
 - [ ] 通过 sysctl 隔离出 vnc 使用的端口，避免被冲突。参见 net.ipv4.ip_local_reserved_ports
 - [ ] 考虑热更新、升级的问题
@@ -75,5 +74,6 @@
 - [x] 实现创建虚拟机时，手动指定计算节点功能
 - [x] 计算机节点加入是否接受自动分配虚拟机开关
 - [ ] 替换 host 对象中的 node_id 为 hostname，统一主键。并消除 node_id
+- [ ] 考虑用管理接口的 IP 地址来区别计算节点，而不是用主机名
 
 
