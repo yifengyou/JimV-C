@@ -119,9 +119,11 @@
 
     function allocation_by_random_click_handler(me) {
         if ($(me).prop('checked')) {
-            $('#on_host').parent().parent().css('display', 'none')
+            $('#create_guest_form').formValidation('removeField', 'on_host');
+            $('#on_host').parent().parent().css('display', 'none');
         } else {
-            $('#on_host').parent().parent().css('display', 'unset')
+            $('#create_guest_form').formValidation('addField', 'on_host', {validators: {notEmpty: {}}});
+            $('#on_host').parent().parent().css('display', 'unset');
         }
     }
 </script>

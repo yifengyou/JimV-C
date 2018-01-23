@@ -153,7 +153,13 @@ def create():
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
-        # TODO: 状态码返回非200时，转到失败页面。
+
+        if j_r['state']['code'] != '200':
+            return render_template('failure.html',
+                                   go_back_url='/guests',
+                                   timeout=10000, title='创建失败',
+                                   message_title='创建实例失败',
+                                   message=j_r['state']['sub']['zh-cn'])
 
         guests_url = host_url + url_for('api_guests.r_get_by_filter')
         guests_ret = requests.get(url=guests_url, cookies=request.cookies)
