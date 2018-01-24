@@ -61,7 +61,7 @@
 - [ ] 迁移时计算出剩余时间
 - [ ] 初始化页面检测 redis、mysql 是否准备好
 - [ ] 日志里面加入操作轨迹
-- [ ] 计算节点页面，展现每个计算节点上功能线程的状态
+- [x] 计算节点页面，展现每个计算节点上功能线程的状态
 - [x] 避免计算节点主机名相同的情况
 - [ ] 考虑 vm_network，vm_manage_network 改名为 vm_network_bridge，vm_manage_network_bridge
 - [ ] 通过 sysctl 隔离出 vnc 使用的端口，避免被冲突。参见 net.ipv4.ip_local_reserved_ports

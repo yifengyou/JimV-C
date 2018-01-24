@@ -26,12 +26,53 @@ class Host(object):
         JimV-C 2 秒更新一次宿主机信息，这里以 5 秒内没收到更新，作为判断宿主机是否在线的标准
         """
 
+        coupler_length = 5
+
         if 'timestamp' not in v:
             return v
 
         v['alive'] = False
-        if v['timestamp'] + 5 >= g.ts:
+        if v['timestamp'] + coupler_length >= g.ts:
             v['alive'] = True
+
+        if 'threads_status' not in v:
+            v['threads_status'] = {
+                'instruction_process_engine': {
+                    'timestamp': 0,
+                    'alive': False
+                },
+                'host_state_report_engine': {
+                    'timestamp': 0,
+                    'alive': False
+                },
+                'guest_creating_progress_report_engine': {
+                    'timestamp': 0,
+                    'alive': False
+                },
+                'guest_performance_collection_engine': {
+                    'timestamp': 0,
+                    'alive': False
+                },
+                'host_performance_collection_engine': {
+                    'timestamp': 0,
+                    'alive': False
+                }
+            }
+
+        if v['threads_status']['instruction_process_engine']['timestamp'] + coupler_length >= g.ts:
+            v['threads_status']['instruction_process_engine']['alive'] = True
+
+        if v['threads_status']['host_state_report_engine']['timestamp'] + coupler_length >= g.ts:
+            v['threads_status']['host_state_report_engine']['alive'] = True
+
+        if v['threads_status']['guest_creating_progress_report_engine']['timestamp'] + coupler_length >= g.ts:
+            v['threads_status']['guest_creating_progress_report_engine']['alive'] = True
+
+        if v['threads_status']['guest_performance_collection_engine']['timestamp'] + coupler_length >= g.ts:
+            v['threads_status']['guest_performance_collection_engine']['alive'] = True
+
+        if v['threads_status']['host_performance_collection_engine']['timestamp'] + coupler_length >= g.ts:
+            v['threads_status']['host_performance_collection_engine']['alive'] = True
 
         return v
 

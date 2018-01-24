@@ -934,11 +934,51 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>
-                                <span class="guest-label">状态:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                <span class="guest-desc">
-                                    <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.alive == true %}font-green{% else %}font-red{% endif %}"></i>
-                                </span>
+                            <td style="padding: 0;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td>
+                                            <span class="guest-label">节点健康状况:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="guest-label">节点性能收集引擎:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.host_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="guest-label">状态汇送引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.host_state_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="guest-label">虚拟机性能收集引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.guest_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="guest-label">指令处理引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.instruction_process_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="guest-label">虚拟机创建进度引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.guest_creating_progress_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                         <tr>
@@ -980,7 +1020,15 @@
                         {% endfor %}
                         <tr>
                             <td>
-                                <span class="guest-label">数据更新时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-label">启动时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ format_datetime_by_tus(host_ret.data.boot_time * 1000 * 1000) }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">更新时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                 {{ format_datetime_by_tus(host_ret.data.timestamp * 1000 * 1000) }}
                                 </span>
