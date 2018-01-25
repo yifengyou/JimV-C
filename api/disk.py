@@ -240,8 +240,14 @@ def add_device(func):
                 for i, item in enumerate(ret['data']):
                     ret['data'][i][u'device'] = u'/dev/' + dev_table[item['sequence']]
 
+                    if item['sequence'] < 0:
+                        ret['data'][i][u'device'] = None
+
             elif isinstance(ret['data'], dict):
                 ret['data'][u'device'] = u'/dev/' + dev_table[ret['data']['sequence']]
+
+                if ret['data']['sequence'] < 0:
+                    ret['data'][u'device'] = None
 
             else:
                 raise json.dumps(ret)

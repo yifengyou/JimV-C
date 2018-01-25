@@ -399,13 +399,7 @@
     }
 
     function render_disks_chart(uuid, granularity) {
-        var dev_table = [];
-
-        for (var i = 1; i <= 26; i++) {
-            dev_table.push('vd' + String.fromCharCode(0x60+i));
-        }
-
-        var dev_name = dev_table[{{ disk_ret.data.sequence }}];
+        var dev_name = '{{ disk_ret.data.device }}';
         var dev_id_throughput = 'disk_throughput_chart';
         var dev_id_iops = 'disk_iops_chart';
 
@@ -669,7 +663,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <span class="guest-label">所属 Guest:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-label">所属虚拟机:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                     {% if disk_ret.data.sequence != -1 %}
                                         <a href="/guest/detail/{{ disk_ret.data.guest_uuid }}">{{ guest_ret.data.label }}/{{ guest_ret.data.remark }}</a>
@@ -680,9 +674,11 @@
                         </tr>
                         <tr>
                             <td>
-                                <span class="guest-label">设备号:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-label">设备路径:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_sequence_to_device_name(disk_ret.data.sequence) }}
+                                    {% if disk_ret.data.sequence >= 0 %}
+                                        {{ disk_ret.data.device }}
+                                    {% endif %}
                                 </span>
                             </td>
                         </tr>

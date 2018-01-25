@@ -620,7 +620,7 @@
                     <th><input class="all_selector" title="选取所有" type="checkbox"></th>
                     <th width="280px;">UUID</th>
                     <th>状态</th>
-                    <th>设备号</th>
+                    <th>设备路径</th>
                     <th>大小</th>
                     <th>IOPS</th>
                     <th>BPS</th>
@@ -648,7 +648,11 @@
                         </div>
                     </td>
                     <td>{{ format_disk_state(item.state)|safe }}</td>
-                    <td>{{ format_sequence_to_device_name(item.sequence) }}</td>
+                    <td>
+                        {% if item.sequence >= 0 %}
+                            {{ item.device }}
+                        {% endif %}
+                    </td>
                     <td>{{ item.size }} GB</td>
                     <td>{{ item.iops }}</td>
                     <td>{{ (item.bps / 1024 / 1024) | int }} MiB</td>

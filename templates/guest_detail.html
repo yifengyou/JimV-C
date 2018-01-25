@@ -74,12 +74,6 @@
         }
     }
 
-    var dev_table = [];
-
-    for (var i = 1; i <= 26; i++) {
-        dev_table.push('vd' + String.fromCharCode(0x60+i));
-    }
-
     function render_cpu_chart(uuid, granularity) {
         var url = '/api/performance/cpu_memory/last_hour/' + uuid;
         if (granularity === 'hour') {
@@ -838,11 +832,6 @@
     }
 
     function render_disks_chart(uuid, granularity) {
-        var dev_table = [];
-
-        for (var i = 1; i <= 26; i++) {
-            dev_table.push('vd' + String.fromCharCode(0x60+i));
-        }
 
         var disks = [];
         var url = '/api/disks?filter=guest_uuid:in:' + uuid;
@@ -857,9 +846,9 @@
             success: function (data, textStatus, xhr) {
                 $('#disks_chart').empty();
                 $.each(data.data, function(i, ele) {
-                    var dev_name = dev_table[ele['sequence']];
-                    var dev_id_throughput = 'throughput_' + dev_table[ele['sequence']];
-                    var dev_id_iops = 'iops_' + dev_table[ele['sequence']];
+                    var dev_name = ele['device'];
+                    var dev_id_throughput = 'throughput_' + ele['device'];
+                    var dev_id_iops = 'iops_' + ele['device'];
                     var disk_uuid = ele['uuid'];
 
                     $('#disks_chart').append($('<div id=' + dev_id_throughput +' style="width: 800px;height:280px;"></div>'));
