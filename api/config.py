@@ -321,7 +321,7 @@ def r_update_quota():
                         'action': 'quota',
                         'uuid': disk.uuid,
                         'guest_uuid': disk.guest_uuid,
-                        'hostname': disk.on_host,
+                        'node_id': disk.node_id,
                         'disks': [disk.__dict__]
                     }
 

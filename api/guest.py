@@ -59,9 +59,9 @@ def r_create():
         Rules.LEASE_TERM.value
     ]
 
-    if 'on_host' in request.json:
+    if 'node_id' in request.json:
         args_rules.append(
-            Rules.GUEST_ON_HOST.value,
+            Rules.NODE_ID.value,
         )
 
     try:
@@ -93,20 +93,20 @@ def r_create():
             ret['state'] = ji.Common.exchange_state(50350)
             return ret
 
-        on_host = request.json.get('on_host', None)
+        node_id = request.json.get('node_id', None)
 
         # 默认只取可随机分配虚拟机的 hosts
         available_hosts = Host.get_available_hosts(nonrandom=False)
 
         # 当指定了 host 时，取全部活着的 hosts
-        if on_host is not None:
+        if node_id is not None:
             available_hosts = Host.get_available_hosts(nonrandom=None)
 
         if available_hosts.__len__() == 0:
             ret['state'] = ji.Common.exchange_state(50351)
             return ret
 
-        if on_host is not None and on_host not in [host['hostname'] for host in available_hosts]:
+        if node_id is not None and node_id not in [host['node_id'] for host in available_hosts]:
             ret['state'] = ji.Common.exchange_state(50351)
             return ret
 
@@ -147,7 +147,7 @@ def r_create():
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
             disk.guest_uuid = ''
             disk.quota(config=config)
-            # disk.on_host 由 guest 事件处理机更新。涉及迁移时，其所属 on_host 会变更。参见 models/event_processory.py:111 附近。
+            # disk.node_id 由 guest 事件处理机更新。涉及迁移时，其所属 node_id 会变更。参见 models/event_processory.py:111 附近。
             disk.create()
 
             guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template.os_type)
@@ -155,10 +155,10 @@ def r_create():
 
             # 在可用计算节点中平均分配任务
             chosen_host = available_hosts[quantity % available_hosts.__len__()]
-            guest.on_host = chosen_host['hostname']
+            guest.node_id = chosen_host['node_id']
 
-            if on_host is not None:
-                guest.on_host = on_host
+            if node_id is not None:
+                guest.node_id = node_id
 
             guest.create()
 
@@ -187,7 +187,7 @@ def r_create():
                 'uuid': guest.uuid,
                 'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
-                'hostname': guest.on_host,
+                'node_id': guest.node_id,
                 'name': guest.label,
                 'template_path': os_template.path,
                 'os_type': os_template.os_type,
@@ -230,7 +230,7 @@ def r_reboot(uuids):
                 '_object': 'guest',
                 'action': 'reboot',
                 'uuid': uuid,
-                'hostname': guest.on_host
+                'node_id': guest.node_id
             }
 
             Utils.emit_instruction(message=json.dumps(message))
@@ -267,7 +267,7 @@ def r_force_reboot(uuids):
                 '_object': 'guest',
                 'action': 'force_reboot',
                 'uuid': uuid,
-                'hostname': guest.on_host,
+                'node_id': guest.node_id,
                 'disks': disks
             }
 
@@ -304,7 +304,7 @@ def r_shutdown(uuids):
                 '_object': 'guest',
                 'action': 'shutdown',
                 'uuid': uuid,
-                'hostname': guest.on_host
+                'node_id': guest.node_id
             }
 
             Utils.emit_instruction(message=json.dumps(message))
@@ -340,7 +340,7 @@ def r_force_shutdown(uuids):
                 '_object': 'guest',
                 'action': 'force_shutdown',
                 'uuid': uuid,
-                'hostname': guest.on_host
+                'node_id': guest.node_id
             }
 
             Utils.emit_instruction(message=json.dumps(message))
@@ -409,7 +409,7 @@ def r_boot(uuids):
                 'action': 'boot',
                 'uuid': uuid,
                 'boot_jobs': boot_jobs,
-                'hostname': guest.on_host,
+                'node_id': guest.node_id,
                 'passback_parameters': {'boot_jobs_id': boot_jobs_id},
                 'disks': disks
             }
@@ -447,7 +447,7 @@ def r_suspend(uuids):
                 '_object': 'guest',
                 'action': 'suspend',
                 'uuid': uuid,
-                'hostname': guest.on_host
+                'node_id': guest.node_id
             }
 
             Utils.emit_instruction(message=json.dumps(message))
@@ -483,7 +483,7 @@ def r_resume(uuids):
                 '_object': 'guest',
                 'action': 'resume',
                 'uuid': uuid,
-                'hostname': guest.on_host
+                'node_id': guest.node_id
             }
 
             Utils.emit_instruction(message=json.dumps(message))
@@ -528,7 +528,7 @@ def r_delete(uuids):
                 'uuid': uuid,
                 'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
-                'hostname': guest.on_host
+                'node_id': guest.node_id
             }
 
             Utils.emit_instruction(message=json.dumps(message))
@@ -589,7 +589,7 @@ def r_attach_disk(uuid, disk_uuid):
 
         # 判断 Guest 与 磁盘是否在同一宿主机上
         if config.storage_mode in [status.StorageMode.local.value, status.StorageMode.shared_mount.value]:
-            if guest.on_host != disk.on_host:
+            if guest.node_id != disk.node_id:
                 ret['state'] = ji.Common.exchange_state(41260)
                 return ret
 
@@ -615,7 +615,7 @@ def r_attach_disk(uuid, disk_uuid):
             '_object': 'guest',
             'action': 'attach_disk',
             'uuid': uuid,
-            'hostname': guest.on_host,
+            'node_id': guest.node_id,
             'xml': guest_xml.get_disk(),
             'passback_parameters': {'disk_uuid': disk.uuid, 'sequence': disk.sequence},
             'disks': [disk.__dict__]
@@ -672,7 +672,7 @@ def r_detach_disk(disk_uuid):
             '_object': 'guest',
             'action': 'detach_disk',
             'uuid': disk.guest_uuid,
-            'hostname': guest.on_host,
+            'node_id': guest.node_id,
             'xml': guest_xml.get_disk(),
             'passback_parameters': {'disk_uuid': disk.uuid}
         }
@@ -716,7 +716,7 @@ def r_migrate(uuids, destination_host):
                 '_object': 'guest',
                 'action': 'migrate',
                 'uuid': uuid,
-                'hostname': guest.on_host,
+                'node_id': guest.node_id,
                 'storage_mode': config.storage_mode,
                 'duri': 'qemu+ssh://' + destination_host + '/system'
             }
@@ -757,7 +757,7 @@ def r_distribute_count():
     ret['data'] = {
         'os_template_id': dict(),
         'status': dict(),
-        'on_host': dict(),
+        'node_id': dict(),
         'cpu_memory': dict(),
         'cpu': 0,
         'memory': 0,
@@ -771,8 +771,8 @@ def r_distribute_count():
         if guest['status'] not in ret['data']['status']:
             ret['data']['status'][guest['status']] = 0
 
-        if guest['on_host'] not in ret['data']['on_host']:
-            ret['data']['on_host'][guest['on_host']] = 0
+        if guest['node_id'] not in ret['data']['node_id']:
+            ret['data']['node_id'][guest['node_id']] = 0
 
         cpu_memory = '_'.join([str(guest['cpu']), str(guest['memory'])])
         if cpu_memory not in ret['data']['cpu_memory']:
@@ -780,7 +780,7 @@ def r_distribute_count():
 
         ret['data']['os_template_id'][guest['os_template_id']] += 1
         ret['data']['status'][guest['status']] += 1
-        ret['data']['on_host'][guest['on_host']] += 1
+        ret['data']['node_id'][guest['node_id']] += 1
         ret['data']['cpu_memory'][cpu_memory] += 1
 
         ret['data']['cpu'] += guest['cpu']

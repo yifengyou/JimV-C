@@ -51,6 +51,7 @@ def show():
 
     host_url = request.host_url.rstrip('/')
 
+    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
     guests_url = host_url + url_for('api_guests.r_get_by_filter')
     if keyword is not None:
         guests_url = host_url + url_for('api_guests.r_content_search')
@@ -59,6 +60,13 @@ def show():
 
     if args.__len__() > 0:
         guests_url = guests_url + '?' + '&'.join(args)
+
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     guests_ret = requests.get(url=guests_url, cookies=request.cookies)
     guests_ret = json.loads(guests_ret.content)
@@ -110,6 +118,7 @@ def show():
 
     return render_template('guests_show.html', guests_ret=guests_ret, resource_path=resource_path,
                            os_templates_mapping_by_id=os_templates_mapping_by_id,
+                           hosts_mapping_by_node_id=hosts_mapping_by_node_id,
                            guests_boot_jobs_ret=guests_boot_jobs_ret, page=page,
                            page_size=page_size, keyword=keyword, pages=pages, last_page=last_page)
 
@@ -221,7 +230,15 @@ def vnc(uuid):
 def detail(uuid):
     host_url = request.host_url.rstrip('/')
 
+    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
     guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
+
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     guest_ret = requests.get(url=guest_url, cookies=request.cookies)
     guest_ret = json.loads(guest_ret.content)
@@ -240,6 +257,7 @@ def detail(uuid):
     config_ret = json.loads(config_ret.content)
 
     return render_template('guest_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,
+                           hosts_mapping_by_node_id=hosts_mapping_by_node_id,
                            disks_ret=disks_ret, config_ret=config_ret)
 
 

@@ -48,3 +48,28 @@ UPDATE disk, config SET
     disk.bps_max=config.bps_max, disk.bps_max_length=config.bps_max_length
 WHERE disk.sequence!=0 AND disk.size>1000 AND config.id=1;
 
+
+-- on_host 变更为 node_id
+ALTER TABLE guest ADD COLUMN node_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE disk ADD COLUMN node_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE guest ADD INDEX (node_id);
+ALTER TABLE disk ADD INDEX (node_id);
+
+-- import jimit as ji
+-- from models import Utils
+-- on_host=ji.Common.get_hostname()
+-- node_id=Utils.uuid_by_decimal(_str=ji.Common.get_hostname(), _len=16)
+-- UPDATE guest SET node_id='' WHERE on_host='';
+-- UPDATE disk SET node_id='' WHERE on_host='';
+
+-- 删除 on_host 字段
+-- ALTER TABLE guest DROP on_host;
+-- ALTER TABLE disk DROP on_host;
+
+-- 更新 旧 node_id 的值为新 node_id 值
+-- import uuid
+-- old_node_id=uuid.getnode()
+-- new_node_id=Utils.uuid_by_decimal(_str=ji.Common.get_hostname(), _len=16)
+-- UPDATE host_cpu_memory SET node_id=new_node_id WHERE node_id=old_node_id;
+-- UPDATE host_traffic SET node_id=new_node_id WHERE node_id=old_node_id;
+-- UPDATE host_disk_usage_io SET node_id=new_node_id WHERE node_id=old_node_id;

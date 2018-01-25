@@ -46,7 +46,6 @@ def r_create():
     args_rules = [
         Rules.DISK_SIZE.value,
         Rules.REMARK.value,
-        Rules.DISK_ON_HOST.value,
         Rules.QUANTITY.value
     ]
 
@@ -54,19 +53,36 @@ def r_create():
     config.id = 1
     config.get()
 
-    if config.storage_mode in [StorageMode.shared_mount.value, StorageMode.ceph.value,
-                               StorageMode.glusterfs.value]:
-        request.json['on_host'] = 'shared_storage'
+    # 非共享模式，必须指定 node_id
+    if config.storage_mode not in [StorageMode.shared_mount.value, StorageMode.ceph.value,
+                                   StorageMode.glusterfs.value]:
+        args_rules.append(
+            Rules.NODE_ID.value
+        )
 
     try:
         ji.Check.previewing(args_rules, request.json)
 
+        size = request.json['size']
+        quantity = request.json['quantity']
+
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
-        size = request.json['size']
-        quantity = request.json['quantity']
-        on_host = request.json['on_host']
+        # 如果是共享模式，则让负载最轻的计算节点去创建磁盘
+        if config.storage_mode in [StorageMode.shared_mount.value, StorageMode.ceph.value,
+                                   StorageMode.glusterfs.value]:
+            available_hosts = Host.get_available_hosts()
+
+            if available_hosts.__len__() == 0:
+                ret['state'] = ji.Common.exchange_state(50351)
+                return ret
+
+            # 在可用计算节点中平均分配任务
+            chosen_host = available_hosts[quantity % available_hosts.__len__()]
+            request.json['node_id'] = chosen_host['node_id']
+
+        node_id = request.json['node_id']
 
         if size < 1:
             ret['state'] = ji.Common.exchange_state(41255)
@@ -79,7 +95,7 @@ def r_create():
             disk.size = size
             disk.uuid = uuid4().__str__()
             disk.remark = request.json.get('remark', '')
-            disk.on_host = on_host
+            disk.node_id = node_id
             disk.sequence = -1
             disk.format = 'qcow2'
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
@@ -91,21 +107,10 @@ def r_create():
                 'uuid': disk.uuid,
                 'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
-                'hostname': disk.on_host,
+                'node_id': disk.node_id,
                 'image_path': disk.path,
                 'size': disk.size
             }
-
-            if disk.on_host == 'shared_storage':
-                available_hosts = Host.get_available_hosts()
-
-                if available_hosts.__len__() == 0:
-                    ret['state'] = ji.Common.exchange_state(50351)
-                    return ret
-
-                # 在可用计算节点中平均分配任务
-                chosen_host = available_hosts[quantity % available_hosts.__len__()]
-                message['hostname'] = chosen_host['hostname']
 
             Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
@@ -155,14 +160,15 @@ def r_resize(uuid, size):
             'storage_mode': config.storage_mode,
             'size': disk.size,
             'dfs_volume': config.dfs_volume,
-            'hostname': disk.on_host,
+            'node_id': disk.node_id,
             'image_path': disk.path,
             'disks': [disk.__dict__],
             'passback_parameters': {'size': disk.size}
         }
 
-        if disk.on_host == 'shared_storage':
-            message['hostname'] = Guest.get_lightest_host()['hostname']
+        if config.storage_mode in [StorageMode.shared_mount.value, StorageMode.ceph.value,
+                                   StorageMode.glusterfs.value]:
+            message['node_id'] = Host.get_lightest_host()['node_id']
 
         if disk.guest_uuid.__len__() == 36:
             message['device_node'] = dev_table[disk.sequence]
@@ -195,6 +201,7 @@ def r_delete(uuids):
             disk.uuid = uuid
             disk.get_by('uuid')
 
+            # 判断磁盘是否与虚拟机处于离状态
             if disk.state != DiskState.idle.value:
                 ret['state'] = ji.Common.exchange_state(41256)
                 return ret
@@ -214,12 +221,13 @@ def r_delete(uuids):
                 'uuid': disk.uuid,
                 'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
-                'hostname': disk.on_host,
+                'node_id': disk.node_id,
                 'image_path': disk.path
             }
 
-            if disk.on_host == 'shared_storage':
-                message['hostname'] = Guest.get_lightest_host()['hostname']
+            if config.storage_mode in [StorageMode.shared_mount.value, StorageMode.ceph.value,
+                                       StorageMode.glusterfs.value]:
+                message['node_id'] = Host.get_lightest_host()['node_id']
 
             Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
@@ -386,7 +394,7 @@ def r_update(uuids):
                     'action': 'quota',
                     'uuid': disk.uuid,
                     'guest_uuid': disk.guest_uuid,
-                    'hostname': disk.on_host,
+                    'node_id': disk.node_id,
                     'disks': [disk.__dict__]
                 }
 

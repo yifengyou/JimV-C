@@ -1130,9 +1130,9 @@
                         </tr>
                         <tr>
                             <td>
-                                <span class="guest-label">所在计算节点:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-label">计算节点:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.on_host }}
+                                {{ hosts_mapping_by_node_id[guest_ret.data.node_id].hostname }}
                                 </span>
                             </td>
                         </tr>

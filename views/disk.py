@@ -88,14 +88,21 @@ def show():
 
     host_url = request.host_url.rstrip('/')
 
+    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
     disks_url = host_url + url_for('api_disks.r_get_by_filter')
-
     config_url = host_url + url_for('api_config.r_get')
 
     if keyword is not None:
         disks_url = host_url + url_for('api_disks.r_content_search')
         # 关键字检索，不支持显示域过滤
         show_area = 'all'
+
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     if args.__len__() > 0:
         disks_url = disks_url + '?' + '&'.join(args)
@@ -150,8 +157,9 @@ def show():
             if i == last_page or last_page == 0:
                 break
 
-    return render_template('disks_show.html', disks_ret=disks_ret, resource_path=resource_path, page=page,
-                           page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
+    return render_template('disks_show.html', disks_ret=disks_ret, resource_path=resource_path,
+                           hosts_mapping_by_node_id=hosts_mapping_by_node_id,
+                           page=page, page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
                            last_page=last_page, show_area=show_area, config_ret=config_ret, show_on_host=show_on_host)
 
 

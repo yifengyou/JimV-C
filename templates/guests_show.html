@@ -671,7 +671,7 @@
                     </td>
                     <td><span class="{{ os_templates_mapping_by_id[item.os_template_id].icon }}" title="{{ os_templates_mapping_by_id[item.os_template_id].label }}"></span></td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
-                    <td>{{ item.on_host }}</td>
+                    <td>{{ hosts_mapping_by_node_id[item.node_id].hostname }}</td>
                     <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>
                     <td>{{ item.ip }}</td>
                     <td><span class="unreal_password">*********</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>

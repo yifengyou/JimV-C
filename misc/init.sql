@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS guest(
     -- 运行时的状态用 status;
     status TINYINT UNSIGNED NOT NULL DEFAULT 0,
     progress TINYINT UNSIGNED NOT NULL DEFAULT 0,
-    on_host VARCHAR(128) NOT NULL DEFAULT '',
+    node_id BIGINT UNSIGNED NOT NULL,
     cpu TINYINT UNSIGNED NOT NULL,
     memory INT UNSIGNED NOT NULL,
     ip CHAR(15) NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS guest(
 
 ALTER TABLE guest ADD INDEX (uuid);
 ALTER TABLE guest ADD INDEX (label);
-ALTER TABLE guest ADD INDEX (on_host);
+ALTER TABLE guest ADD INDEX (node_id);
 ALTER TABLE guest ADD INDEX (ip);
 ALTER TABLE guest ADD INDEX (remark);
 
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS disk(
     uuid CHAR(36) NOT NULL,
     path VARCHAR(255) NOT NULL,
     size INT UNSIGNED NOT NULL,
-    on_host VARCHAR(128) NOT NULL DEFAULT '',
+    node_id BIGINT UNSIGNED NOT NULL,
     remark VARCHAR(255) NOT NULL DEFAULT '',
     sequence TINYINT NOT NULL,
     format CHAR(16) NOT NULL DEFAULT 'qcow2',
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS disk(
 
 ALTER TABLE disk ADD INDEX (size);
 ALTER TABLE disk ADD INDEX (guest_uuid);
-ALTER TABLE disk ADD INDEX (on_host);
+ALTER TABLE disk ADD INDEX (node_id);
 ALTER TABLE disk ADD INDEX (remark);
 
 

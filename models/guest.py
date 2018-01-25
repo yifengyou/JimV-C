@@ -34,7 +34,7 @@ class Guest(ORM):
         self.create_time = ji.Common.tus()
         self.status = GuestState.no_state.value
         self.progress = 0
-        self.on_host = ''
+        self.node_id = None
         self.cpu = None
         self.memory = None
         self.ip = None
@@ -51,7 +51,7 @@ class Guest(ORM):
             'uuid': FilterFieldType.STR.value,
             'label': FilterFieldType.STR.value,
             'remark': FilterFieldType.STR.value,
-            'on_host': FilterFieldType.STR.value,
+            'node_id': FilterFieldType.INT.value,
             'ip': FilterFieldType.STR.value
         }
 
@@ -61,7 +61,7 @@ class Guest(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['label', 'remark', 'on_host', 'ip']
+        return ['label', 'remark', 'node_id', 'ip']
 
     def get_boot_jobs_key(self):
         return ':'.join([app.config['guest_boot_jobs'], self.uuid])
@@ -97,22 +97,6 @@ class Guest(ORM):
 
         return uuids
 
-    @staticmethod
-    def get_lightest_host():
-        # 负载最小的宿主机
-        lightest_host = None
-        for k, v in db.r.hgetall(app.config['hosts_info']).items():
-            v = json.loads(v)
-
-            if lightest_host is None:
-                lightest_host = v
-
-            if float(lightest_host['system_load'][0]) / lightest_host['cpu'] > \
-                    float(v['system_load'][0]) / v['cpu']:
-                lightest_host = v
-
-        return lightest_host
-
 
 class Disk(ORM):
 
@@ -128,7 +112,7 @@ class Disk(ORM):
         self.size = None
         self.sequence = None
         self.state = DiskState.pending.value
-        self.on_host = ''
+        self.node_id = None
         self.format = 'qcow2'
         self.create_time = ji.Common.tus()
         self.guest_uuid = None
@@ -185,17 +169,17 @@ class Disk(ORM):
             'size': FilterFieldType.INT.value,
             'state': FilterFieldType.INT.value,
             'sequence': FilterFieldType.INT.value,
-            'on_host': FilterFieldType.STR.value,
+            'node_id': FilterFieldType.INT.value,
             'guest_uuid': FilterFieldType.STR.value
         }
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['on_host', 'sequence', 'state', 'guest_uuid']
+        return ['node_id', 'sequence', 'state', 'guest_uuid']
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['remark', 'size', 'guest_uuid', 'uuid', 'on_host']
+        return ['remark', 'size', 'guest_uuid', 'uuid', 'node_id']
 
 
 class GuestMigrateInfo(ORM):

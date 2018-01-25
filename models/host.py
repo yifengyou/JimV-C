@@ -137,3 +137,19 @@ class Host(object):
         hosts.sort(key=lambda _k: _k['system_load_per_cpu'])
 
         return hosts
+
+    @staticmethod
+    def get_lightest_host():
+        # 负载最小的宿主机
+        lightest_host = None
+        for k, v in db.r.hgetall(app.config['hosts_info']).items():
+            v = json.loads(v)
+
+            if lightest_host is None:
+                lightest_host = v
+
+            if float(lightest_host['system_load'][0]) / lightest_host['cpu'] > \
+                    float(v['system_load'][0]) / v['cpu']:
+                lightest_host = v
+
+        return lightest_host

@@ -136,7 +136,7 @@ class EventProcessor(object):
         uuid = cls.message['message']['uuid']
         state = cls.message['type']
         data = cls.message['message']['data']
-        hostname = cls.message['host']
+        node_id = cls.message['node_id']
 
         if _object == 'guest':
             if action == 'create':
@@ -214,7 +214,7 @@ class EventProcessor(object):
             if action == 'create':
                 cls.disk.uuid = uuid
                 cls.disk.get_by('uuid')
-                cls.disk.on_host = hostname
+                cls.disk.node_id = node_id
                 if state == ResponseState.success.value:
                     cls.disk.state = DiskState.idle.value
 
