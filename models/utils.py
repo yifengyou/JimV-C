@@ -12,6 +12,7 @@ from werkzeug.utils import import_string, cached_property
 import jwt
 
 from models.initialize import *
+from database import Database as db
 
 
 __author__ = 'James Iter'
@@ -115,6 +116,10 @@ class Utils(object):
             logger.error(e.message)
         ret['state'] = ji.Common.exchange_state(41208)
         raise ji.JITError(json.dumps(ret))
+
+    @staticmethod
+    def emit_instruction(message):
+        db.r.publish(app.config['instruction_channel'], message=message)
 
 
 class LazyView(object):

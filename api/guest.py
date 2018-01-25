@@ -199,7 +199,7 @@ def r_create():
                 'passback_parameters': {'boot_jobs_id': boot_jobs_id}
             }
 
-            Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+            Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
         return ret
 
@@ -233,7 +233,7 @@ def r_reboot(uuids):
                 'hostname': guest.on_host
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -271,7 +271,7 @@ def r_force_reboot(uuids):
                 'disks': disks
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -307,7 +307,7 @@ def r_shutdown(uuids):
                 'hostname': guest.on_host
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -343,7 +343,7 @@ def r_force_shutdown(uuids):
                 'hostname': guest.on_host
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -414,7 +414,7 @@ def r_boot(uuids):
                 'disks': disks
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -450,7 +450,7 @@ def r_suspend(uuids):
                 'hostname': guest.on_host
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -486,7 +486,7 @@ def r_resume(uuids):
                 'hostname': guest.on_host
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -531,7 +531,7 @@ def r_delete(uuids):
                 'hostname': guest.on_host
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
             # 删除创建失败的 Guest
             if guest.status == status.GuestState.dirty.value:
@@ -621,7 +621,7 @@ def r_attach_disk(uuid, disk_uuid):
             'disks': [disk.__dict__]
         }
 
-        Guest.emit_instruction(message=json.dumps(message))
+        Utils.emit_instruction(message=json.dumps(message))
         disk.update()
 
         return ret
@@ -677,7 +677,7 @@ def r_detach_disk(disk_uuid):
             'passback_parameters': {'disk_uuid': disk.uuid}
         }
 
-        Guest.emit_instruction(message=json.dumps(message))
+        Utils.emit_instruction(message=json.dumps(message))
 
         disk.state = DiskState.unloading.value
         disk.update()
@@ -721,7 +721,7 @@ def r_migrate(uuids, destination_host):
                 'duri': 'qemu+ssh://' + destination_host + '/system'
             }
 
-            Guest.emit_instruction(message=json.dumps(message))
+            Utils.emit_instruction(message=json.dumps(message))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)

@@ -7,7 +7,7 @@ import json
 from uuid import uuid4
 import jimit as ji
 
-from models import Guest, DiskState
+from models import Guest, DiskState, Host
 from models.initialize import dev_table
 from models import Config
 from models import Disk
@@ -97,7 +97,7 @@ def r_create():
             }
 
             if disk.on_host == 'shared_storage':
-                available_hosts = Guest.get_available_hosts()
+                available_hosts = Host.get_available_hosts()
 
                 if available_hosts.__len__() == 0:
                     ret['state'] = ji.Common.exchange_state(50351)
@@ -107,7 +107,7 @@ def r_create():
                 chosen_host = available_hosts[quantity % available_hosts.__len__()]
                 message['hostname'] = chosen_host['hostname']
 
-            Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+            Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
             disk.create()
 
@@ -167,7 +167,7 @@ def r_resize(uuid, size):
         if disk.guest_uuid.__len__() == 36:
             message['device_node'] = dev_table[disk.sequence]
 
-        Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+        Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
         return ret
 
@@ -221,7 +221,7 @@ def r_delete(uuids):
             if disk.on_host == 'shared_storage':
                 message['hostname'] = Guest.get_lightest_host()['hostname']
 
-            Guest.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+            Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
         return ret
 
@@ -390,7 +390,7 @@ def r_update(uuids):
                     'disks': [disk.__dict__]
                 }
 
-                Guest.emit_instruction(message=json.dumps(message))
+                Utils.emit_instruction(message=json.dumps(message))
 
             ret['data'].append(disk.__dict__)
 

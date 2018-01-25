@@ -325,7 +325,7 @@ def r_update_quota():
                         'disks': [disk.__dict__]
                     }
 
-                    Guest.emit_instruction(message=json.dumps(message))
+                    Utils.emit_instruction(message=json.dumps(message))
 
         config.update()
         config.update_global_config()

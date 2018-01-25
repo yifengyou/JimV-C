@@ -63,10 +63,6 @@ class Guest(ORM):
     def get_allow_content_search_keywords():
         return ['label', 'remark', 'on_host', 'ip']
 
-    @staticmethod
-    def emit_instruction(message):
-        db.r.publish(app.config['instruction_channel'], message=message)
-
     def get_boot_jobs_key(self):
         return ':'.join([app.config['guest_boot_jobs'], self.uuid])
 
