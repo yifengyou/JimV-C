@@ -11,13 +11,13 @@ __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
 
-class CPUMemory(ORM):
+class GuestCPUMemory(ORM):
 
-    _table_name = 'cpu_memory'
+    _table_name = 'guest_cpu_memory'
     _primary_key = 'id'
 
     def __init__(self):
-        super(CPUMemory, self).__init__()
+        super(GuestCPUMemory, self).__init__()
         self.id = 0
         self.guest_uuid = None
         self.cpu_load = None
@@ -43,13 +43,13 @@ class CPUMemory(ORM):
         return []
 
 
-class Traffic(ORM):
+class GuestTraffic(ORM):
 
-    _table_name = 'traffic'
+    _table_name = 'guest_traffic'
     _primary_key = 'id'
 
     def __init__(self):
-        super(Traffic, self).__init__()
+        super(GuestTraffic, self).__init__()
         self.id = 0
         self.guest_uuid = None
         self.name = None
@@ -85,13 +85,13 @@ class Traffic(ORM):
         return []
 
 
-class DiskIO(ORM):
+class GuestDiskIO(ORM):
 
-    _table_name = 'disk_io'
+    _table_name = 'guest_disk_io'
     _primary_key = 'id'
 
     def __init__(self):
-        super(DiskIO, self).__init__()
+        super(GuestDiskIO, self).__init__()
         self.id = 0
         self.disk_uuid = None
         self.rd_req = None

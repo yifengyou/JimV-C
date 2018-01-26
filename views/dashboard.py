@@ -30,7 +30,7 @@ def show():
     hosts_url = host_url + url_for('api_hosts.r_get_by_filter', alive=True)
     guests_distribute_count_url = host_url + url_for('api_guests.r_distribute_count')
     disks_distribute_count_url = host_url + url_for('api_disks.r_distribute_count')
-    guests_current_top_10_url = host_url + url_for('api_performance.r_current_top_10')
+    guests_current_top_10_url = host_url + url_for('api_guest_performance.r_current_top_10')
     hosts_current_top_10_url = host_url + url_for('api_host_performance.r_current_top_10')
 
     hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)

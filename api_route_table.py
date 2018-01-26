@@ -12,7 +12,7 @@ from api import operate_rule
 from api import os_template
 from api import log
 from api import host
-from api import performance
+from api import guest_performance
 from api import host_performance
 
 
@@ -111,59 +111,62 @@ add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_delete', methods=[
 add_rule_api(host.blueprints, '/<hosts_name>/<random>', api_func='host.r_nonrandom', methods=['PUT'])
 
 # Guest 性能查询
-add_rule_api(performance.blueprint, '/cpu_memory', api_func='performance.r_cpu_memory_get_by_filter', methods=['GET'])
-add_rule_api(performance.blueprint, '/traffic', api_func='performance.r_traffic_get_by_filter', methods=['GET'])
-add_rule_api(performance.blueprint, '/disk_io', api_func='performance.r_disk_io_get_by_filter', methods=['GET'])
-add_rule_api(performance.blueprint, '/cpu_memory/last_hour/<uuid>',
-             api_func='performance.r_cpu_memory_last_hour', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/cpu_memory',
+             api_func='guest_performance.r_cpu_memory_get_by_filter', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/traffic',
+             api_func='guest_performance.r_traffic_get_by_filter', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/disk_io',
+             api_func='guest_performance.r_disk_io_get_by_filter', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/cpu_memory/last_hour/<uuid>',
+             api_func='guest_performance.r_cpu_memory_last_hour', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/cpu_memory/last_six_hours/<uuid>',
-             api_func='performance.r_cpu_memory_last_six_hours', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/cpu_memory/last_six_hours/<uuid>',
+             api_func='guest_performance.r_cpu_memory_last_six_hours', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/cpu_memory/last_day/<uuid>',
-             api_func='performance.r_cpu_memory_last_day', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/cpu_memory/last_day/<uuid>',
+             api_func='guest_performance.r_cpu_memory_last_day', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/cpu_memory/last_seven_days/<uuid>',
-             api_func='performance.r_cpu_memory_last_seven_days', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/cpu_memory/last_seven_days/<uuid>',
+             api_func='guest_performance.r_cpu_memory_last_seven_days', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/traffic/last_hour/<uuid>',
-             api_func='performance.r_traffic_last_hour', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/traffic/last_hour/<uuid>',
+             api_func='guest_performance.r_traffic_last_hour', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/traffic/last_six_hours/<uuid>',
-             api_func='performance.r_traffic_last_six_hours', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/traffic/last_six_hours/<uuid>',
+             api_func='guest_performance.r_traffic_last_six_hours', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/traffic/last_day/<uuid>',
-             api_func='performance.r_traffic_last_day', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/traffic/last_day/<uuid>',
+             api_func='guest_performance.r_traffic_last_day', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/traffic/last_seven_days/<uuid>',
-             api_func='performance.r_traffic_last_seven_days', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/traffic/last_seven_days/<uuid>',
+             api_func='guest_performance.r_traffic_last_seven_days', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/disk_io/last_hour/<uuid>',
-             api_func='performance.r_disk_io_last_hour', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/disk_io/last_hour/<uuid>',
+             api_func='guest_performance.r_disk_io_last_hour', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/disk_io/last_six_hours/<uuid>',
-             api_func='performance.r_disk_io_last_six_hours', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/disk_io/last_six_hours/<uuid>',
+             api_func='guest_performance.r_disk_io_last_six_hours', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/disk_io/last_day/<uuid>',
-             api_func='performance.r_disk_io_last_day', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/disk_io/last_day/<uuid>',
+             api_func='guest_performance.r_disk_io_last_day', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/disk_io/last_seven_days/<uuid>',
-             api_func='performance.r_disk_io_last_seven_days', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/disk_io/last_seven_days/<uuid>',
+             api_func='guest_performance.r_disk_io_last_seven_days', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/_current_top_10',
-             api_func='performance.r_current_top_10', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/_current_top_10',
+             api_func='guest_performance.r_current_top_10', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/_last_10_minutes_top_10',
-             api_func='performance.r_last_10_minutes_top_10', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/_last_10_minutes_top_10',
+             api_func='guest_performance.r_last_10_minutes_top_10', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/_last_hour_top_10',
-             api_func='performance.r_last_hour_top_10', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/_last_hour_top_10',
+             api_func='guest_performance.r_last_hour_top_10', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/_last_six_hours_top_10',
-             api_func='performance.r_last_six_hours_top_10', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/_last_six_hours_top_10',
+             api_func='guest_performance.r_last_six_hours_top_10', methods=['GET'])
 
-add_rule_api(performance.blueprint, '/_last_day_top_10',
-             api_func='performance.r_last_day_top_10', methods=['GET'])
+add_rule_api(guest_performance.blueprint, '/_last_day_top_10',
+             api_func='guest_performance.r_last_day_top_10', methods=['GET'])
 
 # Host 性能查询
 add_rule_api(host_performance.blueprint, '/cpu_memory', api_func='host_performance.r_cpu_memory_get_by_filter',

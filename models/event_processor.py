@@ -8,7 +8,7 @@ import time
 from IPy import IP
 import jimit as ji
 
-from models import Database as db, Config, CPUMemory, Traffic, DiskIO
+from models import Database as db, Config, GuestCPUMemory, GuestTraffic, GuestDiskIO
 from models import Guest
 from models import Disk
 from models import Log
@@ -17,7 +17,7 @@ from models import EmitKind
 from models import ResponseState, GuestState, DiskState
 from models.guest import GuestMigrateInfo
 from models.initialize import app, logger
-from models.status import CollectionPerformanceDataKind, HostCollectionPerformanceDataKind
+from models.status import GuestCollectionPerformanceDataKind, HostCollectionPerformanceDataKind
 from models import HostCPUMemory, HostTraffic, HostDiskUsageIO
 
 
@@ -35,9 +35,9 @@ class EventProcessor(object):
     disk = Disk()
     config = Config()
     config.id = 1
-    cpu_memory = CPUMemory()
-    traffic = Traffic()
-    disk_io = DiskIO()
+    guest_cpu_memory = GuestCPUMemory()
+    guest_traffic = GuestTraffic()
+    guest_disk_io = GuestDiskIO()
     host_cpu_memory = HostCPUMemory()
     host_traffic = HostTraffic()
     host_disk_usage_io = HostDiskUsageIO()
@@ -241,45 +241,45 @@ class EventProcessor(object):
             pass
 
     @classmethod
-    def collection_performance_processor(cls):
+    def guest_collection_performance_processor(cls):
         data_kind = cls.message['type']
         timestamp = ji.Common.ts()
         timestamp -= (timestamp % 60)
         data = cls.message['message']['data']
 
-        if data_kind == CollectionPerformanceDataKind.cpu_memory.value:
+        if data_kind == GuestCollectionPerformanceDataKind.cpu_memory.value:
             for item in data:
-                cls.cpu_memory.guest_uuid = item['guest_uuid']
-                cls.cpu_memory.cpu_load = item['cpu_load']
-                cls.cpu_memory.memory_available = item['memory_available']
-                cls.cpu_memory.memory_unused = item['memory_unused']
-                cls.cpu_memory.timestamp = timestamp
-                cls.cpu_memory.create()
+                cls.guest_cpu_memory.guest_uuid = item['guest_uuid']
+                cls.guest_cpu_memory.cpu_load = item['cpu_load']
+                cls.guest_cpu_memory.memory_available = item['memory_available']
+                cls.guest_cpu_memory.memory_unused = item['memory_unused']
+                cls.guest_cpu_memory.timestamp = timestamp
+                cls.guest_cpu_memory.create()
 
-        if data_kind == CollectionPerformanceDataKind.traffic.value:
+        if data_kind == GuestCollectionPerformanceDataKind.traffic.value:
             for item in data:
-                cls.traffic.guest_uuid = item['guest_uuid']
-                cls.traffic.name = item['name']
-                cls.traffic.rx_bytes = item['rx_bytes']
-                cls.traffic.rx_packets = item['rx_packets']
-                cls.traffic.rx_errs = item['rx_errs']
-                cls.traffic.rx_drop = item['rx_drop']
-                cls.traffic.tx_bytes = item['tx_bytes']
-                cls.traffic.tx_packets = item['tx_packets']
-                cls.traffic.tx_errs = item['tx_errs']
-                cls.traffic.tx_drop = item['tx_drop']
-                cls.traffic.timestamp = timestamp
-                cls.traffic.create()
+                cls.guest_traffic.guest_uuid = item['guest_uuid']
+                cls.guest_traffic.name = item['name']
+                cls.guest_traffic.rx_bytes = item['rx_bytes']
+                cls.guest_traffic.rx_packets = item['rx_packets']
+                cls.guest_traffic.rx_errs = item['rx_errs']
+                cls.guest_traffic.rx_drop = item['rx_drop']
+                cls.guest_traffic.tx_bytes = item['tx_bytes']
+                cls.guest_traffic.tx_packets = item['tx_packets']
+                cls.guest_traffic.tx_errs = item['tx_errs']
+                cls.guest_traffic.tx_drop = item['tx_drop']
+                cls.guest_traffic.timestamp = timestamp
+                cls.guest_traffic.create()
 
-        if data_kind == CollectionPerformanceDataKind.disk_io.value:
+        if data_kind == GuestCollectionPerformanceDataKind.disk_io.value:
             for item in data:
-                cls.disk_io.disk_uuid = item['disk_uuid']
-                cls.disk_io.rd_req = item['rd_req']
-                cls.disk_io.rd_bytes = item['rd_bytes']
-                cls.disk_io.wr_req = item['wr_req']
-                cls.disk_io.wr_bytes = item['wr_bytes']
-                cls.disk_io.timestamp = timestamp
-                cls.disk_io.create()
+                cls.guest_disk_io.disk_uuid = item['disk_uuid']
+                cls.guest_disk_io.rd_req = item['rd_req']
+                cls.guest_disk_io.rd_bytes = item['rd_bytes']
+                cls.guest_disk_io.wr_req = item['wr_req']
+                cls.guest_disk_io.wr_bytes = item['wr_bytes']
+                cls.guest_disk_io.timestamp = timestamp
+                cls.guest_disk_io.create()
 
         else:
             pass
@@ -360,8 +360,8 @@ class EventProcessor(object):
                 elif cls.message['kind'] == EmitKind.response.value:
                     cls.response_processor()
 
-                elif cls.message['kind'] == EmitKind.collection_performance.value:
-                    cls.collection_performance_processor()
+                elif cls.message['kind'] == EmitKind.guest_collection_performance.value:
+                    cls.guest_collection_performance_processor()
 
                 elif cls.message['kind'] == EmitKind.host_collection_performance.value:
                     cls.host_collection_performance_processor()

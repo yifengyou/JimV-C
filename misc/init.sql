@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS log(
 ALTER TABLE log ADD INDEX (host);
 
 
-CREATE TABLE IF NOT EXISTS cpu_memory(
+CREATE TABLE IF NOT EXISTS guest_cpu_memory(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     guest_uuid CHAR(36) NOT NULL,
     cpu_load INT UNSIGNED NOT NULL,
@@ -203,13 +203,13 @@ CREATE TABLE IF NOT EXISTS cpu_memory(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE cpu_memory ADD INDEX (guest_uuid);
-ALTER TABLE cpu_memory ADD INDEX (cpu_load);
-ALTER TABLE cpu_memory ADD INDEX (timestamp);
-ALTER TABLE cpu_memory ADD INDEX (guest_uuid, timestamp);
+ALTER TABLE guest_cpu_memory ADD INDEX (guest_uuid);
+ALTER TABLE guest_cpu_memory ADD INDEX (cpu_load);
+ALTER TABLE guest_cpu_memory ADD INDEX (timestamp);
+ALTER TABLE guest_cpu_memory ADD INDEX (guest_uuid, timestamp);
 
 
-CREATE TABLE IF NOT EXISTS traffic(
+CREATE TABLE IF NOT EXISTS guest_traffic(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     guest_uuid CHAR(36) NOT NULL,
     name VARCHAR(36) NOT NULL,
@@ -226,16 +226,16 @@ CREATE TABLE IF NOT EXISTS traffic(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE traffic ADD INDEX (guest_uuid);
-ALTER TABLE traffic ADD INDEX (rx_bytes);
-ALTER TABLE traffic ADD INDEX (rx_packets);
-ALTER TABLE traffic ADD INDEX (tx_bytes);
-ALTER TABLE traffic ADD INDEX (tx_packets);
-ALTER TABLE traffic ADD INDEX (timestamp);
-ALTER TABLE traffic ADD INDEX (guest_uuid, timestamp);
+ALTER TABLE guest_traffic ADD INDEX (guest_uuid);
+ALTER TABLE guest_traffic ADD INDEX (rx_bytes);
+ALTER TABLE guest_traffic ADD INDEX (rx_packets);
+ALTER TABLE guest_traffic ADD INDEX (tx_bytes);
+ALTER TABLE guest_traffic ADD INDEX (tx_packets);
+ALTER TABLE guest_traffic ADD INDEX (timestamp);
+ALTER TABLE guest_traffic ADD INDEX (guest_uuid, timestamp);
 
 
-CREATE TABLE IF NOT EXISTS disk_io(
+CREATE TABLE IF NOT EXISTS guest_disk_io(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     disk_uuid CHAR(36) NOT NULL,
     rd_req BIGINT UNSIGNED NOT NULL,
@@ -247,13 +247,13 @@ CREATE TABLE IF NOT EXISTS disk_io(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE disk_io ADD INDEX (disk_uuid);
-ALTER TABLE disk_io ADD INDEX (rd_req);
-ALTER TABLE disk_io ADD INDEX (rd_bytes);
-ALTER TABLE disk_io ADD INDEX (wr_req);
-ALTER TABLE disk_io ADD INDEX (wr_bytes);
-ALTER TABLE disk_io ADD INDEX (timestamp);
-ALTER TABLE disk_io ADD INDEX (disk_uuid, timestamp);
+ALTER TABLE guest_disk_io ADD INDEX (disk_uuid);
+ALTER TABLE guest_disk_io ADD INDEX (rd_req);
+ALTER TABLE guest_disk_io ADD INDEX (rd_bytes);
+ALTER TABLE guest_disk_io ADD INDEX (wr_req);
+ALTER TABLE guest_disk_io ADD INDEX (wr_bytes);
+ALTER TABLE guest_disk_io ADD INDEX (timestamp);
+ALTER TABLE guest_disk_io ADD INDEX (disk_uuid, timestamp);
 
 
 CREATE TABLE IF NOT EXISTS host_cpu_memory(

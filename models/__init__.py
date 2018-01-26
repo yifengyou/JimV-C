@@ -64,10 +64,10 @@ from log import (
     Log
 )
 
-from performance import (
-    CPUMemory,
-    Traffic,
-    DiskIO
+from guest_performance import (
+    GuestCPUMemory,
+    GuestTraffic,
+    GuestDiskIO
 )
 
 from host import (
@@ -94,7 +94,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState', 'OSType',
     'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
-    'EventProcessor', 'ResponseState', 'CPUMemory', 'Traffic', 'DiskIO', 'HostCPUMemory', 'HostTraffic',
+    'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO', 'HostCPUMemory', 'HostTraffic',
     'HostDiskUsageIO', 'Host'
 ]
 

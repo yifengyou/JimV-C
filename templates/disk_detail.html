@@ -77,15 +77,15 @@
     }
 
     function render_disk_throughput_chart(disk_uuid, granularity, dev_id, dev_name) {
-        var url = '/api/performance/disk_io/last_hour/' + disk_uuid;
+        var url = '/api/guest_performance/disk_io/last_hour/' + disk_uuid;
         if (granularity === 'hour') {
-            url = '/api/performance/disk_io/last_hour/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_hour/' + disk_uuid
         } else if (granularity === 'six_hours') {
-            url = '/api/performance/disk_io/last_six_hours/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_six_hours/' + disk_uuid
         } else if (granularity === 'day') {
-            url = '/api/performance/disk_io/last_day/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_day/' + disk_uuid
         } else {
-            url = '/api/performance/disk_io/last_seven_days/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_seven_days/' + disk_uuid
         }
 
         $.ajax({
@@ -238,15 +238,15 @@
     }
 
     function render_disk_iops_chart(disk_uuid, granularity, dev_id, dev_name) {
-        var url = '/api/performance/disk_io/last_hour/' + disk_uuid;
+        var url = '/api/guest_performance/disk_io/last_hour/' + disk_uuid;
         if (granularity === 'hour') {
-            url = '/api/performance/disk_io/last_hour/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_hour/' + disk_uuid
         } else if (granularity === 'six_hours') {
-            url = '/api/performance/disk_io/last_six_hours/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_six_hours/' + disk_uuid
         } else if (granularity === 'day') {
-            url = '/api/performance/disk_io/last_day/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_day/' + disk_uuid
         } else {
-            url = '/api/performance/disk_io/last_seven_days/' + disk_uuid
+            url = '/api/guest_performance/disk_io/last_seven_days/' + disk_uuid
         }
 
         $.ajax({

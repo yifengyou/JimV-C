@@ -73,3 +73,9 @@ ALTER TABLE disk ADD INDEX (node_id);
 -- UPDATE host_cpu_memory SET node_id=new_node_id WHERE node_id=old_node_id;
 -- UPDATE host_traffic SET node_id=new_node_id WHERE node_id=old_node_id;
 -- UPDATE host_disk_usage_io SET node_id=new_node_id WHERE node_id=old_node_id;
+
+
+-- guest 性能统计表更名
+ALTER TABLE cpu_memory RENAME TO guest_cpu_memory;
+ALTER TABLE traffic RENAME TO guest_traffic;
+ALTER TABLE disk_io RENAME TO guest_disk_io;

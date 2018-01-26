@@ -7,7 +7,7 @@ import json
 import jimit as ji
 
 from api.base import Base
-from models import CPUMemory, Traffic, DiskIO, Utils, Rules
+from models import GuestCPUMemory, GuestTraffic, GuestDiskIO, Utils, Rules
 
 
 __author__ = 'James Iter'
@@ -17,36 +17,36 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 blueprint = Blueprint(
-    'api_performance',
+    'api_guest_performance',
     __name__,
-    url_prefix='/api/performance'
+    url_prefix='/api/guest_performance'
 )
 
 blueprints = Blueprint(
-    'api_performances',
+    'api_guest_performances',
     __name__,
-    url_prefix='/api/performances'
+    url_prefix='/api/guest_performances'
 )
 
 
-cpu_memory = Base(the_class=CPUMemory, the_blueprint=blueprint, the_blueprints=blueprints)
-traffic = Base(the_class=Traffic, the_blueprint=blueprint, the_blueprints=blueprints)
-disk_io = Base(the_class=DiskIO, the_blueprint=blueprint, the_blueprints=blueprints)
+guest_cpu_memory = Base(the_class=GuestCPUMemory, the_blueprint=blueprint, the_blueprints=blueprints)
+guest_traffic = Base(the_class=GuestTraffic, the_blueprint=blueprint, the_blueprints=blueprints)
+guest_disk_io = Base(the_class=GuestDiskIO, the_blueprint=blueprint, the_blueprints=blueprints)
 
 
 @Utils.dumps2response
 def r_cpu_memory_get_by_filter():
-    return cpu_memory.get_by_filter()
+    return guest_cpu_memory.get_by_filter()
 
 
 @Utils.dumps2response
 def r_traffic_get_by_filter():
-    return traffic.get_by_filter()
+    return guest_traffic.get_by_filter()
 
 
 @Utils.dumps2response
 def r_disk_io_get_by_filter():
-    return disk_io.get_by_filter()
+    return guest_disk_io.get_by_filter()
 
 
 def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
@@ -144,62 +144,62 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
 
 @Utils.dumps2response
 def r_cpu_memory_last_hour(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=CPUMemory, granularity='hour')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestCPUMemory, granularity='hour')
 
 
 @Utils.dumps2response
 def r_cpu_memory_last_six_hours(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=CPUMemory, granularity='six_hours')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestCPUMemory, granularity='six_hours')
 
 
 @Utils.dumps2response
 def r_cpu_memory_last_day(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=CPUMemory, granularity='day')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestCPUMemory, granularity='day')
 
 
 @Utils.dumps2response
 def r_cpu_memory_last_seven_days(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=CPUMemory, granularity='seven_days')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestCPUMemory, granularity='seven_days')
 
 
 @Utils.dumps2response
 def r_traffic_last_hour(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=Traffic, granularity='hour')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestTraffic, granularity='hour')
 
 
 @Utils.dumps2response
 def r_traffic_last_six_hours(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=Traffic, granularity='six_hours')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestTraffic, granularity='six_hours')
 
 
 @Utils.dumps2response
 def r_traffic_last_day(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=Traffic, granularity='day')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestTraffic, granularity='day')
 
 
 @Utils.dumps2response
 def r_traffic_last_seven_days(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=Traffic, granularity='seven_days')
+    return get_performance_data(uuid=uuid, uuid_field='guest_uuid', the_class=GuestTraffic, granularity='seven_days')
 
 
 @Utils.dumps2response
 def r_disk_io_last_hour(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=DiskIO, granularity='hour')
+    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=GuestDiskIO, granularity='hour')
 
 
 @Utils.dumps2response
 def r_disk_io_last_six_hours(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=DiskIO, granularity='six_hours')
+    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=GuestDiskIO, granularity='six_hours')
 
 
 @Utils.dumps2response
 def r_disk_io_last_day(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=DiskIO, granularity='day')
+    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=GuestDiskIO, granularity='day')
 
 
 @Utils.dumps2response
 def r_disk_io_last_seven_days(uuid):
-    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=DiskIO, granularity='seven_days')
+    return get_performance_data(uuid=uuid, uuid_field='disk_uuid', the_class=GuestDiskIO, granularity='seven_days')
 
 
 @Utils.dumps2response
@@ -229,7 +229,7 @@ def r_current_top_10():
     filter_str = ';'.join([':'.join(['timestamp', 'gt', start_ts.__str__()]),
                            ':'.join(['timestamp', 'lt', end_ts.__str__()])])
 
-    rows, _ = CPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
+    rows, _ = GuestCPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
     rows.sort(key=lambda k: k['cpu_load'], reverse=True)
 
     effective_range = length
@@ -242,7 +242,7 @@ def r_current_top_10():
 
         ret['data']['cpu_load'].append(rows[i])
 
-    rows, _ = DiskIO.get_by_filter(limit=limit, filter_str=filter_str)
+    rows, _ = GuestDiskIO.get_by_filter(limit=limit, filter_str=filter_str)
     for i in range(rows.__len__()):
         rows[i]['rw_bytes'] = rows[i]['rd_bytes'] + rows[i]['wr_bytes']
         rows[i]['rw_req'] = rows[i]['rd_req'] + rows[i]['wr_req']
@@ -267,7 +267,7 @@ def r_current_top_10():
 
         ret['data']['rw_req'].append(rows[i])
 
-    rows, _ = Traffic.get_by_filter(limit=limit, filter_str=filter_str)
+    rows, _ = GuestTraffic.get_by_filter(limit=limit, filter_str=filter_str)
     for i in range(rows.__len__()):
         rows[i]['rt_bytes'] = rows[i]['rx_bytes'] + rows[i]['tx_bytes']
         rows[i]['rt_packets'] = rows[i]['rx_packets'] + rows[i]['tx_packets']
@@ -323,7 +323,7 @@ def r_last_the_range_minutes_top_10(_range):
 
     # cpu 负载
     guests_uuid_mapping = dict()
-    rows, _ = CPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
+    rows, _ = GuestCPUMemory.get_by_filter(limit=limit, filter_str=filter_str)
     for row in rows:
         if row['guest_uuid'] not in guests_uuid_mapping:
             guests_uuid_mapping[row['guest_uuid']] = {'cpu_load': 0, 'count': 0}
@@ -350,7 +350,7 @@ def r_last_the_range_minutes_top_10(_range):
 
     # 磁盘使用统计
     guests_uuid_mapping.clear()
-    rows, _ = DiskIO.get_by_filter(limit=limit, filter_str=filter_str)
+    rows, _ = GuestDiskIO.get_by_filter(limit=limit, filter_str=filter_str)
     for row in rows:
         if row['disk_uuid'] not in guests_uuid_mapping:
             guests_uuid_mapping[row['disk_uuid']] = {'rw_bytes': 0, 'rw_req': 0}
@@ -379,7 +379,7 @@ def r_last_the_range_minutes_top_10(_range):
 
     # 网络流量
     guests_uuid_mapping.clear()
-    rows, _ = Traffic.get_by_filter(limit=limit, filter_str=filter_str)
+    rows, _ = GuestTraffic.get_by_filter(limit=limit, filter_str=filter_str)
     for row in rows:
         if row['guest_uuid'] not in guests_uuid_mapping:
             guests_uuid_mapping[row['guest_uuid']] = {'rt_bytes': 0, 'rt_packets': 0}

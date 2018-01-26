@@ -153,7 +153,7 @@ class Init(object):
 
     @staticmethod
     def clear_expire_monitor_log():
-        from models import CPUMemory, Traffic, DiskIO, HostCPUMemory, HostTraffic, HostDiskUsageIO
+        from models import GuestCPUMemory, GuestTraffic, GuestDiskIO, HostCPUMemory, HostTraffic, HostDiskUsageIO
         from models import Utils
 
         already_clear = False
@@ -175,9 +175,9 @@ class Init(object):
                     boundary = ji.Common.ts() - 86400 * 15
                     filter_str = 'timestamp:lt:' + boundary.__str__()
 
-                    CPUMemory.delete_by_filter(filter_str=filter_str)
-                    Traffic.delete_by_filter(filter_str=filter_str)
-                    DiskIO.delete_by_filter(filter_str=filter_str)
+                    GuestCPUMemory.delete_by_filter(filter_str=filter_str)
+                    GuestTraffic.delete_by_filter(filter_str=filter_str)
+                    GuestDiskIO.delete_by_filter(filter_str=filter_str)
 
                     HostCPUMemory.delete_by_filter(filter_str=filter_str)
                     HostTraffic.delete_by_filter(filter_str=filter_str)

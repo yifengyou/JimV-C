@@ -40,8 +40,8 @@ from api.log import blueprint as log_blueprint
 from api.log import blueprints as log_blueprints
 from api.host import blueprint as host_blueprint
 from api.host import blueprints as host_blueprints
-from api.performance import blueprint as performance_blueprint
-from api.performance import blueprints as performance_blueprints
+from api.guest_performance import blueprint as performance_blueprint
+from api.guest_performance import blueprints as performance_blueprints
 from api.host_performance import blueprint as host_performance_blueprint
 from api.host_performance import blueprints as host_performance_blueprints
 
