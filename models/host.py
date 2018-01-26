@@ -38,39 +38,39 @@ class Host(object):
         if 'threads_status' not in v:
             v['threads_status'] = {
                 'instruction_process_engine': {
-                    'timestamp': 0,
-                    'alive': False
+                    'timestamp': 0
                 },
                 'host_state_report_engine': {
-                    'timestamp': 0,
-                    'alive': False
+                    'timestamp': 0
                 },
                 'guest_creating_progress_report_engine': {
-                    'timestamp': 0,
-                    'alive': False
+                    'timestamp': 0
                 },
                 'guest_performance_collection_engine': {
-                    'timestamp': 0,
-                    'alive': False
+                    'timestamp': 0
                 },
                 'host_performance_collection_engine': {
-                    'timestamp': 0,
-                    'alive': False
+                    'timestamp': 0
                 }
             }
 
+        v['threads_status']['instruction_process_engine']['alive'] = False
         if v['threads_status']['instruction_process_engine']['timestamp'] + coupler_length >= g.ts:
             v['threads_status']['instruction_process_engine']['alive'] = True
 
+        v['threads_status']['host_state_report_engine']['alive'] = False
         if v['threads_status']['host_state_report_engine']['timestamp'] + coupler_length >= g.ts:
             v['threads_status']['host_state_report_engine']['alive'] = True
 
+        v['threads_status']['guest_creating_progress_report_engine']['alive'] = False
         if v['threads_status']['guest_creating_progress_report_engine']['timestamp'] + coupler_length >= g.ts:
             v['threads_status']['guest_creating_progress_report_engine']['alive'] = True
 
+        v['threads_status']['guest_performance_collection_engine']['alive'] = False
         if v['threads_status']['guest_performance_collection_engine']['timestamp'] + coupler_length >= g.ts:
             v['threads_status']['guest_performance_collection_engine']['alive'] = True
 
+        v['threads_status']['host_performance_collection_engine']['alive'] = False
         if v['threads_status']['host_performance_collection_engine']['timestamp'] + coupler_length >= g.ts:
             v['threads_status']['host_performance_collection_engine']['alive'] = True
 

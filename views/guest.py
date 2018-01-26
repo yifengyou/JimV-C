@@ -133,7 +133,7 @@ def create():
         password = request.form.get('password')
         remark = request.form.get('remark')
         allocation_by_random = 'allocation_by_random' in request.form
-        on_host = request.form.get('on_host')
+        node_id = request.form.get('node_id')
 
         if not isinstance(ability, basestring):
             pass
@@ -156,7 +156,7 @@ def create():
         }
 
         if not allocation_by_random:
-            payload['on_host'] = on_host
+            payload['node_id'] = node_id
 
         url = host_url + '/api/guest'
         headers = {'content-type': 'application/json'}
@@ -207,10 +207,18 @@ def port_is_opened(port):
 def vnc(uuid):
     host_url = request.host_url.rstrip('/')
 
+    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
     guest_url = host_url + url_for('api_guests.r_get', uuids=uuid)
 
     guest_ret = requests.get(url=guest_url, cookies=request.cookies)
     guest_ret = json.loads(guest_ret.content)
+
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     port = random.randrange(50000, 60000)
     while True:
@@ -219,7 +227,7 @@ def vnc(uuid):
 
         port = random.randrange(50000, 60000)
 
-    payload = {'listen_port': port, 'target_host': guest_ret['data']['on_host'],
+    payload = {'listen_port': port, 'target_host': hosts_mapping_by_node_id[guest_ret['data']['node_id']]['hostname'],
                'target_port': guest_ret['data']['vnc_port']}
     db.r.rpush(config['ipc_queue'], json.dumps(payload, ensure_ascii=False))
     time.sleep(1)

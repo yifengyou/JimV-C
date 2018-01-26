@@ -54,7 +54,7 @@ class EventProcessor(object):
     def guest_event_processor(cls):
         cls.guest.uuid = cls.message['message']['uuid']
         cls.guest.get_by('uuid')
-        cls.guest.on_host = cls.message['host']
+        cls.guest.node_id = cls.message['node_id']
         last_status = cls.guest.status
         cls.guest.status = cls.message['type']
 
@@ -108,7 +108,7 @@ class EventProcessor(object):
 
         # 限定特殊情况下更新磁盘所属 Guest，避免迁移、创建时频繁被无意义的更新
         if cls.guest.status in [GuestState.running.value, GuestState.shutoff.value]:
-            cls.disk.update_by_filter({'on_host': cls.guest.on_host}, filter_str='guest_uuid:eq:' + cls.guest.uuid)
+            cls.disk.update_by_filter({'node_id': cls.guest.node_id}, filter_str='guest_uuid:eq:' + cls.guest.uuid)
 
     @classmethod
     def host_event_processor(cls):

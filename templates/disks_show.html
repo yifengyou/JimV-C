@@ -158,8 +158,8 @@
 
             // 单机版加入与磁盘同一计算节点的过滤
             {% if show_on_host %}
-                var on_host = $(me.relatedTarget).parent().parent().parent().parent().prev().prev().prev().text();
-                url += '&filter=on_host:eq:' + on_host;
+                var node_id = $(me.relatedTarget).parent().parent().parent().parent().prev().prev().prev().text();
+                url += '&filter=node_id:eq:' + node_id;
             {% endif %}
 
             $.ajax({
@@ -626,6 +626,7 @@
                     <th>BPS</th>
                     <th>所属虚拟机</th>
                     <th style="{% if not show_on_host %}display: none;{% endif %}">所属计算节点</th>
+                    <th style="display: none;">NodeID</th>
                     <th>磁盘性别</th>
                     <th>创建时间</th>
                     <th>操作</th>
@@ -661,6 +662,7 @@
                     {% endif %}</a>
                     </td>
                     <td style="{% if not show_on_host %}display: none;{% endif %}">{{ hosts_mapping_by_node_id[item.node_id].hostname }}</td>
+                    <td style="display: none;">{{ item.node_id }}</td>
                     <td>
                         {% if item.sequence == 0 %}
                             系统盘

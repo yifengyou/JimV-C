@@ -170,13 +170,13 @@ def create():
         size = request.form.get('size')
         quantity = request.form.get('quantity')
         remark = request.form.get('remark')
-        on_host = request.form.get('on_host')
+        node_id = request.form.get('node_id')
 
         payload = {
             "size": int(size),
             "quantity": int(quantity),
             "remark": remark,
-            "on_host": on_host
+            "node_id": node_id
         }
 
         url = host_url + '/api/disk'

@@ -119,11 +119,11 @@
 
     function allocation_by_random_click_handler(me) {
         if ($(me).prop('checked')) {
-            $('#create_guest_form').formValidation('removeField', 'on_host');
-            $('#on_host').parent().parent().css('display', 'none');
+            $('#create_guest_form').formValidation('removeField', 'node_id');
+            $('#node_id').parent().parent().css('display', 'none');
         } else {
-            $('#create_guest_form').formValidation('addField', 'on_host', {validators: {notEmpty: {}}});
-            $('#on_host').parent().parent().css('display', 'unset');
+            $('#create_guest_form').formValidation('addField', 'node_id', {validators: {notEmpty: {}}});
+            $('#node_id').parent().parent().css('display', 'unset');
         }
     }
 </script>
@@ -249,9 +249,9 @@
                                 </div>
                             </div>
                             <div class="row form-group" style="display: none;">
-                                <select id="on_host" name="on_host" title="请选择计算节点..." class="selectpicker" data-width="100%">
+                                <select id="node_id" name="node_id" title="请选择计算节点..." class="selectpicker" data-width="100%">
                                     {% for item in hosts_ret.data %}
-                                        <option value="{{ item.hostname }}" data-icon="{{ item.icon }}">&nbsp;&nbsp;{{ item.hostname }}</option>
+                                        <option value="{{ item.node_id }}" data-icon="{{ item.icon }}">&nbsp;&nbsp;{{ item.hostname }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

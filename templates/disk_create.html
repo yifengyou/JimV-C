@@ -38,7 +38,7 @@
             $('.add-transition').addClass(transAttr);
         });
         {% if show_on_host %}
-            refresh_hosts_selectpicker($('#on_host'));
+            refresh_hosts_selectpicker($('#node_id'));
         {% else %}
             $('#on_host_form').remove();
         {% endif %}
@@ -119,7 +119,7 @@
                 selectpicker.empty();
                 $.each(data.data, function(k, v) {
                     selectpicker.append(
-                        $('<option>', {value: v['hostname'], text: v['hostname']})
+                        $('<option>', {value: v['node_id'], text: v['hostname']})
                     );
                 });
                 selectpicker.selectpicker('refresh');
@@ -159,7 +159,7 @@
                     <div id="on_host_form" class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-desktop"></span>&nbsp;&nbsp;计算节点</label>
                         <div class="col-sm-6">
-                            <select id="on_host" name="on_host" title="计算节点" class="selectpicker">
+                            <select id="node_id" name="node_id" title="计算节点" class="selectpicker">
                             </select>
                         </div>
                     </div>
