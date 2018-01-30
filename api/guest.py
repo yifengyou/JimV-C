@@ -147,8 +147,9 @@ def r_create():
             disk.size = 0
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
             disk.guest_uuid = ''
-            disk.quota(config=config)
             # disk.node_id 由 guest 事件处理机更新。涉及迁移时，其所属 node_id 会变更。参见 models/event_processory.py:111 附近。
+            disk.node_id = 0
+            disk.quota(config=config)
             disk.create()
 
             guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template.os_type)

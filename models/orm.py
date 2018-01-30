@@ -37,11 +37,17 @@ class ORM(object):
             cursor.execute(sql_stmt, self.__dict__)
             cnx.commit()
         except errors.IntegrityError, e:
+            ret = dict()
             if e.errno == errorcode.ER_DUP_ENTRY:
-                ret = dict()
                 ret['state'] = ji.Common.exchange_state(40901)
-                ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', e.msg])
-                raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+            elif e.errno == errorcode.ER_BAD_NULL_ERROR:
+                ret['state'] = ji.Common.exchange_state(41202)
+            else:
+                ret['state'] = ji.Common.exchange_state(50002)
+
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', e.msg])
+            raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+
         finally:
             cursor.close()
             cnx.close()
@@ -65,11 +71,17 @@ class ORM(object):
             cursor.execute(sql_stmt, self.__dict__)
             cnx.commit()
         except errors.IntegrityError, e:
+            ret = dict()
             if e.errno == errorcode.ER_DUP_ENTRY:
-                ret = dict()
                 ret['state'] = ji.Common.exchange_state(40901)
-                ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', e.msg])
-                raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+            elif e.errno == errorcode.ER_BAD_NULL_ERROR:
+                ret['state'] = ji.Common.exchange_state(41202)
+            else:
+                ret['state'] = ji.Common.exchange_state(50002)
+
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', e.msg])
+            raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+
         finally:
             cursor.close()
             cnx.close()

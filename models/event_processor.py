@@ -102,6 +102,9 @@ class EventProcessor(object):
                     cls.guest_migrate_info.create()
 
         elif cls.guest.status == GuestState.creating.value:
+            if cls.message['message']['progress'] <= cls.guest.progress:
+                return
+
             cls.guest.progress = cls.message['message']['progress']
 
         cls.guest.update()
