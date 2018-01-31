@@ -95,7 +95,7 @@ def r_create():
             disk.size = size
             disk.uuid = uuid4().__str__()
             disk.remark = request.json.get('remark', '')
-            disk.node_id = node_id
+            disk.node_id = int(node_id)
             disk.sequence = -1
             disk.format = 'qcow2'
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format

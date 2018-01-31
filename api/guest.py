@@ -100,7 +100,6 @@ def r_create():
 
         # 当指定了 host 时，取全部活着的 hosts
         if node_id is not None:
-            node_id = int(node_id)
             available_hosts = Host.get_available_hosts(nonrandom=None)
 
         if available_hosts.__len__() == 0:
@@ -162,6 +161,7 @@ def r_create():
             if node_id is not None:
                 guest.node_id = node_id
 
+            guest.node_id = int(guest.node_id)
             guest.create()
 
             # 替换占位符为有效内容
