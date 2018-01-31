@@ -3,7 +3,6 @@
 
 
 import jimit as ji
-import json
 
 from filter import FilterFieldType
 from orm import ORM
@@ -50,6 +49,7 @@ class Guest(ORM):
             'id': FilterFieldType.INT.value,
             'uuid': FilterFieldType.STR.value,
             'label': FilterFieldType.STR.value,
+            'status': FilterFieldType.INT.value,
             'remark': FilterFieldType.STR.value,
             'node_id': FilterFieldType.INT.value,
             'ip': FilterFieldType.STR.value
