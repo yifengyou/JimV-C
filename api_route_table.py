@@ -10,6 +10,10 @@ from api import disk
 from api import boot_job
 from api import operate_rule
 from api import os_template
+from api import os_template_image
+from api import os_template_profile
+from api import os_template_initialize_operate_set
+from api import os_template_initialize_operate
 from api import log
 from api import host
 from api import guest_performance
@@ -59,6 +63,51 @@ add_rule_api(os_template.blueprints, '/<ids>', api_func='os_template.r_delete', 
 add_rule_api(os_template.blueprints, '/<ids>', api_func='os_template.r_get', methods=['GET'])
 add_rule_api(os_template.blueprints, '', api_func='os_template.r_get_by_filter', methods=['GET'])
 add_rule_api(os_template.blueprints, '/_search', api_func='os_template.r_content_search', methods=['GET'])
+
+# 系统模板镜像操作
+add_rule_api(os_template_image.blueprint, '', api_func='os_template_image.r_create', methods=['POST'])
+add_rule_api(os_template_image.blueprint, '/<_id>', api_func='os_template_image.r_update', methods=['PATCH'])
+add_rule_api(os_template_image.blueprints, '/<ids>', api_func='os_template_image.r_delete', methods=['DELETE'])
+add_rule_api(os_template_image.blueprints, '/<ids>', api_func='os_template_image.r_get', methods=['GET'])
+add_rule_api(os_template_image.blueprints, '', api_func='os_template_image.r_get_by_filter', methods=['GET'])
+add_rule_api(os_template_image.blueprints, '/_search', api_func='os_template_image.r_content_search', methods=['GET'])
+
+# 系统模板描述文件操作
+add_rule_api(os_template_profile.blueprint, '', api_func='os_template_profile.r_create', methods=['POST'])
+add_rule_api(os_template_profile.blueprint, '/<_id>', api_func='os_template_profile.r_update', methods=['PATCH'])
+add_rule_api(os_template_profile.blueprints, '/<ids>', api_func='os_template_profile.r_delete', methods=['DELETE'])
+add_rule_api(os_template_profile.blueprints, '/<ids>', api_func='os_template_profile.r_get', methods=['GET'])
+add_rule_api(os_template_profile.blueprints, '', api_func='os_template_profile.r_get_by_filter', methods=['GET'])
+add_rule_api(os_template_profile.blueprints, '/_search', api_func='os_template_profile.r_content_search',
+             methods=['GET'])
+
+# 系统模板初始化操作集操作
+add_rule_api(os_template_initialize_operate_set.blueprint, '',
+             api_func='os_template_initialize_operate_set.r_create', methods=['POST'])
+add_rule_api(os_template_initialize_operate_set.blueprint, '/<_id>',
+             api_func='os_template_initialize_operate_set.r_update', methods=['PATCH'])
+add_rule_api(os_template_initialize_operate_set.blueprints, '/<ids>',
+             api_func='os_template_initialize_operate_set.r_delete', methods=['DELETE'])
+add_rule_api(os_template_initialize_operate_set.blueprints, '/<ids>',
+             api_func='os_template_initialize_operate_set.r_get', methods=['GET'])
+add_rule_api(os_template_initialize_operate_set.blueprints, '',
+             api_func='os_template_initialize_operate_set.r_get_by_filter', methods=['GET'])
+add_rule_api(os_template_initialize_operate_set.blueprints, '/_search',
+             api_func='os_template_initialize_operate_set.r_content_search', methods=['GET'])
+
+# 系统模板初始化操作细则
+add_rule_api(os_template_initialize_operate.blueprint, '',
+             api_func='os_template_initialize_operate.r_create', methods=['POST'])
+add_rule_api(os_template_initialize_operate.blueprint, '/<_id>',
+             api_func='os_template_initialize_operate.r_update', methods=['PATCH'])
+add_rule_api(os_template_initialize_operate.blueprints, '/<ids>',
+             api_func='os_template_initialize_operate.r_delete', methods=['DELETE'])
+add_rule_api(os_template_initialize_operate.blueprints, '/<ids>',
+             api_func='os_template_initialize_operate.r_get', methods=['GET'])
+add_rule_api(os_template_initialize_operate.blueprints, '',
+             api_func='os_template_initialize_operate.r_get_by_filter', methods=['GET'])
+add_rule_api(os_template_initialize_operate.blueprints, '/_search',
+             api_func='os_template_initialize_operate.r_content_search', methods=['GET'])
 
 # Guest操作
 # 创建虚拟机

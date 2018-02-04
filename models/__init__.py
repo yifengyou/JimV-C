@@ -47,6 +47,22 @@ from os_template import (
     OSTemplate
 )
 
+from os_template_image import (
+    OSTemplateImage
+)
+
+from os_template_profile import (
+    OSTemplateProfile
+)
+
+from os_template_initialize_operate_set import (
+    OSTemplateInitializeOperateSet
+)
+
+from os_template_initialize_operate import (
+    OSTemplateInitializeOperate
+)
+
 from status import (
     EmitKind,
     GuestState,
@@ -94,6 +110,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState', 'OSType',
     'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'BootJob', 'OperateRule', 'OSTemplate', 'GuestXML', 'Log',
+    'OSTemplateImage', 'OSTemplateProfile', 'OSTemplateInitializeOperateSet', 'OSTemplateInitializeOperate',
     'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO', 'HostCPUMemory', 'HostTraffic',
     'HostDiskUsageIO', 'Host'
 ]
