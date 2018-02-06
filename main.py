@@ -25,12 +25,22 @@ from models import Database as db
 from models import Config
 from models import User
 from api.user import blueprint as user_blueprint
+
 from api.boot_job import blueprint as boot_job_blueprint
 from api.boot_job import blueprints as boot_job_blueprints
 from api.operate_rule import blueprint as operate_rule_blueprint
 from api.operate_rule import blueprints as operate_rule_blueprints
 from api.os_template import blueprint as os_template_blueprint
 from api.os_template import blueprints as os_template_blueprints
+
+from api.os_template_image import blueprint as os_template_image_blueprint
+from api.os_template_image import blueprints as os_template_image_blueprints
+from api.os_template_initialize_operate_set import blueprint as os_template_initialize_operate_set_blueprint
+from api.os_template_initialize_operate_set import blueprints as os_template_initialize_operate_set_blueprints
+from api.os_template_initialize_operate import blueprint as os_template_initialize_operate_blueprint
+from api.os_template_initialize_operate import blueprints as os_template_initialize_operate_blueprints
+from api.os_template_profile import blueprint as os_template_profile_blueprint
+from api.os_template_profile import blueprints as os_template_profile_blueprints
 from api.guest import blueprint as guest_blueprint
 from api.guest import blueprints as guest_blueprints
 from api.disk import blueprint as disk_blueprint
@@ -55,12 +65,16 @@ from views.disk import blueprint as view_disk_blueprint
 from views.disk import blueprints as view_disk_blueprints
 from views.log import blueprint as view_log_blueprint
 from views.log import blueprints as view_log_blueprints
+from views.os_template_image import blueprint as view_os_template_image_blueprint
+from views.os_template_image import blueprints as view_os_template_image_blueprints
+
 from views.os_template import blueprint as view_os_template_blueprint
 from views.os_template import blueprints as view_os_template_blueprints
 from views.boot_job import blueprint as view_boot_job_blueprint
 from views.boot_job import blueprints as view_boot_job_blueprints
 from views.operate_rule import blueprint as view_operate_rule_blueprint
 from views.operate_rule import blueprints as view_operate_rule_blueprints
+
 from views.host import blueprint as view_host_blueprint
 from views.host import blueprints as view_host_blueprints
 
@@ -211,12 +225,22 @@ try:
     db.init_conn_redis()
 
     app.register_blueprint(user_blueprint)
+
     app.register_blueprint(boot_job_blueprint)
     app.register_blueprint(boot_job_blueprints)
     app.register_blueprint(operate_rule_blueprint)
     app.register_blueprint(operate_rule_blueprints)
     app.register_blueprint(os_template_blueprint)
     app.register_blueprint(os_template_blueprints)
+
+    app.register_blueprint(os_template_image_blueprint)
+    app.register_blueprint(os_template_image_blueprints)
+    app.register_blueprint(os_template_initialize_operate_set_blueprint)
+    app.register_blueprint(os_template_initialize_operate_set_blueprints)
+    app.register_blueprint(os_template_initialize_operate_blueprint)
+    app.register_blueprint(os_template_initialize_operate_blueprints)
+    app.register_blueprint(os_template_profile_blueprint)
+    app.register_blueprint(os_template_profile_blueprints)
     app.register_blueprint(guest_blueprint)
     app.register_blueprint(guest_blueprints)
     app.register_blueprint(disk_blueprint)
@@ -240,12 +264,16 @@ try:
     app.register_blueprint(view_disk_blueprints)
     app.register_blueprint(view_log_blueprint)
     app.register_blueprint(view_log_blueprints)
+    app.register_blueprint(view_os_template_image_blueprint)
+    app.register_blueprint(view_os_template_image_blueprints)
+
     app.register_blueprint(view_os_template_blueprint)
     app.register_blueprint(view_os_template_blueprints)
     app.register_blueprint(view_boot_job_blueprint)
     app.register_blueprint(view_boot_job_blueprints)
     app.register_blueprint(view_operate_rule_blueprint)
     app.register_blueprint(view_operate_rule_blueprints)
+
     app.register_blueprint(view_host_blueprint)
     app.register_blueprint(view_host_blueprints)
 

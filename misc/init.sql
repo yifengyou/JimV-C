@@ -115,9 +115,12 @@ ALTER TABLE disk ADD INDEX (remark);
 -- 操作系统模板镜像
 CREATE TABLE IF NOT EXISTS os_template_image(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    os_template_profile_id BIGINT UNSIGNED NOT NULL,
+    label VARCHAR(255) NOT NULL,
+    description TEXT,
     path VARCHAR(255) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
+    icon VARCHAR(255) NOT NULL,
+    os_template_profile_id BIGINT UNSIGNED NOT NULL,
     PRIMARY KEY (id))
     ENGINE=InnoDB
     DEFAULT CHARSET=utf8;
@@ -127,7 +130,7 @@ CREATE TABLE IF NOT EXISTS os_template_image(
 CREATE TABLE IF NOT EXISTS os_template_profile(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     label VARCHAR(255) NOT NULL,
-    describe TEXT NOT NULL DEFAULT '',
+    description TEXT,
     -- http://libguestfs.org/guestfish.1.html#inspect-get-type
     os_type VARCHAR(10) NOT NULL,
     -- http://libguestfs.org/guestfish.1.html#inspect-get-distro
@@ -154,7 +157,7 @@ ALTER TABLE os_template_profile ADD INDEX (os_product_name);
 CREATE TABLE IF NOT EXISTS os_template_initialize_operate_set(
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     label VARCHAR(255) NOT NULL,
-    describe TEXT NOT NULL DEFAULT '',
+    description TEXT,
     active BOOLEAN NOT NULL DEFAULT TRUE,
     PRIMARY KEY (id))
     ENGINE=InnoDB
@@ -170,8 +173,8 @@ CREATE TABLE IF NOT EXISTS os_template_initialize_operate(
     kind TINYINT UNSIGNED NOT NULL DEFAULT 0,
     sequence TINYINT UNSIGNED NOT NULL DEFAULT 0,
     path VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL DEFAULT '',
-    command TEXT NOT NULL DEFAULT '',
+    content TEXT,
+    command TEXT,
     PRIMARY KEY (id))
     ENGINE=InnoDB
     DEFAULT CHARSET=utf8;
@@ -354,10 +357,10 @@ ALTER TABLE host_disk_usage_io ADD INDEX (timestamp);
 ALTER TABLE host_disk_usage_io ADD INDEX (node_id, mountpoint, timestamp);
 
 
-INSERT INTO os_template_initialize_operate_set (label, describe, active) VALUES ('CentOS-Systemd', '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。', 1);
-INSERT INTO os_template_initialize_operate_set (label, describe, active) VALUES ('CentOS-SysV', '用作 Redhat SysV 系列的系统初始化。初始化操作依据 CentOS 6.8 来实现。', 1);
-INSERT INTO os_template_initialize_operate_set (label, describe, active) VALUES ('Gentoo-OpenRC', '用作 Gentoo OpenRC 系列的系统初始化。', 1);
-INSERT INTO os_template_initialize_operate_set (label, describe, active) VALUES ('Windows', '用作 MS-Windows 系列的系统初始化。初始化操作依据 Windows 2012 来实现。', 1);
+INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-Systemd', '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。', 1);
+INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-SysV', '用作 Redhat SysV 系列的系统初始化。初始化操作依据 CentOS 6.8 来实现。', 1);
+INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('Gentoo-OpenRC', '用作 Gentoo OpenRC 系列的系统初始化。', 1);
+INSERT INTO os_template_initialize_operate_set (label, descriptione, active) VALUES ('Windows', '用作 MS-Windows 系列的系统初始化。初始化操作依据 Windows 2012 来实现。', 1);
 
 -- For CentOS-Systemd
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (1, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}
@@ -413,11 +416,11 @@ timeout 2 > NUL
 shutdown -r -t 0', '');
 
 
-INSERT INTO os_template_profile (label, describe, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
+INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('CentOS-7.4', 'CentOS 7.4。', 'linux', 'centos', 7, 4, 'x86_64', 'CentOS Linux release 7.4.1708 (Core)', 1, 'icon-os icon-os-centos', 1);
-INSERT INTO os_template_profile (label, describe, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
+INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('CentOS-6.8', 'CentOS 6.8。', 'linux', 'centos', 6, 8, 'x86_64', 'CentOS release 6.8 (Final)', 1, 'icon-os icon-os-centos', 2);
-INSERT INTO os_template_profile (label, describe, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
+INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('Gentoo-2.2', 'Gentoo 2.2。', 'linux', 'gentoo', 2, 2, 'x86_64', 'Gentoo Base System release 2.2', 1, 'icon-os icon-os-gentoo', 3);
-INSERT INTO os_template_profile (label, describe, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
-VALUES ('Windows-2012-R2-Standard', 'Windows 2012 R2 Standard。', 'windows', 'windows', 6, 3, 'x86_64', 'Windows Server 2012 R2 Standard', 1, 'icon-os icon-os-gentoo', 4);
+INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
+VALUES ('Windows-2012-R2-Standard', 'Windows 2012 R2 Standard。', 'windows', 'windows', 6, 3, 'x86_64', 'Windows Server 2012 R2 Standard', 1, 'icon-os icon-os-windows', 4);

@@ -135,16 +135,16 @@
         });
 
         $('#edit_label_modal').on('show.bs.modal', function (me) {
-            $('#os_template_id').val($(me.relatedTarget).parent().parent().prev().prev().text());
+            $('#os_template_image_id').val($(me.relatedTarget).parent().parent().prev().prev().text());
             $('#edit_label').val($(me.relatedTarget).prev().text());
         });
 
         $('#edit_path_modal').on('show.bs.modal', function (me) {
-            $('#os_template_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().text());
+            $('#os_template_image_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().text());
             $('#edit_path').val($(me.relatedTarget).prev().text());
         });
 
-        $('#add_os_template_modal').on('show.bs.modal', function (me) {
+        $('#add_os_template_image_modal').on('show.bs.modal', function (me) {
             refresh_os_template_boot_job_selectpicker($('#boot_job_id'));
         });
 
@@ -153,16 +153,16 @@
         });
 
         $('#update_os_type_modal').on('show.bs.modal', function (me) {
-            $('#os_template_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().text());
+            $('#os_template_image_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().text());
             $('#update_os_type_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().text());
         });
 
         $('#update_icon_modal').on('show.bs.modal', function (me) {
-            $('#os_template_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().prev().text());
+            $('#os_template_image_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().prev().text());
             $('#update_icon_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().prev().text());
         });
 
-        $('#add_os_template_form').formValidation({
+        $('#add_os_template_image_form').formValidation({
             framework: 'bootstrap4',
             icon: {
                 valid: 'fa fa-check',
@@ -259,42 +259,42 @@
     }
 
     function label_update(me) {
-        var os_template_id = $('#os_template_id').val();
+        var os_template_image_id = $('#os_template_image_id').val();
         var label = $('#edit_label').val();
         $('#edit_label_modal').modal('hide');
         $.ajax({
-            url : '/api/os_template/' + os_template_id,
+            url : '/api/os_template_image/' + os_template_image_id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
                 label: label
             }),
             error : function() {
-                alter_danger('模板名称更新失败！');
+                alter_danger('模板镜像名称更新失败！');
             },
             success : function() {
-                alter_success('模板名称更新成功！');
+                alter_success('模板镜像名称更新成功！');
                 refresh()
             }
         });
     }
 
     function path_update(me) {
-        var os_template_id = $('#os_template_id').val();
+        var os_template_image_id = $('#os_template_image_id').val();
         var path = $('#edit_path').val();
         $('#edit_path_modal').modal('hide');
         $.ajax({
-            url : '/api/os_template/' + os_template_id,
+            url : '/api/os_template_image/' + os_template_image_id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
                 path: path
             }),
             error : function() {
-                alter_danger('模板路径更新失败！');
+                alter_danger('模板镜像路径更新失败！');
             },
             success : function() {
-                alter_success('模板路径更新成功！');
+                alter_success('模板镜像路径更新成功！');
                 refresh()
             }
         });
@@ -343,7 +343,7 @@
 
     function enable(id) {
         $.ajax({
-            url : '/api/os_template/' + id,
+            url : '/api/os_template_image/' + id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
@@ -361,7 +361,7 @@
 
     function disable(id) {
         $.ajax({
-            url : '/api/os_template/' + id,
+            url : '/api/os_template_image/' + id,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
@@ -392,60 +392,6 @@
         });
     }
 
-    function update_boot_job(id) {
-        $.ajax({
-            url : '/api/os_template/' + id,
-            type : 'PATCH',
-            contentType: "application/json; charset=utf-8",
-            data : JSON.stringify({
-                boot_job_id: parseInt($('#update_boot_job_id').val())
-            }),
-            error : function() {
-                alter_danger('变更初始化作业指令发送失败！');
-            },
-            success : function() {
-                alter_success('变更初始化作业指令发送成功！');
-                refresh();
-            }
-        });
-    }
-
-    function update_os_type(id) {
-        $.ajax({
-            url : '/api/os_template/' + id,
-            type : 'PATCH',
-            contentType: "application/json; charset=utf-8",
-            data : JSON.stringify({
-                os_type: parseInt($('#update_os_type').val())
-            }),
-            error : function() {
-                alter_danger('变更操作系统类型指令发送失败！');
-            },
-            success : function() {
-                alter_success('变更操作系统类型指令发送成功！');
-                refresh();
-            }
-        });
-    }
-
-    function update_icon(id) {
-        $.ajax({
-            url : '/api/os_template/' + id,
-            type : 'PATCH',
-            contentType: "application/json; charset=utf-8",
-            data : JSON.stringify({
-                icon: $('#update_icon').val()
-            }),
-            error : function() {
-                alter_danger('变更 ICON 指令发送失败！');
-            },
-            success : function() {
-                alter_success('变更 ICON 指令发送成功！');
-                refresh();
-            }
-        });
-    }
-
     function enable_at(me) {
         var id = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
         enable(id);
@@ -457,33 +403,15 @@
     }
 
     function delete_at(me) {
-        var id = $('#os_template_id').val();
+        var id = $('#os_template_image_id').val();
         remove(id);
         $('#delete_modal').modal('hide');
-    }
-
-    function update_boot_job_at(me) {
-        var id = $('#os_template_id').val();
-        update_boot_job(id);
-        $('#update_boot_job_modal').modal('hide');
-    }
-
-    function update_os_type_at(me) {
-        var id = $('#os_template_id').val();
-        update_os_type(id);
-        $('#update_os_type_modal').modal('hide');
-    }
-
-    function update_icon_at(me) {
-        var id = $('#os_template_id').val();
-        update_icon(id);
-        $('#update_icon_modal').modal('hide');
     }
 </script>
 <div class="panel">
     <div class="panel-body">
         <h3 class="title-hero" style="font-size: 24px;">
-            虚拟机模板
+            虚拟机模板镜像
         </h3>
         <div>
             <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
@@ -494,11 +422,11 @@
                         </div>
                         <div class="pull-right">
                             <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
-                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_os_template_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加模板</a>
+                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_os_template_image_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加模板</a>
                         </div>
                     </div>
                 </div>
-                <table id="os_template_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                <table id="os_templates_image_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
                        style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
                 <thead>
                 <tr role="row">
@@ -507,14 +435,12 @@
                     <th width="180px;">名称</th>
                     <th>状态</th>
                     <th width="500px;">路径</th>
-                    <th>操作系统类型</th>
-                    <th>ICON</th>
-                    <th>初始化作业</th>
+                    <th>发行版本</th>
                     <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in os_templates_ret.data %}
+                {% for item in os_templates_image_ret.data %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
                     <td style="display: none;">{{ item.id }}</td>
                     <td><input title="选中" type="checkbox"></td>
@@ -541,19 +467,10 @@
                         </div>
                     </td>
                     <td>
-                        <a href="javascript:;" data-toggle="modal" data-target="#update_os_type_modal">
-                            {{ item.os_type }}
-                        </a>
-                    </td>
-                    <td>
-                        <a href="javascript:;" data-toggle="modal" data-target="#update_icon_modal">
-                            <span class="{{ item.icon }}"></span>
-                        </a>
-                    </td>
-                    <td>
-                        <a href="/boot_jobs?boot_job_id={{ item.boot_job_id }}">
-                            {{ boot_jobs_mapping_by_id[item.boot_job_id].name }}
-                        </a>
+                        <div>
+                            <span class="{{ os_templates_profile_mapping_by_id[item.id].icon }}"></span>
+                            <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.id].os_product_name }}</p>
+                        </div>
                     </td>
                     <td>
                         <div class="dropdown inline-block">
@@ -574,15 +491,15 @@
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
                                 <li>
                                     <a href="javascript:;" data-toggle="modal" data-target="#update_boot_job_modal"
-                                        onclick="$('#os_template_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                        onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                         $('#update_boot_job_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
-                                        变更初始化作业
+                                        变更发行版本
                                     </a>
                                 </li>
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
                                 <li>
                                     <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
-                                       onclick="$('#os_template_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                       onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                        $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
                                         删除
                                     </a>
@@ -604,7 +521,7 @@
                                 <div class="col-sm-6">
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                    共有{{ os_templates_ret.paging.total }}条，每页显示：
+                                    共有{{ os_templates_image_ret.paging.total }}条，每页显示：
                                     <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
                                         <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
                                         <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
@@ -638,16 +555,16 @@
     </div>
 </div>
 
-<input id="os_template_id" title="模板 ID" class="form-control" name="os_template_id" hidden>
+<input id="os_template_image_id" title="模板 ID" class="form-control" name="os_template_image_id" hidden>
 
 <div class="modal" id="edit_label_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">编辑模板名称：</h4>
+                <h4 class="modal-title">编辑模板镜像名称：</h4>
             </div>
             <div class="modal-body">
-                <input id="edit_label" title="系统模板名称" class="form-control" name="os_template_label">
+                <input id="edit_label" title="系统模板镜像名称" class="form-control" name="os_template_image_label">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="label_update();">确定</button>
@@ -661,10 +578,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">编辑模板路径：</h4>
+                <h4 class="modal-title">编辑模板镜像路径：</h4>
             </div>
             <div class="modal-body">
-                <input id="edit_path" title="系统模板路径" class="form-control" name="os_template_path">
+                <input id="edit_path" title="系统模板镜像路径" class="form-control" name="os_template_image_path">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="path_update();">确定</button>
@@ -681,7 +598,7 @@
                 <h4 class="modal-title">删除模板：</h4>
             </div>
             <div class="modal-body">
-                <p>你确定要删除该模板吗？</p>
+                <p>你确定要删除该模板镜像吗？</p>
                 <h3 style="color: orangered;" id="delete_instance_desc"></h3>
             </div>
             <div class="modal-footer">
@@ -692,20 +609,20 @@
     </div>
 </div>
 
-<div class="modal" id="add_os_template_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="add_os_template_image_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">添加模板：</h4>
+                <h4 class="modal-title">添加模板镜像：</h4>
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form id="add_os_template_form" class="form-horizontal bordered-row" action="/os_template" method="post">
+                    <form id="add_os_template_image_form" class="form-horizontal bordered-row" action="/os_template_image" method="post">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板名称</label>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板镜像名称</label>
                             <div class="col-sm-6">
-                                <input id="label" name="label" type="text" title="模板名称" class="form-control">
+                                <input id="label" name="label" type="text" title="模板镜像名称" class="form-control">
                             </div>
                         </div>
                         <div class="form-group">
@@ -767,39 +684,6 @@
     </div>
 </div>
 
-<div class="modal" id="update_boot_job_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">变更初始化作业：</h4>
-            </div>
-            <div class="modal-body" style="padding-top: 0;">
-                <form class="form-horizontal bordered-row">
-                    <div class="form-group">
-                        <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板名称</label>
-                        <div class="col-sm-8">
-                            <h3 style="color: orangered;" id="update_boot_job_instance_desc"></h3>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-file-code-o"></span>&nbsp;&nbsp;初始化作业</label>
-                        <div class="col-sm-8">
-                            <select id="update_boot_job_id" name="boot_job_id" title="实例的启动作业" class="selectpicker">
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="update_boot_job_at();">确定</button>
-                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal" id="update_os_type_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -837,44 +721,4 @@
     </div>
 </div>
 
-<div class="modal" id="update_icon_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">变更 ICON：</h4>
-            </div>
-            <div class="modal-body" style="padding-top: 0;">
-                <form class="form-horizontal bordered-row">
-                    <div class="form-group">
-                        <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板名称</label>
-                        <div class="col-sm-8">
-                            <h3 style="color: orangered;" id="update_icon_instance_desc"></h3>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-1"></div>
-                        <div class="col-sm-8">
-                            <select id="update_icon" name="icon" title="模板 ICON" class="selectpicker">
-                                <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos" selected>CentOS</option>
-                                <option value="icon-os icon-os-linux" data-icon="icon-os icon-os-linux">Linux</option>
-                                <option value="icon-os icon-os-ubuntu" data-icon="icon-os icon-os-ubuntu">Ubuntu</option>
-                                <option value="icon-os icon-os-suse" data-icon="icon-os icon-os-suse">Suse</option>
-                                <option value="icon-os icon-os-gentoo" data-icon="icon-os icon-os-gentoo">Gentoo</option>
-                                <option value="icon-os icon-os-debian" data-icon="icon-os icon-os-debian">Debian</option>
-                                <option value="icon-os icon-os-redhat" data-icon="icon-os icon-os-redhat">Redhat</option>
-                                <option value="icon-os icon-os-bsd" data-icon="icon-os icon-os-bsd">BSD</option>
-                                <option value="icon-os icon-os-windows" data-icon="icon-os icon-os-windows">Windows</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="update_icon_at();">确定</button>
-                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock content %}

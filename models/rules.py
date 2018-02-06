@@ -86,7 +86,7 @@ class Rules(Enum):
     REMARK = (basestring, 'remark')
     USE_FOR = (int, 'use_for')
     LABEL = (basestring, 'label')
-    DESCRIBE = (basestring, 'describe')
+    DESCRIPTION = (basestring, 'description')
     OS_TYPE = (basestring, 'os_type')
     OS_DISTRO = (basestring, 'os_distro')
     OS_MAJOR = (int, 'os_major')

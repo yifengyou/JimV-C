@@ -3,7 +3,15 @@
 
 
 from models.utils import add_rule_views
-from views import guest, disk, log, os_template, boot_job, operate_rule, host, dashboard, config, misc
+from views import guest
+from views import disk
+from views import log
+from views import host
+from views import dashboard
+from views import config
+from views import misc
+from views import os_template_image
+from views import os_template, boot_job, operate_rule
 
 
 __author__ = 'James Iter'
@@ -35,6 +43,9 @@ add_rule_views(disk.blueprints, '/create', views_func='disk.create', methods=['G
 add_rule_views(disk.blueprint, '/detail/<uuid>', views_func='disk.detail', methods=['GET', 'POST'])
 
 add_rule_views(log.blueprints, '', views_func='log.show', methods=['GET'])
+
+add_rule_views(os_template_image.blueprints, '', views_func='os_template_image.show', methods=['GET'])
+add_rule_views(os_template_image.blueprint, '', views_func='os_template_image.create', methods=['POST'])
 
 add_rule_views(os_template.blueprints, '', views_func='os_template.show', methods=['GET'])
 add_rule_views(os_template.blueprint, '', views_func='os_template.create', methods=['POST'])

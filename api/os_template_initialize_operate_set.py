@@ -43,12 +43,12 @@ def r_create():
 
     args_rules = [
         Rules.LABEL.value,
-        Rules.DESCRIBE.value,
+        Rules.DESCRIPTION.value,
         Rules.ACTIVE.value
     ]
 
     os_template_initialize_operate_set.label = request.json.get('label')
-    os_template_initialize_operate_set.describe = request.json.get('describe')
+    os_template_initialize_operate_set.description = request.json.get('description')
     os_template_initialize_operate_set.active = request.json.get('active')
 
     try:
@@ -85,9 +85,9 @@ def r_update(_id):
             Rules.LABEL.value,
         )
 
-    if 'describe' in request.json:
+    if 'description' in request.json:
         args_rules.append(
-            Rules.DESCRIBE.value,
+            Rules.DESCRIPTION.value,
         )
 
     if 'active' in request.json:
@@ -107,8 +107,8 @@ def r_update(_id):
         os_template_initialize_operate_set.id = request.json.get('id')
         os_template_initialize_operate_set.get()
         os_template_initialize_operate_set.label = request.json.get('label', os_template_initialize_operate_set.label)
-        os_template_initialize_operate_set.describe = \
-            request.json.get('describe', os_template_initialize_operate_set.describe)
+        os_template_initialize_operate_set.description = \
+            request.json.get('description', os_template_initialize_operate_set.description)
         os_template_initialize_operate_set.active = \
             request.json.get('active', os_template_initialize_operate_set.active)
 

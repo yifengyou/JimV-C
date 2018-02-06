@@ -20,6 +20,9 @@ class OSTemplateImage(ORM):
     def __init__(self):
         super(OSTemplateImage, self).__init__()
         self.id = 0
+        self.label = None
+        self.description = None
+        self.icon = None
         self.os_template_profile_id = None
         self.path = None
         self.active = True
@@ -28,8 +31,9 @@ class OSTemplateImage(ORM):
     def get_filter_keywords():
         return {
             'id': FilterFieldType.INT.value,
-            'os_template_profile_id': FilterFieldType.INT.value,
+            'label': FilterFieldType.STR.value,
             'path': FilterFieldType.STR.value,
+            'os_template_profile_id': FilterFieldType.INT.value,
             'active': FilterFieldType.INT.value
         }
 
@@ -39,4 +43,5 @@ class OSTemplateImage(ORM):
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['path']
+        return ['label', 'path']
+

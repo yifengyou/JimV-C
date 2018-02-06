@@ -21,7 +21,7 @@ class OSTemplateInitializeOperateSet(ORM):
         super(OSTemplateInitializeOperateSet, self).__init__()
         self.id = 0
         self.label = None
-        self.describe = ''
+        self.description = ''
         self.active = True
 
     @staticmethod

@@ -21,7 +21,7 @@ class OSTemplateProfile(ORM):
         super(OSTemplateProfile, self).__init__()
         self.id = 0
         self.label = None
-        self.describe = ''
+        self.description = ''
         self.os_type = None
         self.os_distro = None
         self.os_major = None

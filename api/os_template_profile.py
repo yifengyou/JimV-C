@@ -42,7 +42,7 @@ def r_create():
 
     args_rules = [
         Rules.LABEL.value,
-        Rules.DESCRIBE.value,
+        Rules.DESCRIPTION.value,
         Rules.OS_TYPE.value,
         Rules.OS_DISTRO.value,
         Rules.OS_MAJOR.value,
@@ -55,7 +55,7 @@ def r_create():
     ]
 
     os_template_profile.label = request.json.get('label')
-    os_template_profile.describe = request.json.get('describe')
+    os_template_profile.description = request.json.get('description')
     os_template_profile.os_type = request.json.get('os_type')
     os_template_profile.os_distro = request.json.get('os_distro')
     os_template_profile.os_major = request.json.get('os_major')
@@ -101,9 +101,9 @@ def r_update(_id):
             Rules.LABEL.value,
         )
 
-    if 'describe' in request.json:
+    if 'description' in request.json:
         args_rules.append(
-            Rules.DESCRIBE.value,
+            Rules.DESCRIPTION.value,
         )
 
     if 'os_type' in request.json:
@@ -164,7 +164,7 @@ def r_update(_id):
 
         os_template_profile.get()
         os_template_profile.label = request.json.get('label', os_template_profile.label)
-        os_template_profile.describe = request.json.get('describe', os_template_profile.describe)
+        os_template_profile.description = request.json.get('description', os_template_profile.description)
         os_template_profile.os_type = request.json.get('os_type', os_template_profile.os_type)
         os_template_profile.os_distro = request.json.get('os_distro', os_template_profile.os_distro)
         os_template_profile.os_major = request.json.get('os_major', os_template_profile.os_major)

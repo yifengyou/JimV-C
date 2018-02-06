@@ -39,6 +39,10 @@
             filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);
         }
 
+        .dropdown-menu {
+            min-width: 100% !important;
+        }
+
         @font-face {
             font-family: 'Baskerville';
             src: url('/static/fonts/Baskerville/Baskerville-Italic.eot');
@@ -361,6 +365,12 @@
                             <a href="{{ url_for('v_logs.show') }}" title="JimV 虚拟化平台日志">
                                 <i class="glyph-icon icon-linecons-eye"></i>
                                 <span>平台日志</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_os_templates_image.show') }}" title="虚拟机模板镜像列表">
+                                <i class="glyph-icon icon-linecons-inbox"></i>
+                                <span>虚拟机模板镜像</span>
                             </a>
                         </li>
                         <li>
