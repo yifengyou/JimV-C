@@ -145,21 +145,26 @@
         });
 
         $('#add_os_template_image_modal').on('show.bs.modal', function (me) {
-            refresh_os_template_boot_job_selectpicker($('#boot_job_id'));
+            refresh_os_template_profile_os_distro_selectpicker($('#os_distro'));
         });
 
-        $('#update_boot_job_modal').on('show.bs.modal', function (me) {
-            refresh_os_template_boot_job_selectpicker($('#update_boot_job_id'));
+        $('#os_distro').on('changed.bs.select', function (me) {
+            refresh_os_template_profile_id_selectpicker($('#os_template_profile_id'), me.currentTarget.value);
+            $('#os_template_profile_id').removeAttr('disabled');
         });
 
-        $('#update_os_type_modal').on('show.bs.modal', function (me) {
-            $('#os_template_image_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().text());
-            $('#update_os_type_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().text());
+        $('#update_os_template_image_profile_id_modal').on('show.bs.modal', function (me) {
+            refresh_os_template_profile_os_distro_selectpicker($('#update_os_distro'));
         });
 
-        $('#update_icon_modal').on('show.bs.modal', function (me) {
-            $('#os_template_image_id').val($(me.relatedTarget).parent().prev().prev().prev().prev().prev().prev().text());
-            $('#update_icon_instance_desc').text($(me.relatedTarget).parent().prev().prev().prev().prev().text());
+        $('#update_os_distro').on('changed.bs.select', function (me) {
+            refresh_os_template_profile_id_selectpicker($('#update_os_template_profile_id'), me.currentTarget.value);
+            $('#update_os_template_profile_id').removeAttr('disabled');
+        });
+
+        $('#update_logo_modal').on('show.bs.modal', function (me) {
+            $('#os_template_image_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().prev().text());
+            $('#update_logo_instance_desc').text($(me.relatedTarget).parent().parent().prev().prev().prev().text());
         });
 
         $('#add_os_template_image_form').formValidation({
@@ -183,10 +188,9 @@
                         }
                     }
                 },
-                icon: {
+                logo: {
                     validators: {
-                        notEmpty: {
-                        }
+                        notEmpty: {}
                     }
                 },
                 path: {
@@ -198,16 +202,9 @@
                         }
                     }
                 },
-                os_type: {
+                os_template_profile_id: {
                     validators: {
-                        notEmpty: {
-                        }
-                    }
-                },
-                boot_job_id: {
-                    validators: {
-                        notEmpty: {
-                        }
+                        notEmpty: {}
                     }
                 }
             }
@@ -238,9 +235,34 @@
         $(me).find(".edit_label_trigger, .edit_path_trigger").css('display','none');
     }
 
-    function refresh_os_template_boot_job_selectpicker(selectpicker) {
+    function refresh_os_template_profile_os_distro_selectpicker(selectpicker) {
         $.ajax({
-            url : '/api/boot_jobs?filter=use_for:eq:0',
+            url : '/api/os_templates_profile?filter=active:eq:1',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                var os_distro = [];
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    if (jQuery.inArray(v['os_distro'], os_distro) >= 0) {
+                        return;
+                    }
+                    os_distro.push(v['os_distro']);
+                    selectpicker.append(
+                        $('<option>', {value: v['os_distro'], text: v['os_distro'], 'data-icon': v['icon']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+            }
+        });
+    }
+
+    function refresh_os_template_profile_id_selectpicker(selectpicker, os_distro) {
+        $.ajax({
+            url : '/api/os_templates_profile?filter=os_distro:eq:' + os_distro,
             type : 'GET',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
@@ -250,7 +272,7 @@
                 selectpicker.empty();
                 $.each(data.data, function(k, v) {
                     selectpicker.append(
-                        $('<option>', {value: v['id'], text: v['name'], 'data-subtext': v['remark']})
+                        $('<option>', {value: v['id'], text: v['label'], 'data-subtext': v['os_product_name']})
                     );
                 });
                 selectpicker.selectpicker('refresh');
@@ -274,7 +296,9 @@
             },
             success : function() {
                 alter_success('模板镜像名称更新成功！');
-                refresh()
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
             }
         });
     }
@@ -295,7 +319,49 @@
             },
             success : function() {
                 alter_success('模板镜像路径更新成功！');
-                refresh()
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function update_os_template_image_profile_id(id) {
+        $.ajax({
+            url : '/api/os_template_image/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                os_template_profile_id: parseInt($('#update_os_template_profile_id').val())
+            }),
+            error : function() {
+                alter_danger('变更模板系统发行版本指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更模板系统发行版本指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function update_logo(id) {
+        $.ajax({
+            url : '/api/os_template_image/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                logo: $('#update_logo').val()
+            }),
+            error : function() {
+                alter_danger('变更 LOGO 指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更 LOGO 指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
             }
         });
     }
@@ -379,15 +445,17 @@
 
     function remove(id) {
         $.ajax({
-            url : '/api/os_templates/' + id,
+            url : '/api/os_templates_image/' + id,
             type : 'DELETE',
             contentType: "application/json; charset=utf-8",
             error : function() {
-                alter_danger('模板删除指令发送失败！');
+                alter_danger('模板镜像删除指令发送失败！');
             },
             success : function() {
-                alter_success('模板删除指令发送成功！');
-                refresh();
+                alter_success('模板镜像删除指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
             }
         });
     }
@@ -406,6 +474,18 @@
         var id = $('#os_template_image_id').val();
         remove(id);
         $('#delete_modal').modal('hide');
+    }
+
+    function update_os_template_image_profile_id_at(me) {
+        var id = $('#os_template_image_id').val();
+        update_os_template_image_profile_id(id);
+        $('#update_os_template_image_profile_id_modal').modal('hide');
+    }
+
+    function update_logo_at(me) {
+        var id = $('#os_template_image_id').val();
+        update_logo(id);
+        $('#update_logo_modal').modal('hide');
     }
 </script>
 <div class="panel">
@@ -468,8 +548,14 @@
                     </td>
                     <td>
                         <div>
-                            <span class="{{ os_templates_profile_mapping_by_id[item.id].icon }}"></span>
-                            <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.id].os_product_name }}</p>
+                            <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
+                                {% if item.logo == "" %}
+                                    <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].icon }}"></span>
+                                {% else %}
+                                    <span class="{{ item.logo }}"></span>
+                                {% endif %}
+                            </a>
+                            <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].os_product_name }}</p>
                         </div>
                     </td>
                     <td>
@@ -490,9 +576,9 @@
                                 </li>
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
                                 <li>
-                                    <a href="javascript:;" data-toggle="modal" data-target="#update_boot_job_modal"
+                                    <a href="javascript:;" data-toggle="modal" data-target="#update_os_template_image_profile_id_modal"
                                         onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
-                                        $('#update_boot_job_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
+                                        $('#update_os_template_image_profile_id_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
                                         变更发行版本
                                     </a>
                                 </li>
@@ -618,6 +704,7 @@
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
                     <form id="add_os_template_image_form" class="form-horizontal bordered-row" action="/os_template_image" method="post">
+                        <input id="active" name="active" value="1" type="hidden" title="激活" class="form-control">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板镜像名称</label>
@@ -627,10 +714,17 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;ICON</label>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-stumbleupon"></span>&nbsp;&nbsp;模板路径</label>
                             <div class="col-sm-6">
-                                <select id="icon" name="icon" title="模板 ICON" class="selectpicker">
-                                    <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos" selected>CentOS</option>
+                                <input id="path" name="path" type="text" title="模板路径" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-child"></span>&nbsp;&nbsp;LOGO</label>
+                            <div class="col-sm-6">
+                                <select id="logo" name="logo" title="请选择 LOGO" class="selectpicker">
+                                    <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos">CentOS</option>
                                     <option value="icon-os icon-os-linux" data-icon="icon-os icon-os-linux">Linux</option>
                                     <option value="icon-os icon-os-ubuntu" data-icon="icon-os icon-os-ubuntu">Ubuntu</option>
                                     <option value="icon-os icon-os-suse" data-icon="icon-os icon-os-suse">Suse</option>
@@ -644,30 +738,19 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-stumbleupon"></span>&nbsp;&nbsp;模板路径</label>
-                            <div class="col-sm-6">
-                                <input id="path" name="path" type="text" title="模板路径" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;模板系统类型</label>
-                            <div class="col-sm-6">
-                                <select id="os_type" name="os_type" title="请选择模板系统类型" class="selectpicker">
-                                    <option value="0">Linux</option>
-                                    <option value="1">Windows</option>
-                                    <option value="2">BSD</option>
-                                    <option value="3">AIX</option>
-                                    <option value="4">HP-UNIX</option>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;发行版本</label>
+                            <div class="col-sm-8">
+                                <select id="os_distro" name="os_distro" title="请选择发行版" class="selectpicker" data-width="140px">
+                                </select>
+                                <select id="os_template_profile_id" name="os_template_profile_id" title="请选择版本" class="selectpicker" data-width="237px" disabled>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-file-code-o"></span>&nbsp;&nbsp;初始化作业</label>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;模板镜像描述</label>
                             <div class="col-sm-6">
-                                <select id="boot_job_id" name="boot_job_id" title="实例的启动作业" class="selectpicker">
-                                </select>
+                                <textarea id="description" name="description" title="模板镜像描述" class="form-control"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
@@ -684,41 +767,79 @@
     </div>
 </div>
 
-<div class="modal" id="update_os_type_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
-    <div class="modal-dialog">
+<div class="modal" id="update_os_template_image_profile_id_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">变更操作系统类型：</h4>
+                <h4 class="modal-title">变更模板系统发行版：</h4>
             </div>
             <div class="modal-body" style="padding-top: 0;">
                 <form class="form-horizontal bordered-row">
                     <div class="form-group">
                         <div class="col-sm-1"></div>
-                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;操作系统类型</label>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板镜像名称</label>
                         <div class="col-sm-8">
-                            <h3 style="color: orangered;" id="update_os_type_instance_desc"></h3>
+                            <h3 style="color: orangered;" id="update_os_template_image_profile_id_instance_desc"></h3>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;发行版本</label>
                         <div class="col-sm-8">
-                            <select id="update_os_type" name="os_type" title="操作系统类型" class="selectpicker">
-                                <option value="0" selected>Linux</option>
-                                <option value="1">Windows</option>
-                                <option value="2">BSD</option>
-                                <option value="3">AIX</option>
-                                <option value="4">HP-UNIX</option>
+                            <select id="update_os_distro" name="os_distro" title="请选择发行版" class="selectpicker" data-width="140px">
+                            </select>
+                            <select id="update_os_template_profile_id" name="os_template_profile_id" title="请选择版本" class="selectpicker" data-width="237px" disabled>
                             </select>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-primary" onclick="update_os_type_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_os_template_image_profile_id_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>
 </div>
-
+<div class="modal" id="update_logo_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更 LOGO：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板镜像名称</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_logo_instance_desc"></h3>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-child"></span>&nbsp;&nbsp;LOGO</label>
+                        <div class="col-sm-8">
+                            <select id="update_logo" name="logo" title="模板 LOGO" class="selectpicker">
+                                <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos" selected>CentOS</option>
+                                <option value="icon-os icon-os-linux" data-icon="icon-os icon-os-linux">Linux</option>
+                                <option value="icon-os icon-os-ubuntu" data-icon="icon-os icon-os-ubuntu">Ubuntu</option>
+                                <option value="icon-os icon-os-suse" data-icon="icon-os icon-os-suse">Suse</option>
+                                <option value="icon-os icon-os-gentoo" data-icon="icon-os icon-os-gentoo">Gentoo</option>
+                                <option value="icon-os icon-os-debian" data-icon="icon-os icon-os-debian">Debian</option>
+                                <option value="icon-os icon-os-redhat" data-icon="icon-os icon-os-redhat">Redhat</option>
+                                <option value="icon-os icon-os-bsd" data-icon="icon-os icon-os-bsd">BSD</option>
+                                <option value="icon-os icon-os-windows" data-icon="icon-os icon-os-windows">Windows</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_logo_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

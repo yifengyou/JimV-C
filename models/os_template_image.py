@@ -22,7 +22,7 @@ class OSTemplateImage(ORM):
         self.id = 0
         self.label = None
         self.description = None
-        self.icon = None
+        self.logo = None
         self.os_template_profile_id = None
         self.path = None
         self.active = True

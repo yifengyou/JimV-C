@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS os_template_image(
     description TEXT,
     path VARCHAR(255) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    icon VARCHAR(255) NOT NULL,
+    logo VARCHAR(255) NOT NULL,
     os_template_profile_id BIGINT UNSIGNED NOT NULL,
     PRIMARY KEY (id))
     ENGINE=InnoDB

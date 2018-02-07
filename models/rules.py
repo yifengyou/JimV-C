@@ -95,6 +95,7 @@ class Rules(Enum):
     OS_PRODUCT_NAME = (basestring, 'os_product_name')
     ACTIVE = (bool, 'active')
     ICON = (basestring, 'icon')
+    LOGO = (basestring, 'logo')
 
     BOOT_JOB_ID_EXT = (int, 'boot_job_id')
     OS_TEMPLATE_PROFILE_ID_EXT = (int, 'os_template_profile_id')

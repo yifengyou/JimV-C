@@ -106,17 +106,17 @@ def create():
 
     if request.method == 'POST':
         label = request.form.get('label')
-        description = request.form.get('description')
+        description = request.form.get('description', '')
         path = request.form.get('path')
-        icon = request.form.get('icon')
-        active = request.form.get('active')
+        logo = request.form.get('logo')
+        active = request.form.get('active', 1)
         os_template_profile_id = request.form.get('os_template_profile_id')
 
         payload = {
             "label": label,
             "description": description,
             "path": path,
-            "icon": icon,
+            "logo": logo,
             "active": active,
             "os_template_profile_id": int(os_template_profile_id)
         }
@@ -125,6 +125,13 @@ def create():
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers, cookies=request.cookies)
         j_r = json.loads(r.content)
+        if j_r['state']['code'] != '200':
+            return render_template('failure.html',
+                                   go_back_url='/os_templates_image',
+                                   timeout=10000, title='创建失败',
+                                   message_title='创建模板镜像失败',
+                                   message=j_r['state']['sub']['zh-cn'])
+
         return render_template('success.html', go_back_url='/os_templates_image', timeout=10000, title='提交成功',
                                message_title='添加模板镜像的请求已被接受',
                                message='您所提交的模板镜像已创建。页面将在10秒钟后自动跳转到模板列表页面！')
