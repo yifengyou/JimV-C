@@ -338,16 +338,10 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" title="虚拟机">
+                            <a href="{{ url_for('v_guests.show') }}" title="虚拟机实例">
                                 <i class="glyph-icon icon-linecons-cloud"></i>
-                                <span>虚拟机</span>
+                                <span>虚拟机实例</span>
                             </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-                                    <li><a href="{{ url_for('v_guests.show') }}" title="虚拟机实例列表"><span>实例</span></a></li>
-                                    <li><a href="{{ url_for('v_guests.show_guests_boot_jobs') }}" title="虚拟机启动作业列表"><span>启动作业</span></a></li>
-                                </ul>
-                            </div><!-- .sidebar-submenu -->
                         </li>
                         <li>
                             <a href="{{ url_for('v_disks.show') }}" title="磁盘实例列表">
@@ -372,24 +366,6 @@
                                 <i class="glyph-icon icon-linecons-inbox"></i>
                                 <span>虚拟机模板镜像</span>
                             </a>
-                        </li>
-                        <li>
-                            <a href="{{ url_for('v_os_templates.show') }}" title="虚拟机模板列表">
-                                <i class="glyph-icon icon-linecons-inbox"></i>
-                                <span>虚拟机模板</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" title="虚拟机启动作业">
-                                <i class="glyph-icon icon-linecons-paper-plane"></i>
-                                <span>启动作业</span>
-                            </a>
-                            <div class="sidebar-submenu">
-                                <ul>
-                                    <li><a href="{{ url_for('v_boot_jobs.show') }}" title="启动作业列表"><span>启动作业</span></a></li>
-                                    <li><a href="{{ url_for('v_operate_rules.show') }}" title="启动作业操作细则"><span>启动作业操作细则</span></a></li>
-                                </ul>
-                            </div><!-- .sidebar-submenu -->
                         </li>
                         <li>
                             <a href="{{ url_for('v_config.show') }}" title="JimV 虚拟化平台系统配置">

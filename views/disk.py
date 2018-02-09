@@ -208,7 +208,7 @@ def detail(uuid):
     disk_ret = json.loads(disk_ret.content)
 
     guest_ret = None
-    os_template_ret = None
+    os_template_image_ret = None
 
     config_url = host_url + url_for('api_config.r_get')
     config_ret = requests.get(url=config_url, cookies=request.cookies)
@@ -220,12 +220,13 @@ def detail(uuid):
         guest_ret = requests.get(url=guest_url, cookies=request.cookies)
         guest_ret = json.loads(guest_ret.content)
 
-        os_template_url = host_url + url_for('api_os_templates.r_get', ids=guest_ret['data']['os_template_id'].__str__())
+        os_template_image_url = host_url + url_for('api_os_templates_image.r_get',
+                                                   ids=guest_ret['data']['os_template_image_id'].__str__())
 
-        os_template_ret = requests.get(url=os_template_url, cookies=request.cookies)
-        os_template_ret = json.loads(os_template_ret.content)
+        os_template_image_ret = requests.get(url=os_template_image_url, cookies=request.cookies)
+        os_template_image_ret = json.loads(os_template_image_ret.content)
 
-    return render_template('disk_detail.html', uuid=uuid, guest_ret=guest_ret, os_template_ret=os_template_ret,
-                           disk_ret=disk_ret, config_ret=config_ret)
+    return render_template('disk_detail.html', uuid=uuid, guest_ret=guest_ret,
+                           os_template_image_ret=os_template_image_ret, disk_ret=disk_ret, config_ret=config_ret)
 
 

@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS guest(
     label VARCHAR(64) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     remark VARCHAR(255) NOT NULL DEFAULT '',
-    os_template_id BIGINT UNSIGNED NOT NULL,
+    os_template_image_id BIGINT UNSIGNED NOT NULL,
     create_time BIGINT UNSIGNED NOT NULL,
     -- 运行时的状态用 status;
     status TINYINT UNSIGNED NOT NULL DEFAULT 0,

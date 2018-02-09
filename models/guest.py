@@ -7,8 +7,6 @@ import jimit as ji
 from filter import FilterFieldType
 from orm import ORM
 from status import GuestState, DiskState
-from database import Database as db
-from initialize import app
 
 
 __author__ = 'James Iter'
@@ -29,7 +27,7 @@ class Guest(ORM):
         self.label = None
         self.password = None
         self.remark = ''
-        self.os_template_id = None
+        self.os_template_image_id = None
         self.create_time = ji.Common.tus()
         self.status = GuestState.no_state.value
         self.progress = 0
@@ -62,40 +60,6 @@ class Guest(ORM):
     @staticmethod
     def get_allow_content_search_keywords():
         return ['label', 'remark', 'node_id', 'ip']
-
-    def get_boot_jobs_key(self):
-        return ':'.join([app.config['guest_boot_jobs'], self.uuid])
-
-    def add_boot_jobs(self, boot_jobs_id):
-        if not isinstance(boot_jobs_id, list):
-            raise ValueError('The boot_jobs_id must be a list.')
-
-        key = self.get_boot_jobs_key()
-        db.r.sadd(key, *boot_jobs_id)
-        db.r.expire(key, app.config['guest_boot_jobs_wait_time'])
-
-    def get_boot_jobs(self):
-        return db.r.ttl(self.get_boot_jobs_key()), list(db.r.smembers(self.get_boot_jobs_key()))
-
-    def delete_boot_jobs(self, boot_jobs_id):
-        if not isinstance(boot_jobs_id, list):
-            raise ValueError('The boot_jobs_id must be a list.')
-
-        key = self.get_boot_jobs_key()
-        db.r.srem(key, *boot_jobs_id)
-
-        # 如果集合下还有值，则更新启动作业有效时间
-        if db.r.exists(key):
-            db.r.expire(key, app.config['guest_boot_jobs_wait_time'])
-
-    @staticmethod
-    def get_uuids_of_all_had_boot_job():
-        boot_job_keys = db.r.keys(pattern=app.config['guest_boot_jobs'] + '*')
-        uuids = list()
-        for boot_job_key in boot_job_keys:
-            uuids.append(boot_job_key.split(':')[-1])
-
-        return uuids
 
 
 class Disk(ORM):

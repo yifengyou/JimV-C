@@ -205,13 +205,9 @@ class EventProcessor(object):
                     cls.disk.update()
 
             elif action == 'boot':
-                boot_jobs_id = cls.message['message']['passback_parameters']['boot_jobs_id']
 
                 if state == ResponseState.success.value:
-                    cls.guest.uuid = uuid
-
-                    if boot_jobs_id.__len__() > 0:
-                        cls.guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id)
+                    pass
 
         elif _object == 'disk':
             if action == 'create':

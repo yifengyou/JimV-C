@@ -85,12 +85,6 @@ class BootJobUseFor(IntEnum):
     user = 2
 
 
-class OperateRuleKind(IntEnum):
-    cmd = 0
-    write_file = 1
-    append_file = 2
-
-
 class OSTemplateInitializeOperateKind(IntEnum):
     cmd = 0
     write_file = 1
@@ -107,13 +101,4 @@ class HostCollectionPerformanceDataKind(IntEnum):
     cpu_memory = 0
     traffic = 1
     disk_usage_io = 2
-
-
-class OSType(IntEnum):
-    linux = 0
-    windows = 1
-    bsd = 2
-    aix = 3
-    hp_unix = 4
-    unknown = 255
 

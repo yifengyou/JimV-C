@@ -1107,9 +1107,14 @@
                             <td>
                                 <span class="guest-label">操作系统:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ os_template_ret.data.label }}
+                                {{ os_template_image_ret.data.label }}
                                 </span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                <span class="{{ os_template_ret.data.icon }}"></span>
+
+                                {% if os_template_image_ret.data.logo == "" %}
+                                    <span class="{{ os_templates_profile_mapping_by_id[os_template_image_ret.data.os_template_profile_id].icon }}"></span>
+                                {% else %}
+                                    <span class="{{ os_template_image_ret.data.logo }}"></span>
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>

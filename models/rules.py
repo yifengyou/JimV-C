@@ -64,7 +64,7 @@ class Rules(Enum):
     UUIDS = (REG_UUIDS, 'uuids')
     CPU = (int, 'cpu')
     MEMORY = (int, 'memory')
-    OS_TEMPLATE_ID = (int, 'os_template_id')
+    OS_TEMPLATE_IMAGE_ID = (int, 'os_template_image_id')
     QUANTITY = (int, 'quantity')
     NAME = (basestring, 'name')
     PATH = (basestring, 'path')

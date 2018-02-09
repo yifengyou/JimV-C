@@ -16,7 +16,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 class TestOSTemplate(unittest.TestCase):
 
     base_url = 'http://127.0.0.1:8008/api'
-    os_template_id = 0
+    os_template_image_id = 0
 
     def setUp(self):
         pass

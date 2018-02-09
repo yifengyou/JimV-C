@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from models import Config, Disk, OSTemplate, OSType
+from models import Config, Disk
 from models import Guest
 from models import status
 
@@ -59,7 +59,7 @@ class GuestXML(object):
         # Windows Guest 设为 localtime，非 Windows Guest 都设为 utc
         offset = 'utc'
 
-        if self.os_type == OSType.windows.value:
+        if str(self.os_type).lower().find('windows') >= 0:
             offset = 'localtime'
 
         return """<clock offset='{0}'/>""".format(offset)

@@ -170,10 +170,6 @@
             $('#reset_password_instance_uuid').val(
                 $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
         });
-
-        $('#add_boot_job_modal').on('show.bs.modal', function (me) {
-            refresh_boot_job_selectpicker($('#boot_job_selector'));
-        });
     });
 
     function refresh() {
@@ -185,26 +181,6 @@
             cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
         }
         window.location.href=cur_url;
-    }
-
-    function refresh_boot_job_selectpicker(selectpicker) {
-        $.ajax({
-            url : '/api/boot_jobs?filter=use_for:eq:2',
-            type : 'GET',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            error : function() {
-            },
-            success : function(data, textStatus, xhr) {
-                selectpicker.empty();
-                $.each(data.data, function(k, v) {
-                    selectpicker.append(
-                        $('<option>', {value: v['id'], text: v['name'], 'data-subtext': v['remark']})
-                    );
-                });
-                selectpicker.selectpicker('refresh');
-            }
-        });
     }
 
     function row_onmouseover(me) {
@@ -417,22 +393,6 @@
         });
     }
 
-    function add_boot_job(uuids, boot_job_id) {
-        $.ajax({
-            url : '/api/guests/_boot_jobs/' + uuids.join(',') + '/' + boot_job_id,
-            type : 'PUT',
-            contentType: "application/json; charset=utf-8",
-            error : function() {
-                alter_danger('启动作业添加指令发送失败！');
-            },
-            success : function() {
-                alter_success('启动作业添加指令发送成功！');
-                window.location.href='/guests/boot_jobs_list';
-                // refresh();
-            }
-        });
-    }
-
     function boot_at(me) {
         var uuid = $('#instance_uuid').val();
         boot([uuid]);
@@ -594,15 +554,6 @@
         $('#batch_delete_modal').modal('hide');
     }
 
-    function batch_add_boot_job() {
-        var uuids = get_checked_uuids();
-        var boot_job_id = $('#boot_job_selector').val();
-        if (uuids) {
-            add_boot_job(uuids, boot_job_id);
-        }
-        $('#add_boot_job_modal').modal('hide');
-    }
-
     var show_real_password = false;
     function change_display_password(me) {
         if (show_real_password) {
@@ -669,7 +620,13 @@
                             </a>
                         </div>
                     </td>
-                    <td><span class="{{ os_templates_mapping_by_id[item.os_template_id].icon }}" title="{{ os_templates_mapping_by_id[item.os_template_id].label }}"></span></td>
+                    <td>
+                        {% if os_templates_image_mapping_by_id[item.os_template_image_id].logo == "" %}
+                            <span class="{{ os_templates_profile_mapping_by_id[os_templates_image_mapping_by_id[item.os_template_image_id].os_template_profile_id].icon }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id].label }}"></span>
+                        {% else %}
+                            <span class="{{ os_templates_image_mapping_by_id[item.os_template_image_id].logo }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id].label }}"></span>
+                        {% endif %}
+                    </td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
                     <td>{{ hosts_mapping_by_node_id[item.node_id].hostname }}</td>
                     <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>
@@ -681,7 +638,6 @@
                             <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
                                 更多
                             </a>
-                            <div class="small-badge bg-red" style="display: {% if guests_boot_jobs_ret.data[item.uuid].boot_jobs|length < 1 %} none {% else %} inline-flex{% endif %};"></div>
                             <ul class="dropdown-menu">
                                 <li class="{% if item.status not in [4, 5, 6] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#boot_modal"
@@ -745,13 +701,6 @@
                                 </li>
                                 <li class="divider"></li>
                                 <li class="">
-                                    <a href="/guest/boot_jobs/{{ item.uuid }}" target="_blank">
-                                        启动作业&nbsp;&nbsp;
-                                        <span class="bs-badge badge-info" style="display: {% if guests_boot_jobs_ret.data[item.uuid].boot_jobs|length < 1 %} none {% endif %};">{{ guests_boot_jobs_ret.data[item.uuid].boot_jobs|length }}</span>
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li class="">
                                     <a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"
                                        onclick="$('#reset_password_type').val('single')">
                                         密码重置
@@ -810,12 +759,6 @@
                                                 <a href="javascript:;" onclick="$('#reset_password_type').val('batch');"
                                                    data-toggle="modal" data-target="#reset_password_modal">
                                                     密码重置
-                                                </a>
-                                            </li>
-                                            <li class="divider"></li>
-                                            <li>
-                                                <a href="javascript:;" data-toggle="modal" data-target="#add_boot_job_modal">
-                                                    启动作业
                                                 </a>
                                             </li>
                                             <li class="divider"></li>
@@ -917,37 +860,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="reset_password_go();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal" id="add_boot_job_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">添加启动作业：</h4>
-            </div>
-            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
-                <div class="example-box-wrapper">
-                    <form class="form-horizontal bordered-row">
-                        <div class="form-group">
-                            <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-list-alt"></span>&nbsp;&nbsp;启动作业</label>
-                            <div class="col-sm-6">
-                                <select id="boot_job_selector" name="boot_job_selector" title="启动作业" class="selectpicker">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-4"></div>
-                            <div class="col-sm-6 pull-right">
-                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" onclick="batch_add_boot_job();">添加</button>
-                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>

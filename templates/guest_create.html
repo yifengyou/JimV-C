@@ -60,7 +60,7 @@
                         }
                     }
                 },
-                os_template_id: {
+                os_template_image_id: {
                     validators: {
                         notEmpty: {
                         }
@@ -105,7 +105,55 @@
                 data.fv.disableSubmitButtons(true);
             }
         });
+
+        refresh_os_template_image_id_selectpicker($('#os_template_image_id'));
     });
+
+    function get_os_templates_profile_mapping_by_id() {
+        var os_templates_profile_mapping_by_id = {};
+
+        $.ajax({
+            url : '/api/os_templates_profile',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                $.each(data.data, function(k, v) {
+                    os_templates_profile_mapping_by_id[v['id']] = v;
+                });
+            }
+        });
+
+        return os_templates_profile_mapping_by_id;
+    }
+
+    function refresh_os_template_image_id_selectpicker(selectpicker) {
+        $.ajax({
+            url : '/api/os_templates_image',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                var os_templates_profile_mapping_by_id = get_os_templates_profile_mapping_by_id();
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    if (v['logo'] === "") {
+                        v['logo'] = os_templates_profile_mapping_by_id[v['os_template_profile_id']].icon;
+                    }
+                    selectpicker.append(
+                        $('<option>', {value: v['id'], text: '\xa0\xa0' + v['label'], 'data-icon': v['logo']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+            }
+        });
+    }
 
     $(function() { "use strict";
         $("#quantity").TouchSpin({
@@ -201,10 +249,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;系统模板</label>
                         <div class="col-sm-6">
-                            <select id="os_template" name="os_template_id" title="请选择系统模板..." class="selectpicker" data-width="100%">
-                                {% for item in os_template_ret.data %}
-                                    <option value="{{ item.id }}" data-icon="{{ item.icon }}">&nbsp;&nbsp;{{ item.label }}</option>
-                                {% endfor %}
+                            <select id="os_template_image_id" name="os_template_image_id" title="请选择系统模板..." class="selectpicker" data-width="100%">
                             </select>
                         </div>
                     </div>

@@ -11,7 +11,6 @@ import jimit as ji
 
 from api.base import Base
 from models import DiskState, Host
-from models import OperateRule
 from models.initialize import app, dev_table
 from models import Database as db
 from models import Config
@@ -19,7 +18,9 @@ from models import Disk
 from models import Rules
 from models import Utils
 from models import Guest
-from models import OSTemplate
+from models import OSTemplateImage
+from models import OSTemplateProfile
+from models import OSTemplateInitializeOperate
 from models import GuestXML
 from models import status
 
@@ -52,7 +53,7 @@ def r_create():
     args_rules = [
         Rules.CPU.value,
         Rules.MEMORY.value,
-        Rules.OS_TEMPLATE_ID.value,
+        Rules.OS_TEMPLATE_IMAGE_ID.value,
         Rules.QUANTITY.value,
         Rules.REMARK.value,
         Rules.PASSWORD.value,
@@ -74,20 +75,23 @@ def r_create():
         config.id = 1
         config.get()
 
-        os_template = OSTemplate()
-        os_template.id = request.json.get('os_template_id')
-        if not os_template.exist():
+        os_template_image = OSTemplateImage()
+        os_template_profile = OSTemplateProfile()
+
+        os_template_image.id = request.json.get('os_template_image_id')
+        if not os_template_image.exist():
             ret['state'] = ji.Common.exchange_state(40450)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_template.id.__str__()])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_template_image.id.__str__()])
             return ret
 
-        os_template.get()
-        # 重置密码的 boot job id 固定为 1
-        boot_jobs_id = [1, os_template.boot_job_id]
+        os_template_image.get()
+        os_template_profile.id = os_template_image.os_template_profile_id
+        os_template_profile.get()
 
-        boot_jobs, boot_jobs_count = OperateRule.get_by_filter(
-            filter_str='boot_job_id:in:' +
-                       ','.join(['{0}'.format(boot_job_id) for boot_job_id in boot_jobs_id]).__str__())
+        os_template_initialize_operates, os_template_initialize_operates_count = \
+            OSTemplateInitializeOperate.get_by_filter(
+                filter_str='os_template_initialize_operate_set_id:eq:' +
+                           os_template_profile.os_template_initialize_operate_set_id.__str__())
 
         if db.r.scard(app.config['ip_available_set']) < 1:
             ret['state'] = ji.Common.exchange_state(50350)
@@ -119,7 +123,7 @@ def r_create():
             guest.cpu = request.json.get('cpu')
             # 虚拟机内存单位，模板生成方法中已置其为GiB
             guest.memory = request.json.get('memory')
-            guest.os_template_id = request.json.get('os_template_id')
+            guest.os_template_image_id = request.json.get('os_template_image_id')
             guest.label = ji.Common.generate_random_code(length=8)
             guest.remark = request.json.get('remark', '')
 
@@ -151,7 +155,7 @@ def r_create():
             disk.quota(config=config)
             disk.create()
 
-            guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template.os_type)
+            guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template_profile.os_type)
             guest.xml = guest_xml.get_domain()
 
             # 在可用计算节点中平均分配任务
@@ -165,9 +169,9 @@ def r_create():
             guest.create()
 
             # 替换占位符为有效内容
-            _boot_jobs = copy.deepcopy(boot_jobs)
-            for k, v in enumerate(_boot_jobs):
-                _boot_jobs[k]['content'] = v['content'].replace('{IP}', guest.ip).\
+            _os_template_initialize_operates = copy.deepcopy(os_template_initialize_operates)
+            for k, v in enumerate(_os_template_initialize_operates):
+                _os_template_initialize_operates[k]['content'] = v['content'].replace('{IP}', guest.ip).\
                     replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask).\
@@ -175,7 +179,7 @@ def r_create():
                     replace('{DNS1}', config.dns1).\
                     replace('{DNS2}', config.dns2)
 
-                _boot_jobs[k]['command'] = v['command'].replace('{IP}', guest.ip). \
+                _os_template_initialize_operates[k]['command'] = v['command'].replace('{IP}', guest.ip). \
                     replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
                     replace('{NETMASK}', config.netmask). \
@@ -191,14 +195,12 @@ def r_create():
                 'dfs_volume': config.dfs_volume,
                 'node_id': guest.node_id,
                 'name': guest.label,
-                'template_path': os_template.path,
-                'os_type': os_template.os_type,
-                'disk': disk.__dict__,
-                # disk 将被废弃，由 disks 代替，暂时保留它的目的，是为了保持与 JimV-N 的兼容性
+                'template_path': os_template_image.path,
+                'os_type': os_template_profile.os_type,
                 'disks': [disk.__dict__],
                 'xml': guest_xml.get_domain(),
-                'boot_jobs': _boot_jobs,
-                'passback_parameters': {'boot_jobs_id': boot_jobs_id}
+                'os_template_initialize_operates': _os_template_initialize_operates,
+                'passback_parameters': {}
             }
 
             Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
@@ -379,40 +381,14 @@ def r_boot(uuids):
             guest.uuid = uuid
             guest.get_by('uuid')
 
-            _, boot_jobs_id = guest.get_boot_jobs()
-
-            boot_jobs = list()
-
-            if boot_jobs_id.__len__() > 0:
-                boot_jobs, count = OperateRule.get_by_filter(filter_str='boot_job_id:in:' + ','.join(boot_jobs_id))
-
-            # 替换占位符为有效内容
-            for k, v in enumerate(boot_jobs):
-                boot_jobs[k]['content'] = v['content'].replace('{IP}', guest.ip). \
-                    replace('{HOSTNAME}', guest.label). \
-                    replace('{PASSWORD}', guest.password). \
-                    replace('{NETMASK}', config.netmask). \
-                    replace('{GATEWAY}', config.gateway). \
-                    replace('{DNS1}', config.dns1). \
-                    replace('{DNS2}', config.dns2)
-
-                boot_jobs[k]['command'] = v['command'].replace('{IP}', guest.ip). \
-                    replace('{HOSTNAME}', guest.label). \
-                    replace('{PASSWORD}', guest.password). \
-                    replace('{NETMASK}', config.netmask). \
-                    replace('{GATEWAY}', config.gateway). \
-                    replace('{DNS1}', config.dns1). \
-                    replace('{DNS2}', config.dns2)
-
             disks, _ = Disk.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
 
             message = {
                 '_object': 'guest',
                 'action': 'boot',
                 'uuid': uuid,
-                'boot_jobs': boot_jobs,
                 'node_id': guest.node_id,
-                'passback_parameters': {'boot_jobs_id': boot_jobs_id},
+                'passback_parameters': {},
                 'disks': disks
             }
 
@@ -757,7 +733,7 @@ def r_distribute_count():
     ret['state'] = ji.Common.exchange_state(20000)
 
     ret['data'] = {
-        'os_template_id': dict(),
+        'os_template_image_id': dict(),
         'status': dict(),
         'node_id': dict(),
         'cpu_memory': dict(),
@@ -767,8 +743,8 @@ def r_distribute_count():
     }
 
     for guest in rows:
-        if guest['os_template_id'] not in ret['data']['os_template_id']:
-            ret['data']['os_template_id'][guest['os_template_id']] = 0
+        if guest['os_template_image_id'] not in ret['data']['os_template_image_id']:
+            ret['data']['os_template_image_id'][guest['os_template_image_id']] = 0
 
         if guest['status'] not in ret['data']['status']:
             ret['data']['status'][guest['status']] = 0
@@ -780,7 +756,7 @@ def r_distribute_count():
         if cpu_memory not in ret['data']['cpu_memory']:
             ret['data']['cpu_memory'][cpu_memory] = 0
 
-        ret['data']['os_template_id'][guest['os_template_id']] += 1
+        ret['data']['os_template_image_id'][guest['os_template_image_id']] += 1
         ret['data']['status'][guest['status']] += 1
         ret['data']['node_id'][guest['node_id']] += 1
         ret['data']['cpu_memory'][cpu_memory] += 1
@@ -830,127 +806,6 @@ def r_update(uuid):
 
 
 @Utils.dumps2response
-def r_add_boot_jobs(uuids, boot_jobs_id):
-
-    args_rules = [
-        Rules.UUIDS.value,
-        Rules.BOOT_JOBS_ID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuids': uuids, 'boot_jobs_id': boot_jobs_id})
-
-        guest = Guest()
-        for uuid in uuids.split(','):
-            guest.uuid = uuid
-            guest.get_by('uuid')
-
-        for uuid in uuids.split(','):
-            guest.uuid = uuid
-            guest.add_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-
-        if uuids.split(',').__len__() > 1:
-            ret['data'] = dict()
-            for uuid in uuids.split(','):
-                guest.uuid = uuid
-                boot_jobs = dict()
-                boot_jobs['ttl'], boot_jobs['boot_jobs'] = guest.get_boot_jobs()
-                ret['data'][uuid] = boot_jobs
-
-        else:
-            guest.uuid = uuids
-            ret['data'] = dict()
-            ret['data']['ttl'], ret['data']['boot_jobs'] = guest.get_boot_jobs()
-
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_get_boot_jobs(uuids):
-
-    args_rules = [
-        Rules.UUIDS.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuids': uuids})
-
-        guest = Guest()
-
-        for uuid in uuids.split(','):
-            guest.uuid = uuid
-            guest.get_by('uuid')
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-
-        if uuids.split(',').__len__() > 1:
-            ret['data'] = dict()
-            for uuid in uuids.split(','):
-                guest.uuid = uuid
-                boot_jobs = dict()
-                boot_jobs['ttl'], boot_jobs['boot_jobs'] = guest.get_boot_jobs()
-                ret['data'][uuid] = boot_jobs
-
-        else:
-            guest.uuid = uuids
-            ret['data'] = dict()
-            ret['data']['ttl'], ret['data']['boot_jobs'] = guest.get_boot_jobs()
-
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_delete_boot_jobs(uuids, boot_jobs_id):
-
-    args_rules = [
-        Rules.UUIDS.value,
-        Rules.BOOT_JOBS_ID.value
-    ]
-
-    try:
-        ji.Check.previewing(args_rules, {'uuids': uuids, 'boot_jobs_id': boot_jobs_id})
-
-        guest = Guest()
-        # 检测所指定的 UUDIs 实例都存在
-        for uuid in uuids.split(','):
-            guest.uuid = uuid
-            guest.get_by('uuid')
-
-        for uuid in uuids.split(','):
-            guest.uuid = uuid
-            guest.delete_boot_jobs(boot_jobs_id=boot_jobs_id.split(','))
-
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        return ret
-
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
-def r_get_uuids_of_all_had_boot_job():
-    guest = Guest()
-    try:
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = guest.get_uuids_of_all_had_boot_job()
-        return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
-
-
-@Utils.dumps2response
 def r_reset_password(uuids, password):
 
     args_rules = [
@@ -973,8 +828,6 @@ def r_reset_password(uuids, password):
             guest.get_by('uuid')
             guest.password = password
             guest.update()
-
-            guest.add_boot_jobs(boot_jobs_id=['1'])
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)

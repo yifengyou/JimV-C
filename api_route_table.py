@@ -7,9 +7,6 @@ from api import config
 from api import user
 from api import guest
 from api import disk
-from api import boot_job
-from api import operate_rule
-from api import os_template
 from api import os_template_image
 from api import os_template_profile
 from api import os_template_initialize_operate_set
@@ -40,29 +37,6 @@ add_rule_api(user.blueprint, '/_change_password', api_func='user.r_change_passwo
 add_rule_api(user.blueprint, '/_reset_password/<token>', api_func='user.r_reset_password', methods=['POST'])
 add_rule_api(user.blueprint, '/_send_reset_password_email/<login_name>', api_func='user.r_send_reset_password_email',
              methods=['PUT'])
-
-# 系统启动作业配置操作
-add_rule_api(boot_job.blueprint, '', api_func='boot_job.r_create', methods=['POST'])
-add_rule_api(boot_job.blueprint, '/<_id>', api_func='boot_job.r_update', methods=['PATCH'])
-add_rule_api(boot_job.blueprints, '/<ids>', api_func='boot_job.r_delete', methods=['DELETE'])
-add_rule_api(boot_job.blueprints, '/<ids>', api_func='boot_job.r_get', methods=['GET'])
-add_rule_api(boot_job.blueprints, '', api_func='boot_job.r_get_by_filter', methods=['GET'])
-add_rule_api(boot_job.blueprints, '/_search', api_func='boot_job.r_content_search', methods=['GET'])
-
-add_rule_api(operate_rule.blueprint, '', api_func='operate_rule.r_create', methods=['POST'])
-add_rule_api(operate_rule.blueprint, '/<_id>', api_func='operate_rule.r_update', methods=['PATCH'])
-add_rule_api(operate_rule.blueprints, '/<ids>', api_func='operate_rule.r_delete', methods=['DELETE'])
-add_rule_api(operate_rule.blueprints, '/<ids>', api_func='operate_rule.r_get', methods=['GET'])
-add_rule_api(operate_rule.blueprints, '', api_func='operate_rule.r_get_by_filter', methods=['GET'])
-add_rule_api(operate_rule.blueprints, '/_search', api_func='operate_rule.r_content_search', methods=['GET'])
-
-# 系统模板操作
-add_rule_api(os_template.blueprint, '', api_func='os_template.r_create', methods=['POST'])
-add_rule_api(os_template.blueprint, '/<_id>', api_func='os_template.r_update', methods=['PATCH'])
-add_rule_api(os_template.blueprints, '/<ids>', api_func='os_template.r_delete', methods=['DELETE'])
-add_rule_api(os_template.blueprints, '/<ids>', api_func='os_template.r_get', methods=['GET'])
-add_rule_api(os_template.blueprints, '', api_func='os_template.r_get_by_filter', methods=['GET'])
-add_rule_api(os_template.blueprints, '/_search', api_func='os_template.r_content_search', methods=['GET'])
 
 # 系统模板镜像操作
 add_rule_api(os_template_image.blueprint, '', api_func='os_template_image.r_create', methods=['POST'])
