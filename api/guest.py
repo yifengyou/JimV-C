@@ -150,7 +150,7 @@ def r_create():
             disk.size = 0
             disk.path = config.storage_path + '/' + disk.uuid + '.' + disk.format
             disk.guest_uuid = ''
-            # disk.node_id 由 guest 事件处理机更新。涉及迁移时，其所属 node_id 会变更。参见 models/event_processory.py:111 附近。
+            # disk.node_id 由 guest 事件处理机更新。涉及迁移时，其所属 node_id 会变更。参见 @models/event_processory.py:111 附近。
             disk.node_id = 0
             disk.quota(config=config)
             disk.create()
@@ -817,17 +817,43 @@ def r_reset_password(uuids, password):
         ji.Check.previewing(args_rules, {'uuids': uuids, 'password': password})
 
         guest = Guest()
+        os_template_image = OSTemplateImage()
+        os_template_profile = OSTemplateProfile()
+
         # 检测所指定的 UUDIs 实例都存在
         for uuid in uuids.split(','):
             guest.uuid = uuid
             guest.get_by('uuid')
 
-        # 重置密码的 boot job id 固定为 1
         for uuid in uuids.split(','):
             guest.uuid = uuid
             guest.get_by('uuid')
-            guest.password = password
-            guest.update()
+
+            os_template_image.id = guest.os_template_image_id
+            os_template_image.get()
+
+            os_template_profile.id = os_template_image.os_template_profile_id
+            os_template_profile.get()
+
+            user = 'root'
+
+            if os_template_profile.os_type == 'windows':
+                user = 'administrator'
+
+            # guest.password 由 guest 事件处理机更新。参见 @models/event_processory.py:189 附近。
+
+            message = {
+                '_object': 'guest',
+                'action': 'reset_password',
+                'uuid': guest.uuid,
+                'node_id': guest.node_id,
+                'os_type': os_template_profile.os_type,
+                'user': user,
+                'password': password,
+                'passback_parameters': {'password': password}
+            }
+
+            Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
