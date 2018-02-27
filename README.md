@@ -57,6 +57,7 @@
 |RESTful 风格的 API|✓|
 |Virtio设备|✓|
 |Guest 暂停/恢复|✓|
+|Guest 在线重置密码|✓|
 
 
 ## 未来计划

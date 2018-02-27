@@ -1,5 +1,19 @@
 
 
+CREATE TABLE IF NOT EXISTS ssh_key(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    label VARCHAR(255) NOT NULL,
+    public_key TEXT,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE ssh_key ADD INDEX (label);
+
+ALTER TABLE guest ADD COLUMN ssh_keys_id TEXT AFTER xml;
+
+
 -- 操作系统模板镜像
 CREATE TABLE IF NOT EXISTS os_template_image(
     label VARCHAR(255) NOT NULL,
@@ -137,3 +151,4 @@ INSERT INTO os_template_profile (label, description, os_type, os_distro, os_majo
 VALUES ('Gentoo-2.2', 'Gentoo 2.2。', 'linux', 'gentoo', 2, 2, 'x86_64', 'Gentoo Base System release 2.2', 1, 'icon-os icon-os-gentoo', 3);
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('Windows-2012-R2-Standard', 'Windows 2012 R2 Standard。', 'windows', 'windows', 6, 3, 'x86_64', 'Windows Server 2012 R2 Standard', 1, 'icon-os icon-os-windows', 4);
+

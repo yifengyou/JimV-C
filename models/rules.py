@@ -56,8 +56,8 @@ class Rules(Enum):
     BPS_CAP = (int, 'iops_cap')
     BPS_MAX = (int, 'iops_max')
     BPS_MAX_LENGTH = (int, 'iops_max_length')
-    RSA_PRIVATE = (basestring, 'rsa_private')
-    RSA_PUBLIC = (basestring, 'rsa_public')
+
+    PUBLIC_KEY = (basestring, 'public_key')
 
     UUID = (basestring, 'uuid', (36, 36))
     NODE_ID = (basestring, 'node_id', (16, 16))

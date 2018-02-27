@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS guest(
     manage_network VARCHAR(64) NOT NULL,
     vnc_port INT UNSIGNED NOT NULL,
     vnc_password VARCHAR(255) NOT NULL,
+    ssh_keys_id TEXT NOT NULL,
     xml TEXT NOT NULL,
     PRIMARY KEY (id))
     ENGINE=InnoDB
@@ -357,10 +358,22 @@ ALTER TABLE host_disk_usage_io ADD INDEX (timestamp);
 ALTER TABLE host_disk_usage_io ADD INDEX (node_id, mountpoint, timestamp);
 
 
+CREATE TABLE IF NOT EXISTS ssh_key(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    label VARCHAR(255) NOT NULL,
+    public_key TEXT,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE ssh_key ADD INDEX (label);
+
+
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-Systemd', '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。', 1);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-SysV', '用作 Redhat SysV 系列的系统初始化。初始化操作依据 CentOS 6.8 来实现。', 1);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('Gentoo-OpenRC', '用作 Gentoo OpenRC 系列的系统初始化。', 1);
-INSERT INTO os_template_initialize_operate_set (label, descriptione, active) VALUES ('Windows', '用作 MS-Windows 系列的系统初始化。初始化操作依据 Windows 2012 来实现。', 1);
+INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('Windows', '用作 MS-Windows 系列的系统初始化。初始化操作依据 Windows 2012 来实现。', 1);
 
 -- For CentOS-Systemd
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (1, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}

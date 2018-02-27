@@ -141,6 +141,8 @@ def r_create():
             db.r.sadd(app.config['vnc_port_used_set'], guest.vnc_port)
 
             guest.vnc_password = ji.Common.generate_random_code(length=16)
+            guest.ssh_keys_id = []
+            guest.ssh_keys_id = json.dumps(guest.ssh_keys_id)
 
             disk = Disk()
             disk.uuid = guest.uuid

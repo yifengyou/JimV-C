@@ -43,6 +43,8 @@ from api.log import blueprint as log_blueprint
 from api.log import blueprints as log_blueprints
 from api.host import blueprint as host_blueprint
 from api.host import blueprints as host_blueprints
+from api.ssh_key import blueprint as ssh_key_blueprint
+from api.ssh_key import blueprints as ssh_key_blueprints
 from api.guest_performance import blueprint as performance_blueprint
 from api.guest_performance import blueprints as performance_blueprints
 from api.host_performance import blueprint as host_performance_blueprint
@@ -60,6 +62,8 @@ from views.log import blueprint as view_log_blueprint
 from views.log import blueprints as view_log_blueprints
 from views.os_template_image import blueprint as view_os_template_image_blueprint
 from views.os_template_image import blueprints as view_os_template_image_blueprints
+from views.ssh_key import blueprint as view_ssh_key_blueprint
+from views.ssh_key import blueprints as view_ssh_key_blueprints
 
 from views.host import blueprint as view_host_blueprint
 from views.host import blueprints as view_host_blueprints
@@ -229,6 +233,8 @@ try:
     app.register_blueprint(log_blueprints)
     app.register_blueprint(host_blueprint)
     app.register_blueprint(host_blueprints)
+    app.register_blueprint(ssh_key_blueprint)
+    app.register_blueprint(ssh_key_blueprints)
     app.register_blueprint(performance_blueprint)
     app.register_blueprint(performance_blueprints)
     app.register_blueprint(host_performance_blueprint)
@@ -245,6 +251,8 @@ try:
     app.register_blueprint(view_log_blueprints)
     app.register_blueprint(view_os_template_image_blueprint)
     app.register_blueprint(view_os_template_image_blueprints)
+    app.register_blueprint(view_ssh_key_blueprint)
+    app.register_blueprint(view_ssh_key_blueprints)
 
     app.register_blueprint(view_host_blueprint)
     app.register_blueprint(view_host_blueprints)

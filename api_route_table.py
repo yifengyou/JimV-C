@@ -15,6 +15,7 @@ from api import log
 from api import host
 from api import guest_performance
 from api import host_performance
+from api import ssh_key
 
 
 __author__ = 'James Iter'
@@ -133,6 +134,15 @@ add_rule_api(host.blueprints, '/_search', api_func='host.r_content_search', meth
 add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_delete', methods=['DELETE'])
 add_rule_api(host.blueprints, '/<hosts_name>/<random>', api_func='host.r_nonrandom', methods=['PUT'])
 
+# SSH Key 操作
+add_rule_api(ssh_key.blueprint, '', api_func='ssh_key.r_create', methods=['POST'])
+add_rule_api(ssh_key.blueprints, '/<ids>', api_func='ssh_key.r_delete', methods=['DELETE'])
+add_rule_api(ssh_key.blueprints, '/<_id>', api_func='ssh_key.r_update', methods=['PATCH'])
+add_rule_api(ssh_key.blueprints, '/<ids>', api_func='ssh_key.r_get', methods=['GET'])
+add_rule_api(ssh_key.blueprints, '', api_func='ssh_key.r_get_by_filter', methods=['GET'])
+add_rule_api(ssh_key.blueprints, '/_search', api_func='ssh_key.r_content_search', methods=['GET'])
+
+# 日志查询
 # Guest 性能查询
 add_rule_api(guest_performance.blueprint, '/cpu_memory',
              api_func='guest_performance.r_cpu_memory_get_by_filter', methods=['GET'])
