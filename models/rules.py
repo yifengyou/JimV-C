@@ -57,6 +57,7 @@ class Rules(Enum):
     BPS_MAX = (int, 'iops_max')
     BPS_MAX_LENGTH = (int, 'iops_max_length')
 
+    SSH_KEY_ID_EXT = (REG_NUMBER, 'ssh_key_id')
     PUBLIC_KEY = (basestring, 'public_key')
 
     UUID = (basestring, 'uuid', (36, 36))
@@ -97,7 +98,6 @@ class Rules(Enum):
     ICON = (basestring, 'icon')
     LOGO = (basestring, 'logo')
 
-    BOOT_JOB_ID_EXT = (int, 'boot_job_id')
     OS_TEMPLATE_PROFILE_ID_EXT = (int, 'os_template_profile_id')
     OS_TEMPLATE_INITIALIZE_OPERATE_SET_ID_EXT = (int, 'os_template_initialize_operate_set_id')
     OS_TEMPLATE_INITIALIZE_OPERATE_KIND = (int, 'kind')

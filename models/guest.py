@@ -40,7 +40,6 @@ class Guest(ORM):
         self.vnc_port = None
         self.vnc_password = None
         self.xml = None
-        self.ssh_keys_id = None
 
     @staticmethod
     def get_filter_keywords():
@@ -56,7 +55,7 @@ class Guest(ORM):
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['remark', 'cpu', 'memory', 'network', 'manage_network', 'vnc_password', 'ssh_keys_id']
+        return ['remark', 'cpu', 'memory', 'network', 'manage_network', 'vnc_password']
 
     @staticmethod
     def get_allow_content_search_keywords():

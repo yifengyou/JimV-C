@@ -367,6 +367,10 @@
                     </td>
                     <td>
                         <div class="dropdown inline-block">
+                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#ssh_key_bind_modal">绑定</a>
+                            <span> | </span>
+                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#ssh_key_unbind_modal">解绑</a>
+                            <span> | </span>
                             <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
                                 更多
                             </a>
@@ -488,6 +492,79 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">添加 SSH Key：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
+                <div class="example-box-wrapper">
+                    <form id="add_ssh_key_form" class="form-horizontal bordered-row" action="/ssh_key" method="post">
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
+                            <div class="col-sm-6">
+                                <input id="label" name="label" type="text" title="SSH Key 名称" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;Public Key</label>
+                            <div class="col-sm-6">
+                                <textarea id="public_key" name="public_key" title="Public key" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-6 pull-right">
+                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="ssh_key_bind_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">绑定 SSH Key：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
+                <div class="example-box-wrapper">
+                    <form id="add_ssh_key_form" class="form-horizontal bordered-row" action="/ssh_key" method="post">
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
+                            <div class="col-sm-6">
+                                <input id="label" name="label" type="text" title="SSH Key 名称" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;Public Key</label>
+                            <div class="col-sm-6">
+                                <textarea id="public_key" name="public_key" title="Public key" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-6 pull-right">
+                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="ssh_key_unbind_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">解绑 SSH Key：</h4>
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">

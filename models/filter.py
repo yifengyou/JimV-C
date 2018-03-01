@@ -25,7 +25,7 @@ class Filter(object):
                 'lt': '<',
                 'ne': '!=',
                 'in': 'in',
-                'notin': 'in',
+                'notin': 'not in',
                 'like': 'like'}
 
     def __init__(self):

@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS guest(
     manage_network VARCHAR(64) NOT NULL,
     vnc_port INT UNSIGNED NOT NULL,
     vnc_password VARCHAR(255) NOT NULL,
-    ssh_keys_id TEXT NOT NULL,
     xml TEXT NOT NULL,
     PRIMARY KEY (id))
     ENGINE=InnoDB
@@ -368,6 +367,18 @@ CREATE TABLE IF NOT EXISTS ssh_key(
     DEFAULT CHARSET=utf8;
 
 ALTER TABLE ssh_key ADD INDEX (label);
+
+
+CREATE TABLE IF NOT EXISTS ssh_key_guest_mapping(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ssh_key_id BIGINT UNSIGNED NOT NULL,
+    guest_uuid CHAR(36) NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE ssh_key_guest_mapping ADD UNIQUE INDEX (ssh_key_id, guest_uuid);
+ALTER TABLE ssh_key_guest_mapping ADD INDEX (guest_uuid);
 
 
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-Systemd', '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。', 1);

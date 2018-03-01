@@ -43,6 +43,10 @@ from ssh_key import (
     SSHKey
 )
 
+from ssh_key_guest_mapping import (
+    SSHKeyGuestMapping
+)
+
 from os_template_image import (
     OSTemplateImage
 )
@@ -104,7 +108,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 __all__ = [
     'Rules', 'Utils', 'Init', 'Database', 'FilterFieldType', 'Filter', 'EmitKind', 'GuestState', 'DiskState',
-    'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'GuestXML', 'Log', 'SSHKey',
+    'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'GuestXML', 'Log', 'SSHKey', 'SSHKeyGuestMapping',
     'OSTemplateImage', 'OSTemplateProfile', 'OSTemplateInitializeOperateSet', 'OSTemplateInitializeOperate',
     'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO', 'HostCPUMemory', 'HostTraffic',
     'HostDiskUsageIO', 'Host'

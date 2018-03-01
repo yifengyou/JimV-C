@@ -141,6 +141,10 @@ add_rule_api(ssh_key.blueprints, '/<_id>', api_func='ssh_key.r_update', methods=
 add_rule_api(ssh_key.blueprints, '/<ids>', api_func='ssh_key.r_get', methods=['GET'])
 add_rule_api(ssh_key.blueprints, '', api_func='ssh_key.r_get_by_filter', methods=['GET'])
 add_rule_api(ssh_key.blueprints, '/_search', api_func='ssh_key.r_content_search', methods=['GET'])
+add_rule_api(ssh_key.blueprint, '/_bound/<ssh_key_id>', api_func='ssh_key.r_bound', methods=['GET'])
+add_rule_api(ssh_key.blueprint, '/_unbound/<ssh_key_id>', api_func='ssh_key.r_unbound', methods=['GET'])
+add_rule_api(ssh_key.blueprint, '/_bind/<ssh_key_id>/<uuids>', api_func='ssh_key.r_bind', methods=['PUT'])
+add_rule_api(ssh_key.blueprint, '/_unbind/<ssh_key_id>/<uuids>', api_func='ssh_key.r_unbind', methods=['PUT'])
 
 # 日志查询
 # Guest 性能查询

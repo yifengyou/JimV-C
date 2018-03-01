@@ -11,7 +11,17 @@ CREATE TABLE IF NOT EXISTS ssh_key(
 
 ALTER TABLE ssh_key ADD INDEX (label);
 
-ALTER TABLE guest ADD COLUMN ssh_keys_id TEXT AFTER xml;
+
+CREATE TABLE IF NOT EXISTS ssh_key_guest_mapping(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ssh_key_id BIGINT UNSIGNED NOT NULL,
+    guest_uuid CHAR(36) NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE ssh_key_guest_mapping ADD UNIQUE INDEX (ssh_key_id, guest_uuid);
+ALTER TABLE ssh_key_guest_mapping ADD INDEX (guest_uuid);
 
 
 -- 操作系统模板镜像
