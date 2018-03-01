@@ -328,3 +328,23 @@ class ORM(object):
             cursor.close()
             cnx.close()
 
+    @classmethod
+    def distinct_by(cls, fields=None, order_by=None, order='asc'):
+        if order_by is None:
+            order_by = cls._primary_key
+
+        assert isinstance(fields, list)
+
+        sql_stmt = ("SELECT DISTINCT " + ', '.join(fields) + " FROM " + cls._table_name +
+                    " ORDER BY " + order_by + " " + order)
+
+        cnx = db.cnxpool.get_connection()
+        cursor = cnx.cursor(dictionary=True, buffered=True)
+        try:
+            cursor.execute(sql_stmt)
+            rows = cursor.fetchall()
+            return rows, rows.__len__()
+        finally:
+            cursor.close()
+            cnx.close()
+
