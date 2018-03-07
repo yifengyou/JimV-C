@@ -4,6 +4,7 @@
 
 from flask import Blueprint
 from flask import request
+from werkzeug.datastructures import ImmutableMultiDict
 import json
 import jimit as ji
 
@@ -132,6 +133,7 @@ def r_content_search():
 
 @Utils.dumps2response
 def r_delete(ids):
+    # TODO: 做好依赖逻辑处理。比如已关联 ssh_key 的删除。
     return ssh_key_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 
@@ -150,7 +152,13 @@ def r_bound(ssh_key_id):
         for row in rows:
             guests_uuid.append(row['guest_uuid'])
 
-        request.args['filter_str'] = ':'.join(['uuid', 'in', ','.join(guests_uuid)])
+        if guests_uuid.__len__() == 0:
+            guests_uuid.append('_')
+
+        request.__setattr__('args', ImmutableMultiDict([
+            ('filter', ':'.join(['uuid', 'in', ','.join(guests_uuid)])),
+            ('page_size', 10000)
+        ]))
 
         return guest_base.get_by_filter()
     except ji.PreviewingError, e:
@@ -172,13 +180,14 @@ def r_unbound(ssh_key_id):
         for row in rows:
             guests_uuid.append(row['guest_uuid'])
 
-        from werkzeug.datastructures import ImmutableMultiDict
+        if guests_uuid.__len__() == 0:
+            guests_uuid.append('_')
+
         request.__setattr__('args', ImmutableMultiDict([
             ('filter', ':'.join(['uuid', 'notin', ','.join(guests_uuid)])),
             ('page_size', 10000)
         ]))
 
-        x = guest_base.get_by_filter()
         return guest_base.get_by_filter()
     except ji.PreviewingError, e:
         return json.loads(e.message)
@@ -230,8 +239,13 @@ def r_bind(ssh_key_id, uuids):
         for row in rows:
             guests_uuid.append(row['guest_uuid'])
 
-        request.args['filter_str'] = ':'.join(['uuid', 'in', ','.join(guests_uuid)])
-        request.args['page_size'] = 10000
+        if guests_uuid.__len__() == 0:
+            guests_uuid.append('_')
+
+        request.__setattr__('args', ImmutableMultiDict([
+            ('filter', ':'.join(['uuid', 'in', ','.join(guests_uuid)])),
+            ('page_size', 10000)
+        ]))
 
         return guest_base.get_by_filter()
     except ji.PreviewingError, e:
@@ -270,8 +284,13 @@ def r_unbind(ssh_key_id, uuids):
         for row in rows:
             guests_uuid.append(row['guest_uuid'])
 
-        request.args['filter_str'] = ':'.join(['uuid', 'in', ','.join(guests_uuid)])
-        request.args['page_size'] = 10000
+        if guests_uuid.__len__() == 0:
+            guests_uuid.append('_')
+
+        request.__setattr__('args', ImmutableMultiDict([
+            ('filter', ':'.join(['uuid', 'in', ','.join(guests_uuid)])),
+            ('page_size', 10000)
+        ]))
 
         return guest_base.get_by_filter()
     except ji.PreviewingError, e:

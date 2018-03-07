@@ -66,7 +66,6 @@
             background: #fafaff !important;
         }
     </style>
-
 {% endblock head %}
 {% block content %}
 
@@ -148,6 +147,14 @@
             //
         });
 
+        $('#ssh_key_bind_modal').on('show.bs.modal', function (me) {
+            refresh_multi_selector($('#bind_multi_selector'), false);
+        });
+
+        $('#ssh_key_unbind_modal').on('show.bs.modal', function (me) {
+            refresh_multi_selector($('#unbind_multi_selector'), true);
+        });
+
         $('#add_ssh_key_form').formValidation({
             framework: 'bootstrap4',
             icon: {
@@ -184,7 +191,10 @@
             if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
                 data.fv.disableSubmitButtons(true);
             }
-        })
+        });
+
+        init_multi_selector($('#bind_multi_selector'));
+        init_multi_selector($('#unbind_multi_selector'));
     });
 
     function refresh() {
@@ -315,6 +325,138 @@
         remove(ssh_key_id);
         $('#delete_modal').modal('hide');
     }
+
+    function init_multi_selector(multi_selector) {
+
+        function button_disable() {
+
+            var the_button = $('#ssh_key_bind_button');
+            if (multi_selector.attr('id') !== 'bind_multi_selector'){
+                the_button = $('#ssh_key_unbind_button');
+            }
+
+            if (multi_selector.val() !== null) {
+                the_button.removeAttr('disabled');
+            } else {
+                the_button.prop('disabled', 'true');
+            }
+        }
+
+        multi_selector.multiSelect({
+            selectableHeader: "<input type='text' class='form-control' autocomplete='off' placeholder='关键字查找...'>",
+            selectionHeader: "<input type='text' class='form-control' autocomplete='off' placeholder='关键字查找...'>",
+            afterInit: function(ms){
+                var that = this,
+                    $selectableSearch = that.$selectableUl.prev(),
+                    $selectionSearch = that.$selectionUl.prev(),
+                    selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)',
+                    selectionSearchString = '#'+that.$container.attr('id')+' .ms-elem-selection.ms-selected';
+
+                ms.css({ width: '100%' });
+
+                that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+                    .on('keydown', function(e){
+                        if (e.which === 40){
+                            that.$selectableUl.focus();
+                            return false;
+                        }
+                    });
+
+                that.qs2 = $selectionSearch.quicksearch(selectionSearchString)
+                    .on('keydown', function(e){
+                        if (e.which == 40){
+                            that.$selectionUl.focus();
+                            return false;
+                        }
+                    });
+            },
+            afterSelect: function(){
+                this.qs1.cache();
+                this.qs2.cache();
+
+                button_disable();
+            },
+            afterDeselect: function(){
+                this.qs1.cache();
+                this.qs2.cache();
+
+                button_disable();
+            }
+        });
+    }
+    
+    function refresh_multi_selector(multi_selector, is_bound) {
+        var ssh_key_id = $('#ssh_key_id').val();
+        var url = '/api/ssh_key/_bound/';
+        if (!is_bound) {
+            url = '/api/ssh_key/_unbound/';
+        }
+
+        $.ajax({
+            url : url + ssh_key_id,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取 SSH-Key 绑定信息失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                multi_selector.multiSelect({});
+                $.each(data.data, function(k, v) {
+                    multi_selector.multiSelect('addOption', {value: v['uuid'], text: v['label'] + '/' + v['ip']});
+                });
+                multi_selector.multiSelect('refresh');
+            }
+        });
+    }
+
+    function ssh_key_bind() {
+        $('#ssh_key_bind_modal').modal('hide');
+
+        var ssh_key_id = $('#ssh_key_id').val();
+        var uuids = $('#bind_multi_selector').val();
+        var url = '/api/ssh_key/_bind/';
+
+        $.ajax({
+            url : url + ssh_key_id + '/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('绑定 SSH-Key 失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('绑定 SSH-Key 成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function ssh_key_unbind() {
+        $('#ssh_key_unbind_modal').modal('hide');
+
+        var ssh_key_id = $('#ssh_key_id').val();
+        var uuids = $('#unbind_multi_selector').val();
+        var url = '/api/ssh_key/_unbind/';
+
+        $.ajax({
+            url : url + ssh_key_id + '/' + uuids.join(','),
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('解绑 SSH-Key 失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('解绑 SSH-Key 成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -367,9 +509,9 @@
                     </td>
                     <td>
                         <div class="dropdown inline-block">
-                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#ssh_key_bind_modal">绑定</a>
+                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#ssh_key_bind_modal" onclick="$('#ssh_key_id').val($(this).parent().parent().parent().children()[0].textContent)">绑定</a>
                             <span> | </span>
-                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#ssh_key_unbind_modal">解绑</a>
+                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#ssh_key_unbind_modal" onclick="$('#ssh_key_id').val($(this).parent().parent().parent().children()[0].textContent)">解绑</a>
                             <span> | </span>
                             <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
                                 更多
@@ -532,25 +674,19 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form id="add_ssh_key_form" class="form-horizontal bordered-row" action="/ssh_key" method="post">
+                    <form id="ssh_key_bind_form" class="form-horizontal bordered-row" action="javascript;">
                         <div class="form-group">
-                            <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
-                            <div class="col-sm-6">
-                                <input id="label" name="label" type="text" title="SSH Key 名称" class="form-control">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-10">
+                                <select id='bind_multi_selector' multiple='multiple' title="绑定 SSH-Key">
+                                </select>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;Public Key</label>
-                            <div class="col-sm-6">
-                                <textarea id="public_key" name="public_key" title="Public key" class="form-control"></textarea>
-                            </div>
+                            <div class="col-sm-1"></div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-4"></div>
                             <div class="col-sm-6 pull-right">
-                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                                <button id="ssh_key_bind_button" type="button" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled onclick="ssh_key_bind(this);">绑定</button>
                                 <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
                             </div>
                         </div>
@@ -568,25 +704,19 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form id="add_ssh_key_form" class="form-horizontal bordered-row" action="/ssh_key" method="post">
+                    <form id="ssh_key_unbind_form" class="form-horizontal bordered-row" action="javascript;">
                         <div class="form-group">
-                            <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
-                            <div class="col-sm-6">
-                                <input id="label" name="label" type="text" title="SSH Key 名称" class="form-control">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-10">
+                                <select id='unbind_multi_selector' multiple='multiple' title="解绑 SSH Key">
+                                </select>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-2"></div>
-                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;Public Key</label>
-                            <div class="col-sm-6">
-                                <textarea id="public_key" name="public_key" title="Public key" class="form-control"></textarea>
-                            </div>
+                            <div class="col-sm-1"></div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-4"></div>
                             <div class="col-sm-6 pull-right">
-                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                                <button id="ssh_key_unbind_button" type="button" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled onclick="ssh_key_unbind(this);">解绑</button>
                                 <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
                             </div>
                         </div>
