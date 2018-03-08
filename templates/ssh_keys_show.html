@@ -326,21 +326,21 @@
         $('#delete_modal').modal('hide');
     }
 
-    function init_multi_selector(multi_selector) {
+    function bind_unbind_button_disable(multi_selector) {
 
-        function button_disable() {
-
-            var the_button = $('#ssh_key_bind_button');
-            if (multi_selector.attr('id') !== 'bind_multi_selector'){
-                the_button = $('#ssh_key_unbind_button');
-            }
-
-            if (multi_selector.val() !== null) {
-                the_button.removeAttr('disabled');
-            } else {
-                the_button.prop('disabled', 'true');
-            }
+        var the_button = $('#ssh_key_bind_button');
+        if (multi_selector.attr('id') !== 'bind_multi_selector'){
+            the_button = $('#ssh_key_unbind_button');
         }
+
+        if (multi_selector.val() !== null) {
+            the_button.removeAttr('disabled');
+        } else {
+            the_button.prop('disabled', 'true');
+        }
+    }
+
+    function init_multi_selector(multi_selector) {
 
         multi_selector.multiSelect({
             selectableHeader: "<input type='text' class='form-control' autocomplete='off' placeholder='关键字查找...'>",
@@ -374,13 +374,13 @@
                 this.qs1.cache();
                 this.qs2.cache();
 
-                button_disable();
+                bind_unbind_button_disable(multi_selector);
             },
             afterDeselect: function(){
                 this.qs1.cache();
                 this.qs2.cache();
 
-                button_disable();
+                bind_unbind_button_disable(multi_selector);
             }
         });
     }
@@ -395,19 +395,27 @@
         $.ajax({
             url : url + ssh_key_id,
             type : 'GET',
+            async: false,
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
             error : function() {
                 alter_danger('获取 SSH-Key 绑定信息失败！');
             },
             success : function(data, textStatus, xhr) {
-                multi_selector.multiSelect({});
+                multi_selector.empty();
+                var subtext = '';
                 $.each(data.data, function(k, v) {
-                    multi_selector.multiSelect('addOption', {value: v['uuid'], text: v['label'] + '/' + v['ip']});
+                    subtext = v['remark'];
+                    if (subtext === '') {
+                        subtext = v['ip']
+                    }
+                    multi_selector.multiSelect('addOption', {value: v['uuid'], text: v['label'] + ' / ' + subtext});
                 });
                 multi_selector.multiSelect('refresh');
             }
         });
+
+        bind_unbind_button_disable(multi_selector);
     }
 
     function ssh_key_bind() {
@@ -427,9 +435,6 @@
             },
             success : function(data, textStatus, xhr) {
                 alter_success('绑定 SSH-Key 成功！');
-                setTimeout(function() {
-                    refresh();
-                }, 1000);
             }
         });
     }
@@ -451,9 +456,6 @@
             },
             success : function(data, textStatus, xhr) {
                 alter_success('解绑 SSH-Key 成功！');
-                setTimeout(function() {
-                    refresh();
-                }, 1000);
             }
         });
     }

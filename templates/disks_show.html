@@ -171,9 +171,14 @@
                 },
                 success : function(data, textStatus, xhr) {
                     $('#mountable_guest').empty();
+                    var subtext = ''
                     $.each(data.data, function(k, v) {
+                        subtext = v['remark'];
+                        if (subtext === '') {
+                            subtext = v['ip'];
+                        }
                         $('#mountable_guest').append(
-                            $('<option>', {value: v['uuid'], text: v['label'], 'data-subtext': v['remark']})
+                            $('<option>', {value: v['uuid'], text: v['label'], 'data-subtext': subtext})
                         );
                     });
                     $('#mountable_guest').selectpicker('refresh');
