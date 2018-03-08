@@ -9,7 +9,7 @@ import json
 import jimit as ji
 
 from api.base import Base
-from models import SSHKey
+from models import SSHKey, OSTemplateImage, OSTemplateProfile
 from models import SSHKeyGuestMapping
 from models import Guest
 from models import Utils
@@ -193,6 +193,53 @@ def r_unbound(ssh_key_id):
         return json.loads(e.message)
 
 
+def update_ssh_key(uuid):
+
+    guest = Guest()
+    guest.uuid = uuid
+    guest.get_by('uuid')
+
+    os_template_image = OSTemplateImage()
+    os_template_profile = OSTemplateProfile()
+
+    os_template_image.id = guest.os_template_image_id
+    os_template_image.get()
+
+    os_template_profile.id = os_template_image.os_template_profile_id
+    os_template_profile.get()
+
+    if os_template_profile.os_type == 'windows':
+        return
+
+    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', uuid]))
+
+    ssh_keys_id = list()
+    for row in rows:
+        ssh_keys_id.append(row['ssh_key_id'].__str__())
+
+    ssh_keys = list()
+
+    if ssh_keys_id.__len__() > 0:
+        rows, _ = SSHKey.get_by_filter(filter_str=':'.join(['id', 'in', ','.join(ssh_keys_id)]))
+        for row in rows:
+            ssh_keys.append(row['public_key'])
+
+    else:
+        ssh_keys.append('')
+
+    message = {
+        '_object': 'guest',
+        'uuid': uuid,
+        'node_id': guest.node_id,
+        'action': 'update_ssh_key',
+        'ssh_keys': ssh_keys,
+        'os_type': os_template_profile.os_type,
+        'passback_parameters': {'uuid': uuid, 'ssh_keys': ssh_keys, 'os_type': os_template_profile.os_type}
+    }
+
+    Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+
 @Utils.dumps2response
 def r_bind(ssh_key_id, uuids):
 
@@ -232,6 +279,8 @@ def r_bind(ssh_key_id, uuids):
             ssh_key_guest_mapping.ssh_key_id = ssh_key_id
             ssh_key_guest_mapping.guest_uuid = uuid
             ssh_key_guest_mapping.create()
+
+            update_ssh_key(uuid=uuid)
 
         # 返回执行结果
         rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['ssh_key_id', 'eq', ssh_key_id]))
@@ -277,6 +326,8 @@ def r_unbind(ssh_key_id, uuids):
             if row['guest_uuid'] in guests_uuid:
                 ssh_key_guest_mapping.id = row['id']
                 ssh_key_guest_mapping.delete()
+
+                update_ssh_key(uuid=row['guest_uuid'])
 
         # 返回执行结果
         rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['ssh_key_id', 'eq', ssh_key_id]))
