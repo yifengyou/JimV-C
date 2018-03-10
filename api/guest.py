@@ -715,6 +715,9 @@ def r_migrate(uuids, destination_host):
 def r_get(uuids):
     ret = guest_base.get(ids=uuids, ids_rule=Rules.UUIDS.value, by_field='uuid')
 
+    if '200' != ret['state']['code']:
+        return ret
+
     rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'in', uuids]))
 
     guest_uuid_ssh_key_id_mapping = dict()
