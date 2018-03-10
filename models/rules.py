@@ -30,7 +30,6 @@ class Rules(Enum):
     ID = (REG_NUMBER, 'id')
     IDS = (REG_NUMBERS, 'ids')
     HOSTS_NAME = (REG_HOSTS_NAME, 'hosts_name')
-    BOOT_JOBS_ID = (REG_NUMBERS, 'boot_jobs_id')
 
     CONFIG_ID = (int, 'id')
     JIMV_EDITION = (int, 'jimv_edition')

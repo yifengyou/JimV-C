@@ -102,11 +102,6 @@ add_rule_api(guest.blueprints, '', api_func='guest.r_get_by_filter', methods=['G
 add_rule_api(guest.blueprints, '/_search', api_func='guest.r_content_search', methods=['GET'])
 add_rule_api(guest.blueprint, '/<uuid>', api_func='guest.r_update', methods=['PATCH'])
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_delete', methods=['DELETE'])
-add_rule_api(guest.blueprints, '/_boot_jobs/<uuids>/<boot_jobs_id>', api_func='guest.r_add_boot_jobs', methods=['PUT'])
-add_rule_api(guest.blueprints, '/_boot_jobs/<uuids>', api_func='guest.r_get_boot_jobs', methods=['GET'])
-add_rule_api(guest.blueprints, '/_boot_jobs/<uuids>/<boot_jobs_id>', api_func='guest.r_delete_boot_jobs',
-             methods=['DELETE'])
-add_rule_api(guest.blueprints, '/_boot_jobs/uuids', api_func='guest.r_get_uuids_of_all_had_boot_job', methods=['GET'])
 add_rule_api(guest.blueprints, '/_reset_password/<uuids>/<password>', api_func='guest.r_reset_password',
              methods=['PUT'])
 add_rule_api(guest.blueprints, '/_distribute_count', api_func='guest.r_distribute_count', methods=['GET'])

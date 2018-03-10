@@ -9,7 +9,7 @@ import json
 import jimit as ji
 
 from api.base import Base
-from models import SSHKey, OSTemplateImage, OSTemplateProfile
+from models import SSHKey, OSTemplateImage, OSTemplateProfile, GuestState
 from models import SSHKeyGuestMapping
 from models import Guest
 from models import Utils
@@ -131,9 +131,66 @@ def r_content_search():
     return ssh_key_base.content_search()
 
 
+def update_ssh_key(uuid):
+
+    guest = Guest()
+    guest.uuid = uuid
+    guest.get_by('uuid')
+
+    # 不支持更新离线虚拟机的 SSH-KEY
+    if guest.status != GuestState.running.value:
+        return
+
+    os_template_image = OSTemplateImage()
+    os_template_profile = OSTemplateProfile()
+
+    os_template_image.id = guest.os_template_image_id
+    os_template_image.get()
+
+    os_template_profile.id = os_template_image.os_template_profile_id
+    os_template_profile.get()
+
+    # 不支持更新 Windows 虚拟机的 SSH-KEY
+    if os_template_profile.os_type == 'windows':
+        return
+
+    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', uuid]))
+
+    ssh_keys_id = list()
+    for row in rows:
+        ssh_keys_id.append(row['ssh_key_id'].__str__())
+
+    ssh_keys = list()
+
+    if ssh_keys_id.__len__() > 0:
+        rows, _ = SSHKey.get_by_filter(filter_str=':'.join(['id', 'in', ','.join(ssh_keys_id)]))
+        for row in rows:
+            ssh_keys.append(row['public_key'])
+
+    else:
+        ssh_keys.append('')
+
+    message = {
+        '_object': 'guest',
+        'uuid': uuid,
+        'node_id': guest.node_id,
+        'action': 'update_ssh_key',
+        'ssh_keys': ssh_keys,
+        'os_type': os_template_profile.os_type,
+        'passback_parameters': {'uuid': uuid, 'ssh_keys': ssh_keys, 'os_type': os_template_profile.os_type}
+    }
+
+    Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+
 @Utils.dumps2response
 def r_delete(ids):
-    # TODO: 做好依赖逻辑处理。比如已关联 ssh_key 的删除。
+    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['ssh_key_id', 'in', ids]))
+    SSHKeyGuestMapping.delete_by_filter(filter_str=':'.join(['ssh_key_id', 'in', ids]))
+
+    for row in rows:
+        update_ssh_key(uuid=row['guest_uuid'])
+
     return ssh_key_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 
@@ -191,53 +248,6 @@ def r_unbound(ssh_key_id):
         return guest_base.get_by_filter()
     except ji.PreviewingError, e:
         return json.loads(e.message)
-
-
-def update_ssh_key(uuid):
-
-    guest = Guest()
-    guest.uuid = uuid
-    guest.get_by('uuid')
-
-    os_template_image = OSTemplateImage()
-    os_template_profile = OSTemplateProfile()
-
-    os_template_image.id = guest.os_template_image_id
-    os_template_image.get()
-
-    os_template_profile.id = os_template_image.os_template_profile_id
-    os_template_profile.get()
-
-    if os_template_profile.os_type == 'windows':
-        return
-
-    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'eq', uuid]))
-
-    ssh_keys_id = list()
-    for row in rows:
-        ssh_keys_id.append(row['ssh_key_id'].__str__())
-
-    ssh_keys = list()
-
-    if ssh_keys_id.__len__() > 0:
-        rows, _ = SSHKey.get_by_filter(filter_str=':'.join(['id', 'in', ','.join(ssh_keys_id)]))
-        for row in rows:
-            ssh_keys.append(row['public_key'])
-
-    else:
-        ssh_keys.append('')
-
-    message = {
-        '_object': 'guest',
-        'uuid': uuid,
-        'node_id': guest.node_id,
-        'action': 'update_ssh_key',
-        'ssh_keys': ssh_keys,
-        'os_type': os_template_profile.os_type,
-        'passback_parameters': {'uuid': uuid, 'ssh_keys': ssh_keys, 'os_type': os_template_profile.os_type}
-    }
-
-    Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
 
 @Utils.dumps2response
