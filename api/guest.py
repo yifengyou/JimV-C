@@ -3,7 +3,7 @@
 
 
 import copy
-from flask import Blueprint
+from flask import Blueprint, url_for
 from flask import request
 import json
 from uuid import uuid4
@@ -22,6 +22,8 @@ from models import OSTemplateImage
 from models import OSTemplateProfile
 from models import OSTemplateInitializeOperate
 from models import GuestXML
+from models import SSHKeyGuestMapping
+from models import SSHKey
 from models import status
 
 
@@ -711,12 +713,89 @@ def r_migrate(uuids, destination_host):
 
 @Utils.dumps2response
 def r_get(uuids):
-    return guest_base.get(ids=uuids, ids_rule=Rules.UUIDS.value, by_field='uuid')
+    ret = guest_base.get(ids=uuids, ids_rule=Rules.UUIDS.value, by_field='uuid')
+
+    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'in', uuids]))
+
+    guest_uuid_ssh_key_id_mapping = dict()
+    ssh_keys_id = list()
+
+    for row in rows:
+        if row['ssh_key_id'] not in ssh_keys_id:
+            ssh_keys_id.append(row['ssh_key_id'].__str__())
+
+        if row['guest_uuid'] not in guest_uuid_ssh_key_id_mapping:
+            guest_uuid_ssh_key_id_mapping[row['guest_uuid']] = list()
+
+        guest_uuid_ssh_key_id_mapping[row['guest_uuid']].append(row['ssh_key_id'])
+
+    rows, _ = SSHKey.get_by_filter(filter_str=':'.join(['id', 'in', ','.join(ssh_keys_id)]))
+
+    ssh_key_id_mapping = dict()
+
+    for row in rows:
+        row['url'] = url_for('v_ssh_keys.show')
+        ssh_key_id_mapping[row['id']] = row
+
+    if -1 == uuids.find(','):
+        if 'ssh_keys' not in ret['data']:
+            ret['data']['ssh_keys'] = list()
+
+        if ret['data']['uuid'] in guest_uuid_ssh_key_id_mapping:
+            for ssh_key_id in guest_uuid_ssh_key_id_mapping[ret['data']['uuid']]:
+                ret['data']['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
+
+    else:
+        for i, guest in enumerate(ret['data']):
+            if 'ssh_keys' not in ret['data'][i]:
+                ret['data'][i]['ssh_keys'] = list()
+
+            if ret['data'][i]['uuid'] in guest_uuid_ssh_key_id_mapping:
+                for ssh_key_id in guest_uuid_ssh_key_id_mapping[ret['data'][i]['uuid']]:
+                    ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
+
+    return ret
 
 
 @Utils.dumps2response
 def r_get_by_filter():
-    return guest_base.get_by_filter()
+    ret = guest_base.get_by_filter()
+
+    uuids = list()
+    for guest in ret['data']:
+        uuids.append(guest['uuid'])
+
+    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'in', ','.join(uuids)]))
+
+    guest_uuid_ssh_key_id_mapping = dict()
+    ssh_keys_id = list()
+
+    for row in rows:
+        if row['ssh_key_id'] not in ssh_keys_id:
+            ssh_keys_id.append(row['ssh_key_id'].__str__())
+
+        if row['guest_uuid'] not in guest_uuid_ssh_key_id_mapping:
+            guest_uuid_ssh_key_id_mapping[row['guest_uuid']] = list()
+
+        guest_uuid_ssh_key_id_mapping[row['guest_uuid']].append(row['ssh_key_id'])
+
+    rows, _ = SSHKey.get_by_filter(filter_str=':'.join(['id', 'in', ','.join(ssh_keys_id)]))
+
+    ssh_key_id_mapping = dict()
+
+    for row in rows:
+        row['url'] = url_for('v_ssh_keys.show')
+        ssh_key_id_mapping[row['id']] = row
+
+    for i, guest in enumerate(ret['data']):
+        if 'ssh_keys' not in ret['data'][i]:
+            ret['data'][i]['ssh_keys'] = list()
+
+        if ret['data'][i]['uuid'] in guest_uuid_ssh_key_id_mapping:
+            for ssh_key_id in guest_uuid_ssh_key_id_mapping[ret['data'][i]['uuid']]:
+                ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
+
+    return ret
 
 
 @Utils.dumps2response

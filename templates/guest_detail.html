@@ -1159,6 +1159,18 @@
                         </tr>
                         <tr>
                             <td>
+                                <span class="guest-label">SSH-KEY 名称:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                    {% set ssh_keys_label = [] %}
+                                    {% for ssh_key in guest_ret.data.ssh_keys %}
+                                    {% do ssh_keys_label.append('<a href="' + ssh_key.url + '">' + ssh_key.label + '</a>') %}
+                                    {% endfor %}
+                                    {{ ssh_keys_label | join('、') | safe }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <span class="guest-label">创建时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                 {{ format_datetime_by_tus(guest_ret.data.create_time) }}

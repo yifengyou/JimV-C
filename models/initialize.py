@@ -30,6 +30,8 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
+app.jinja_env.add_extension('jinja2.ext.i18n')
+app.jinja_env.add_extension('jinja2.ext.do')
 
 
 class Init(object):
