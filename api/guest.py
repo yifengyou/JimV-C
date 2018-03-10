@@ -64,7 +64,12 @@ def r_create():
 
     if 'node_id' in request.json:
         args_rules.append(
-            Rules.NODE_ID.value,
+            Rules.NODE_ID.value
+        )
+
+    if 'ssh_keys_id' in request.json:
+        args_rules.append(
+            Rules.SSH_KEYS_ID.value
         )
 
     try:
@@ -115,6 +120,17 @@ def r_create():
         if node_id is not None and node_id not in [host['node_id'] for host in available_hosts]:
             ret['state'] = ji.Common.exchange_state(50351)
             return ret
+
+        ssh_keys_id = request.json.get('ssh_keys_id', list())
+        ssh_keys = list()
+        ssh_key_guest_mapping = SSHKeyGuestMapping()
+
+        if ssh_keys_id.__len__() > 0:
+            rows, _ = SSHKey.get_by_filter(
+                filter_str=':'.join(['id', 'in', ','.join(_id.__str__() for _id in ssh_keys_id)]))
+
+            for row in rows:
+                ssh_keys.append(row['public_key'])
 
         quantity = request.json.get('quantity')
 
@@ -170,6 +186,13 @@ def r_create():
             guest.node_id = int(guest.node_id)
             guest.create()
 
+            ssh_key_guest_mapping.guest_uuid = guest.uuid
+
+            if ssh_keys_id.__len__() > 0:
+                for ssh_key_id in ssh_keys_id:
+                    ssh_key_guest_mapping.ssh_key_id = ssh_key_id
+                    ssh_key_guest_mapping.create()
+
             # 替换占位符为有效内容
             _os_template_initialize_operates = copy.deepcopy(os_template_initialize_operates)
             for k, v in enumerate(_os_template_initialize_operates):
@@ -179,7 +202,8 @@ def r_create():
                     replace('{NETMASK}', config.netmask).\
                     replace('{GATEWAY}', config.gateway).\
                     replace('{DNS1}', config.dns1).\
-                    replace('{DNS2}', config.dns2)
+                    replace('{DNS2}', config.dns2). \
+                    replace('{SSH-KEY}', '\n'.join(ssh_keys))
 
                 _os_template_initialize_operates[k]['command'] = v['command'].replace('{IP}', guest.ip). \
                     replace('{HOSTNAME}', guest.label). \
@@ -187,7 +211,8 @@ def r_create():
                     replace('{NETMASK}', config.netmask). \
                     replace('{GATEWAY}', config.gateway). \
                     replace('{DNS1}', config.dns1). \
-                    replace('{DNS2}', config.dns2)
+                    replace('{DNS2}', config.dns2). \
+                    replace('{SSH-KEY}', '\n'.join(ssh_keys))
 
             message = {
                 '_object': 'guest',
@@ -746,6 +771,10 @@ def r_get(uuids):
 
         if ret['data']['uuid'] in guest_uuid_ssh_key_id_mapping:
             for ssh_key_id in guest_uuid_ssh_key_id_mapping[ret['data']['uuid']]:
+
+                if ssh_key_id not in ssh_key_id_mapping:
+                    continue
+
                 ret['data']['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
 
     else:
@@ -755,6 +784,10 @@ def r_get(uuids):
 
             if ret['data'][i]['uuid'] in guest_uuid_ssh_key_id_mapping:
                 for ssh_key_id in guest_uuid_ssh_key_id_mapping[ret['data'][i]['uuid']]:
+
+                    if ssh_key_id not in ssh_key_id_mapping:
+                        continue
+
                     ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
 
     return ret
@@ -796,6 +829,10 @@ def r_get_by_filter():
 
         if ret['data'][i]['uuid'] in guest_uuid_ssh_key_id_mapping:
             for ssh_key_id in guest_uuid_ssh_key_id_mapping[ret['data'][i]['uuid']]:
+
+                if ssh_key_id not in ssh_key_id_mapping:
+                    continue
+
                 ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
 
     return ret

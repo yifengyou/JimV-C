@@ -57,6 +57,7 @@ class Rules(Enum):
     BPS_MAX_LENGTH = (int, 'iops_max_length')
 
     SSH_KEY_ID_EXT = (REG_NUMBER, 'ssh_key_id')
+    SSH_KEYS_ID = (list, 'ssh_keys_id')
     PUBLIC_KEY = (basestring, 'public_key')
 
     UUID = (basestring, 'uuid', (36, 36))

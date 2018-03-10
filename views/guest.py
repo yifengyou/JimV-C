@@ -128,6 +128,7 @@ def create():
         remark = request.form.get('remark')
         allocation_by_random = 'allocation_by_random' in request.form
         node_id = request.form.get('node_id')
+        ssh_keys_id = request.form.getlist('ssh_keys_id')
 
         if not isinstance(ability, basestring):
             pass
@@ -146,6 +147,7 @@ def create():
             "quantity": int(quantity),
             "remark": remark,
             "password": password,
+            "ssh_keys_id": ssh_keys_id,
             "lease_term": 100
         }
 

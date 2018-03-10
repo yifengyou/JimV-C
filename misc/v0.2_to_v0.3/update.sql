@@ -115,6 +115,8 @@ IPV6INIT=no
 NAME=eth0', '');
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (1, 1, 2, '/etc/hostname', '{HOSTNAME}', '');
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (1, 0, 3, '', '', 'echo "root:{PASSWORD}" | chpasswd');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (1, 0, 4, '', '', 'mkdir -p /root/.ssh');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (1, 1, 5, '/root/.ssh/authorized_keys', '{SSH-KEY}', '');
 
 -- For CentOS-SysV
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (2, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}
@@ -131,6 +133,8 @@ NAME=eth0', '');
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (2, 1, 2, '/etc/sysconfig/network', 'NETWORKING=yes
 HOSTNAME="{HOSTNAME}"', '');
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (2, 0, 3, '', '', 'echo "root:{PASSWORD}" | chpasswd');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (2, 0, 4, '', '', 'mkdir -p /root/.ssh');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (2, 1, 5, '/root/.ssh/authorized_keys', '{SSH-KEY}', '');
 
 -- For Gentoo-OpenRC
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (3, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}
@@ -139,6 +143,8 @@ INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_i
 routes_eth0="default via {GATEWAY}"', '');
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (3, 1, 2, '/etc/conf.d/hostname', 'hostname="{HOSTNAME}"', '');
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (3, 0, 3, '', '', 'echo "root:{PASSWORD}" | chpasswd');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (3, 0, 4, '', '', 'mkdir -p /root/.ssh');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (3, 1, 5, '/root/.ssh/authorized_keys', '{SSH-KEY}', '');
 
 -- For Windows
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (4, 1, 0, '/Windows/jimv_init.bat', 'netsh interface ip set address name="Ethernet" source=static {IP} {NETMASK} {GATEWAY}
