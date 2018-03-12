@@ -547,6 +547,7 @@ def r_delete(uuids):
                 if disk.state == status.DiskState.pending.value:
                     disk.delete()
                     guest.delete()
+                    SSHKeyGuestMapping.delete_by_filter(filter_str=':'.join(['guest_uuid', 'eq', guest.uuid]))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)

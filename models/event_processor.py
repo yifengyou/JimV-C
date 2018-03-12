@@ -8,7 +8,7 @@ import time
 from IPy import IP
 import jimit as ji
 
-from models import Database as db, Config, GuestCPUMemory, GuestTraffic, GuestDiskIO
+from models import Database as db, Config, GuestCPUMemory, GuestTraffic, GuestDiskIO, SSHKeyGuestMapping
 from models import Guest
 from models import Disk
 from models import Log
@@ -185,6 +185,8 @@ class EventProcessor(object):
                     cls.disk.delete()
                     cls.disk.update_by_filter({'guest_uuid': '', 'sequence': -1, 'state': DiskState.idle.value},
                                               filter_str='guest_uuid:eq:' + cls.guest.uuid)
+
+                    SSHKeyGuestMapping.delete_by_filter(filter_str=':'.join(['guest_uuid', 'eq', cls.guest.uuid]))
 
             elif action == 'reset_password':
                 if state == ResponseState.success.value:
