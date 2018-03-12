@@ -70,6 +70,7 @@
     var keyword = '';
     var resource_path = window.location.pathname;
     var cur_url = resource_path;
+    var show_real_password_for_renew = false;
 
     $(document).ready(function() {
         page_size = $('#page_size').val();
@@ -169,6 +170,11 @@
         $('#reset_password_modal').on('show.bs.modal', function (me) {
             $('#reset_password_instance_uuid').val(
                 $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
+
+            show_real_password_for_renew = false;
+            $('#show_new_password_button').removeClass("icon-elusive-eye").addClass("icon-elusive-eye-off");
+            $('#new_password').val('');
+            $('#new_password').attr({type: "password"});
         });
     });
 
@@ -568,6 +574,18 @@
             $('.real_password').toggle();
         }
     }
+
+    function change_display_password_for_renew(me) {
+        if (show_real_password_for_renew) {
+            show_real_password_for_renew = false;
+            $(me).removeClass("icon-elusive-eye").addClass("icon-elusive-eye-off");
+            $('#new_password').attr({type: "password"});
+        } else {
+            show_real_password_for_renew = true;
+            $(me).removeClass("icon-elusive-eye-off").addClass("icon-elusive-eye");
+            $('#new_password').attr({type: "text"});
+        }
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -851,10 +869,18 @@
                 <h4 class="modal-title">重置密码：</h4>
             </div>
             <div class="modal-body">
-                <div class="form-group">
+                <div class="form-group" style="height: 20px;">
                     <input id="reset_password_type" title="重置密码类型" class="form-control" name="reset_password_type" value="single" hidden>
                     <input id="reset_password_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
-                    <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="新密码">
+                    <div class="col-sm-8">
+                        <input id="new_password" title="新密码" class="form-control" name="new_password" type="password" placeholder="新密码">
+                    </div>
+                    <div class="col-sm-2">
+                        <button id="show_new_password_button" class="form-control glyph-icon icon-elusive-eye-off" onclick="change_display_password_for_renew(this);" style="color: #014c8c; width: 35px;"></button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button class="form-control glyph-icon icon-elusive-key" onclick="$('#new_password').val(new RandomPassword().create(16));" style="color: #014c8c; width: 35px;"></button>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
