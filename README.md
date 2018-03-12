@@ -94,7 +94,7 @@
     curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash -
     ```
 5. [安装部署 JimV-N](https://github.com/jamesiter/JimV-N#%E5%AE%89%E8%A3%85)
-6. [获取系统镜像模板](https://pan.baidu.com/s/1qYmNwK0)
+6. [获取系统镜像模板](http://template.iit.im)
 7. 上传系统镜像模板
    > 存放系统镜像模板，到所有计算节点可以访问到的路径(如果是单个计算节点，可以存放到 /opt/template_images 目录下。如果是多个计算节点，可以通过 NFS 共享该目录。)。
 8. 创建虚拟机模板
