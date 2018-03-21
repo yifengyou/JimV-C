@@ -148,7 +148,7 @@ function install_MariaDB() {
     sed -i '/\[mysqld\]/a\log-bin' /etc/my.cnf
     sed -i '/\[mysqld\]/a\expire_logs_days = 1' /etc/my.cnf
     sed -i '/\[mysqld\]/a\innodb_file_per_table' /etc/my.cnf
-    sed -i '/\[mysqld\]/a\max_connections = 1000' /etc/my.cnf
+    sed -i '/\[mysqld\]/a\max_connections = 10000' /etc/my.cnf
 
     # 启动并使其随机启动
     systemctl enable mariadb.service

@@ -379,4 +379,5 @@ class EventProcessor(object):
 
             except Exception as e:
                 logger.error(traceback.format_exc())
+                time.sleep(1)
 
