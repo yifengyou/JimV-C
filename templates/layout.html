@@ -364,9 +364,15 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ url_for('v_snapshots.show') }}" title="虚拟机实例快照列表">
+                                <i class="glyph-icon icon-linecons-camera"></i>
+                                <span>实例快照</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ url_for('v_os_templates_image.show') }}" title="虚拟机模板镜像列表">
                                 <i class="glyph-icon icon-linecons-inbox"></i>
-                                <span>虚拟机模板镜像</span>
+                                <span>模板镜像</span>
                             </a>
                         </li>
                         <li>
@@ -470,6 +476,9 @@
         <script type="text/javascript" src="{{ url_for('static', filename='multi-select/js/jquery.multi-select.js') }}"></script>
         <!-- Quicksearch -->
         <script type="text/javascript" src="{{ url_for('static', filename='js-core/jquery.quicksearch.js') }}"></script>
+
+        <!-- jsPlumb -->
+        <script type="text/javascript" src="{{ url_for('static', filename='jsplumb/jsplumb.min.js') }}"></script>
 
         <!-- JS-URL -->
         <script type="text/javascript" src="{{ url_for('static', filename='js-core/url.js') }}"></script>

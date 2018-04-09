@@ -34,7 +34,6 @@ def show():
     keyword = request.args.get('keyword', None)
     order_by = request.args.get('order_by', None)
     order = request.args.get('order', None)
-    filters = list()
 
     if page is not None:
         args.append('page=' + page.__str__())
@@ -50,9 +49,6 @@ def show():
 
     if order is not None:
         args.append('order=' + order)
-
-    if filters.__len__() > 0:
-        args.append('filter=' + ','.join(filters))
 
     host_url = request.host_url.rstrip('/')
 

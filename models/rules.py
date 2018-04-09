@@ -11,6 +11,7 @@ __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
 
+# TODO: 考虑按视角归类，比如自身视角名称(uuid)，外部视角名称(guest_uuid)
 class Rules(Enum):
     # 正则表达式方便校验其来自URL的参数
     REG_NUMBER = 'regex:^\d{1,17}$'
@@ -83,6 +84,10 @@ class Rules(Enum):
     BPS_RD = (int, 'bps_rd')
     BPS_WR = (int, 'bps_wr')
     INFLUENCE_CURRENT_GUEST = (bool, 'influence_current_guest')
+
+    GUEST_UUID = (basestring, 'guest_uuid', (36, 36))
+    SNAPSHOT_ID = (REG_NUMBER, 'snapshot_id')
+    SNAPSHOTS_ID = (REG_NUMBERS, 'snapshots_id')
 
     REMARK = (basestring, 'remark')
     USE_FOR = (int, 'use_for')

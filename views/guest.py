@@ -84,11 +84,6 @@ def show():
     for os_template_profile in os_templates_profile_ret['data']:
         os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
 
-    guests_uuid = list()
-
-    for guest in guests_ret['data']:
-        guests_uuid.append(guest['uuid'])
-
     last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
     page_length = 5
     pages = list()

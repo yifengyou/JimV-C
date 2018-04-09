@@ -381,6 +381,37 @@ ALTER TABLE ssh_key_guest_mapping ADD UNIQUE INDEX (ssh_key_id, guest_uuid);
 ALTER TABLE ssh_key_guest_mapping ADD INDEX (guest_uuid);
 
 
+CREATE TABLE IF NOT EXISTS snapshot(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    label VARCHAR(255) NOT NULL,
+    snapshot_id VARCHAR(255) NOT NULL,
+    parent_id VARCHAR(255) NOT NULL,
+    guest_uuid CHAR(36) NOT NULL,
+    status TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    progress TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    create_time BIGINT UNSIGNED NOT NULL,
+    xml TEXT NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE snapshot ADD INDEX (label);
+ALTER TABLE snapshot ADD INDEX (snapshot_id);
+ALTER TABLE snapshot ADD INDEX (guest_uuid);
+
+
+CREATE TABLE IF NOT EXISTS snapshot_disk_mapping(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    snapshot_id VARCHAR(255) NOT NULL,
+    disk_uuid CHAR(36) NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE snapshot_disk_mapping ADD UNIQUE INDEX (snapshot_id, disk_uuid);
+ALTER TABLE snapshot_disk_mapping ADD INDEX (disk_uuid);
+
+
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-Systemd', '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。', 1);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-SysV', '用作 Redhat SysV 系列的系统初始化。初始化操作依据 CentOS 6.8 来实现。', 1);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('Gentoo-OpenRC', '用作 Gentoo OpenRC 系列的系统初始化。', 1);

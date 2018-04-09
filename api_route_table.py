@@ -7,6 +7,7 @@ from api import config
 from api import user
 from api import guest
 from api import disk
+from api import snapshot
 from api import os_template_image
 from api import os_template_profile
 from api import os_template_initialize_operate_set
@@ -140,6 +141,14 @@ add_rule_api(ssh_key.blueprint, '/_bound/<ssh_key_id>', api_func='ssh_key.r_boun
 add_rule_api(ssh_key.blueprint, '/_unbound/<ssh_key_id>', api_func='ssh_key.r_unbound', methods=['GET'])
 add_rule_api(ssh_key.blueprint, '/_bind/<ssh_key_id>/<uuids>', api_func='ssh_key.r_bind', methods=['PUT'])
 add_rule_api(ssh_key.blueprint, '/_unbind/<ssh_key_id>/<uuids>', api_func='ssh_key.r_unbind', methods=['PUT'])
+
+# 快照操作
+add_rule_api(snapshot.blueprint, '', api_func='snapshot.r_create', methods=['POST'])
+add_rule_api(snapshot.blueprints, '/<snapshots_id>', api_func='snapshot.r_delete', methods=['DELETE'])
+add_rule_api(snapshot.blueprints, '/<snapshot_id>', api_func='snapshot.r_update', methods=['PATCH'])
+add_rule_api(snapshot.blueprints, '/<snapshots_id>', api_func='snapshot.r_get', methods=['GET'])
+add_rule_api(snapshot.blueprints, '', api_func='snapshot.r_get_by_filter', methods=['GET'])
+add_rule_api(snapshot.blueprints, '/_search', api_func='snapshot.r_content_search', methods=['GET'])
 
 # 日志查询
 # Guest 性能查询

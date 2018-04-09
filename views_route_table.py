@@ -12,6 +12,7 @@ from views import config
 from views import misc
 from views import os_template_image
 from views import ssh_key
+from views import snapshot
 
 
 __author__ = 'James Iter'
@@ -51,3 +52,4 @@ add_rule_views(host.blueprint, '/detail/<node_id>', views_func='host.detail', me
 add_rule_views(ssh_key.blueprints, '', views_func='ssh_key.show', methods=['GET'])
 add_rule_views(ssh_key.blueprint, '', views_func='ssh_key.create', methods=['POST'])
 
+add_rule_views(snapshot.blueprints, '', views_func='snapshot.show', methods=['GET'])

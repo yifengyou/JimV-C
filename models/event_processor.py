@@ -11,6 +11,7 @@ import jimit as ji
 from models import Database as db, Config, GuestCPUMemory, GuestTraffic, GuestDiskIO, SSHKeyGuestMapping
 from models import Guest
 from models import Disk
+from models import Snapshot, SnapshotDiskMapping
 from models import Log
 from models import Utils
 from models import EmitKind
@@ -33,6 +34,8 @@ class EventProcessor(object):
     guest = Guest()
     guest_migrate_info = GuestMigrateInfo()
     disk = Disk()
+    snapshot = Snapshot()
+    snapshot_disk_mapping = SnapshotDiskMapping()
     config = Config()
     config.id = 1
     guest_cpu_memory = GuestCPUMemory()
@@ -244,6 +247,44 @@ class EventProcessor(object):
                 cls.disk.uuid = uuid
                 cls.disk.get_by('uuid')
                 cls.disk.delete()
+
+        elif _object == 'snapshot':
+            if action == 'create':
+                if state == ResponseState.success.value:
+                    cls.snapshot.id = cls.message['message']['passback_parameters']['id']
+                    cls.snapshot.snapshot_id = data['snapshot_id']
+                    cls.snapshot.parent_id = data['parent_id']
+                    cls.snapshot.xml = data['xml']
+                    cls.snapshot.progress = 100
+                    cls.snapshot.update()
+
+                    disks, _ = Disk.get_by_filter(filter_str='guest_uuid:eq:' + cls.snapshot.guest_uuid)
+
+                    for disk in disks:
+                        cls.snapshot_disk_mapping.snapshot_id = cls.snapshot.snapshot_id
+                        cls.snapshot_disk_mapping.disk_uuid = disk['uuid']
+                        cls.snapshot_disk_mapping.create()
+
+                else:
+                    cls.snapshot.progress = 255
+                    cls.snapshot.update()
+
+            if action == 'delete':
+                if state == ResponseState.success.value:
+                    cls.snapshot.id = cls.message['message']['passback_parameters']['id']
+                    cls.snapshot.get()
+
+                    # 更新子快照的 parent_id 为，当前快照的 parent_id。因为当前快照已被删除。
+                    Snapshot.update_by_filter({'parent_id': cls.snapshot.parent_id},
+                                              filter_str='parent_id:eq:' + cls.snapshot.snapshot_id)
+
+                    SnapshotDiskMapping.delete_by_filter(
+                        filter_str=':'.join(['snapshot_id', 'eq', cls.snapshot.snapshot_id]))
+
+                    cls.snapshot.delete()
+
+                else:
+                    pass
 
         else:
             pass

@@ -99,6 +99,14 @@ from event_processor import (
     EventProcessor
 )
 
+from snapshot import (
+    Snapshot
+)
+
+from snapshot_disk_mapping import (
+    SnapshotDiskMapping
+)
+
 
 __author__ = 'James Iter'
 __date__ = '2017/3/21'
@@ -111,7 +119,6 @@ __all__ = [
     'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'GuestXML', 'Log', 'SSHKey', 'SSHKeyGuestMapping',
     'OSTemplateImage', 'OSTemplateProfile', 'OSTemplateInitializeOperateSet', 'OSTemplateInitializeOperate',
     'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO', 'HostCPUMemory', 'HostTraffic',
-    'HostDiskUsageIO', 'Host'
+    'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping'
 ]
-
 
