@@ -29,7 +29,7 @@ class Snapshot(ORM):
         self.status = None
         self.progress = None
         self.create_time = ji.Common.tus()
-        self.xml = None
+        self.xml = ''
 
     @staticmethod
     def get_filter_keywords():

@@ -95,16 +95,16 @@ from host_performance import (
     HostDiskUsageIO
 )
 
-from event_processor import (
-    EventProcessor
-)
-
 from snapshot import (
     Snapshot
 )
 
 from snapshot_disk_mapping import (
     SnapshotDiskMapping
+)
+
+from event_processor import (
+    EventProcessor
 )
 
 

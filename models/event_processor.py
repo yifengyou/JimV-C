@@ -250,8 +250,10 @@ class EventProcessor(object):
 
         elif _object == 'snapshot':
             if action == 'create':
+                cls.snapshot.id = cls.message['message']['passback_parameters']['id']
+                cls.snapshot.get()
+
                 if state == ResponseState.success.value:
-                    cls.snapshot.id = cls.message['message']['passback_parameters']['id']
                     cls.snapshot.snapshot_id = data['snapshot_id']
                     cls.snapshot.parent_id = data['parent_id']
                     cls.snapshot.xml = data['xml']

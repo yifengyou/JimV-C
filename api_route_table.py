@@ -145,7 +145,7 @@ add_rule_api(ssh_key.blueprint, '/_unbind/<ssh_key_id>/<uuids>', api_func='ssh_k
 # 快照操作
 add_rule_api(snapshot.blueprint, '', api_func='snapshot.r_create', methods=['POST'])
 add_rule_api(snapshot.blueprints, '/<snapshots_id>', api_func='snapshot.r_delete', methods=['DELETE'])
-add_rule_api(snapshot.blueprints, '/<snapshot_id>', api_func='snapshot.r_update', methods=['PATCH'])
+add_rule_api(snapshot.blueprint, '/<snapshot_id>', api_func='snapshot.r_update', methods=['PATCH'])
 add_rule_api(snapshot.blueprints, '/<snapshots_id>', api_func='snapshot.r_get', methods=['GET'])
 add_rule_api(snapshot.blueprints, '', api_func='snapshot.r_get_by_filter', methods=['GET'])
 add_rule_api(snapshot.blueprints, '/_search', api_func='snapshot.r_content_search', methods=['GET'])

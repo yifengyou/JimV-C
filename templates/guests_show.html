@@ -329,6 +329,25 @@
         });
     }
 
+    function create_snapshot(uuid, label) {
+        $.ajax({
+            url : '/api/snapshot',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data : JSON.stringify({guest_uuid: uuid, label: label}),
+            error : function(data, textStatus, xhr) {
+                alter_danger('实例创建快照指令发送失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('实例创建快照指令发送成功！');
+                setTimeout(function() {
+                    window.location.href="/snapshots";
+                }, 1000);
+            }
+        });
+    }
+
     function suspend(uuids) {
         $.ajax({
             url : '/api/guests/_suspend/' + uuids.join(','),
@@ -427,6 +446,13 @@
         var uuid = $('#instance_uuid').val();
         force_shutdown([uuid]);
         $('#force_shutdown_modal').modal('hide');
+    }
+
+    function create_snapshot_at(me) {
+        var uuid = $('#instance_uuid').val();
+        var label = $('#snapshot_label').val();
+        create_snapshot(uuid, label);
+        $('#create_snapshot_modal').modal('hide');
     }
 
     function suspend_at(me) {
@@ -664,7 +690,6 @@
                                        启动
                                     </a>
                                 </li>
-                                </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#reboot_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
@@ -679,14 +704,12 @@
                                        强制重启
                                     </a>
                                 </li>
-                                </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#shutdown_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
                                                 $('#shutdown_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
                                        停止
                                     </a>
-                                </li>
                                 </li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#force_shutdown_modal"
@@ -695,6 +718,13 @@
                                        强制停止
                                     </a>
                                 </li>
+                                <li class="divider"></li>
+                                <li class="">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#create_snapshot_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#create_snapshot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                        创建快照
+                                    </a>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [1] %} disabled {% endif %}">
@@ -704,14 +734,12 @@
                                        暂停
                                     </a>
                                 </li>
-                                </li>
                                 <li class="{% if item.status not in [3] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#resume_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
                                                 $('#resume_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
                                        恢复
                                     </a>
-                                </li>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="">
@@ -1067,6 +1095,26 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="batch_force_shutdown();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="create_snapshot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">创建快照：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要为该虚拟机创建快照吗？</p>
+                <h3 style="color: orangered;" id="create_snapshot_instance_desc"></h3>
+                <p></p>
+                <input id="snapshot_label" title="快照名称" class="form-control" name="snapshot_label" placeholder="快照名称">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="create_snapshot_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
