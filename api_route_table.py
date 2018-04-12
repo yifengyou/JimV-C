@@ -149,6 +149,7 @@ add_rule_api(snapshot.blueprint, '/<snapshot_id>', api_func='snapshot.r_update',
 add_rule_api(snapshot.blueprints, '/<snapshots_id>', api_func='snapshot.r_get', methods=['GET'])
 add_rule_api(snapshot.blueprints, '', api_func='snapshot.r_get_by_filter', methods=['GET'])
 add_rule_api(snapshot.blueprints, '/_search', api_func='snapshot.r_content_search', methods=['GET'])
+add_rule_api(snapshot.blueprint, '/_revert/<snapshot_id>', api_func='snapshot.r_revert', methods=['PUT'])
 
 # 日志查询
 # Guest 性能查询

@@ -86,8 +86,8 @@ class Rules(Enum):
     INFLUENCE_CURRENT_GUEST = (bool, 'influence_current_guest')
 
     GUEST_UUID = (basestring, 'guest_uuid', (36, 36))
-    SNAPSHOT_ID = (REG_NUMBER, 'snapshot_id')
-    SNAPSHOTS_ID = (REG_NUMBERS, 'snapshots_id')
+    SNAPSHOT_ID = (basestring, 'snapshot_id', (10, 12))
+    SNAPSHOTS_ID = (basestring, 'snapshots_id', (10, 1200))
 
     REMARK = (basestring, 'remark')
     USE_FOR = (int, 'use_for')

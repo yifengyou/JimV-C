@@ -183,6 +183,42 @@
         });
     }
 
+    function revert_snapshot(me) {
+        var snapshot_id = $('#snapshot_id').val();
+        $('#snapshot_revert_modal').modal('hide');
+        $.ajax({
+            url : '/api/snapshot/_revert/' + snapshot_id,
+            type : 'PUT',
+            error : function() {
+                alter_danger('快照恢复失败！');
+            },
+            success : function() {
+                alter_success('快照恢复成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function delete_snapshot(me) {
+        var snapshot_id = $('#snapshot_id').val();
+        $('#snapshot_delete_modal').modal('hide');
+        $.ajax({
+            url : '/api/snapshots/' + snapshot_id,
+            type : 'DELETE',
+            error : function() {
+                alter_danger('快照删除失败！');
+            },
+            success : function() {
+                alter_success('快照删除成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
     function get_selected_element(checked) {
         if (checked === null) {
             checked = true;
@@ -271,12 +307,17 @@
                             </a>
                         </div>
                     </td>
-                    <td>{% if item.progress == 255 %}
-                        <span style="color: #990000;">创建失败</span>
+                    <td>
+                        {% if item.progress == 255 %}
+                            <span style="color: #990000;">创建失败</span>
+                        {% elif item.progress == 254 %}
+                            <span style="color: #ff0000dd;">删除中...</span>
+                        {% elif item.progress == 253 %}
+                            <span style="color: #009cc5;">恢复中...</span>
                         {% elif item.progress == 100 %}
-                        <span style="color: #00BB00;">{{ item.progress }}%</span>
+                            <span style="color: #00BB00;">{{ item.progress }}%</span>
                         {% else %}
-                        <span style="color: #e5b715;">{{ item.progress }}%</span>
+                            <span style="color: #e5b715;">{{ item.progress }}%</span>
                         {% endif %}
                     </td>
                     <td>{{ format_guest_status(item.status, 100)|safe }}</td>
@@ -288,9 +329,11 @@
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
                     <td>
                         <div class="dropdown inline-block">
-                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_revert_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent)">恢复</a>
+                            <a href="javascript:;" class="{% if item.progress not in [100] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_revert_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
+                                                                                                                                            $('#revert_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">恢复</a>
                             <span> | </span>
-                            <a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_delete_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent)">删除</a>
+                            <a href="javascript:;" class="{% if item.progress not in [100, 255] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_delete_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
+                                                                                                                                            $('#delete_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">删除</a>
                         </div>
                     </td>
                 </tr>
@@ -354,6 +397,42 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="label_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="snapshot_revert_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">恢复实例快照：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要使该虚拟机恢复至此快照吗？</p>
+                <h3 style="color: orangered;" id="revert_snapshot_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="revert_snapshot();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="snapshot_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除实例快照：</h4>
+            </div>
+            <div class="modal-body">
+                <p>你确定要删除此快照吗？</p>
+                <h3 style="color: orangered;" id="delete_snapshot_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_snapshot();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

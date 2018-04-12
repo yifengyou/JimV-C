@@ -185,8 +185,55 @@ def r_delete(snapshots_id):
                 SnapshotDiskMapping.delete_by_filter(filter_str=':'.join(['snapshot_id', 'eq', snapshot.snapshot_id]))
                 snapshot.delete()
 
+            else:
+                snapshot.progress = 254
+                snapshot.update()
+
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_revert(snapshot_id):
+
+    args_rules = [
+        Rules.SNAPSHOT_ID.value
+    ]
+
+    try:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        ji.Check.previewing(args_rules, {'snapshot_id': snapshot_id})
+
+        snapshot = Snapshot()
+        guest = Guest()
+
+        snapshot.snapshot_id = snapshot_id
+        snapshot.get_by('snapshot_id')
+        snapshot.progress = 253
+        snapshot.update()
+        snapshot.get()
+
+        guest.uuid = snapshot.guest_uuid
+        guest.get_by('uuid')
+
+        message = {
+            '_object': 'snapshot',
+            'action': 'revert',
+            'uuid': guest.uuid,
+            'snapshot_id': snapshot.snapshot_id,
+            'node_id': guest.node_id,
+            'passback_parameters': {'id': snapshot.id}
+        }
+
+        Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+        ret['data'] = snapshot.__dict__
         return ret
 
     except ji.PreviewingError, e:

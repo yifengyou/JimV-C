@@ -288,6 +288,13 @@ class EventProcessor(object):
                 else:
                     pass
 
+            if action == 'revert':
+                # 不论恢复成功与否，都使快照恢复至正常状态。
+                cls.snapshot.id = cls.message['message']['passback_parameters']['id']
+                cls.snapshot.get()
+                cls.snapshot.progress = 100
+                cls.snapshot.update()
+
         else:
             pass
 

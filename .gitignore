@@ -55,3 +55,6 @@ target/
 
 # PyCharm IDE
 .idea/
+
+# MAC .DS_Store
+.DS_Store
