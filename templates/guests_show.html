@@ -722,7 +722,8 @@
                                 <li class="">
                                     <a href="javascript:;" data-toggle="modal" data-target="#create_snapshot_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
-                                                $('#create_snapshot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                $('#create_snapshot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent);
+                                                $('#snapshot_label').val($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
                                         创建快照
                                     </a>
                                 </li>

@@ -33,7 +33,7 @@ def show():
     page_size = int(request.args.get('page_size', 10))
     keyword = request.args.get('keyword', None)
     order_by = request.args.get('order_by', None)
-    order = request.args.get('order', None)
+    order = request.args.get('order', 'desc')
 
     if page is not None:
         args.append('page=' + page.__str__())
