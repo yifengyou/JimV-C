@@ -150,6 +150,9 @@ add_rule_api(snapshot.blueprints, '/<snapshots_id>', api_func='snapshot.r_get', 
 add_rule_api(snapshot.blueprints, '', api_func='snapshot.r_get_by_filter', methods=['GET'])
 add_rule_api(snapshot.blueprints, '/_search', api_func='snapshot.r_content_search', methods=['GET'])
 add_rule_api(snapshot.blueprint, '/_revert/<snapshot_id>', api_func='snapshot.r_revert', methods=['PUT'])
+add_rule_api(snapshot.blueprint, '/_disks/<snapshot_id>', api_func='snapshot.r_get_disks', methods=['GET'])
+add_rule_api(snapshot.blueprint, '/_convert_to_os_template_image/<snapshot_id>/<disk_uuid>',
+             api_func='snapshot.r_convert_to_os_template_image', methods=['PUT'])
 
 # 日志查询
 # Guest 性能查询

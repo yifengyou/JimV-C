@@ -259,6 +259,89 @@
         highlight_selected_element();
         shortcut_bar_enable();
     }
+    
+    function make_list_of_disks(me) {
+        var snapshot_id = $('#snapshot_id').val();
+        var disks_uuid = [];
+
+        $.ajax({
+            url : '/api/snapshot/_disks/' + snapshot_id,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+                alter_danger('获取实例磁盘列表失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                disks_uuid = data.data;
+            }
+        });
+
+        $.ajax({
+            url : '/api/disks?order_by=sequence&filter=uuid:in:' + disks_uuid.join(','),
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+                alter_danger('获取实例磁盘列表失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                var disks_list_tbody = $("#disks_list").find("tbody");
+                var disk_kind = '系统盘';
+                disks_list_tbody.empty();
+
+                $.each(data.data, function(k, v) {
+                    if (v['sequence'] === 0) {
+                        disk_kind = '系统盘';
+                    } else {
+                        disk_kind = '数据盘';
+                    }
+                    disks_list_tbody.append(
+                        '<tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">' +
+                        '<td>' +
+                            '<div>' + v['uuid'] + '</div>' +
+                            '<div>' + '<p style="display: inline-block;">' + v['remark'] + '</p></div>' +
+                        '</td>' +
+                        '<td>' + v['device'] + '</td>' +
+                        '<td>' + v['size'] + ' GB</td>' +
+                        '<td>' + disk_kind + '</td>' +
+                        '<td><a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#create_os_template_image_from_disk_snapshot_modal" ' +
+                        'onclick="$(\'#os_template_image_label\').val($(this).parent().prev().prev().prev().prev().children()[1].textContent);$(\'#disk_uuid\').val(\'' + v['uuid'] + '\');' +
+                        '$(\'#create_os_template_image_from_disk_snapshot_desc\').text($(this).parent().prev().prev().prev().text());$(\'#snapshot_convert_to_os_template_image_modal\').modal(\'hide\');">创建</a></td>' +
+                        '</tr>'
+                        );
+                });
+            }
+        });
+    }
+    
+    function create_os_template_image_from_disk_snapshot() {
+        var snapshot_id = $('#snapshot_id').val();
+        var disk_uuid = $('#disk_uuid').val();
+        var label = $('#os_template_image_label').val();
+
+        $('#create_os_template_image_from_disk_snapshot_modal').modal('hide');
+
+        $.ajax({
+            url : '/api/snapshot/_convert_to_os_template_image/' + snapshot_id + '/' + disk_uuid,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                label: label
+            }),
+            error : function() {
+                alter_danger('从磁盘快照创建自定义镜像失败！');
+            },
+            success : function() {
+                alter_success('从磁盘快照创建自定义镜像成功！');
+                setTimeout(function() {
+                    window.location.href="/os_templates_image";
+                }, 1000);
+            }
+        });
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -332,6 +415,10 @@
                             <a href="javascript:;" class="{% if item.progress not in [100] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_revert_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
                                                                                                                                             $('#revert_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">恢复</a>
                             <span> | </span>
+                            <a href="javascript:;" data-guest_uuid="{{ item.guest_uuid }}" class="{% if item.progress not in [100] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_convert_to_os_template_image_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
+                                                                                                                                            make_list_of_disks(this);
+                                                                                                                                            $('#convert_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">创建镜像</a>
+                            <span> | </span>
                             <a href="javascript:;" class="{% if item.progress not in [100, 255] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_delete_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
                                                                                                                                             $('#delete_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">删除</a>
                         </div>
@@ -385,6 +472,7 @@
 </div>
 
 <input id="snapshot_id" title="快照 ID" class="form-control" name="snapshot_id" hidden>
+<input id="disk_uuid" title="磁盘 UUID" class="form-control" name="disk_uuid" hidden>
 
 <div class="modal" id="edit_label_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
@@ -415,6 +503,56 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="revert_snapshot();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="snapshot_convert_to_os_template_image_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">请选择自定义镜像的磁盘：</h4>
+            </div>
+            <div class="modal-body">
+                <h3 style="color: orangered;" id="convert_snapshot_instance_desc"></h3>
+                <p></p>
+                <table id="disks_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                       style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                    <thead>
+                    <tr role="row">
+                        <th width="280px;">UUID</th>
+                        <th>设备路径</th>
+                        <th>大小</th>
+                        <th>磁盘性别</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="create_os_template_image_from_disk_snapshot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">创建自定义镜像：</h4>
+            </div>
+            <div class="modal-body">
+                <h3 style="color: orangered;" id="create_os_template_image_from_disk_snapshot_desc"></h3>
+                <p></p>
+                <input id="os_template_image_label" title="自定义镜像名称" class="form-control" name="os_template_image_label">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="create_os_template_image_from_disk_snapshot();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

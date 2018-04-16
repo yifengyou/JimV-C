@@ -47,6 +47,7 @@ class GuestState(IntEnum):
     migrating = 8
     update = 9
     creating = 10
+    snapshot_converting = 11
     dirty = 255
 
 
@@ -89,6 +90,11 @@ class OSTemplateInitializeOperateKind(IntEnum):
     cmd = 0
     write_file = 1
     append_file = 2
+
+
+class OSTemplateImageKind(IntEnum):
+    public = 0
+    custom = 1
 
 
 class GuestCollectionPerformanceDataKind(IntEnum):

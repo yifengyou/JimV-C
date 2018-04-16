@@ -11,7 +11,7 @@ import jimit as ji
 from models import Database as db, Config, GuestCPUMemory, GuestTraffic, GuestDiskIO, SSHKeyGuestMapping
 from models import Guest
 from models import Disk
-from models import Snapshot, SnapshotDiskMapping
+from models import Snapshot, SnapshotDiskMapping, OSTemplateImage
 from models import Log
 from models import Utils
 from models import EmitKind
@@ -36,6 +36,7 @@ class EventProcessor(object):
     disk = Disk()
     snapshot = Snapshot()
     snapshot_disk_mapping = SnapshotDiskMapping()
+    os_template_image = OSTemplateImage()
     config = Config()
     config.id = 1
     guest_cpu_memory = GuestCPUMemory()
@@ -109,6 +110,18 @@ class EventProcessor(object):
                 return
 
             cls.guest.progress = cls.message['message']['progress']
+
+        elif cls.guest.status == GuestState.snapshot_converting.value:
+            print cls.message
+            cls.os_template_image.id = cls.message['message']['os_template_image_id']
+            cls.os_template_image.get()
+
+            if cls.message['message']['progress'] <= cls.os_template_image.progress:
+                return
+
+            cls.os_template_image.progress = cls.message['message']['progress']
+            cls.os_template_image.update()
+            return
 
         cls.guest.update()
 
@@ -294,6 +307,18 @@ class EventProcessor(object):
                 cls.snapshot.get()
                 cls.snapshot.progress = 100
                 cls.snapshot.update()
+
+            if action == 'convert':
+                cls.os_template_image.id = cls.message['message']['passback_parameters']['id']
+                cls.os_template_image.get()
+
+                if state == ResponseState.success.value:
+                    cls.os_template_image.progress = 100
+
+                else:
+                    cls.os_template_image.progress = 255
+
+                cls.os_template_image.update()
 
         else:
             pass

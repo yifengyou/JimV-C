@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
+import jimit as ji
+
 from models import FilterFieldType
 from models import ORM
 
@@ -26,6 +28,9 @@ class OSTemplateImage(ORM):
         self.os_template_profile_id = None
         self.path = None
         self.active = True
+        self.kind = None
+        self.progress = None
+        self.create_time = ji.Common.tus()
 
     @staticmethod
     def get_filter_keywords():
@@ -34,7 +39,9 @@ class OSTemplateImage(ORM):
             'label': FilterFieldType.STR.value,
             'path': FilterFieldType.STR.value,
             'os_template_profile_id': FilterFieldType.INT.value,
-            'active': FilterFieldType.INT.value
+            'active': FilterFieldType.INT.value,
+            'kind': FilterFieldType.INT.value,
+            'progress': FilterFieldType.INT.value
         }
 
     @staticmethod

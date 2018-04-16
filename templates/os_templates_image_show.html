@@ -227,6 +227,19 @@
         window.location.href=cur_url;
     }
 
+    function select_this(me) {
+        $(me).parent().parent().children().removeClass('active');
+        $(me).parent().addClass('active');
+
+        $('#public_os_templates_image, #custom_os_templates_image').css('display', 'none');
+
+        if (me.id === 'custom_os_templates_image_label') {
+            $('#custom_os_templates_image').css('display', 'unset');
+        } else {
+            $('#public_os_templates_image').css('display', 'unset');
+        }
+    }
+
     function row_onmouseover(me) {
         $(me).find(".edit_label_trigger, .edit_path_trigger").css('display','inline-flex');
     }
@@ -490,24 +503,24 @@
 </script>
 <div class="panel">
     <div class="panel-body">
-        <h3 class="title-hero" style="font-size: 24px;">
-            虚拟机模板镜像
-        </h3>
-        <div>
-            <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
-                <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
-                    <div class="col-sm-12" style="padding-right: 0;">
-                        <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
-                            <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
-                        </div>
-                        <div class="pull-right">
-                            <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
-                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_os_template_image_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加模板</a>
-                        </div>
+        <ul class="nav nav-tabs mrg25B">
+            <li class="active"><a href="javascript:;" onclick="select_this(this);" id="public_os_templates_image_label">公共镜像</a></li>
+            <li><a href="javascript:;" onclick="select_this(this);" id="custom_os_templates_image_label">自定义镜像</a></li>
+        </ul>
+        <div id="public_os_templates_image" class="dataTables_wrapper form-inline">
+            <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                <div class="col-sm-12" style="padding-right: 0;">
+                    <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                        <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                        <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_os_template_image_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加模板</a>
                     </div>
                 </div>
-                <table id="os_templates_image_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
-                       style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+            </div>
+            <table id="os_templates_image_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                   style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
                 <thead>
                 <tr role="row">
                     <th style="display: none;">ID</th>
@@ -520,123 +533,269 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in os_templates_image_ret.data %}
-                <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
-                    <td style="display: none;">{{ item.id }}</td>
-                    <td><input title="选中" type="checkbox"></td>
-                    <td>
-                        <div>
-                            <p style="display: inline-block;">{{ item.label }}</p>
-                            <a href="javascript:;" class="edit_label_trigger" data-toggle="modal" data-target="#edit_label_modal" style="display: none; float: right;">
-                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
-                            </a>
-                        </div>
-                    </td>
-                    <td>{% if item.active == 0 %}
-                        <span style="color: #990000;">未启用</span>
+                {% for item in os_templates_image_ret.data if item.kind == 0 %}
+                    <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                        <td style="display: none;">{{ item.id }}</td>
+                        <td><input title="选中" type="checkbox"></td>
+                        <td>
+                            <div>
+                                <p style="display: inline-block;">{{ item.label }}</p>
+                                <a href="javascript:;" class="edit_label_trigger" data-toggle="modal" data-target="#edit_label_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>{% if item.active == 0 %}
+                            <span style="color: #990000;">未启用</span>
                         {% else %}
-                        <span style="color: #00BB00;">启用</span>
+                            <span style="color: #00BB00;">启用</span>
                         {% endif %}
-                    </td>
-                    <td>
-                        <div>
-                            <p style="display: inline-block;">{{ item.path }}</p>
-                            <a href="javascript:;" class="edit_path_trigger" data-toggle="modal" data-target="#edit_path_modal" style="display: none; float: right;">
-                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
-                            </a>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
-                                {% if item.logo == "" %}
-                                    <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].icon }}"></span>
-                                {% else %}
-                                    <span class="{{ item.logo }}"></span>
-                                {% endif %}
-                            </a>
-                            <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].os_product_name }}</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="dropdown inline-block">
-                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-                                更多
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="{% if item.active == true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
-                                    <a href="javascript:;" onclick="enable_at(this);">
-                                        启用
-                                    </a>
-                                </li>
-                                <li class="{% if item.active != true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
-                                    <a href="javascript:;" onclick="disable_at(this);">
-                                        禁用
-                                    </a>
-                                </li>
-                                <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                <li>
-                                    <a href="javascript:;" data-toggle="modal" data-target="#update_os_template_image_profile_id_modal"
-                                        onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                        </td>
+                        <td>
+                            <div>
+                                <p style="display: inline-block;">{{ item.path }}</p>
+                                <a href="javascript:;" class="edit_path_trigger" data-toggle="modal" data-target="#edit_path_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
+                                    {% if item.logo == "" %}
+                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].icon }}"></span>
+                                    {% else %}
+                                        <span class="{{ item.logo }}"></span>
+                                    {% endif %}
+                                </a>
+                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].os_product_name }}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="dropdown inline-block">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                    更多
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{% if item.active == true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="enable_at(this);">
+                                            启用
+                                        </a>
+                                    </li>
+                                    <li class="{% if item.active != true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="disable_at(this);">
+                                            禁用
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#update_os_template_image_profile_id_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                         $('#update_os_template_image_profile_id_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
-                                        变更发行版本
-                                    </a>
-                                </li>
-                                <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                <li>
-                                    <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
-                                       onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                            变更发行版本
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                        $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
-                                        删除
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
+                                            删除
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
                 {% endfor %}
                 </tbody>
-                </table>
+            </table>
 
-                <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
-                    <tfoot>
-                    <tr style="height: 70px;">
-                        <th><input type="checkbox" title="选取所有" class="all_selector"></th>
-                        <th>
-                            <div class="row">
-                                <div class="col-sm-6">
-                                </div>
-                                <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                    共有{{ os_templates_image_ret.paging.total }}条，每页显示：
-                                    <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
-                                        <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
-                                        <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
-                                        <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
-                                    </select>&nbsp;&nbsp;条
-                                </div>
-                                <div class="col-sm-3" style="text-align: left;">
-                                    <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
-                                        <ul id="pagination" class="pagination">
-                                            <li class="{% if page == 1 %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
-                                            </li>
-                                            {% for item in pages %}
+            <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                <tfoot>
+                <tr style="height: 70px;">
+                    <th><input type="checkbox" title="选取所有" class="all_selector"></th>
+                    <th>
+                        <div class="row">
+                            <div class="col-sm-6">
+                            </div>
+                            <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                共有{{ os_templates_image_ret.paging.total }}条，每页显示：
+                                <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
+                                    <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
+                                    <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
+                                    <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
+                                </select>&nbsp;&nbsp;条
+                            </div>
+                            <div class="col-sm-3" style="text-align: left;">
+                                <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
+                                    <ul id="pagination" class="pagination">
+                                        <li class="{% if page == 1 %} disabled {% endif %}">
+                                            <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
+                                        </li>
+                                        {% for item in pages %}
                                             <li class="{% if item == page %} active {% endif %}">
                                                 <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
                                             </li>
-                                            {% endfor %}
-                                            <li class="{% if page == last_page %} disabled {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                        {% endfor %}
+                                        <li class="{% if page == last_page %} disabled {% endif %}">
+                                            <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
-                        </th>
-                    </tr>
-                    </tfoot>
-                </table>
+                        </div>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div id="custom_os_templates_image" class="dataTables_wrapper form-inline" style="display: none;">
+            <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                <div class="col-sm-12" style="padding-right: 0;">
+                    <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                        <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                    </div>
+                </div>
             </div>
+            <table id="os_templates_image_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                   style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <thead>
+                <tr role="row">
+                    <th style="display: none;">ID</th>
+                    <th><input class="all_selector" title="选取所有" type="checkbox"></th>
+                    <th width="220px;">名称</th>
+                    <th>状态</th>
+                    <th>进度</th>
+                    <th>创建时间</th>
+                    <th>发行版本</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in os_templates_image_ret.data if item.kind == 1 %}
+                    <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                        <td style="display: none;">{{ item.id }}</td>
+                        <td><input title="选中" type="checkbox"></td>
+                        <td>
+                            <div>
+                                <p style="display: inline-block;">{{ item.label }}</p>
+                                <a href="javascript:;" class="edit_label_trigger" data-toggle="modal" data-target="#edit_label_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>{% if item.active == 0 %}
+                            <span style="color: #990000;">未启用</span>
+                        {% else %}
+                            <span style="color: #00BB00;">启用</span>
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% if item.progress == 255 %}
+                                <span style="color: #990000;">创建失败</span>
+                            {% elif item.progress == 254 %}
+                                <span style="color: #ff0000dd;">删除中...</span>
+                            {% elif item.progress == 100 %}
+                                <span style="color: #00BB00;">{{ item.progress }}%</span>
+                            {% else %}
+                                <span style="color: #e5b715;">{{ item.progress }}%</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ format_datetime_by_tus(item.create_time) }}</td>
+                        <td>
+                            <div>
+                                <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
+                                    {% if item.logo == "" %}
+                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].icon }}"></span>
+                                    {% else %}
+                                        <span class="{{ item.logo }}"></span>
+                                    {% endif %}
+                                </a>
+                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].os_product_name }}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="dropdown inline-block">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                    更多
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{% if item.active == true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="enable_at(this);">
+                                            启用
+                                        </a>
+                                    </li>
+                                    <li class="{% if item.active != true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="disable_at(this);">
+                                            禁用
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#update_os_template_image_profile_id_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                        $('#update_os_template_image_profile_id_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
+                                            变更发行版本
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                       $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
+                                            删除
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                <tfoot>
+                <tr style="height: 70px;">
+                    <th><input type="checkbox" title="选取所有" class="all_selector"></th>
+                    <th>
+                        <div class="row">
+                            <div class="col-sm-6">
+                            </div>
+                            <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                共有{{ os_templates_image_ret.paging.total }}条，每页显示：
+                                <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
+                                    <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
+                                    <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
+                                    <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
+                                </select>&nbsp;&nbsp;条
+                            </div>
+                            <div class="col-sm-3" style="text-align: left;">
+                                <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
+                                    <ul id="pagination" class="pagination">
+                                        <li class="{% if page == 1 %} disabled {% endif %}">
+                                            <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
+                                        </li>
+                                        {% for item in pages %}
+                                            <li class="{% if item == page %} active {% endif %}">
+                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
+                                            </li>
+                                        {% endfor %}
+                                        <li class="{% if page == last_page %} disabled {% endif %}">
+                                            <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 </div>

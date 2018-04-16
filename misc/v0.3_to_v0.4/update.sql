@@ -30,3 +30,7 @@ CREATE TABLE IF NOT EXISTS snapshot_disk_mapping(
 ALTER TABLE snapshot_disk_mapping ADD UNIQUE INDEX (snapshot_id, disk_uuid);
 ALTER TABLE snapshot_disk_mapping ADD INDEX (disk_uuid);
 
+ALTER TABLE os_template_image ADD COLUMN kind TINYINT UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE os_template_image ADD COLUMN progress TINYINT UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE os_template_image ADD COLUMN create_time BIGINT UNSIGNED NOT NULL;
+

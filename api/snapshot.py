@@ -6,12 +6,15 @@ from flask import Blueprint
 from flask import request
 import json
 import jimit as ji
+import os
 
 from api.base import Base
-from models import Guest
+from models import Guest, Config, Disk
 from models import Snapshot, SnapshotDiskMapping
+from models import OSTemplateImage
 from models import Utils
 from models import Rules
+from models import OSTemplateImageKind
 
 
 __author__ = 'James Iter'
@@ -238,4 +241,119 @@ def r_revert(snapshot_id):
 
     except ji.PreviewingError, e:
         return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_get_disks(snapshot_id):
+
+    args_rules = [
+        Rules.SNAPSHOT_ID.value
+    ]
+
+    try:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = list()
+
+        ji.Check.previewing(args_rules, {'snapshot_id': snapshot_id})
+
+        rows, _ = SnapshotDiskMapping.get_by_filter(filter_str=':'.join(['snapshot_id', 'eq', snapshot_id]))
+
+        for row in rows:
+            ret['data'].append(row['disk_uuid'])
+
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_convert_to_os_template_image(snapshot_id, disk_uuid):
+
+    args_rules = [
+        Rules.SNAPSHOT_ID.value,
+        Rules.DISK_UUID.value,
+        Rules.LABEL.value
+    ]
+
+    try:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        ji.Check.previewing(args_rules, {'snapshot_id': snapshot_id, 'disk_uuid': disk_uuid,
+                                         'label': request.json.get('label')})
+
+        rows, _ = SnapshotDiskMapping.get_by_filter(filter_str=':'.join(['snapshot_id', 'eq', snapshot_id]))
+
+        disks_uuid = list()
+
+        for row in rows:
+            disks_uuid.append(row['disk_uuid'])
+
+        if disk_uuid not in disks_uuid:
+            ret['state'] = ji.Common.exchange_state(40401)
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': 未在快照: ',
+                                                    snapshot_id, u' 中找到磁盘：', disk_uuid])
+            return ret
+
+        config = Config()
+        config.id = 1
+        config.get()
+
+        snapshot = Snapshot()
+        os_template_image = OSTemplateImage()
+        guest = Guest()
+        disk = Disk()
+
+        snapshot.snapshot_id = snapshot_id
+        snapshot.get_by('snapshot_id')
+
+        guest.uuid = snapshot.guest_uuid
+        guest.get_by('uuid')
+
+        disk.uuid = disk_uuid
+        disk.get_by('uuid')
+
+        os_template_image.id = guest.os_template_image_id
+        os_template_image.get()
+
+        image_name = '_'.join([snapshot.snapshot_id, disk.uuid]) + '.' + disk.format
+
+        os_template_image.id = 0
+        os_template_image.label = request.json.get('label')
+        os_template_image.path = '/'.join([os.path.dirname(os_template_image.path), image_name])
+        os_template_image.kind = OSTemplateImageKind.custom.value
+        os_template_image.progress = 0
+        os_template_image.create_time = ji.Common.tus()
+
+        if os_template_image.exist_by('path'):
+            ret['state'] = ji.Common.exchange_state(40901)
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': ', os_template_image.path])
+            return ret
+
+        os_template_image.create()
+        os_template_image.get_by('path')
+
+        message = {
+            '_object': 'snapshot',
+            'action': 'convert',
+            'uuid': disk.guest_uuid,
+            'snapshot_id': snapshot.snapshot_id,
+            'storage_mode': config.storage_mode,
+            'dfs_volume': config.dfs_volume,
+            'node_id': disk.node_id,
+            'snapshot_path': disk.path,
+            'template_path': os_template_image.path,
+            'os_template_image_id': os_template_image.id,
+            'passback_parameters': {'id': os_template_image.id}
+        }
+
+        Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
 

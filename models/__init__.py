@@ -68,7 +68,8 @@ from status import (
     GuestState,
     ResponseState,
     DiskState,
-    LogLevel
+    LogLevel,
+    OSTemplateImageKind
 )
 
 from guest_xml import (
@@ -119,6 +120,6 @@ __all__ = [
     'LogLevel', 'ORM', 'User', 'Config', 'Guest', 'Disk', 'GuestXML', 'Log', 'SSHKey', 'SSHKeyGuestMapping',
     'OSTemplateImage', 'OSTemplateProfile', 'OSTemplateInitializeOperateSet', 'OSTemplateInitializeOperate',
     'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO', 'HostCPUMemory', 'HostTraffic',
-    'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping'
+    'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping', 'OSTemplateImageKind'
 ]
 

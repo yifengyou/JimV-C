@@ -107,6 +107,7 @@ def create():
         logo = request.form.get('logo')
         active = request.form.get('active', 1)
         os_template_profile_id = request.form.get('os_template_profile_id')
+        kind = request.form.get('kind', 0)
 
         payload = {
             "label": label,
@@ -114,7 +115,8 @@ def create():
             "path": path,
             "logo": logo,
             "active": active,
-            "os_template_profile_id": int(os_template_profile_id)
+            "os_template_profile_id": int(os_template_profile_id),
+            "kind": int(kind)
         }
 
         url = host_url + '/api/os_template_image'

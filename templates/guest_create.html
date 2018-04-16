@@ -133,7 +133,7 @@
 
     function refresh_os_template_image_id_selectpicker(selectpicker) {
         $.ajax({
-            url : '/api/os_templates_image',
+            url : '/api/os_templates_image?filter=active:eq:1',
             type : 'GET',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',

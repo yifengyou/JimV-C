@@ -103,6 +103,7 @@ class Rules(Enum):
     ICON = (basestring, 'icon')
     LOGO = (basestring, 'logo')
 
+    OS_TEMPLATE_IMAGE_KIND = (int, 'kind')
     OS_TEMPLATE_PROFILE_ID_EXT = (int, 'os_template_profile_id')
     OS_TEMPLATE_INITIALIZE_OPERATE_SET_ID_EXT = (int, 'os_template_initialize_operate_set_id')
     OS_TEMPLATE_INITIALIZE_OPERATE_KIND = (int, 'kind')

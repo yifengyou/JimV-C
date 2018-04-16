@@ -46,7 +46,8 @@ def r_create():
         Rules.PATH.value,
         Rules.LOGO.value,
         Rules.OS_TEMPLATE_PROFILE_ID_EXT.value,
-        Rules.ACTIVE.value
+        Rules.ACTIVE.value,
+        Rules.OS_TEMPLATE_IMAGE_KIND.value
     ]
 
     os_template_image.label = request.json.get('label')
@@ -55,6 +56,8 @@ def r_create():
     os_template_image.logo = request.json.get('logo')
     os_template_image.active = bool(int(request.json.get('active', 1)))
     os_template_image.os_template_profile_id = request.json.get('os_template_profile_id')
+    os_template_image.kind = request.json.get('kind')
+    os_template_image.progress = 100
 
     try:
         ji.Check.previewing(args_rules, os_template_image.__dict__)
@@ -122,6 +125,11 @@ def r_update(_id):
             Rules.OS_TEMPLATE_PROFILE_ID_EXT.value,
         )
 
+    if 'kind' in request.json:
+        args_rules.append(
+            Rules.OS_TEMPLATE_IMAGE_KIND.value,
+        )
+
     if args_rules.__len__() < 2:
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -141,6 +149,7 @@ def r_update(_id):
         os_template_image.logo = request.json.get('logo', os_template_image.logo)
         os_template_image.os_template_profile_id = \
             request.json.get('os_template_profile_id', os_template_image.os_template_profile_id)
+        os_template_image.kind = request.json.get('kind', os_template_image.kind)
 
         os_template_image.update()
         os_template_image.get()
