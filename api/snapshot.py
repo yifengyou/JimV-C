@@ -308,6 +308,7 @@ def r_convert_to_os_template_image(snapshot_id, disk_uuid):
 
         snapshot.snapshot_id = snapshot_id
         snapshot.get_by('snapshot_id')
+        snapshot.progress = 252
 
         guest.uuid = snapshot.guest_uuid
         guest.get_by('uuid')
@@ -346,10 +347,12 @@ def r_convert_to_os_template_image(snapshot_id, disk_uuid):
             'snapshot_path': disk.path,
             'template_path': os_template_image.path,
             'os_template_image_id': os_template_image.id,
-            'passback_parameters': {'id': os_template_image.id}
+            'passback_parameters': {'id': snapshot.snapshot_id}
         }
 
         Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+        snapshot.update()
 
         return ret
 

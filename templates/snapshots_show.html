@@ -337,7 +337,7 @@
             success : function() {
                 alter_success('从磁盘快照创建自定义镜像成功！');
                 setTimeout(function() {
-                    window.location.href="/os_templates_image";
+                    window.location.href="/os_templates_image#custom";
                 }, 1000);
             }
         });
@@ -397,6 +397,8 @@
                             <span style="color: #ff0000dd;">删除中...</span>
                         {% elif item.progress == 253 %}
                             <span style="color: #009cc5;">恢复中...</span>
+                        {% elif item.progress == 252 %}
+                            <span style="color: #009cc5;">创建镜像中...</span>
                         {% elif item.progress == 100 %}
                             <span style="color: #00BB00;">{{ item.progress }}%</span>
                         {% else %}

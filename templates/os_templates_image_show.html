@@ -71,39 +71,38 @@
 {% block content %}
 
 <script type="text/javascript">
-    var page = 1;
-    var page_size = 10;
     var keyword = '';
     var resource_path = window.location.pathname;
     var cur_url = resource_path;
+    var sheet_tag = window.location.hash;
 
     $(document).ready(function() {
-        page_size = $('#page_size').val();
-        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+        keyword = url('?keyword', window.location.href);
+
+        if (keyword !== undefined && typeof(keyword) === 'string') {
+            $('#content_search_by_public').val(keyword);
+            $('#content_search_by_custom').val(keyword);
+        }
 
         var last_ready = null;
-        $('#content_search').keydown(function() {
+        $('#content_search_by_public').keydown(function() {
             if (last_ready !== null) {
                 clearTimeout(last_ready);
             }
             last_ready = setTimeout(function () {
-                keyword = $('#content_search').val();
-                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
-                if (keyword.length > 0) {
-                    cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
-                }
-                window.location.href=cur_url;
+                keyword = $('#content_search_by_public').val();
+                refresh();
             }, 1000);
         });
 
-        $('#page_size').change(function () {
-            keyword = $('#content_search').val();
-            page_size = $('#page_size').val();
-            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
-            if (keyword.length > 0) {
-                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+        $('#content_search_by_custom').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
             }
-            window.location.href=cur_url;
+            last_ready = setTimeout(function () {
+                keyword = $('#content_search_by_custom').val();
+                refresh();
+            }, 1000);
         });
 
         $("thead").on('click', ".all_selector", function() {
@@ -213,18 +212,27 @@
             if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
                 data.fv.disableSubmitButtons(true);
             }
-        })
+        });
+
+        nav_to_sheet_tag();
     });
 
     function refresh() {
-        keyword = $('#content_search').val();
-        page = $('#pagination li.active a').text();
-        page_size = $('#page_size').val();
-        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
-        if (keyword.length > 0) {
-            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+        if (keyword !== undefined && keyword.length > 0) {
+            cur_url = resource_path + '?keyword=' + keyword + '&r=' + new RandomPassword().create(16);
         }
-        window.location.href=cur_url;
+
+        sheet_tag = window.location.hash;
+        if (sheet_tag !== '') {
+
+            if (keyword === undefined) {
+                cur_url = '?r=' + new RandomPassword().create(16);
+            }
+
+            cur_url += sheet_tag;
+        }
+
+        window.location.href = cur_url;
     }
 
     function select_this(me) {
@@ -235,7 +243,26 @@
 
         if (me.id === 'custom_os_templates_image_label') {
             $('#custom_os_templates_image').css('display', 'unset');
+            window.location.hash = "custom";
         } else {
+            $('#public_os_templates_image').css('display', 'unset');
+            history.replaceState(null, null, ' ');
+        }
+    }
+
+    function nav_to_sheet_tag() {
+        var public_os_templates_image_label = $('#public_os_templates_image_label');
+        var custom_os_templates_image_label = $('#custom_os_templates_image_label');
+
+        public_os_templates_image_label.parent().parent().children().removeClass('active');
+
+        $('#public_os_templates_image, #custom_os_templates_image').css('display', 'none');
+
+        if (sheet_tag === '#custom') {
+            custom_os_templates_image_label.parent().addClass('active');
+            $('#custom_os_templates_image').css('display', 'unset');
+        } else {
+            public_os_templates_image_label.parent().addClass('active');
             $('#public_os_templates_image').css('display', 'unset');
         }
     }
@@ -511,7 +538,7 @@
             <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
                 <div class="col-sm-12" style="padding-right: 0;">
                     <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
-                        <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                        <input id="content_search_by_public" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
                     </div>
                     <div class="pull-right">
                         <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
@@ -620,29 +647,9 @@
                             <div class="col-sm-6">
                             </div>
                             <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                共有{{ os_templates_image_ret.paging.total }}条，每页显示：
-                                <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
-                                    <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
-                                    <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
-                                    <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
-                                </select>&nbsp;&nbsp;条
+                                共有{{ public_count }}条
                             </div>
                             <div class="col-sm-3" style="text-align: left;">
-                                <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
-                                    <ul id="pagination" class="pagination">
-                                        <li class="{% if page == 1 %} disabled {% endif %}">
-                                            <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
-                                        </li>
-                                        {% for item in pages %}
-                                            <li class="{% if item == page %} active {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
-                                            </li>
-                                        {% endfor %}
-                                        <li class="{% if page == last_page %} disabled {% endif %}">
-                                            <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                     </th>
@@ -654,7 +661,7 @@
             <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
                 <div class="col-sm-12" style="padding-right: 0;">
                     <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
-                        <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                        <input id="content_search_by_custom" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
                     </div>
                     <div class="pull-right">
                         <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
@@ -743,7 +750,7 @@
                                         </a>
                                     </li>
                                     <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                    <li>
+                                    <li class="{% if item.progress != 100 %} disabled {% endif %}">
                                         <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
                                            onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                        $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
@@ -767,29 +774,9 @@
                             <div class="col-sm-6">
                             </div>
                             <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                共有{{ os_templates_image_ret.paging.total }}条，每页显示：
-                                <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
-                                    <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
-                                    <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
-                                    <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
-                                </select>&nbsp;&nbsp;条
+                                共有{{ custom_count }}条
                             </div>
                             <div class="col-sm-3" style="text-align: left;">
-                                <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
-                                    <ul id="pagination" class="pagination">
-                                        <li class="{% if page == 1 %} disabled {% endif %}">
-                                            <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
-                                        </li>
-                                        {% for item in pages %}
-                                            <li class="{% if item == page %} active {% endif %}">
-                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
-                                            </li>
-                                        {% endfor %}
-                                        <li class="{% if page == last_page %} disabled {% endif %}">
-                                            <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                     </th>

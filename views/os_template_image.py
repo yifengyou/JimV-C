@@ -30,7 +30,7 @@ blueprints = Blueprint(
 def show():
     args = list()
     page = int(request.args.get('page', 1))
-    page_size = int(request.args.get('page_size', 10))
+    page_size = int(request.args.get('page_size', 1000))
     keyword = request.args.get('keyword', None)
     order_by = request.args.get('order_by', None)
     order = request.args.get('order', None)
@@ -64,6 +64,16 @@ def show():
     os_templates_image_ret = requests.get(url=os_templates_image_url, cookies=request.cookies)
     os_templates_image_ret = json.loads(os_templates_image_ret.content)
 
+    public_count = 0
+    custom_count = 0
+
+    for os_template_image in os_templates_image_ret['data']:
+        if os_template_image['kind'] == 0:
+            public_count += 1
+
+        elif os_template_image['kind'] == 1:
+            custom_count += 1
+
     os_templates_profile_ret = requests.get(url=os_templates_profile_url, cookies=request.cookies)
     os_templates_profile_ret = json.loads(os_templates_profile_ret.content)
     os_templates_profile_mapping_by_id = dict()
@@ -94,7 +104,7 @@ def show():
     return render_template('os_templates_image_show.html', os_templates_image_ret=os_templates_image_ret,
                            os_templates_profile_mapping_by_id=os_templates_profile_mapping_by_id,
                            page=page, page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
-                           last_page=last_page)
+                           last_page=last_page, public_count=public_count, custom_count=custom_count)
 
 
 def create():
