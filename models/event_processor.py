@@ -112,7 +112,6 @@ class EventProcessor(object):
             cls.guest.progress = cls.message['message']['progress']
 
         elif cls.guest.status == GuestState.snapshot_converting.value:
-            print cls.message
             cls.os_template_image.id = cls.message['message']['os_template_image_id']
             cls.os_template_image.get()
 
