@@ -699,7 +699,7 @@
                                     </a>
                                 </li>
                                 <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                <li class="{% if item.state not in [1, 255] %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                <li class="{% if item.state not in [1, 255] or 'snapshot' in item %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
                                        $('#delete_instance_desc').text($('#instance_uuid').val().split('-')[0] + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">

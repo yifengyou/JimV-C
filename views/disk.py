@@ -110,14 +110,17 @@ def show():
     disks_ret = requests.get(url=disks_url, cookies=request.cookies)
     disks_ret = json.loads(disks_ret.content)
 
-    guest_uuids = list()
+    guests_uuid = list()
+    disks_uuid = list()
 
     for disk in disks_ret['data']:
-        if disk['guest_uuid'].__len__() == 36:
-            guest_uuids.append(disk['guest_uuid'])
+        disks_uuid.append(disk['uuid'])
 
-    if guest_uuids.__len__() > 0:
-        guests_url = host_url + url_for('api_guests.r_get_by_filter', filter='uuid:in:' + ','.join(guest_uuids))
+        if disk['guest_uuid'].__len__() == 36:
+            guests_uuid.append(disk['guest_uuid'])
+
+    if guests_uuid.__len__() > 0:
+        guests_url = host_url + url_for('api_guests.r_get_by_filter', filter='uuid:in:' + ','.join(guests_uuid))
         guests_ret = requests.get(url=guests_url, cookies=request.cookies)
         guests_ret = json.loads(guests_ret.content)
 
@@ -128,6 +131,29 @@ def show():
         for i, disk in enumerate(disks_ret['data']):
             if disk['guest_uuid'].__len__() == 36:
                 disks_ret['data'][i]['guest'] = guests_uuid_mapping[disk['guest_uuid']]
+
+    if disks_uuid.__len__() > 0:
+        snapshots_id_mapping_by_disks_uuid_url = host_url + url_for('api_snapshots.r_get_snapshots_by_disks_uuid',
+                                                                    disks_uuid=','.join(disks_uuid))
+        snapshots_id_mapping_by_disks_uuid_ret = requests.get(url=snapshots_id_mapping_by_disks_uuid_url,
+                                                              cookies=request.cookies)
+        snapshots_id_mapping_by_disks_uuid_ret = json.loads(snapshots_id_mapping_by_disks_uuid_ret.content)
+
+        snapshots_id_mapping_by_disk_uuid = dict()
+
+        for snapshot_id_mapping_by_disk_uuid in snapshots_id_mapping_by_disks_uuid_ret['data']:
+
+            disk_uuid = snapshot_id_mapping_by_disk_uuid['disk_uuid']
+            snapshot_id = snapshot_id_mapping_by_disk_uuid['snapshot_id']
+
+            if disk_uuid not in snapshots_id_mapping_by_disk_uuid:
+                snapshots_id_mapping_by_disk_uuid[disk_uuid] = list()
+
+            snapshots_id_mapping_by_disk_uuid[disk_uuid].append(snapshot_id)
+
+        for i, disk in enumerate(disks_ret['data']):
+            if disk['uuid'] in snapshots_id_mapping_by_disk_uuid:
+                disks_ret['data'][i]['snapshot'] = snapshots_id_mapping_by_disk_uuid[disk['uuid']]
 
     config_ret = requests.get(url=config_url, cookies=request.cookies)
     config_ret = json.loads(config_ret.content)

@@ -269,6 +269,30 @@ def r_get_disks(snapshot_id):
 
 
 @Utils.dumps2response
+def r_get_snapshots_by_disks_uuid(disks_uuid):
+
+    args_rules = [
+        Rules.UUIDS.value
+    ]
+
+    try:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        ret['data'] = list()
+
+        ji.Check.previewing(args_rules, {'uuids': disks_uuid})
+
+        rows, _ = SnapshotDiskMapping.get_by_filter(filter_str=':'.join(['disk_uuid', 'in', disks_uuid]))
+
+        ret['data'] = rows
+
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
 def r_convert_to_os_template_image(snapshot_id, disk_uuid):
 
     args_rules = [
