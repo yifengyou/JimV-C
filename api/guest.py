@@ -24,6 +24,7 @@ from models import OSTemplateInitializeOperate
 from models import GuestXML
 from models import SSHKeyGuestMapping
 from models import SSHKey
+from models import Snapshot
 from models import status
 
 
@@ -824,17 +825,47 @@ def r_get_by_filter():
         row['url'] = url_for('v_ssh_keys.show')
         ssh_key_id_mapping[row['id']] = row
 
+    rows, _ = Snapshot.get_by_filter(filter_str=':'.join(['guest_uuid', 'in', ','.join(uuids)]))
+
+    snapshots_guest_uuid_mapping = dict()
+
+    for row in rows:
+        guest_uuid = row['guest_uuid']
+        if guest_uuid not in snapshots_guest_uuid_mapping:
+            snapshots_guest_uuid_mapping[guest_uuid] = list()
+
+        snapshots_guest_uuid_mapping[guest_uuid].append(row)
+
     for i, guest in enumerate(ret['data']):
+
+        guest_uuid = ret['data'][i]['uuid']
+
         if 'ssh_keys' not in ret['data'][i]:
             ret['data'][i]['ssh_keys'] = list()
 
-        if ret['data'][i]['uuid'] in guest_uuid_ssh_key_id_mapping:
-            for ssh_key_id in guest_uuid_ssh_key_id_mapping[ret['data'][i]['uuid']]:
+        if guest_uuid in guest_uuid_ssh_key_id_mapping:
+            for ssh_key_id in guest_uuid_ssh_key_id_mapping[guest_uuid]:
 
                 if ssh_key_id not in ssh_key_id_mapping:
                     continue
 
                 ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
+
+        if 'snapshot' not in ret['data'][i]:
+            ret['data'][i]['snapshot'] = {
+                'creatable': True,
+                'mapping': list()
+            }
+
+        if guest_uuid in snapshots_guest_uuid_mapping:
+            ret['data'][i]['snapshot']['mapping'] = snapshots_guest_uuid_mapping[guest_uuid]
+
+            for snapshot in snapshots_guest_uuid_mapping[guest_uuid]:
+                if snapshot['progress'] == 100:
+                    continue
+
+                else:
+                    ret['data'][i]['snapshot']['creatable'] = False
 
     return ret
 
