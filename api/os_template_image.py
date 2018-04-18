@@ -8,7 +8,7 @@ import jimit as ji
 import json
 
 from api.base import Base
-from models import OSTemplateImage, OSTemplateProfile, Host, Config, OSTemplateImageKind
+from models import OSTemplateImage, OSTemplateProfile, Host, Config, OSTemplateImageKind, Guest
 from models import Rules
 from models import Utils
 
@@ -183,6 +183,7 @@ def r_delete(ids):
 
     os_template_image = OSTemplateImage()
 
+    # TODO: 加入对，是否有被 Guest 引用的判断
     for _id in ids.split(','):
         os_template_image.id = _id
         os_template_image.get()
@@ -226,7 +227,38 @@ def r_get(ids):
 
 @Utils.dumps2response
 def r_get_by_filter():
-    return os_template_image_base.get_by_filter()
+    ret = os_template_image_base.get_by_filter()
+
+    if '200' != ret['state']['code']:
+        return ret
+
+    os_template_images_id = list()
+
+    for os_template_image in ret['data']:
+        os_template_image_id = os_template_image['id']
+
+        if os_template_image_id not in os_template_images_id:
+            os_template_images_id.append(os_template_image_id)
+
+    rows, _ = Guest.get_by_filter(filter_str=':'.join(['os_template_image_id', 'in',
+                                                       ','.join(_id.__str__() for _id in os_template_images_id)]))
+
+    os_template_image_guest_mapping = dict()
+
+    for guest in rows:
+        os_template_image_id = guest['os_template_image_id']
+
+        if os_template_image_id not in os_template_image_guest_mapping:
+            os_template_image_guest_mapping[os_template_image_id] = list()
+
+        os_template_image_guest_mapping[os_template_image_id].append(guest)
+
+    for i, os_template_image in enumerate(ret['data']):
+
+        if os_template_image['id'] in os_template_image_guest_mapping:
+            ret['data'][i]['guests'] = os_template_image_guest_mapping[os_template_image['id']]
+
+    return ret
 
 
 @Utils.dumps2response

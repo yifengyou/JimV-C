@@ -623,7 +623,7 @@
                                         </a>
                                     </li>
                                     <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                    <li>
+                                    <li class="{% if 'guests' in item %} disabled {% endif %}">
                                         <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
                                            onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                        $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
@@ -750,7 +750,7 @@
                                         </a>
                                     </li>
                                     <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
-                                    <li class="{% if item.progress != 100 %} disabled {% endif %}">
+                                    <li class="{% if item.progress != 100 or 'guests' in item %} disabled {% endif %}">
                                         <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
                                            onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
                                        $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
