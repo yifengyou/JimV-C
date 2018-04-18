@@ -8,7 +8,7 @@ import jimit as ji
 import json
 
 from api.base import Base
-from models import OSTemplateImage, OSTemplateProfile
+from models import OSTemplateImage, OSTemplateProfile, Host, Config, OSTemplateImageKind
 from models import Rules
 from models import Utils
 
@@ -164,7 +164,59 @@ def r_update(_id):
 
 @Utils.dumps2response
 def r_delete(ids):
-    return os_template_image_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    config = Config()
+    config.id = 1
+    config.get()
+
+    # 取全部活着的 hosts
+    available_hosts = Host.get_available_hosts(nonrandom=None)
+
+    if available_hosts.__len__() == 0:
+        ret['state'] = ji.Common.exchange_state(50351)
+        return ret
+
+    chosen_host = available_hosts[0]
+    node_id = chosen_host['node_id']
+
+    os_template_image = OSTemplateImage()
+
+    for _id in ids.split(','):
+        os_template_image.id = _id
+        os_template_image.get()
+
+    for _id in ids.split(','):
+        os_template_image.id = _id
+        os_template_image.get()
+
+        # 暂时不支持从计算节点上，删除公共镜像
+        if os_template_image.kind == OSTemplateImageKind.public.value:
+            os_template_image.delete()
+            continue
+
+        elif os_template_image.kind == OSTemplateImageKind.custom.value:
+            os_template_image.progress = 254
+
+            message = {
+                '_object': 'os_template_image',
+                'action': 'delete',
+                'storage_mode': config.storage_mode,
+                'dfs_volume': config.dfs_volume,
+                'template_path': os_template_image.path,
+                # uuid 这里没有实际意义，仅仅是为了迁就 JimV-C 的个命令格式
+                'uuid': None,
+                'node_id': node_id,
+                'os_template_image_id': os_template_image.id,
+                'passback_parameters': {'id': os_template_image.id}
+            }
+
+            Utils.emit_instruction(message=json.dumps(message))
+
+            os_template_image.update()
+
+    return ret
 
 
 @Utils.dumps2response

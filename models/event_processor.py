@@ -328,6 +328,17 @@ class EventProcessor(object):
 
                 cls.os_template_image.update()
 
+        elif _object == 'os_template_image':
+            if action == 'delete':
+                cls.os_template_image.id = cls.message['message']['passback_parameters']['id']
+                cls.os_template_image.get()
+
+                if state == ResponseState.success.value:
+                    cls.os_template_image.delete()
+
+                else:
+                    pass
+
         else:
             pass
 
