@@ -263,5 +263,35 @@ def r_get_by_filter():
 
 @Utils.dumps2response
 def r_content_search():
-    return os_template_image_base.content_search()
+    ret = os_template_image_base.content_search()
 
+    if '200' != ret['state']['code']:
+        return ret
+
+    os_template_images_id = list()
+
+    for os_template_image in ret['data']:
+        os_template_image_id = os_template_image['id']
+
+        if os_template_image_id not in os_template_images_id:
+            os_template_images_id.append(os_template_image_id)
+
+    rows, _ = Guest.get_by_filter(filter_str=':'.join(['os_template_image_id', 'in',
+                                                       ','.join(_id.__str__() for _id in os_template_images_id)]))
+
+    os_template_image_guest_mapping = dict()
+
+    for guest in rows:
+        os_template_image_id = guest['os_template_image_id']
+
+        if os_template_image_id not in os_template_image_guest_mapping:
+            os_template_image_guest_mapping[os_template_image_id] = list()
+
+        os_template_image_guest_mapping[os_template_image_id].append(guest)
+
+    for i, os_template_image in enumerate(ret['data']):
+
+        if os_template_image['id'] in os_template_image_guest_mapping:
+            ret['data'][i]['guests'] = os_template_image_guest_mapping[os_template_image['id']]
+
+    return ret

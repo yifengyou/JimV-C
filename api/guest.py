@@ -872,7 +872,77 @@ def r_get_by_filter():
 
 @Utils.dumps2response
 def r_content_search():
-    return guest_base.content_search()
+    ret = guest_base.content_search()
+
+    uuids = list()
+    for guest in ret['data']:
+        uuids.append(guest['uuid'])
+
+    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'in', ','.join(uuids)]))
+
+    guest_uuid_ssh_key_id_mapping = dict()
+    ssh_keys_id = list()
+
+    for row in rows:
+        if row['ssh_key_id'] not in ssh_keys_id:
+            ssh_keys_id.append(row['ssh_key_id'].__str__())
+
+        if row['guest_uuid'] not in guest_uuid_ssh_key_id_mapping:
+            guest_uuid_ssh_key_id_mapping[row['guest_uuid']] = list()
+
+        guest_uuid_ssh_key_id_mapping[row['guest_uuid']].append(row['ssh_key_id'])
+
+    rows, _ = SSHKey.get_by_filter(filter_str=':'.join(['id', 'in', ','.join(ssh_keys_id)]))
+
+    ssh_key_id_mapping = dict()
+
+    for row in rows:
+        row['url'] = url_for('v_ssh_keys.show')
+        ssh_key_id_mapping[row['id']] = row
+
+    rows, _ = Snapshot.get_by_filter(filter_str=':'.join(['guest_uuid', 'in', ','.join(uuids)]))
+
+    snapshots_guest_uuid_mapping = dict()
+
+    for row in rows:
+        guest_uuid = row['guest_uuid']
+        if guest_uuid not in snapshots_guest_uuid_mapping:
+            snapshots_guest_uuid_mapping[guest_uuid] = list()
+
+        snapshots_guest_uuid_mapping[guest_uuid].append(row)
+
+    for i, guest in enumerate(ret['data']):
+
+        guest_uuid = ret['data'][i]['uuid']
+
+        if 'ssh_keys' not in ret['data'][i]:
+            ret['data'][i]['ssh_keys'] = list()
+
+        if guest_uuid in guest_uuid_ssh_key_id_mapping:
+            for ssh_key_id in guest_uuid_ssh_key_id_mapping[guest_uuid]:
+
+                if ssh_key_id not in ssh_key_id_mapping:
+                    continue
+
+                ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
+
+        if 'snapshot' not in ret['data'][i]:
+            ret['data'][i]['snapshot'] = {
+                'creatable': True,
+                'mapping': list()
+            }
+
+        if guest_uuid in snapshots_guest_uuid_mapping:
+            ret['data'][i]['snapshot']['mapping'] = snapshots_guest_uuid_mapping[guest_uuid]
+
+            for snapshot in snapshots_guest_uuid_mapping[guest_uuid]:
+                if snapshot['progress'] == 100:
+                    continue
+
+                else:
+                    ret['data'][i]['snapshot']['creatable'] = False
+
+    return ret
 
 
 @Utils.dumps2response
