@@ -313,10 +313,7 @@ class EventProcessor(object):
                 cls.snapshot.progress = 100
                 cls.snapshot.update()
 
-                cls.guest.uuid = cls.snapshot.guest_uuid
-                cls.guest.get_by('uuid')
-
-                cls.os_template_image.id = cls.guest.os_template_image_id
+                cls.os_template_image.id = cls.message['message']['passback_parameters']['os_template_image_id']
                 cls.os_template_image.get()
 
                 if state == ResponseState.success.value:

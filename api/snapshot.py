@@ -371,7 +371,7 @@ def r_convert_to_os_template_image(snapshot_id, disk_uuid):
             'snapshot_path': disk.path,
             'template_path': os_template_image.path,
             'os_template_image_id': os_template_image.id,
-            'passback_parameters': {'id': snapshot.snapshot_id}
+            'passback_parameters': {'id': snapshot.snapshot_id, 'os_template_image_id': os_template_image.id}
         }
 
         Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
