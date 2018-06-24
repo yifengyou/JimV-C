@@ -233,6 +233,13 @@ class EventProcessor(object):
                 if state == ResponseState.success.value:
                     pass
 
+            elif action == 'allocate_bandwidth':
+                if state == ResponseState.success.value:
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+                    cls.guest.bandwidth = cls.message['message']['passback_parameters']['bandwidth']
+                    cls.guest.update()
+
         elif _object == 'disk':
             if action == 'create':
                 cls.disk.uuid = uuid

@@ -105,6 +105,8 @@ add_rule_api(guest.blueprint, '/<uuid>', api_func='guest.r_update', methods=['PA
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_delete', methods=['DELETE'])
 add_rule_api(guest.blueprints, '/_reset_password/<uuids>/<password>', api_func='guest.r_reset_password',
              methods=['PUT'])
+add_rule_api(guest.blueprints, '/_allocate_bandwidth/<uuids>/<bandwidth>/<bandwidth_unit>',
+             api_func='guest.r_allocate_bandwidth', methods=['PUT'])
 add_rule_api(guest.blueprints, '/_distribute_count', api_func='guest.r_distribute_count', methods=['GET'])
 
 # Disk操作

@@ -1103,3 +1103,62 @@ def r_reset_password(uuids, password):
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
+
+@Utils.dumps2response
+def r_allocate_bandwidth(uuids, bandwidth, bandwidth_unit):
+
+    args_rules = [
+        Rules.UUIDS.value,
+        Rules.BANDWIDTH_IN_URL.value,
+        Rules.BANDWIDTH_UNIT.value,
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'bandwidth': bandwidth, 'bandwidth_unit': bandwidth_unit})
+
+        bandwidth = int(bandwidth)
+
+        if bandwidth_unit == 'k':
+            bandwidth = bandwidth * 1000
+
+        elif bandwidth_unit == 'm':
+            bandwidth = bandwidth * 1000 ** 2
+
+        elif bandwidth_unit == 'g':
+            bandwidth = bandwidth * 1000 ** 3
+
+        else:
+            ret = dict()
+            ret['state'] = ji.Common.exchange_state(41203)
+            raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+
+        guest = Guest()
+
+        # 检测所指定的 UUDIs 实例都存在
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+            guest.bandwidth = bandwidth
+
+            message = {
+                '_object': 'guest',
+                'action': 'allocate_bandwidth',
+                'uuid': guest.uuid,
+                'node_id': guest.node_id,
+                'bandwidth': guest.bandwidth,
+                'passback_parameters': {'bandwidth': guest.bandwidth}
+            }
+
+            Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+

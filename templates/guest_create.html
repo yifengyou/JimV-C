@@ -110,10 +110,10 @@
         refresh_ssh_keys_checkboxer($('#ssh_keys_id_div'));
 
         $('#bandwidth_unit').on('changed.bs.select', function (me) {
-            render_bandwidth_slider('update', $('#bandwidth_unit').val())
+            render_bandwidth_slider($("#bandwidth"), 'update', $('#bandwidth_unit').val())
         });
 
-        render_bandwidth_slider('create', 'm');
+        render_bandwidth_slider($("#bandwidth"), 'create', 'm');
     });
 
     function get_os_templates_profile_mapping_by_id() {
@@ -199,66 +199,6 @@
         } else {
             $('#create_guest_form').formValidation('addField', 'node_id', {validators: {notEmpty: {}}});
             $('#node_id').parent().parent().css('display', 'unset');
-        }
-    }
-
-    function render_bandwidth_slider(action, bandwidth_unit) {
-        var bandwidth_slider = $("#bandwidth");
-
-        if (action === 'create') {
-            bandwidth_slider.ionRangeSlider({
-                min: 0,
-                max: 1000,
-                from: 200,
-                from_min: 1,
-                from_max: 999,
-                step: 1,
-                grid: true,
-                grid_num: 10,
-                postfix: ' Mbps'
-            });
-
-        } else if (action === 'update') {
-            var bandwitdh_slider_instance = bandwidth_slider.data("ionRangeSlider");
-            if (bandwidth_unit === 'g') {
-                bandwitdh_slider_instance.update({
-                    min: 0,
-                    max: 100,
-                    from: 1,
-                    from_min: 1,
-                    from_max: 100,
-                    step: 1,
-                    grid: true,
-                    grid_num: 10,
-                    postfix: ' Gbps'
-                });
-
-            } else if (bandwidth_unit === 'm') {
-                bandwitdh_slider_instance.update({
-                    min: 0,
-                    max: 1000,
-                    from: 200,
-                    from_min: 1,
-                    from_max: 999,
-                    step: 1,
-                    grid: true,
-                    grid_num: 10,
-                    postfix: ' Mbps'
-                });
-
-            } else if (bandwidth_unit === 'k') {
-                bandwitdh_slider_instance.update({
-                    min: 0,
-                    max: 1000,
-                    from: 512,
-                    from_min: 8,
-                    from_max: 992,
-                    step: 8,
-                    grid: true,
-                    grid_num: 10,
-                    postfix: ' Kbps'
-                });
-            }
         }
     }
 </script>

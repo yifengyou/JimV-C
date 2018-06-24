@@ -117,3 +117,62 @@ RandomPassword.prototype.trim = function(s) {
 	else
 		return s.trim();
 };
+
+function render_bandwidth_slider(bandwidth_slider ,action, bandwidth_unit) {
+
+    if (action === 'create') {
+        bandwidth_slider.ionRangeSlider({
+            min: 0,
+            max: 1000,
+            from: 200,
+            from_min: 1,
+            from_max: 999,
+            step: 1,
+            grid: true,
+            grid_num: 10,
+            postfix: ' Mbps'
+        });
+
+    } else if (action === 'update') {
+        var bandwitdh_slider_instance = bandwidth_slider.data("ionRangeSlider");
+        if (bandwidth_unit === 'g') {
+            bandwitdh_slider_instance.update({
+                min: 0,
+                max: 100,
+                from: 1,
+                from_min: 1,
+                from_max: 100,
+                step: 1,
+                grid: true,
+                grid_num: 10,
+                postfix: ' Gbps'
+            });
+
+        } else if (bandwidth_unit === 'm') {
+            bandwitdh_slider_instance.update({
+                min: 0,
+                max: 1000,
+                from: 200,
+                from_min: 1,
+                from_max: 999,
+                step: 1,
+                grid: true,
+                grid_num: 10,
+                postfix: ' Mbps'
+            });
+
+        } else if (bandwidth_unit === 'k') {
+            bandwitdh_slider_instance.update({
+                min: 0,
+                max: 1000,
+                from: 512,
+                from_min: 8,
+                from_max: 992,
+                step: 8,
+                grid: true,
+                grid_num: 10,
+                postfix: ' Kbps'
+            });
+        }
+    }
+}
