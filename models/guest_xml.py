@@ -15,11 +15,12 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 class GuestXML(object):
 
-    def __init__(self, guest=None, disk=None, config=None, os_type=None):
+    def __init__(self, host=None, guest=None, disk=None, config=None, os_type=None):
         assert isinstance(guest, Guest)
         assert isinstance(disk, Disk)
         assert isinstance(config, Config)
 
+        self.host = host
         self.guest = guest
         self.disk = disk
         self.config = config
@@ -27,8 +28,7 @@ class GuestXML(object):
 
     def get_domain(self):
         return """<?xml version="1.0" encoding="utf-8"?>
-            <domain type="kvm">
-            {0}
+            <domain type="{0}">
             {1}
             {2}
             {3}
@@ -37,9 +37,19 @@ class GuestXML(object):
             {6}
             {7}
             {8}
+            {9}
             </domain>
-        """.format(self.get_features(), self.get_cpu_mode(), self.get_clock(), self.get_name(), self.get_uuid(),
-                   self.get_vcpu(), self.get_memory(), self.get_os(), self.get_devices())
+        """.format(self.get_hypervisor(), self.get_features(), self.get_cpu_mode(), self.get_clock(), self.get_name(),
+                   self.get_uuid(), self.get_vcpu(), self.get_memory(), self.get_os(), self.get_devices())
+
+    def get_hypervisor(self):
+        hypervisor = 'qemu'
+
+        if self.host.cpuinfo is not None and 'flags' in self.host.cpuinfo:
+            if 'vmx' in self.host.cpuinfo['flags'] or 'svm' in self.host.cpuinfo['flags']:
+                hypervisor = 'kvm'
+
+        return hypervisor
 
     @staticmethod
     def get_features():
@@ -50,9 +60,13 @@ class GuestXML(object):
             </features>
         """
 
-    @staticmethod
-    def get_cpu_mode():
-        return """<cpu mode='host-passthrough'/>"""
+    def get_cpu_mode(self):
+        cpu_mode = """"""
+
+        if 'kvm' == self.get_hypervisor():
+            cpu_mode = """<cpu mode='host-passthrough'/>"""
+
+        return cpu_mode
 
     def get_clock(self):
         # clock 参考链接：https://libvirt.org/formatdomain.html#elementsTime

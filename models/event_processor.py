@@ -134,6 +134,7 @@ class EventProcessor(object):
         value = {
             'hostname': cls.message['host'],
             'cpu': cls.message['message']['cpu'],
+            'cpuinfo': cls.message['message'].get('cpuinfo'),
             'system_load': cls.message['message']['system_load'],
             'memory': cls.message['message']['memory'],
             'memory_available': cls.message['message']['memory_available'],

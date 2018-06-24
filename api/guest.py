@@ -194,12 +194,13 @@ def r_create():
             disk.quota(config=config)
             disk.create()
 
-            guest_xml = GuestXML(guest=guest, disk=disk, config=config, os_type=os_template_profile.os_type)
-            guest.xml = guest_xml.get_domain()
-
             # 在可用计算节点中平均分配任务
             chosen_host = available_hosts[quantity % available_hosts.__len__()]
             guest.node_id = chosen_host['node_id']
+
+            guest_xml = GuestXML(host=chosen_host, guest=guest, disk=disk, config=config,
+                                 os_type=os_template_profile.os_type)
+            guest.xml = guest_xml.get_domain()
 
             if node_id is not None:
                 guest.node_id = node_id
