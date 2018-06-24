@@ -56,6 +56,8 @@ class Rules(Enum):
     BPS_CAP = (int, 'iops_cap')
     BPS_MAX = (int, 'iops_max')
     BPS_MAX_LENGTH = (int, 'iops_max_length')
+    BANDWIDTH = (int, 'bandwidth')
+    BANDWIDTH_UNIT = (basestring, 'bandwidth_unit', ['k', 'm', 'g'])
 
     SSH_KEY_ID_EXT = (REG_NUMBER, 'ssh_key_id')
     SSH_KEYS_ID = (list, 'ssh_keys_id')

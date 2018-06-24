@@ -117,6 +117,8 @@ def create():
 
     if request.method == 'POST':
         ability = request.form.get('ability')
+        bandwidth = request.form.get('bandwidth', 0)
+        bandwidth_unit = request.form.get('bandwidth_unit', 'm')
         os_template_image_id = request.form.get('os_template_image_id')
         quantity = request.form.get('quantity')
         password = request.form.get('password')
@@ -138,6 +140,8 @@ def create():
         payload = {
             "cpu": int(cpu),
             "memory": int(memory),
+            "bandwidth": int(bandwidth),
+            "bandwidth_unit": bandwidth_unit,
             "os_template_image_id": int(os_template_image_id),
             "quantity": int(quantity),
             "remark": remark,

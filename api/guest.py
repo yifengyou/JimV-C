@@ -56,6 +56,8 @@ def r_create():
     args_rules = [
         Rules.CPU.value,
         Rules.MEMORY.value,
+        Rules.BANDWIDTH.value,
+        Rules.BANDWIDTH_UNIT.value,
         Rules.OS_TEMPLATE_IMAGE_ID.value,
         Rules.QUANTITY.value,
         Rules.REMARK.value,
@@ -133,6 +135,23 @@ def r_create():
             for row in rows:
                 ssh_keys.append(row['public_key'])
 
+        bandwidth = request.json.get('bandwidth')
+        bandwidth_unit = request.json.get('bandwidth_unit')
+
+        if bandwidth_unit == 'k':
+            bandwidth = bandwidth * 1000
+
+        elif bandwidth_unit == 'm':
+            bandwidth = bandwidth * 1000 ** 2
+
+        elif bandwidth_unit == 'g':
+            bandwidth = bandwidth * 1000 ** 3
+
+        else:
+            ret = dict()
+            ret['state'] = ji.Common.exchange_state(41203)
+            raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+
         quantity = request.json.get('quantity')
 
         while quantity:
@@ -142,6 +161,7 @@ def r_create():
             guest.cpu = request.json.get('cpu')
             # 虚拟机内存单位，模板生成方法中已置其为GiB
             guest.memory = request.json.get('memory')
+            guest.bandwidth = bandwidth
             guest.os_template_image_id = request.json.get('os_template_image_id')
             guest.label = ji.Common.generate_random_code(length=8)
             guest.remark = request.json.get('remark', '')

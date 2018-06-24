@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS guest(
     node_id BIGINT UNSIGNED NOT NULL,
     cpu TINYINT UNSIGNED NOT NULL,
     memory INT UNSIGNED NOT NULL,
+    -- bps
+    bandwidth INT UNSIGNED NOT NULL DEFAULT 0,
     ip CHAR(15) NOT NULL,
     network VARCHAR(64) NOT NULL,
     manage_network VARCHAR(64) NOT NULL,

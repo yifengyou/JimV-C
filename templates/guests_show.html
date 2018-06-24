@@ -673,7 +673,34 @@
                     </td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
                     <td>{{ hosts_mapping_by_node_id[item.node_id].hostname }}</td>
-                    <td>CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB</td>
+                    <td>
+                        CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />
+                        内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB<br />
+                        带宽 :&nbsp;&nbsp;
+                            {% if item.bandwidth == 0 %}
+                                <span style="font-size: 16px;">
+                                ∞
+                                </span>
+                            {% elif item.bandwidth > 0 and item.bandwidth < 1000**2 %}
+                                {{ item.bandwidth // 1000 }}
+
+                            {% elif item.bandwidth >= 1000**2 and item.bandwidth < 1000**3 %}
+                                {{ item.bandwidth // 1000**2 }}
+
+                            {% else %}
+                                {{ item.bandwidth // 1000**3 }}
+
+                            {% endif %}
+
+                            {% if item.bandwidth == 0 %}
+                            {% elif item.bandwidth > 0 and item.bandwidth < 1000**2 %}
+                                Kbps
+                            {% elif item.bandwidth >= 1000**2 and item.bandwidth < 1000**3 %}
+                                Mbps
+                            {% else %}
+                                Gbps
+                            {% endif %}
+                    </td>
                     <td>{{ item.ip }}</td>
                     <td><span class="unreal_password">*********</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>

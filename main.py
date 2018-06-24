@@ -13,7 +13,13 @@ import json
 import os
 import threading
 from flask import g, request, redirect, url_for, Response, session
-from flask.ext.session import Session
+
+try:
+    from flask_session import Session
+except ImportError as e:
+    # 兼容老版本
+    from flask.ext.session import Session
+
 from werkzeug.debug import get_current_traceback
 
 from models import Utils

@@ -34,6 +34,7 @@ class Guest(ORM):
         self.node_id = None
         self.cpu = None
         self.memory = None
+        self.bandwidth = 0
         self.ip = None
         self.network = None
         self.manage_network = None
@@ -50,12 +51,13 @@ class Guest(ORM):
             'status': FilterFieldType.INT.value,
             'remark': FilterFieldType.STR.value,
             'node_id': FilterFieldType.INT.value,
-            'ip': FilterFieldType.STR.value
+            'ip': FilterFieldType.STR.value,
+            'bandwidth': FilterFieldType.INT.value
         }
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['remark', 'cpu', 'memory', 'network', 'manage_network', 'vnc_password']
+        return ['remark', 'cpu', 'memory', 'bandwidth', 'network', 'manage_network', 'vnc_password']
 
     @staticmethod
     def get_allow_content_search_keywords():

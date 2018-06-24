@@ -102,8 +102,12 @@ class GuestXML(object):
             <interface type='network'>
                 <source network='{0}'/>
                 <model type='virtio'/>
+                <bandwidth>
+                    <inbound average='{1}'/>
+                    <outbound average='{1}'/>
+                </bandwidth>
             </interface>
-        """.format(self.guest.network)
+        """.format(self.guest.network, self.guest.bandwidth / 1000 / 8)
 
     def get_disk(self):
 
