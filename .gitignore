@@ -58,3 +58,6 @@ target/
 
 # MAC .DS_Store
 .DS_Store
+
+# Windows venv
+venv/
