@@ -45,8 +45,8 @@ class GuestXML(object):
     def get_hypervisor(self):
         hypervisor = 'qemu'
 
-        if self.host.cpuinfo is not None and 'flags' in self.host.cpuinfo:
-            if 'vmx' in self.host.cpuinfo['flags'] or 'svm' in self.host.cpuinfo['flags']:
+        if self.host['cpuinfo'] is not None and 'flags' in self.host['cpuinfo']:
+            if 'vmx' in self.host['cpuinfo']['flags'] or 'svm' in self.host['cpuinfo']['flags']:
                 hypervisor = 'kvm'
 
         return hypervisor

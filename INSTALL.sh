@@ -6,15 +6,25 @@
 #
 # Author: James Iter <james.iter.cn@gmail.com>
 #
-#  This script will help you to automation install JimV-C.
+#   This script will help you to automation install JimV-C.
 #
+# Example:
+#   Pass arguments to the installer.
+#   curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash -s -- --version dev
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
-export JIMVC_REPOSITORY_URL='https://raw.githubusercontent.com/jamesiter/JimV-C'
+export JIMVC_REPOSITORY_URL='https://github.com/jamesiter/JimV-C.git'
+export JIMVC_REPOSITORY_URL_CN='https://gitee.com/jimit/JimV-C.git'
+export JIMVC_REPOSITORY_RAW_URL='https://raw.githubusercontent.com/jamesiter/JimV-C'
+export COUNTRY=`curl http://iit.im/ip/country`
 export GENERATE_PASSWORD_SCRIPT_TMP_PATH='/tmp/gen_pswd.sh'
 export SMTP_HOST=''
 export SMTP_USER=''
 export SMTP_PASSWORD=''
+
+if [ ${COUNTRY} = 'CN' ]; then
+    export JIMVC_REPOSITORY_URL=${JIMVC_REPOSITORY_URL_CN}
+fi
 
 ARGS=`getopt -o h --long rdb_root_password:,rdb_jimv_password:,redis_password:,jwt_secret:,secret_key:,version:,help -n 'INSTALL.sh' -- "$@"`
 
@@ -85,7 +95,7 @@ function prepare() {
     fi
 
     if [ ! -e ${GENERATE_PASSWORD_SCRIPT_TMP_PATH} ]; then
-        curl ${JIMVC_REPOSITORY_URL}'/'${JIMV_VERSION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
+        curl ${JIMVC_REPOSITORY_RAW_URL}'/'${JIMV_VERSION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
         chmod +x ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
     fi
 
@@ -191,7 +201,7 @@ function install_Redis() {
 }
 
 function install_Nginx() {
-    export NGINX_JIMV_URL=${JIMVC_REPOSITORY_URL}'/'${JIMV_VERSION}'/misc/nginx_jimv.conf'
+    export NGINX_JIMV_URL=${JIMVC_REPOSITORY_RAW_URL}'/'${JIMV_VERSION}'/misc/nginx_jimv.conf'
 
     # 安装 Nginx
     yum install nginx -y
@@ -217,7 +227,7 @@ function create_web_sites_directory() {
 }
 
 function clone_and_checkout_JimVC() {
-    su - www -c "git clone https://github.com/jamesiter/JimV-C.git ~/sites/JimV-C"
+    su - www -c "git clone ${JIMVC_REPOSITORY_URL} ~/sites/JimV-C"
     su - www -c "cd ~/sites/JimV-C && git checkout ${JIMV_VERSION}"
 }
 
