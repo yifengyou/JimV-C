@@ -120,7 +120,13 @@ def r_create():
             ret['state'] = ji.Common.exchange_state(50351)
             return ret
 
-        if node_id is not None and node_id not in [host['node_id'] for host in available_hosts]:
+        available_hosts_mapping_by_node_id = dict()
+
+        for host in available_hosts:
+            if host['node_id'] not in available_hosts_mapping_by_node_id:
+                available_hosts_mapping_by_node_id[host['node_id']] = host
+
+        if node_id is not None and node_id not in available_hosts_mapping_by_node_id:
             ret['state'] = ji.Common.exchange_state(50351)
             return ret
 
@@ -194,16 +200,18 @@ def r_create():
             disk.quota(config=config)
             disk.create()
 
-            # 在可用计算节点中平均分配任务
-            chosen_host = available_hosts[quantity % available_hosts.__len__()]
+            if node_id is None:
+                # 在可用计算节点中平均分配任务
+                chosen_host = available_hosts[quantity % available_hosts.__len__()]
+
+            else:
+                chosen_host = available_hosts_mapping_by_node_id[node_id]
+
             guest.node_id = chosen_host['node_id']
 
             guest_xml = GuestXML(host=chosen_host, guest=guest, disk=disk, config=config,
                                  os_type=os_template_profile.os_type)
             guest.xml = guest_xml.get_domain()
-
-            if node_id is not None:
-                guest.node_id = node_id
 
             guest.node_id = int(guest.node_id)
             guest.create()
