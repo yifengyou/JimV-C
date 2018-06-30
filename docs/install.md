@@ -78,10 +78,10 @@ timedatectl status
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
 192.168.2.253    jimvc.jimv.io
-192.168.2.221    10k01.jimv.io
-192.168.2.222    10k02.jimv.io
-192.168.2.223    10k03.jimv.io
-192.168.2.224    10k04.jimv.io
+192.168.2.221    jimvn01.jimv.io
+192.168.2.222    jimvn02.jimv.io
+192.168.2.223    jimvn03.jimv.io
+192.168.2.224    jimvn04.jimv.io
 ```
 
 

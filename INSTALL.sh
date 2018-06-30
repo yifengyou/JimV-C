@@ -88,6 +88,45 @@ function check_precondition() {
     esac
 }
 
+function ensure_hosts_layout() {
+    echo "______________________________________________________________________________"
+    /bin/cat /etc/hosts
+    echo
+    read -p "您已经布局好 /etc/hosts 了吗 [Y/N]? " answer
+
+    if [  "x_"${answer} != "x_Y" ] && [ "x_"${answer} != "x_y" ]; then
+        echo "OK, good bye!";
+        exit 0
+    fi
+}
+
+function sync_ssh_key_pair() {
+    sed -i 's@.*StrictHostKeyChecking.*@StrictHostKeyChecking no@' /etc/ssh/ssh_config
+
+    rm -f ~/.ssh/id_rsa ~/.ssh/id_rsa.pub; echo -e "\n\n\n" | ssh-keygen -N ""
+    echo >> ~/.ssh/authorized_keys
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+    chmod 0600 ~/.ssh/authorized_keys
+
+    DHOSTS=`egrep -v '^$|localhost|jimvc' /etc/hosts | awk '{ print $1; }'`
+
+    for dhost in ${DHOSTS}
+    do
+        scp -r ~/.ssh ${dhost}:~/
+        # 关闭 SSH 服务器端 Key 校验
+        ssh ${dhost} "sed -i 's@.*StrictHostKeyChecking.*@StrictHostKeyChecking no@' /etc/ssh/ssh_config"
+    done
+}
+
+function sync_hosts_file() {
+    DHOSTS=`egrep -v '^$|localhost|jimvc' /etc/hosts | awk '{ print $1; }'`
+
+    for dhost in ${DHOSTS}
+    do
+        scp /etc/hosts ${dhost}:/etc/hosts
+    done
+}
+
 function prepare() {
 
     if [ ! ${JIMV_VERSION} ] || [ ${#JIMV_VERSION} -eq 0 ]; then
@@ -293,11 +332,18 @@ function display_summary_information() {
     echo
     echo "记录下上面信息，安装 JimV-N 时需要用到。"
     echo "现在可以通过命令 '/home/www/sites/JimV-C/startup.sh' 启动 JimV-C。"
+    echo "======================="
+    echo
+    echo "通过 Web 页面完成 JimV-C 的初始化操作。然后到 [计算节点] 执行如下命令，进行 JimV-N 的部署。"
+    echo "curl https://raw.githubusercontent.com/jamesiter/JimV-N/master/INSTALL.sh | bash -s -- --redis_host `hostname -I` --redis_password ${REDIS_PSWD} --redis_port 6379"
 }
 
 function deploy() {
     check_precondition
     clear_up_environment
+    ensure_hosts_layout
+    sync_ssh_key_pair
+    sync_hosts_file
     prepare
     set_ntp
     create_web_user
