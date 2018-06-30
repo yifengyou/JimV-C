@@ -158,6 +158,12 @@ def r_create():
             ret['state'] = ji.Common.exchange_state(41203)
             raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
 
+        # http://man7.org/linux/man-pages/man8/tc.8.html
+        # 如果带宽大于 tc 所控最大速率，则置其为无限带宽
+        # 34359738360 等于 tc 最大可控字节速率，换算出的比特位
+        if bandwidth > 34359738360:
+            bandwidth = 0
+
         quantity = request.json.get('quantity')
 
         while quantity:
@@ -1140,6 +1146,12 @@ def r_allocate_bandwidth(uuids, bandwidth, bandwidth_unit):
             ret = dict()
             ret['state'] = ji.Common.exchange_state(41203)
             raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+
+        # http://man7.org/linux/man-pages/man8/tc.8.html
+        # 如果带宽大于 tc 所控最大速率，则置其为无限带宽
+        # 34359738360 等于 tc 最大可控字节速率，换算出的比特位
+        if bandwidth > 34359738360:
+            bandwidth = 0
 
         guest = Guest()
 

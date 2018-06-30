@@ -119,6 +119,17 @@ RandomPassword.prototype.trim = function(s) {
 };
 
 function render_bandwidth_slider(bandwidth_slider ,action, bandwidth_unit) {
+    var values_with_gbps = [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+        31, 32, 33, 34, 35
+    ];
+    var values_p_with_gbps = [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+        31, 32, 33, 34, '∞'];
 
     if (action === 'create') {
         bandwidth_slider.ionRangeSlider({
@@ -138,14 +149,19 @@ function render_bandwidth_slider(bandwidth_slider ,action, bandwidth_unit) {
         if (bandwidth_unit === 'g') {
             bandwitdh_slider_instance.update({
                 min: 0,
-                max: 100,
+                max: 35,
                 from: 1,
                 from_min: 1,
-                from_max: 100,
+                from_max: 35,
                 step: 1,
                 grid: true,
-                grid_num: 10,
+                grid_num: 7,
                 postfix: ' Gbps'
+                // values: values_with_gbps,
+                // prettify: function (n) {
+                //     var ind = values_with_gbps.indexOf(n);
+                //     return values_p_with_gbps[ind];
+                // }
             });
 
         } else if (bandwidth_unit === 'm') {
