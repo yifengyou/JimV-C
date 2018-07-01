@@ -10,7 +10,8 @@
 #
 # Example:
 #   Pass arguments to the installer.
-#   curl https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh | bash -s -- --version dev
+#   curl https://raw.githubusercontent.com/jamesiter/JimV-C/dev/INSTALL.sh | bash -s -- --version dev
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/jamesiter/JimV-C/dev/INSTALL.sh)" -- --version dev
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
 export JIMVC_REPOSITORY_URL='https://github.com/jamesiter/JimV-C.git'
@@ -330,12 +331,21 @@ function display_summary_information() {
     echo "Redis 密码: [${REDIS_PSWD}]"
     echo "======================="
     echo
-    echo "记录下上面信息，安装 JimV-N 时需要用到。"
-    echo "现在可以通过命令 '/home/www/sites/JimV-C/startup.sh' 启动 JimV-C。"
-    echo "======================="
+    echo "JimV-C 已经安装完成，您再需如下几步就能完成整个 JimV 的部署: "
     echo
-    echo "通过 Web 页面完成 JimV-C 的初始化操作。然后到 [计算节点] 执行如下命令，进行 JimV-N 的部署。"
+    echo "--->"
+    echo "1: 执行 '/home/www/sites/JimV-C/startup.sh' 启动 JimV-C。"
+    echo
+    echo "--->"
+    echo "2: 通过 Web 页面 http://`hostname -I` 初始化 JimV-C。"
+    echo
+    echo "--->"
+    echo "3: 到 [计算节点] 执行如下命令，进行 JimV-N 的部署。"
     echo "curl https://raw.githubusercontent.com/jamesiter/JimV-N/master/INSTALL.sh | bash -s -- --redis_host `hostname -I` --redis_password ${REDIS_PSWD} --redis_port 6379"
+    echo
+    echo "--->"
+    echo "4: 享受 JimV 给您带来的 '简单、快速、灵活' 开创虚拟机实例的快乐。。。。。"
+    echo
 }
 
 function deploy() {
