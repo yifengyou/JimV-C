@@ -1131,6 +1131,9 @@ def r_allocate_bandwidth(uuids, bandwidth, bandwidth_unit):
     try:
         ji.Check.previewing(args_rules, {'uuids': uuids, 'bandwidth': bandwidth, 'bandwidth_unit': bandwidth_unit})
 
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
         bandwidth = int(bandwidth)
 
         if bandwidth_unit == 'k':
@@ -1143,9 +1146,8 @@ def r_allocate_bandwidth(uuids, bandwidth, bandwidth_unit):
             bandwidth = bandwidth * 1000 ** 3
 
         else:
-            ret = dict()
             ret['state'] = ji.Common.exchange_state(41203)
-            raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
+            return ret
 
         # http://man7.org/linux/man-pages/man8/tc.8.html
         # 如果带宽大于 tc 所控最大速率，则置其为无限带宽
@@ -1176,8 +1178,64 @@ def r_allocate_bandwidth(uuids, bandwidth, bandwidth_unit):
 
             Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_adjust_ability(uuids, cpu, memory):
+    args_rules = [
+        Rules.UUIDS.value,
+        Rules.CPU.value,
+        Rules.MEMORY.value,
+    ]
+
+    try:
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
+
+        cpu = int(cpu)
+        memory = int(memory)
+
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'cpu': cpu, 'memory': memory})
+
+        not_ready_yet_of_guests = list()
+
+        guest = Guest()
+
+        # 检测所指定的 UUDIs 实例都存在。且状态都为可以操作状态（即关闭状态）。
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            if guest.status != status.GuestState.shutoff.value:
+                not_ready_yet_of_guests.append(guest.__dict__)
+
+        if not_ready_yet_of_guests.__len__() > 0:
+            ret['state'] = ji.Common.exchange_state(41261)
+            ret['data'] = not_ready_yet_of_guests
+            return ret
+
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+            guest.cpu = cpu
+            guest.memory = memory
+
+            message = {
+                '_object': 'guest',
+                'action': 'adjust_ability',
+                'uuid': guest.uuid,
+                'node_id': guest.node_id,
+                'cpu': guest.cpu,
+                'memory': guest.memory,
+                'passback_parameters': {'cpu': guest.cpu, 'memory': guest.memory}
+            }
+
+            Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
         return ret
 
     except ji.PreviewingError, e:

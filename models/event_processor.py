@@ -241,6 +241,14 @@ class EventProcessor(object):
                     cls.guest.bandwidth = cls.message['message']['passback_parameters']['bandwidth']
                     cls.guest.update()
 
+            elif action == 'adjust_ability':
+                if state == ResponseState.success.value:
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+                    cls.guest.cpu = cls.message['message']['passback_parameters']['cpu']
+                    cls.guest.memory = cls.message['message']['passback_parameters']['memory']
+                    cls.guest.update()
+
         elif _object == 'disk':
             if action == 'create':
                 cls.disk.uuid = uuid
