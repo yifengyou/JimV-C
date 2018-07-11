@@ -202,7 +202,7 @@ def r_delete(uuids):
             disk.get_by('uuid')
 
             # 判断磁盘是否与虚拟机处于离状态
-            if disk.state != DiskState.idle.value:
+            if disk.state not in [DiskState.idle.value, DiskState.dirty.value]:
                 ret['state'] = ji.Common.exchange_state(41256)
                 return ret
 

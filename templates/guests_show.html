@@ -47,6 +47,7 @@
 
         .btn,
         .form-control,
+        .form-group>div>div,
         .modal-content {
             border-radius: 0 !important;
         }
@@ -68,6 +69,16 @@
 
         .dropdown-menu {
             min-width: 100%;
+        }
+
+        .btn-ability {
+            margin-right: 16px;
+            height: 50px;
+            padding: 8px 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn-ability-line {
         }
     </style>
 
@@ -201,6 +212,76 @@
             });
 
             render_bandwidth_slider($("#batch_bandwidth"), 'create', 'm');
+        });
+
+        $('#adjust_ability_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                ability: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                $('#adjust_ability_form_button').prop('disabled', true);
+            } else {
+                $('#adjust_ability_form_button').prop('disabled', false);
+            }
+        });
+
+        $('#batch_adjust_ability_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                ability: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                $('#batch_adjust_ability_form_button').prop('disabled', true);
+            } else {
+                $('#batch_adjust_ability_form_button').prop('disabled', false);
+            }
+        });
+
+        $('#adjust_ability_modal').on('show.bs.modal', function (me) {
+            $('#adjust_ability_modal input:radio[name="ability"]').prop('checked',false);
+            $('#adjust_ability_modal .btn-ability-line label').removeClass('active');
+            $('#adjust_ability_form_button').prop('disabled', true);
+            $('#adjust_ability_modal .form-group').removeClass('has-success');
+        });
+
+        $('#batch_adjust_ability_modal').on('show.bs.modal', function (me) {
+            $('#batch_adjust_ability_modal input:radio[name="ability"]').prop('checked',false);
+            $('#batch_adjust_ability_modal .btn-ability-line label').removeClass('active');
+            $('#batch_adjust_ability_form_button').prop('disabled', true);
+            $('#batch_adjust_ability_modal .form-group').removeClass('has-success');
         });
     });
 
@@ -416,6 +497,20 @@
         });
     }
 
+    function adjust_ability(uuids, cpu, memory) {
+        $.ajax({
+            url : '/api/guests/_adjust_ability/' + uuids.join(',') + '/' + cpu + '/' + memory,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例变更配置指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例变更配置指令发送成功！');
+            }
+        });
+    }
+
     function remove(uuids) {
         $.ajax({
             url : '/api/guests/' + uuids.join(','),
@@ -511,6 +606,25 @@
         var uuid = $('#instance_uuid').val();
         allocate_bandwidth([uuid], $('#bandwidth').val(), $('#bandwidth_unit').val());
         $('#allocate_bandwidth_modal').modal('hide');
+    }
+
+    function adjust_ability_at(me) {
+        var uuid = $('#instance_uuid').val();
+        var adjust_ability_value = $('#adjust_ability_modal input:radio[name="ability"]:checked').val();
+
+        adjust_ability_value = adjust_ability_value.match(/^(\d+)c(\d+)g$/i);
+
+        if (adjust_ability_value === null) {
+            alter_danger('实例变更配置失败，指定的配置取值有误！');
+            return
+        }
+
+        var cpu = adjust_ability_value[1];
+        var memory = adjust_ability_value[2];
+
+        adjust_ability([uuid], cpu, memory);
+
+        $('#adjust_ability_modal').modal('hide');
     }
 
     function delete_at(me) {
@@ -630,6 +744,28 @@
             allocate_bandwidth(uuids, $('#batch_bandwidth').val(), $('#batch_bandwidth_unit').val());
         }
         $('#batch_allocate_bandwidth_modal').modal('hide');
+    }
+
+    function batch_adjust_ability() {
+        var uuids = get_checked_uuids();
+
+        var adjust_ability_value = $('#batch_adjust_ability_modal input:radio[name="ability"]:checked').val();
+
+        adjust_ability_value = adjust_ability_value.match(/^(\d+)c(\d+)g$/i);
+
+        if (adjust_ability_value === null) {
+            alter_danger('实例批量变更配置失败，指定的配置取值有误！');
+            return
+        }
+
+        var cpu = adjust_ability_value[1];
+        var memory = adjust_ability_value[2];
+
+        if (uuids) {
+            adjust_ability(uuids, cpu, memory);
+        }
+
+        $('#batch_adjust_ability_modal').modal('hide');
     }
 
     function batch_delete() {
@@ -835,6 +971,12 @@
                                        分配带宽
                                     </a>
                                 </li>
+                                <li class="">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#adjust_ability_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#adjust_ability_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                       变更配置
+                                    </a>
                                 <li class="divider"></li>
                                 <li class="">
                                     <a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"
@@ -900,6 +1042,9 @@
                                             <li class="divider"></li>
                                             <li>
                                                 <a href="javascript:;" data-toggle="modal" data-target="#batch_allocate_bandwidth_modal">分配带宽</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#batch_adjust_ability_modal">变更配置</a>
                                             </li>
                                             <li class="divider"></li>
                                             <li>
@@ -1395,6 +1540,168 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="batch_allocate_bandwidth();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="adjust_ability_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">给虚拟机变更配置：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <div class="example-box-wrapper">
+                    <form id="adjust_ability_form" class="form-horizontal bordered-row">
+                        <div class="form-group">
+                            <div class="col-sm-1"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;实例名称</label>
+                            <div class="col-sm-9">
+                                <h3 style="color: orangered;" id="adjust_ability_instance_desc"></h3>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-1"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-gauge"></span>&nbsp;&nbsp;运算能力</label>
+                            <div class="col-sm-9">
+                                <div class="btn-ability-line" data-toggle="buttons">
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="1 CPU 1GB Memory" name="ability" type="radio" value="1c1g">1&nbsp;&nbsp;核&nbsp;&nbsp;1&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="1 CPU 2GB Memory" name="ability" type="radio" value="1c2g">1&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="2 CPU 2GB Memory" name="ability" type="radio" value="2c2g">2&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="2 CPU 4GB Memory" name="ability" type="radio" value="2c4g">2&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 4GB Memory" name="ability" type="radio" value="4c4g">4&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 8GB Memory" name="ability" type="radio" value="4c8g">4&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="8 CPU 8GB Memory" name="ability" type="radio" value="8c8g">8&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="8 CPU 16GB Memory" name="ability" type="radio" value="8c16g">8&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="1 CPU 16GB Memory" name="ability" type="radio" value="1c16g">1&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 32GB Memory" name="ability" type="radio" value="4c32g">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 64GB Memory" name="ability" type="radio" value="4c64g">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="8 CPU 64GB Memory" name="ability" type="radio" value="8c64g">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="16 CPU 16GB Memory" name="ability" type="radio" value="16c16g">16核&nbsp;&nbsp;16GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="24 CPU 24GB Memory" name="ability" type="radio" value="24c24g">24核&nbsp;&nbsp;24GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="32 CPU 32GB Memory" name="ability" type="radio" value="32c32g">32核&nbsp;&nbsp;32GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="64 CPU 64GB Memory" name="ability" type="radio" value="64c64g">64核&nbsp;&nbsp;64GB
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="adjust_ability_form_button" disabled type="button" class="btn btn-sm btn-primary" onclick="adjust_ability_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_adjust_ability_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量变更虚拟机配置：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要给选定的虚拟机变更配置吗？</p>
+                <p></p>
+                <div class="example-box-wrapper">
+                    <form id="batch_adjust_ability_form" class="form-horizontal bordered-row">
+                        <div class="form-group">
+                            <div class="col-sm-1"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-gauge"></span>&nbsp;&nbsp;运算能力</label>
+                            <div class="col-sm-9">
+                                <div class="btn-ability-line" data-toggle="buttons">
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="1 CPU 1GB Memory" name="ability" type="radio" value="1c1g">1&nbsp;&nbsp;核&nbsp;&nbsp;1&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="1 CPU 2GB Memory" name="ability" type="radio" value="1c2g">1&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="2 CPU 2GB Memory" name="ability" type="radio" value="2c2g">2&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="2 CPU 4GB Memory" name="ability" type="radio" value="2c4g">2&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 4GB Memory" name="ability" type="radio" value="4c4g">4&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 8GB Memory" name="ability" type="radio" value="4c8g">4&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="8 CPU 8GB Memory" name="ability" type="radio" value="8c8g">8&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="8 CPU 16GB Memory" name="ability" type="radio" value="8c16g">8&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="1 CPU 16GB Memory" name="ability" type="radio" value="1c16g">1&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 32GB Memory" name="ability" type="radio" value="4c32g">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="4 CPU 64GB Memory" name="ability" type="radio" value="4c64g">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="8 CPU 64GB Memory" name="ability" type="radio" value="8c64g">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="16 CPU 16GB Memory" name="ability" type="radio" value="16c16g">16核&nbsp;&nbsp;16GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="24 CPU 24GB Memory" name="ability" type="radio" value="24c24g">24核&nbsp;&nbsp;24GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="32 CPU 32GB Memory" name="ability" type="radio" value="32c32g">32核&nbsp;&nbsp;32GB
+                                    </label>
+                                    <label class="btn btn-default btn-ability">
+                                        <input title="64 CPU 64GB Memory" name="ability" type="radio" value="64c64g">64核&nbsp;&nbsp;64GB
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="batch_adjust_ability_form_button" type="button" class="btn btn-sm btn-primary" onclick="batch_adjust_ability();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
