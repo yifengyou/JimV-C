@@ -741,6 +741,22 @@ def r_migrate(uuids, destination_host):
     try:
         ji.Check.previewing(args_rules, {'uuids': uuids, 'destination_host': destination_host})
 
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        # 取全部活着的 hosts
+        available_hosts = Host.get_available_hosts(nonrandom=None)
+
+        if available_hosts.__len__() == 0:
+            ret['state'] = ji.Common.exchange_state(50351)
+            return ret
+
+        available_hosts_mapping_by_node_id = dict()
+
+        for host in available_hosts:
+            if host['node_id'] not in available_hosts_mapping_by_node_id:
+                available_hosts_mapping_by_node_id[host['node_id']] = host
+
         guest = Guest()
         for uuid in uuids.split(','):
             guest.uuid = uuid
@@ -754,6 +770,12 @@ def r_migrate(uuids, destination_host):
             guest.uuid = uuid
             guest.get_by('uuid')
 
+            # 忽略宕机计算节点 上面的 虚拟机 迁移请求
+            # 忽略目标计算节点 等于 当前所在 计算节点 的虚拟机 迁移请求
+            if guest.node_id not in available_hosts_mapping_by_node_id or \
+                    available_hosts_mapping_by_node_id[guest.node_id]['hostname'] == destination_host:
+                continue
+
             message = {
                 '_object': 'guest',
                 'action': 'migrate',
@@ -765,8 +787,6 @@ def r_migrate(uuids, destination_host):
 
             Utils.emit_instruction(message=json.dumps(message))
 
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
     except ji.PreviewingError, e:

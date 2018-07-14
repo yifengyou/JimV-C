@@ -457,7 +457,7 @@
                     },
                     yAxis: {
                         min: 0,
-                        max: 'dataMax',
+                        max: {{ guest_ret.data.memory }},
                         minInterval: 2,
                         axisTick: {
                             show: false
@@ -492,7 +492,7 @@
                             $.each(data.data, function (i, ele) {
                                 d.push([
                                     ele['timestamp'] * 1000,
-                                    ele['memory_unused'] !== null ? Math.floor(ele['memory_unused'] / 1024) / 1000 : null
+                                    ele['memory_available'] !== null ? Math.floor(ele['memory_available'] / 1024) / 1000 : null
                                 ])
                             });
                             return d;
@@ -871,11 +871,11 @@
 
         cpu_chart = echarts.init(document.getElementById('cpu_chart'));
         traffic_chart = echarts.init(document.getElementById('traffic_chart'));
-        // memory_chart = echarts.init(document.getElementById('memory_chart'));
+        memory_chart = echarts.init(document.getElementById('memory_chart'));
         render_cpu_chart(uuid, 'hour');
         render_traffic_chart(uuid, 'hour');
-        render_disks_chart(uuid, 'hour')
-        // render_memory_chart(uuid, 'hour');
+        render_disks_chart(uuid, 'hour');
+        render_memory_chart(uuid, 'hour');
 
         $("#disks_table thead").on('click', ".all_selector", function() {
             if ($("#disks_table thead .all_selector").is(':checked')) {
@@ -1196,8 +1196,8 @@
                     <div>
                         <div id="cpu_chart" style="width: 800px;height:280px;"></div>
                         <div id="traffic_chart" style="width: 800px;height:280px;"></div>
+                        <div id="memory_chart" style="width: 800px;height:280px;"></div>
                     </div>
-                    <!--<div id="memory_chart" style="width: 800px;height:280px;"></div>-->
                     <div id="disks_chart"></div>
                 </div>
             </div>

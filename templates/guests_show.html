@@ -170,7 +170,7 @@
             $('#migrate_instance_uuid').val(
                 $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
             $.ajax({
-                url : '/api/hosts',
+                url : '/api/hosts?alive',
                 type : 'GET',
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json',
@@ -960,7 +960,7 @@
                                     </a>
                                 </li>
                                 <li class="divider"></li>
-                                <li class="">
+                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
                                     <a href="/guest/vnc/{{ item.uuid }}" target="_blank">远程连接</a>
                                 </li>
                                 <li class="divider"></li>
@@ -971,14 +971,14 @@
                                        分配带宽
                                     </a>
                                 </li>
-                                <li class="">
+                                <li class="{% if item.status not in [5] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#adjust_ability_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
                                                 $('#adjust_ability_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
                                        变更配置
                                     </a>
                                 <li class="divider"></li>
-                                <li class="">
+                                <li class="{% if item.status not in [1] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"
                                        onclick="$('#reset_password_type').val('single')">
                                         密码重置

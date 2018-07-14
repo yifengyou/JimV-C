@@ -138,6 +138,7 @@ class EventProcessor(object):
             'system_load': cls.message['message']['system_load'],
             'memory': cls.message['message']['memory'],
             'memory_available': cls.message['message']['memory_available'],
+            'dmidecode': cls.message['message']['dmidecode'],
             'interfaces': cls.message['message']['interfaces'],
             'disks': cls.message['message']['disks'],
             'boot_time': cls.message['message']['boot_time'],
