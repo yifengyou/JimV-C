@@ -367,7 +367,7 @@ class EventProcessor(object):
                 cls.guest_cpu_memory.guest_uuid = item['guest_uuid']
                 cls.guest_cpu_memory.cpu_load = item['cpu_load']
                 cls.guest_cpu_memory.memory_available = item['memory_available']
-                cls.guest_cpu_memory.memory_unused = item['memory_unused']
+                cls.guest_cpu_memory.memory_rate = item['memory_rate']
                 cls.guest_cpu_memory.timestamp = timestamp
                 cls.guest_cpu_memory.create()
 

@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS guest_cpu_memory(
     guest_uuid CHAR(36) NOT NULL,
     cpu_load INT UNSIGNED NOT NULL,
     memory_available BIGINT UNSIGNED NOT NULL,
-    memory_unused BIGINT UNSIGNED NOT NULL,
+    memory_rate TINYINT UNSIGNED NOT NULL DEFAULT 0,
     timestamp BIGINT UNSIGNED NOT NULL,
     PRIMARY KEY (id))
     ENGINE=Innodb
@@ -244,6 +244,8 @@ CREATE TABLE IF NOT EXISTS guest_cpu_memory(
 
 ALTER TABLE guest_cpu_memory ADD INDEX (guest_uuid);
 ALTER TABLE guest_cpu_memory ADD INDEX (cpu_load);
+ALTER TABLE guest_cpu_memory ADD INDEX (memory_available);
+ALTER TABLE guest_cpu_memory ADD INDEX (memory_rate);
 ALTER TABLE guest_cpu_memory ADD INDEX (timestamp);
 ALTER TABLE guest_cpu_memory ADD INDEX (guest_uuid, timestamp);
 

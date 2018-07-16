@@ -22,7 +22,7 @@ class GuestCPUMemory(ORM):
         self.guest_uuid = None
         self.cpu_load = None
         self.memory_available = None
-        self.memory_unused = None
+        self.memory_rate = None
         self.timestamp = None
 
     @staticmethod
@@ -31,6 +31,8 @@ class GuestCPUMemory(ORM):
             'id': FilterFieldType.INT.value,
             'guest_uuid': FilterFieldType.STR.value,
             'cpu_load': FilterFieldType.INT.value,
+            'memory_available': FilterFieldType.INT.value,
+            'memory_rate': FilterFieldType.INT.value,
             'timestamp': FilterFieldType.INT.value
         }
 

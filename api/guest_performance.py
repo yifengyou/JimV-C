@@ -220,6 +220,7 @@ def r_current_top_10():
     ret['state'] = ji.Common.exchange_state(20000)
     ret['data'] = {
         'cpu_load': list(),
+        'memory_rate': list(),
         'rw_bytes': list(),
         'rw_req': list(),
         'rt_bytes': list(),
@@ -241,6 +242,14 @@ def r_current_top_10():
             break
 
         ret['data']['cpu_load'].append(rows[i])
+
+    rows.sort(key=lambda k: k['memory_rate'], reverse=True)
+
+    for i in range(effective_range):
+        if rows[i]['memory_rate'] == 0:
+            break
+
+        ret['data']['memory_rate'].append(rows[i])
 
     rows, _ = GuestDiskIO.get_by_filter(limit=limit, filter_str=filter_str)
     for i in range(rows.__len__()):

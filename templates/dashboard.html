@@ -107,7 +107,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="content-box">
-                        <h3 class="content-box-header bg-blue-alt">
+                        <h3 class="content-box-header btn-blue-alt">
                             CPU
                         </h3>
                         <div class="content-box-wrapper" style="padding-top: 0;">
@@ -175,7 +175,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="content-box">
-                        <h3 class="content-box-header" style="background-color: #9e9e9e; opacity: 0.9; color: #fff;">
+                        <h3 class="content-box-header btn-warning" style="background-color: #9e9e9e; opacity: 0.9; color: #fff;">
                             磁盘吞吐量
                         </h3>
                         <div class="content-box-wrapper" style="padding-top: 0;">
@@ -219,7 +219,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="content-box">
-                        <h3 class="content-box-header bg-green" style="opacity: 0.72;">
+                        <h3 class="content-box-header btn-success" style="opacity: 0.72;">
                             网络流量
                         </h3>
                         <div class="content-box-wrapper" style="padding-top: 0;">
@@ -259,6 +259,36 @@
                     </div>
                 </div>
                 <div class="col-md-4">
+                    <div class="content-box">
+                        <h3 class="content-box-header btn-warning" style="opacity: 0.72;">
+                            内存使用率
+                        </h3>
+                        <div class="content-box-wrapper" style="padding-top: 0;">
+                            <table class="table mrg0B mrg10T" style="table-layout: fixed;">
+                                <thead>
+                                <tr>
+                                    <td style="width: 65%;">实例</td>
+                                    <td style="width: 35%;">使用率</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for item in guests_current_top_10_ret.data.memory_rate %}
+                                    {% if item.guest_uuid not in guests_mapping_by_uuid %}{% continue %}{% endif %}
+                                    <tr>
+                                        <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
+                                            <a href="/guest/detail/{{ item.guest_uuid }}">
+                                                {{ guests_mapping_by_uuid[item.guest_uuid].label }}/{{ guests_mapping_by_uuid[item.guest_uuid].remark }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{ item.memory_rate }}%
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-4">
                 </div>
@@ -383,7 +413,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="content-box">
-                        <h3 class="content-box-header bg-green">
+                        <h3 class="content-box-header btn-success">
                             网络流量
                         </h3>
                         <div class="content-box-wrapper" style="padding-top: 0;">
