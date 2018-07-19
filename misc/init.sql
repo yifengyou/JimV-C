@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS guest(
     os_template_image_id BIGINT UNSIGNED NOT NULL,
     create_time BIGINT UNSIGNED NOT NULL,
     -- 运行时的状态用 status;
+    -- state倾向于condition，是一种延续性的状态。status常用于描述一个过程中的某阶段
     status TINYINT UNSIGNED NOT NULL DEFAULT 0,
     progress TINYINT UNSIGNED NOT NULL DEFAULT 0,
     node_id BIGINT UNSIGNED NOT NULL,

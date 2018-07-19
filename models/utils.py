@@ -167,7 +167,12 @@ def utility_processor():
         icon = 'glyph-icon icon-bolt'
         desc = '未知状态'
 
-        if _status == GuestState.running.value:
+        if _status == GuestState.booting.value:
+            color = '00BBBB'
+            icon = 'glyph-icon icon-circle'
+            desc = '启动中'
+
+        elif _status == GuestState.running.value:
             color = '00BB00'
             icon = 'glyph-icon icon-circle'
             desc = '运行中'

@@ -484,6 +484,13 @@ class EventProcessor(object):
                 else:
                     pass
 
+            except AttributeError as e:
+                logger.error(traceback.format_exc())
+                time.sleep(1)
+
+                if db.r is None:
+                    db.init_conn_redis()
+
             except Exception as e:
                 logger.error(traceback.format_exc())
                 time.sleep(1)

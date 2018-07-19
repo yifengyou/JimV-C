@@ -1261,3 +1261,28 @@ def r_adjust_ability(uuids, cpu, memory):
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
+
+@Utils.dumps2response
+def r_refresh_guest_state():
+    try:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        # 取全部活着的 hosts
+        available_hosts = Host.get_available_hosts(nonrandom=None)
+
+        if available_hosts.__len__() == 0:
+            ret['state'] = ji.Common.exchange_state(50351)
+            return ret
+
+        for host in available_hosts:
+            message = {
+                '_object': 'global',
+                'action': 'refresh_guest_state',
+                'node_id': host['node_id']
+            }
+
+            Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)

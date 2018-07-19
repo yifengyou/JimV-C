@@ -37,17 +37,18 @@ class GuestState(IntEnum):
     # http://libvirt.org/docs/libvirt-appdev-guide-python/en-US/html/libvirt_application_development_guide_using_python-Guest_Domains-Information-State.html
 
     no_state = 0
-    running = 1
-    blocked = 2
-    paused = 3
-    shutdown = 4
-    shutoff = 5
-    crashed = 6
-    pm_suspended = 7
-    migrating = 8
-    update = 9
-    creating = 10
-    snapshot_converting = 11
+    booting = 1
+    running = 2
+    blocked = 3
+    paused = 4
+    shutdown = 5
+    shutoff = 6
+    crashed = 7
+    pm_suspended = 8
+    migrating = 9
+    update = 10
+    creating = 11
+    snapshot_converting = 12
     dirty = 255
 
 

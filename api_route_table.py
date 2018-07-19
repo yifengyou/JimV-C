@@ -113,6 +113,7 @@ add_rule_api(guest.blueprints, '/_adjust_ability/<uuids>/<cpu>/<memory>', api_fu
              methods=['PUT'])
 
 add_rule_api(guest.blueprints, '/_distribute_count', api_func='guest.r_distribute_count', methods=['GET'])
+add_rule_api(guest.blueprints, '/_refresh_guest_state', api_func='guest.r_refresh_guest_state', methods=['PATCH'])
 
 # Disk操作
 add_rule_api(disk.blueprint, '', api_func='disk.r_create', methods=['POST'])
