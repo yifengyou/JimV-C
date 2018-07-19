@@ -57,10 +57,14 @@
             $(me).parent().parent().children().removeClass('active');
             $(me).parent().addClass('active');
 
-            $('#jimv_system_config, #quota').css('display', 'none');
+            $('#jimv_system_config, #quota, #auxiliary').css('display', 'none');
 
             if (me.id === 'quota_label') {
                 $('#quota').css('display', 'unset');
+
+            } else if (me.id === 'auxiliary_label') {
+                $('#auxiliary').css('display', 'unset');
+
             } else {
                 $('#jimv_system_config').css('display', 'unset');
             }
@@ -232,12 +236,29 @@
             });
         }
 
+        function refresh_guest_state() {
+            $.ajax({
+                url : '/api/guests/_refresh_guest_state',
+                type : 'PATCH',
+                error : function() {
+                    alter_danger('刷新虚拟机状态失败！');
+                },
+                success : function() {
+                    alter_success('刷新虚拟机状态成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+
     </script>
     <div class="panel">
         <div class="panel-body">
             <ul class="nav nav-tabs mrg25B">
                 <li class="active"><a href="javascript:;" onclick="select_this(this);" id="jimv_system_config_label">JimV 系统配置</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="quota_label">性能配额</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="auxiliary_label">辅助</a></li>
             </ul>
             <div id="jimv_system_config" class="example-box-wrapper">
                 <form class="form-horizontal bordered-row" style="padding-left: 8%;">
@@ -400,6 +421,15 @@
                             <div style="padding: 0; text-align: right;">
                                 <button type="button" class="btn btn-sm btn-primary" style="right: 10%;" onclick="update_quota();">更新</button>
                             </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="auxiliary" class="example-box-wrapper" style="display: none;">
+                <form class="form-horizontal bordered-row" style="padding-left: 8%;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <div class="col-sm-3">
+                            <button type="button" class="btn btn-primary" onclick="refresh_guest_state();">刷新虚拟机状态</button>
                         </div>
                     </div>
                 </form>
