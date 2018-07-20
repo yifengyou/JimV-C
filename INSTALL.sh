@@ -277,6 +277,7 @@ function install_dependencies_library() {
     su - www -c "cat > ~/.pip/pip.conf << EOF
 [global]
 index-url = ${PYPI}
+EOF
 "
 
     # 创建 python 虚拟环境
