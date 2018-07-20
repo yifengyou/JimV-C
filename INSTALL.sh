@@ -272,6 +272,13 @@ function clone_and_checkout_JimVC() {
 }
 
 function install_dependencies_library() {
+    # 指定 www 用户 pip 源
+    su - www -c "mkdir -p ~/.pip"
+    su - www -c "cat > ~/.pip/pip.conf << EOF
+[global]
+index-url = ${PYPI}
+"
+
     # 创建 python 虚拟环境
     su - www -c "virtualenv --system-site-packages ~/venv"
 
