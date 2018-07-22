@@ -100,6 +100,25 @@ JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门
 4. [获取系统镜像模板](http://template.iit.im)
 5. 上传系统镜像模板
    > 存放系统镜像模板，到所有计算节点可以访问到的路径(如果是单个计算节点，可以存放到 /opt/template_images 目录下。如果是多个计算节点，可以通过 NFS 共享该目录。)。
+
+   `NFS 参考配置`
+   ``` bash
+   # NFS 服务端
+   yum install nfs-utils -y
+   mkdir /srv/nfs_template_images
+   cat > /etc/exports << EOF
+   /srv/nfs_template_images    *(rw,no_root_squash,sync,no_wdelay)
+   EOF
+   systemctl start nfs
+   systemctl enable nfs
+   
+   # NFS 客户端
+   yum install nfs-utils -y
+   mkdir /opt/template_images
+   echo "x.x.x.x:/srv/nfs_template_images       /opt/template_images      nfs4    defaults  0 0" >> /etc/fstab
+   mount -a
+   ```
+
 6. 创建虚拟机模板
    > 在 JimV-C 控制面板中，添加虚拟机模板。
 7. 享受"简单、快速开"创虚拟机实例的快乐。。。。。
