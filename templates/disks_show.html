@@ -159,7 +159,7 @@
             // 单机版加入与磁盘同一计算节点的过滤
             {% if show_on_host %}
                 var node_id = $(me.relatedTarget).parent().parent().parent().parent().prev().prev().prev().text();
-                url += '&filter=node_id:eq:' + node_id + ';status:eq:1';
+                url += '&filter=node_id:eq:' + node_id + ';status:eq:2';
             {% endif %}
 
             $.ajax({
@@ -171,7 +171,7 @@
                 },
                 success : function(data, textStatus, xhr) {
                     $('#mountable_guest').empty();
-                    var subtext = ''
+                    var subtext = '';
                     $.each(data.data, function(k, v) {
                         subtext = v['remark'];
                         if (subtext === '') {
