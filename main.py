@@ -57,6 +57,8 @@ from api.guest_performance import blueprint as performance_blueprint
 from api.guest_performance import blueprints as performance_blueprints
 from api.host_performance import blueprint as host_performance_blueprint
 from api.host_performance import blueprints as host_performance_blueprints
+from api.dashboard import blueprint as dashboard_blueprint
+from api.dashboard import blueprints as dashboard_blueprints
 
 from views.error_pages import *
 from views.config import blueprint as view_config_blueprint
@@ -251,6 +253,8 @@ try:
     app.register_blueprint(performance_blueprints)
     app.register_blueprint(host_performance_blueprint)
     app.register_blueprint(host_performance_blueprints)
+    app.register_blueprint(dashboard_blueprint)
+    app.register_blueprint(dashboard_blueprints)
 
     app.register_blueprint(view_config_blueprint)
     app.register_blueprint(view_misc_blueprint)

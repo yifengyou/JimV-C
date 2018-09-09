@@ -144,6 +144,7 @@ class EventProcessor(object):
             'boot_time': cls.message['message']['boot_time'],
             'nonrandom': False,
             'threads_status': cls.message['message']['threads_status'],
+            'version': cls.message['message']['version'],
             'timestamp': ji.Common.ts()
         }
 

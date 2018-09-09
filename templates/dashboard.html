@@ -11,9 +11,6 @@
 {% block content %}
 
 <script type="text/javascript">
-    var resource_path = window.location.pathname;
-    var cur_url = resource_path;
-
     $(document).ready(function() {
         $('body').addClass('add-transition');
         $('.add-page-transition').on('click', function(){
@@ -316,11 +313,11 @@
                                 </thead>
                                 <tbody>
                                 {% for item in hosts_current_top_10_ret.data.cpu_load %}
-                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    {% if item.node_id | string not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
                                     <tr>
                                         <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                             <a href="/host/detail/{{ item.node_id }}">
-                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}
+                                                {{ hosts_mapping_by_node_id[item.node_id | string].hostname }}
                                             </a>
                                         </td>
                                         <td>
@@ -351,11 +348,11 @@
                                 </thead>
                                 <tbody>
                                 {% for item in hosts_current_top_10_ret.data.rw_req %}
-                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    {% if item.node_id | string not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
                                     <tr>
                                         <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                             <a href="/host/detail/{{ item.node_id }}">
-                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.mountpoint }})
+                                                {{ hosts_mapping_by_node_id[item.node_id | string].hostname }}({{ item.mountpoint }})
                                             </a>
                                         </td>
                                         <td>
@@ -383,11 +380,11 @@
                                 </thead>
                                 <tbody>
                                 {% for item in hosts_current_top_10_ret.data.rw_bytes %}
-                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    {% if item.node_id | string not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
                                     <tr>
                                         <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                             <a href="/host/detail/{{ item.node_id }}">
-                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.mountpoint }})
+                                                {{ hosts_mapping_by_node_id[item.node_id | string].hostname }}({{ item.mountpoint }})
                                             </a>
                                         </td>
                                         <td>
@@ -426,11 +423,11 @@
                                 </thead>
                                 <tbody>
                                 {% for item in hosts_current_top_10_ret.data.rt_bytes %}
-                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    {% if item.node_id | string not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
                                     <tr>
                                         <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                             <a href="/host/detail/{{ item.node_id }}">
-                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}({{ item.name }})
+                                                {{ hosts_mapping_by_node_id[item.node_id | string].hostname }}({{ item.name }})
                                             </a>
                                         </td>
                                         <td>
@@ -467,11 +464,11 @@
                                 </thead>
                                 <tbody>
                                 {% for item in hosts_current_top_10_ret.data.memory_rate %}
-                                    {% if item.node_id not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
+                                    {% if item.node_id | string not in hosts_mapping_by_node_id %}{% continue %}{% endif %}
                                     <tr>
                                         <td class="text-left" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
                                             <a href="/host/detail/{{ item.node_id }}">
-                                                {{ hosts_mapping_by_node_id[item.node_id].hostname }}
+                                                {{ hosts_mapping_by_node_id[item.node_id | string].hostname }}
                                             </a>
                                         </td>
                                         <td>

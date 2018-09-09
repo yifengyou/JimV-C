@@ -23,10 +23,10 @@ class Host(object):
     @staticmethod
     def alive_check(v):
         """
-        JimV-C 2 秒更新一次宿主机信息，这里以 5 秒内没收到更新，作为判断宿主机是否在线的标准
+        60 秒内没收到更新，作为判断 [计算节点] 是否在线的标准。包含了 [计算节点] 与 [控制节点] 间的时间差。
         """
 
-        coupler_length = 5
+        coupler_length = 60
 
         if 'timestamp' not in v:
             return v

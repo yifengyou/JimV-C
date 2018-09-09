@@ -115,7 +115,7 @@ JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门
    # NFS 客户端
    yum install nfs-utils -y
    mkdir /opt/template_images
-   echo "x.x.x.x:/srv/nfs_template_images       /opt/template_images      nfs4    defaults  0 0" >> /etc/fstab
+   echo "x.x.x.x:/srv/nfs_template_images       /opt/template_images      nfs4    soft  0 0" >> /etc/fstab
    mount -a
    ```
 

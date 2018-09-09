@@ -3,6 +3,7 @@
 
 
 from models.utils import add_rule_api
+from api import dashboard
 from api import config
 from api import user
 from api import guest
@@ -31,6 +32,9 @@ add_rule_api(config.blueprint, '', api_func='config.r_create', methods=['POST'])
 add_rule_api(config.blueprint, '', api_func='config.r_update', methods=['PATCH'])
 add_rule_api(config.blueprint, '/_quota', api_func='config.r_update_quota', methods=['PATCH'])
 add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
+
+# JimV 配置操作
+add_rule_api(dashboard.blueprint, '/_show', api_func='dashboard.r_show', methods=['GET'])
 
 # 用户管理
 add_rule_api(user.blueprint, '/_sign_in', api_func='user.r_sign_in', methods=['POST'])
