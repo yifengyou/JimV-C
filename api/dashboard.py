@@ -32,9 +32,6 @@ blueprints = Blueprint(
 
 @Utils.dumps2response
 def r_show():
-    ret = dict()
-    ret['state'] = ji.Common.exchange_state(20000)
-
     # alive 的布尔值 True，在 url 中传输前，会自动转换为字符串 'True'
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True, alive=True)
     guests_distribute_count_url = url_for('api_guests.r_distribute_count', _external=True)
@@ -115,6 +112,9 @@ def r_show():
     for host in hosts_ret['data']:
         hosts_sum['cpu'] += host['cpu']
         hosts_sum['memory'] += host['memory']
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
 
     ret['data'] = {
         'hosts_sum': hosts_sum,

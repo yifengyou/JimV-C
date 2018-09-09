@@ -3,11 +3,13 @@
 
 
 import copy
-from flask import Blueprint, url_for
-from flask import request
+from math import ceil
+
+import requests
 import json
 from uuid import uuid4
 import jimit as ji
+from flask import Blueprint, url_for, request
 
 from api.base import Base
 from models import DiskState, Host
@@ -1286,3 +1288,92 @@ def r_refresh_guest_state():
 
     except ji.PreviewingError, e:
         return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_show():
+    args = list()
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 10))
+    keyword = request.args.get('keyword', None)
+
+    if page is not None:
+        args.append('page=' + page.__str__())
+
+    if page_size is not None:
+        args.append('page_size=' + page_size.__str__())
+
+    if keyword is not None:
+        args.append('keyword=' + keyword.__str__())
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    guests_url = url_for('api_guests.r_get_by_filter', _external=True)
+    if keyword is not None:
+        guests_url = url_for('api_guests.r_content_search', _external=True)
+
+    os_templates_image_url = url_for('api_os_templates_image.r_get_by_filter', _external=True)
+    os_templates_profile_url = url_for('api_os_templates_profile.r_get_by_filter', _external=True)
+
+    if args.__len__() > 0:
+        guests_url = guests_url + '?' + '&'.join(args)
+
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
+
+    guests_ret = requests.get(url=guests_url, cookies=request.cookies)
+    guests_ret = json.loads(guests_ret.content)
+
+    os_templates_image_ret = requests.get(url=os_templates_image_url, cookies=request.cookies)
+    os_templates_image_ret = json.loads(os_templates_image_ret.content)
+    os_templates_image_mapping_by_id = dict()
+    for os_template_image in os_templates_image_ret['data']:
+        os_templates_image_mapping_by_id[os_template_image['id']] = os_template_image
+
+    os_templates_profile_ret = requests.get(url=os_templates_profile_url, cookies=request.cookies)
+    os_templates_profile_ret = json.loads(os_templates_profile_ret.content)
+    os_templates_profile_mapping_by_id = dict()
+    for os_template_profile in os_templates_profile_ret['data']:
+        os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
+
+    last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
+    page_length = 5
+    pages = list()
+    if page < int(ceil(page_length / 2.0)):
+        for i in range(1, page_length + 1):
+            pages.append(i)
+            if i == last_page or last_page == 0:
+                break
+
+    elif last_page - page < page_length / 2:
+        for i in range(last_page - page_length + 1, last_page + 1):
+            if i < 1:
+                continue
+            pages.append(i)
+
+    else:
+        for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
+            pages.append(i)
+            if i == last_page or last_page == 0:
+                break
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'guests_ret': guests_ret,
+        'os_templates_image_mapping_by_id': os_templates_image_mapping_by_id,
+        'os_templates_profile_mapping_by_id': os_templates_profile_mapping_by_id,
+        'hosts_mapping_by_node_id': hosts_mapping_by_node_id,
+        'page': page,
+        'page_size': page_size,
+        'keyword': keyword,
+        'pages': pages,
+        'last_page': last_page
+    }
+
+    return ret
+

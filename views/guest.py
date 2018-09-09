@@ -10,6 +10,9 @@ from math import ceil
 import re
 import socket
 import time
+
+from werkzeug.datastructures import ImmutableMultiDict
+
 from models import Database as db
 from models.initialize import config
 
@@ -34,82 +37,25 @@ blueprints = Blueprint(
 
 
 def show():
-    args = list()
-    page = int(request.args.get('page', 1))
-    page_size = int(request.args.get('page_size', 10))
-    keyword = request.args.get('keyword', None)
-    resource_path = request.path
+    url = url_for('api_guests.r_show', _external=True)
+    if request.args.__len__() >= 1:
+        args = list()
 
-    if page is not None:
-        args.append('page=' + page.__str__())
+        for k, v in request.args.items():
+            args.append('='.join([k, v]))
 
-    if page_size is not None:
-        args.append('page_size=' + page_size.__str__())
+        url += '?' + '&'.join(args)
 
-    if keyword is not None:
-        args.append('keyword=' + keyword.__str__())
+    ret = requests.get(url=url, cookies=request.cookies)
+    ret = json.loads(ret.content)
 
-    host_url = request.host_url.rstrip('/')
-
-    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
-    guests_url = host_url + url_for('api_guests.r_get_by_filter')
-    if keyword is not None:
-        guests_url = host_url + url_for('api_guests.r_content_search')
-
-    os_templates_image_url = host_url + url_for('api_os_templates_image.r_get_by_filter')
-    os_templates_profile_url = host_url + url_for('api_os_templates_profile.r_get_by_filter')
-
-    if args.__len__() > 0:
-        guests_url = guests_url + '?' + '&'.join(args)
-
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
-    hosts_ret = json.loads(hosts_ret.content)
-
-    hosts_mapping_by_node_id = dict()
-    for host in hosts_ret['data']:
-        hosts_mapping_by_node_id[int(host['node_id'])] = host
-
-    guests_ret = requests.get(url=guests_url, cookies=request.cookies)
-    guests_ret = json.loads(guests_ret.content)
-
-    os_templates_image_ret = requests.get(url=os_templates_image_url, cookies=request.cookies)
-    os_templates_image_ret = json.loads(os_templates_image_ret.content)
-    os_templates_image_mapping_by_id = dict()
-    for os_template_image in os_templates_image_ret['data']:
-        os_templates_image_mapping_by_id[os_template_image['id']] = os_template_image
-
-    os_templates_profile_ret = requests.get(url=os_templates_profile_url, cookies=request.cookies)
-    os_templates_profile_ret = json.loads(os_templates_profile_ret.content)
-    os_templates_profile_mapping_by_id = dict()
-    for os_template_profile in os_templates_profile_ret['data']:
-        os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
-
-    last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
-    page_length = 5
-    pages = list()
-    if page < int(ceil(page_length / 2.0)):
-        for i in range(1, page_length + 1):
-            pages.append(i)
-            if i == last_page or last_page == 0:
-                break
-
-    elif last_page - page < page_length / 2:
-        for i in range(last_page - page_length + 1, last_page + 1):
-            if i < 1:
-                continue
-            pages.append(i)
-
-    else:
-        for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
-            pages.append(i)
-            if i == last_page or last_page == 0:
-                break
-
-    return render_template('guests_show.html', guests_ret=guests_ret, resource_path=resource_path,
-                           os_templates_image_mapping_by_id=os_templates_image_mapping_by_id,
-                           os_templates_profile_mapping_by_id=os_templates_profile_mapping_by_id,
-                           hosts_mapping_by_node_id=hosts_mapping_by_node_id, page=page,
-                           page_size=page_size, keyword=keyword, pages=pages, last_page=last_page)
+    return render_template('guests_show.html', guests_ret=ret['data']['guests_ret'],
+                           resource_path=request.path,
+                           os_templates_image_mapping_by_id=ret['data']['os_templates_image_mapping_by_id'],
+                           os_templates_profile_mapping_by_id=ret['data']['os_templates_profile_mapping_by_id'],
+                           hosts_mapping_by_node_id=ret['data']['hosts_mapping_by_node_id'], page=ret['data']['page'],
+                           page_size=ret['data']['page_size'], keyword=ret['data']['keyword'],
+                           pages=ret['data']['pages'], last_page=ret['data']['last_page'])
 
 
 def create():

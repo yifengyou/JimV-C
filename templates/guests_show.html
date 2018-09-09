@@ -855,14 +855,14 @@
                         </div>
                     </td>
                     <td>
-                        {% if os_templates_image_mapping_by_id[item.os_template_image_id].logo == "" %}
-                            <span class="{{ os_templates_profile_mapping_by_id[os_templates_image_mapping_by_id[item.os_template_image_id].os_template_profile_id].icon }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id].label }}"></span>
+                        {% if os_templates_image_mapping_by_id[item.os_template_image_id | string].logo == "" %}
+                            <span class="{{ os_templates_profile_mapping_by_id[os_templates_image_mapping_by_id[item.os_template_image_id | string].os_template_profile_id].icon }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].label }}"></span>
                         {% else %}
-                            <span class="{{ os_templates_image_mapping_by_id[item.os_template_image_id].logo }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id].label }}"></span>
+                            <span class="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].logo }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].label }}"></span>
                         {% endif %}
                     </td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
-                    <td>{{ hosts_mapping_by_node_id[item.node_id].hostname }}</td>
+                    <td>{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</td>
                     <td>
                         CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />
                         内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB<br />
