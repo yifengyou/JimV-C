@@ -104,6 +104,8 @@
             if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
                 data.fv.disableSubmitButtons(true);
             }
+        }).on('success.form.fv', function (e, data) {
+            create();
         });
 
         refresh_os_template_image_id_selectpicker($('#os_template_image_id'));
@@ -182,6 +184,72 @@
         });
     }
 
+    function create() {
+        var adjust_ability_value = $('#create_guest_form input:radio[name="ability"]:checked').val();
+
+        adjust_ability_value = adjust_ability_value.match(/^(\d+)c(\d+)g$/i);
+
+        if (adjust_ability_value === null) {
+            alter_danger('指定的配置取值有误！');
+            return
+        }
+
+        var cpu = adjust_ability_value[1];
+        var memory = adjust_ability_value[2];
+
+        var data = {
+            cpu: parseInt(cpu),
+            memory: parseInt(memory),
+            bandwidth: parseInt($('#bandwidth').val()),
+            bandwidth_unit: $('#bandwidth_unit').val(),
+            os_template_image_id: parseInt($('#os_template_image_id').val()),
+            quantity: parseInt($('#quantity').val()),
+            remark: $('#remark').val(),
+            password: $('#password').val(),
+            ssh_keys_id: $('#ssh_key_id').val(),
+            lease_term: 100
+        };
+
+        if (!$('#allocation_by_random').prop('checked')) {
+            data['node_id'] = $('#node_id').val()
+        }
+
+        var go_back_url = '/guests';
+
+        $.ajax({
+            url : '/api/guest',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('创建实例失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('您所提交的资源正在创建中。根据所提交资源的大小，需要等待几到十几分钟。页面将在3秒钟后自动跳转到实例列表页面！');
+
+                $.ajax({
+                    url: '/api/guests',
+                    type : 'GET',
+                    dataType: "json",
+                    error : function(data, textStatus, xhr) {
+                    },
+                    success : function(data, textStatus, xhr) {
+                        var page_size = 10;
+                        var last_page = Math.ceil(data['paging']['total'] / page_size);
+                        go_back_url = "/guests?page_size=" + page_size + "&page=" + last_page;
+                    }
+                });
+            }
+        });
+
+        setTimeout(function() {
+            window.location.href=go_back_url;
+        }, 3000);
+    }
+
     $(function() { "use strict";
         $("#quantity").TouchSpin({
             max: 20,
@@ -202,6 +270,14 @@
         }
     }
 </script>
+<div id="page-content-wrapper">
+    <div id="alert-success-tip" class="alert alert-success alert-top">
+    </div>
+    <div id="alert-warning-tip" class="alert alert-warning alert-top">
+    </div>
+    <div id="alert-danger-tip" class="alert alert-danger alert-top">
+    </div>
+</div>
 <div class="container" style="padding-top: 100px;">
     <div class="panel">
         <div class="panel-body">
@@ -217,7 +293,7 @@
                 </span>
             </a>
             <div class="example-box-wrapper">
-                <form id="create_guest_form" class="form-horizontal bordered-row" action="/guests/create" method="post">
+                <form id="create_guest_form" class="form-horizontal bordered-row" action="javascript:;">
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-gauge"></span>&nbsp;&nbsp;运算能力</label>
                         <div class="col-sm-10">
@@ -358,7 +434,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label"></label>
                         <div class="col-sm-3 pull-right">
-                            <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                            <button id="create_guest_form_button" type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
                         </div>
                     </div>
                 </form>

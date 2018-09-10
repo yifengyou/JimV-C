@@ -32,8 +32,6 @@ add_rule_views(misc.blueprint, 'reset_password/<token>', views_func='misc.reset_
 add_rule_views(dashboard.blueprint, '', views_func='dashboard.show', methods=['GET'])
 
 add_rule_views(guest.blueprints, '', views_func='guest.show', methods=['GET'])
-add_rule_views(guest.blueprints, '/create', views_func='guest.create', methods=['GET', 'POST'])
-add_rule_views(guest.blueprints, '/success', views_func='guest.success', methods=['GET'])
 add_rule_views(guest.blueprint, '/vnc/<uuid>', views_func='guest.vnc', methods=['GET'])
 add_rule_views(guest.blueprint, '/detail/<uuid>', views_func='guest.detail', methods=['GET'])
 

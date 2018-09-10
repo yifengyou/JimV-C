@@ -3,7 +3,7 @@
 
 
 from functools import wraps
-
+import socket
 import commands
 
 from flask import make_response, g, request
@@ -120,6 +120,15 @@ class Utils(object):
     @staticmethod
     def emit_instruction(message):
         db.r.publish(app.config['instruction_channel'], message=message)
+
+    @staticmethod
+    def port_is_opened(port):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = s.connect_ex(('0.0.0.0', port))
+        if result == 0:
+            return True
+        else:
+            return False
 
 
 class LazyView(object):
