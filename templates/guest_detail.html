@@ -457,7 +457,7 @@
                     },
                     yAxis: {
                         min: 0,
-                        max: {{ guest_ret.data.memory }},
+                        max: {{ guest.memory }},
                         minInterval: 2,
                         axisTick: {
                             show: false
@@ -897,7 +897,7 @@
     function refresh_render_with_specify_granularity(granularity) {
         render_cpu_chart(uuid, granularity);
         render_traffic_chart(uuid, granularity);
-        render_disks_chart(uuid, granularity)
+        render_disks_chart(uuid, granularity);
         render_memory_chart(uuid, granularity);
     }
 
@@ -984,7 +984,7 @@
 
     $(function() { "use strict";
         $("#iops").TouchSpin({
-            max: {{ config_ret.data.iops_cap }},
+            max: {{ config.iops_cap }},
             min: 1,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -994,7 +994,7 @@
 
     $(function() { "use strict";
         $("#bps").TouchSpin({
-            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            max: {{ (config.bps_cap / 1024 / 1024) | int }},
             min: 1,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -1026,7 +1026,7 @@
                             <td>
                                 <span class="guest-label">UUID:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.uuid }}
+                                {{ guest.uuid }}
                                 </span>
                             </td>
                         </tr>
@@ -1034,7 +1034,7 @@
                             <td>
                                 <span class="guest-label">标识:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.label }}
+                                {{ guest.label }}
                                 </span>
                             </td>
                         </tr>
@@ -1042,7 +1042,7 @@
                             <td>
                                 <span class="guest-label">名称:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.remark }}
+                                {{ guest.remark }}
                                 </span>
                             </td>
                         </tr>
@@ -1050,7 +1050,7 @@
                             <td>
                                 <span class="guest-label">状态:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_guest_status(guest_ret.data.status, guest_ret.data.progress)|safe }}
+                                {{ format_guest_status(guest.status, guest.progress)|safe }}
                                 </span>
                             </td>
                         </tr>
@@ -1058,7 +1058,7 @@
                             <td>
                                 <span class="guest-label">CPU:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.cpu }} 核
+                                {{ guest.cpu }} 核
                                 </span>
                             </td>
                         </tr>
@@ -1066,7 +1066,7 @@
                             <td>
                                 <span class="guest-label">内存:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.memory }} GB
+                                {{ guest.memory }} GB
                                 </span>
                             </td>
                         </tr>
@@ -1078,7 +1078,7 @@
                                         <td colspan="6">
                                             <span class="guest-label">磁盘:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
-                                                    <a href="/disks?guest_uuid={{ guest_ret.data.uuid }}" style="color: #0275d8;">{{ disks_ret.data|length }}</a>
+                                                    <a href="/disks?guest_uuid={{ guest.uuid }}" style="color: #0275d8;">{{ disks|length }}</a>
                                             </span>
                                             <button class="btn btn-xs btn-default btn-shortcut disabled" style="float: right;" data-toggle="modal" data-target="#change_disk_quota_modal">变更配额</button>
                                         </td>
@@ -1093,7 +1093,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% for disk in disks_ret.data %}
+                                    {% for disk in disks %}
                                         <tr class="guest-desc">
                                             <td style="display: none;">{{ disk.uuid }}</td>
                                             <td><input title="选中" type="checkbox"></td>
@@ -1108,13 +1108,13 @@
                             <td>
                                 <span class="guest-label">操作系统:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ os_template_image_ret.data.label }}
+                                {{ os_template_image.label }}
                                 </span>&nbsp;&nbsp;&nbsp;&nbsp;
 
-                                {% if os_template_image_ret.data.logo == "" %}
-                                    <span class="{{ os_templates_profile_mapping_by_id[os_template_image_ret.data.os_template_profile_id].icon }}"></span>
+                                {% if os_template_image.logo == "" %}
+                                    <span class="{{ os_templates_profile_mapping_by_id[os_template_image.os_template_profile_id].icon }}"></span>
                                 {% else %}
-                                    <span class="{{ os_template_image_ret.data.logo }}"></span>
+                                    <span class="{{ os_template_image.logo }}"></span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -1122,7 +1122,7 @@
                             <td>
                                 <span class="guest-label">IP:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.ip }}
+                                {{ guest.ip }}
                                 </span>
                             </td>
                         </tr>
@@ -1130,7 +1130,7 @@
                             <td>
                                 <span class="guest-label">密码:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.password }}
+                                {{ guest.password }}
                                 </span>
                             </td>
                         </tr>
@@ -1138,7 +1138,7 @@
                             <td>
                                 <span class="guest-label">计算节点:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ hosts_mapping_by_node_id[guest_ret.data.node_id].hostname }}
+                                {{ hosts_mapping_by_node_id[guest.node_id | string].hostname }}
                                 </span>
                             </td>
                         </tr>
@@ -1146,7 +1146,7 @@
                             <td>
                                 <span class="guest-label">VNC 端口:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.vnc_port }}
+                                {{ guest.vnc_port }}
                                 </span>
                             </td>
                         </tr>
@@ -1154,7 +1154,7 @@
                             <td>
                                 <span class="guest-label">VNC 密码:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ guest_ret.data.vnc_password }}
+                                {{ guest.vnc_password }}
                                 </span>
                             </td>
                         </tr>
@@ -1163,7 +1163,7 @@
                                 <span class="guest-label">SSH-KEY 名称:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
                                     {% set ssh_keys_label = [] %}
-                                    {% for ssh_key in guest_ret.data.ssh_keys %}
+                                    {% for ssh_key in guest.ssh_keys %}
                                     {% do ssh_keys_label.append('<a href="' + ssh_key.url + '">' + ssh_key.label + '</a>') %}
                                     {% endfor %}
                                     {{ ssh_keys_label | join('、') | safe }}
@@ -1174,7 +1174,7 @@
                             <td>
                                 <span class="guest-label">创建时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_datetime_by_tus(guest_ret.data.create_time) }}
+                                {{ format_datetime_by_tus(guest.create_time) }}
                                 </span>
                             </td>
                         </tr>
@@ -1217,12 +1217,12 @@
                     <div class="form-group" style="margin-bottom: 0;">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>&nbsp;&nbsp;IOPS</label>
                         <div class="col-sm-3">
-                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ config_ret.data.iops_base }}" name="iops">
+                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ config.iops_base }}" name="iops">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS(MiB)</label>
                         <div class="col-sm-3">
-                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ config_ret.data.bps_base / 1024 / 1024 | int }}" name="bps">
+                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ config.bps_base / 1024 / 1024 | int }}" name="bps">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>

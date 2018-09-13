@@ -120,6 +120,8 @@ add_rule_api(guest.blueprints, '/_distribute_count', api_func='guest.r_distribut
 add_rule_api(guest.blueprints, '/_refresh_guest_state', api_func='guest.r_refresh_guest_state', methods=['PATCH'])
 
 add_rule_api(guest.blueprints, '/_show', api_func='guest.r_show', methods=['GET'])
+add_rule_api(guest.blueprint, '/_detail/<uuid>', api_func='guest.r_detail', methods=['GET'])
+add_rule_api(guest.blueprint, '/_vnc/<uuid>', api_func='guest.r_vnc', methods=['GET'])
 
 # Disk操作
 add_rule_api(disk.blueprint, '', api_func='disk.r_create', methods=['POST'])

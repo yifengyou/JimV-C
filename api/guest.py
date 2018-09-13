@@ -8,12 +8,14 @@ from math import ceil
 import requests
 import json
 from uuid import uuid4
+import random
+import time
 import jimit as ji
 from flask import Blueprint, url_for, request
 
 from api.base import Base
-from models import DiskState, Host
 from models.initialize import app, dev_table
+from models import DiskState, Host
 from models import Database as db
 from models import Config
 from models import Disk
@@ -50,6 +52,8 @@ blueprints = Blueprint(
 
 
 guest_base = Base(the_class=Guest, the_blueprint=blueprint, the_blueprints=blueprints)
+os_template_image_base = Base(the_class=OSTemplateImage, the_blueprint=blueprint, the_blueprints=blueprints)
+os_template_profile_base = Base(the_class=OSTemplateProfile, the_blueprint=blueprint, the_blueprints=blueprints)
 
 
 @Utils.dumps2response
@@ -1311,9 +1315,6 @@ def r_show():
     if keyword is not None:
         guests_url = url_for('api_guests.r_content_search', _external=True)
 
-    os_templates_image_url = url_for('api_os_templates_image.r_get_by_filter', _external=True)
-    os_templates_profile_url = url_for('api_os_templates_profile.r_get_by_filter', _external=True)
-
     if args.__len__() > 0:
         guests_url = guests_url + '?' + '&'.join(args)
 
@@ -1327,16 +1328,14 @@ def r_show():
     guests_ret = requests.get(url=guests_url, cookies=request.cookies)
     guests_ret = json.loads(guests_ret.content)
 
-    os_templates_image_ret = requests.get(url=os_templates_image_url, cookies=request.cookies)
-    os_templates_image_ret = json.loads(os_templates_image_ret.content)
+    os_templates_image, _ = OSTemplateImage.get_by_filter()
     os_templates_image_mapping_by_id = dict()
-    for os_template_image in os_templates_image_ret['data']:
+    for os_template_image in os_templates_image:
         os_templates_image_mapping_by_id[os_template_image['id']] = os_template_image
 
-    os_templates_profile_ret = requests.get(url=os_templates_profile_url, cookies=request.cookies)
-    os_templates_profile_ret = json.loads(os_templates_profile_ret.content)
+    os_templates_profile, _ = OSTemplateProfile.get_by_filter()
     os_templates_profile_mapping_by_id = dict()
-    for os_template_profile in os_templates_profile_ret['data']:
+    for os_template_profile in os_templates_profile:
         os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
 
     last_page = int(ceil(guests_ret['paging']['total'] / float(page_size)))
@@ -1364,10 +1363,11 @@ def r_show():
     ret['state'] = ji.Common.exchange_state(20000)
 
     ret['data'] = {
-        'guests_ret': guests_ret,
+        'guests': guests_ret['data'],
         'os_templates_image_mapping_by_id': os_templates_image_mapping_by_id,
         'os_templates_profile_mapping_by_id': os_templates_profile_mapping_by_id,
         'hosts_mapping_by_node_id': hosts_mapping_by_node_id,
+        'paging': guests_ret['paging'],
         'page': page,
         'page_size': page_size,
         'keyword': keyword,
@@ -1376,4 +1376,109 @@ def r_show():
     }
 
     return ret
+
+
+@Utils.dumps2response
+def r_vnc(uuid):
+
+    guest_ret = guest_base.get(ids=uuid, ids_rule=Rules.UUID.value, by_field='uuid')
+
+    if '200' != guest_ret['state']['code']:
+        return guest_ret
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
+
+    port = random.randrange(50000, 60000)
+    while True:
+        if not Utils.port_is_opened(port=port):
+            break
+
+        port = random.randrange(50000, 60000)
+
+    payload = {'listen_port': port, 'target_host': hosts_mapping_by_node_id[guest_ret['data']['node_id']]['hostname'],
+               'target_port': guest_ret['data']['vnc_port']}
+
+    db.r.rpush(app.config['ipc_queue'], json.dumps(payload, ensure_ascii=False))
+    time.sleep(1)
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'port': port,
+        'vnc_password': guest_ret['data']['vnc_password']
+    }
+
+    return ret
+
+
+@Utils.dumps2response
+def r_detail(uuid):
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
+
+    guest = Guest()
+    guest.uuid = uuid
+    guest.get_by(field='uuid')
+    guest.ssh_keys = list()
+
+    rows, _ = SSHKeyGuestMapping.get_by_filter(filter_str=':'.join(['guest_uuid', 'in', guest.uuid]))
+
+    ssh_keys_id = list()
+
+    for row in rows:
+        if row['ssh_key_id'] not in ssh_keys_id:
+            ssh_keys_id.append(row['ssh_key_id'].__str__())
+
+    rows, _ = SSHKey.get_by_filter(filter_str=':'.join(['id', 'in', ','.join(ssh_keys_id)]))
+
+    for row in rows:
+        row['url'] = url_for('v_ssh_keys.show')
+        guest.ssh_keys.append(row)
+
+    os_template_image = OSTemplateImage()
+    os_template_image.id = guest.os_template_image_id.__str__()
+    os_template_image.get()
+
+    os_template_profiles, _ = OSTemplateProfile.get_by_filter()
+
+    os_templates_profile_mapping_by_id = dict()
+    for os_template_profile in os_template_profiles:
+        os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
+
+    disks_url = url_for('api_disks.r_get_by_filter', filter='guest_uuid:in:' + guest.uuid, _external=True)
+    disks_ret = requests.get(url=disks_url, cookies=request.cookies)
+    disks = json.loads(disks_ret.content)['data']
+
+    config = Config()
+    config.id = 1
+    config.get()
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'uuid': uuid,
+        'guest': guest.__dict__,
+        'os_template_image': os_template_image.__dict__,
+        'os_templates_profile_mapping_by_id': os_templates_profile_mapping_by_id,
+        'hosts_mapping_by_node_id': hosts_mapping_by_node_id,
+        'disks': disks,
+        'config': config.__dict__
+    }
+
+    return ret
+
 

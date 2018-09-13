@@ -839,7 +839,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in guests_ret.data %}
+                {% for item in guests %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
                     <td style="display: none;">{{ item.uuid }}</td>
                     <td><input title="选中" type="checkbox"></td>
@@ -1057,7 +1057,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                    共有{{ guests_ret.paging.total }}条，每页显示：
+                                    共有{{ paging.total }}条，每页显示：
                                     <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
                                         <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
                                         <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
