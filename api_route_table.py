@@ -176,6 +176,7 @@ add_rule_api(snapshot.blueprints, '/_mapping_by_disks_uuid/<disks_uuid>',
              api_func='snapshot.r_get_snapshots_by_disks_uuid', methods=['GET'])
 add_rule_api(snapshot.blueprint, '/_convert_to_os_template_image/<snapshot_id>/<disk_uuid>',
              api_func='snapshot.r_convert_to_os_template_image', methods=['PUT'])
+add_rule_api(snapshot.blueprints, '/_show', api_func='snapshot.r_show', methods=['GET'])
 
 # Guest 性能查询
 add_rule_api(guest_performance.blueprint, '/cpu_memory',

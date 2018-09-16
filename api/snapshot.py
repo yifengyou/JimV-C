@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from math import ceil
 
-
-from flask import Blueprint
+import requests
+from flask import Blueprint, url_for
 from flask import request
 import json
 import jimit as ji
@@ -382,5 +383,95 @@ def r_convert_to_os_template_image(snapshot_id, disk_uuid):
 
     except ji.PreviewingError, e:
         return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_show():
+    args = list()
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 10))
+    keyword = request.args.get('keyword', None)
+    order_by = request.args.get('order_by', None)
+    order = request.args.get('order', 'desc')
+
+    if page is not None:
+        args.append('page=' + page.__str__())
+
+    if page_size is not None:
+        args.append('page_size=' + page_size.__str__())
+
+    if keyword is not None:
+        args.append('keyword=' + keyword.__str__())
+
+    if order_by is not None:
+        args.append('order_by=' + order_by)
+
+    if order is not None:
+        args.append('order=' + order)
+
+    snapshots_url = url_for('api_snapshots.r_get_by_filter', _external=True)
+    if keyword is not None:
+        snapshots_url = url_for('api_snapshots.r_content_search', _external=True)
+
+    if args.__len__() > 0:
+        snapshots_url = snapshots_url + '?' + '&'.join(args)
+
+    snapshots_ret = requests.get(url=snapshots_url, cookies=request.cookies)
+    snapshots_ret = json.loads(snapshots_ret.content)
+
+    guests_uuid = list()
+
+    for snapshot in snapshots_ret['data']:
+        guests_uuid.append(snapshot['guest_uuid'])
+
+    guests, _ = Guest.get_by_filter(filter_str='uuid:in:' + ','.join(guests_uuid))
+
+    # Guest uuid 与 Guest 的映射
+    guests_mapping_by_uuid = dict()
+    for guest in guests:
+        guests_mapping_by_uuid[guest['uuid']] = guest
+
+    for i, snapshot in enumerate(snapshots_ret['data']):
+        if snapshot['guest_uuid'].__len__() == 36:
+            snapshots_ret['data'][i]['guest'] = guests_mapping_by_uuid[snapshot['guest_uuid']]
+
+    last_page = int(ceil(1 / float(page_size)))
+    page_length = 5
+    pages = list()
+    if page < int(ceil(page_length / 2.0)):
+        for i in range(1, page_length + 1):
+            pages.append(i)
+            if i == last_page or last_page == 0:
+                break
+
+    elif last_page - page < page_length / 2:
+        for i in range(last_page - page_length + 1, last_page + 1):
+            if i < 1:
+                continue
+            pages.append(i)
+
+    else:
+        for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
+            pages.append(i)
+            if i == last_page or last_page == 0:
+                break
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'snapshots': snapshots_ret['data'],
+        'paging': snapshots_ret['paging'],
+        'guests_mapping_by_uuid': guests_mapping_by_uuid,
+        'page': page,
+        'page_size': page_size,
+        'keyword': keyword,
+        'pages': pages,
+        'last_page': last_page,
+        'order_by': order_by,
+        'order': order
+    }
+
+    return ret
 
 
