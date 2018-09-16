@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+
 from math import ceil
 
 from flask import Blueprint, request, url_for
@@ -14,6 +16,7 @@ from models import Config
 from models import Disk
 from models import Rules
 from models import Utils
+from models import OSTemplateImage
 from models.status import StorageMode
 
 from base import Base
@@ -606,6 +609,45 @@ def r_show():
         'keyword': keyword,
         'pages': pages,
         'last_page': last_page
+    }
+
+    return ret
+
+
+@Utils.dumps2response
+def r_detail(uuid):
+    disk = Disk()
+    disk.uuid = uuid
+    disk.get_by(field='uuid')
+    disk.wrap_device(dev_table=dev_table)
+
+    guest = None
+    os_template_image = None
+
+    config = Config()
+    config.id = 1
+    config.get()
+
+    if disk.sequence != -1:
+        guest = Guest()
+        guest.uuid = disk.guest_uuid
+        guest.get_by('uuid')
+
+        os_template_image = OSTemplateImage()
+        os_template_image.id = guest.os_template_image_id
+        os_template_image.get()
+
+        guest = guest.__dict__
+        os_template_image = os_template_image.__dict__
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'guest': guest,
+        'os_template_image': os_template_image,
+        'disk': disk.__dict__,
+        'config': config.__dict__
     }
 
     return ret

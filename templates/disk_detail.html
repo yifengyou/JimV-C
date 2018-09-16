@@ -399,7 +399,7 @@
     }
 
     function render_disks_chart(uuid, granularity) {
-        var dev_name = '{{ disk_ret.data.device }}';
+        var dev_name = '{{ disk.device }}';
         var dev_id_throughput = 'disk_throughput_chart';
         var dev_id_iops = 'disk_iops_chart';
 
@@ -465,7 +465,7 @@
 
     $(function() { "use strict";
         $("#iops").TouchSpin({
-            max: {{ config_ret.data.iops_cap }},
+            max: {{ config.iops_cap }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -475,7 +475,7 @@
 
     $(function() { "use strict";
         $("#iops_rd").TouchSpin({
-            max: {{ config_ret.data.iops_cap - disk_ret.data.iops_wr }},
+            max: {{ config.iops_cap - disk.iops_wr }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -485,7 +485,7 @@
 
     $(function() { "use strict";
         $("#iops_wr").TouchSpin({
-            max: {{ config_ret.data.iops_cap - disk_ret.data.iops_rd }},
+            max: {{ config.iops_cap - disk.iops_rd }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -495,7 +495,7 @@
 
     $(function() { "use strict";
         $("#iops_max").TouchSpin({
-            max: {{ config_ret.data.iops_max }},
+            max: {{ config.iops_max }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -505,7 +505,7 @@
 
     $(function() { "use strict";
         $("#iops_max_length").TouchSpin({
-            max: {{ config_ret.data.iops_max_length }},
+            max: {{ config.iops_max_length }},
             min: 0,
             postfix: '秒',
             verticalbuttons: true,
@@ -516,7 +516,7 @@
 
     $(function() { "use strict";
         $("#bps").TouchSpin({
-            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            max: {{ (config.bps_cap / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -527,7 +527,7 @@
 
     $(function() { "use strict";
         $("#bps_rd").TouchSpin({
-            max: {{ ((config_ret.data.bps_cap - disk_ret.data.bps_wr) / 1024 / 1024) | int }},
+            max: {{ ((config.bps_cap - disk.bps_wr) / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -538,7 +538,7 @@
 
     $(function() { "use strict";
         $("#bps_wr").TouchSpin({
-            max: {{ ((config_ret.data.bps_cap - disk_ret.data.bps_rd) / 1024 / 1024) | int }},
+            max: {{ ((config.bps_cap - disk.bps_rd) / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -549,7 +549,7 @@
 
     $(function() { "use strict";
         $("#bps_max").TouchSpin({
-            max: {{ (config_ret.data.bps_max / 1024 / 1024) | int }},
+            max: {{ (config.bps_max / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -560,7 +560,7 @@
 
     $(function() { "use strict";
         $("#bps_max_length").TouchSpin({
-            max: {{ config_ret.data.bps_max_length }},
+            max: {{ config.bps_max_length }},
             min: 0,
             postfix: '秒',
             verticalbuttons: true,
@@ -621,7 +621,7 @@
                             <td>
                                 <span class="guest-label">UUID:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ disk_ret.data.uuid }}
+                                {{ disk.uuid }}
                                 </span>
                             </td>
                         </tr>
@@ -629,7 +629,7 @@
                             <td>
                                 <span class="guest-label">名称:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ disk_ret.data.remark }}
+                                {{ disk.remark }}
                                 </span>
                             </td>
                         </tr>
@@ -637,7 +637,7 @@
                             <td>
                                 <span class="guest-label">状态:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_disk_state(disk_ret.data.state)|safe }}
+                                {{ format_disk_state(disk.state)|safe }}
                                 </span>
                             </td>
                         </tr>
@@ -645,7 +645,7 @@
                             <td>
                                 <span class="guest-label">磁盘性别:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                    {% if disk_ret.data.sequence == 0 %}
+                                    {% if disk.sequence == 0 %}
                                         系统盘
                                     {% else %}
                                         数据盘
@@ -657,7 +657,7 @@
                             <td>
                                 <span class="guest-label">磁盘容量:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ disk_ret.data.size }} GB
+                                {{ disk.size }} GB
                                 </span>
                             </td>
                         </tr>
@@ -665,8 +665,8 @@
                             <td>
                                 <span class="guest-label">所属虚拟机:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                    {% if disk_ret.data.sequence != -1 %}
-                                        <a href="/guest/detail/{{ disk_ret.data.guest_uuid }}">{{ guest_ret.data.label }}/{{ guest_ret.data.remark }}</a>
+                                    {% if disk.sequence != -1 %}
+                                        <a href="/guest/detail/{{ disk.guest_uuid }}">{{ guest.label }}/{{ guest.remark }}</a>
                                     {% else %}
                                     {% endif %}
                                 </span>
@@ -676,8 +676,8 @@
                             <td>
                                 <span class="guest-label">设备路径:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                    {% if disk_ret.data.sequence >= 0 %}
-                                        {{ disk_ret.data.device }}
+                                    {% if disk.sequence >= 0 %}
+                                        {{ disk.device }}
                                     {% endif %}
                                 </span>
                             </td>
@@ -704,11 +704,11 @@
                                     </thead>
                                     <tbody>
                                     <tr class="guest-desc">
-                                        <th style="text-align: center;">{{ disk_ret.data.iops }}</th>
-                                        <th style="text-align: center;">{{ disk_ret.data.iops_rd }}</th>
-                                        <th style="text-align: center;">{{ disk_ret.data.iops_wr }}</th>
-                                        <th style="text-align: center;">{{ disk_ret.data.iops_max }}</th>
-                                        <th style="text-align: center;">{{ disk_ret.data.iops_max_length }} 秒</th>
+                                        <th style="text-align: center;">{{ disk.iops }}</th>
+                                        <th style="text-align: center;">{{ disk.iops_rd }}</th>
+                                        <th style="text-align: center;">{{ disk.iops_wr }}</th>
+                                        <th style="text-align: center;">{{ disk.iops_max }}</th>
+                                        <th style="text-align: center;">{{ disk.iops_max_length }} 秒</th>
                                     </tr>
                                     </tbody>
                                     <thead>
@@ -722,11 +722,11 @@
                                     </thead>
                                     <tbody>
                                     <tr class="guest-desc">
-                                        <th style="text-align: center;">{{ (disk_ret.data.bps / 1024 / 1024) | int }} MiB</th>
-                                        <th style="text-align: center;">{{ (disk_ret.data.bps_rd / 1024 / 1024) | int }} MiB</th>
-                                        <th style="text-align: center;">{{ (disk_ret.data.bps_wr / 1024 / 1024) | int }} MiB</th>
-                                        <th style="text-align: center;">{{ (disk_ret.data.bps_max / 1024 / 1024) | int }} MiB</th>
-                                        <th style="text-align: center;">{{ disk_ret.data.bps_max_length }} 秒</th>
+                                        <th style="text-align: center;">{{ (disk.bps / 1024 / 1024) | int }} MiB</th>
+                                        <th style="text-align: center;">{{ (disk.bps_rd / 1024 / 1024) | int }} MiB</th>
+                                        <th style="text-align: center;">{{ (disk.bps_wr / 1024 / 1024) | int }} MiB</th>
+                                        <th style="text-align: center;">{{ (disk.bps_max / 1024 / 1024) | int }} MiB</th>
+                                        <th style="text-align: center;">{{ disk.bps_max_length }} 秒</th>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -736,7 +736,7 @@
                             <td>
                                 <span class="guest-label">创建时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_datetime_by_tus(disk_ret.data.create_time) }}
+                                {{ format_datetime_by_tus(disk.create_time) }}
                                 </span>
                             </td>
                         </tr>
@@ -781,12 +781,12 @@
                             &nbsp;&nbsp;IOPS
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ disk_ret.data.iops }}" name="iops">
+                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ disk.iops }}" name="iops">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS</label>
                         <div class="col-sm-3">
-                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ (disk_ret.data.bps / 1024 / 1024) | int }}" name="bps">
+                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ (disk.bps / 1024 / 1024) | int }}" name="bps">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -796,12 +796,12 @@
                             &nbsp;&nbsp;IOPS 读
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_rd" title="IOPS 读" class="form-control" type="text" value="{{ disk_ret.data.iops_rd }}" name="iops_rd">
+                            <input id="iops_rd" title="IOPS 读" class="form-control" type="text" value="{{ disk.iops_rd }}" name="iops_rd">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 读</label>
                         <div class="col-sm-3">
-                            <input id="bps_rd" title="BPS 读" class="form-control" type="text" value="{{ (disk_ret.data.bps_rd / 1024 / 1024) | int }}" name="bps_rd">
+                            <input id="bps_rd" title="BPS 读" class="form-control" type="text" value="{{ (disk.bps_rd / 1024 / 1024) | int }}" name="bps_rd">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -811,12 +811,12 @@
                             &nbsp;&nbsp;IOPS 写
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_wr" title="IOPS 写" class="form-control" type="text" value="{{ disk_ret.data.iops_wr }}" name="iops_wr">
+                            <input id="iops_wr" title="IOPS 写" class="form-control" type="text" value="{{ disk.iops_wr }}" name="iops_wr">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 写</label>
                         <div class="col-sm-3">
-                            <input id="bps_wr" title="BPS 写" class="form-control" type="text" value="{{ (disk_ret.data.bps_wr / 1024 / 1024) | int }}" name="bps_wr">
+                            <input id="bps_wr" title="BPS 写" class="form-control" type="text" value="{{ (disk.bps_wr / 1024 / 1024) | int }}" name="bps_wr">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -827,12 +827,12 @@
                             &nbsp;&nbsp;IOPS 桶宽
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ disk_ret.data.iops_max }}" name="iops_max">
+                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ disk.iops_max }}" name="iops_max">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶宽</label>
                         <div class="col-sm-3">
-                            <input id="bps_max" title="BPS 桶宽" class="form-control" type="text" value="{{ (disk_ret.data.bps_max / 1024 / 1024) | int }}" name="bps_max">
+                            <input id="bps_max" title="BPS 桶宽" class="form-control" type="text" value="{{ (disk.bps_max / 1024 / 1024) | int }}" name="bps_max">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -843,12 +843,12 @@
                             &nbsp;&nbsp;IOPS 桶高
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max_length" title="IOPS 桶高" class="form-control" type="text" value="{{ disk_ret.data.iops_max_length }}" name="iops_max_length">
+                            <input id="iops_max_length" title="IOPS 桶高" class="form-control" type="text" value="{{ disk.iops_max_length }}" name="iops_max_length">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶高</label>
                         <div class="col-sm-3">
-                            <input id="bps_max_length" title="BPS 桶高" class="form-control" type="text" value="{{ disk_ret.data.bps_max_length }}" name="bps_max_length">
+                            <input id="bps_max_length" title="BPS 桶高" class="form-control" type="text" value="{{ disk.bps_max_length }}" name="bps_max_length">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>

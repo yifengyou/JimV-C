@@ -5,8 +5,6 @@
 import json
 from flask import Blueprint, render_template, url_for, request
 import requests
-from math import ceil
-from models.status import StorageMode
 
 
 __author__ = 'James Iter'
@@ -56,33 +54,12 @@ def create():
 
 
 def detail(uuid):
-    host_url = request.host_url.rstrip('/')
+    disk_detail_url = url_for('api_disk.r_detail', uuid=uuid, _external=True)
+    disk_detail_ret = requests.get(url=disk_detail_url, cookies=request.cookies)
+    disk_detail_ret = json.loads(disk_detail_ret.content)
 
-    disk_url = host_url + url_for('api_disks.r_get', uuids=uuid)
-
-    disk_ret = requests.get(url=disk_url, cookies=request.cookies)
-    disk_ret = json.loads(disk_ret.content)
-
-    guest_ret = None
-    os_template_image_ret = None
-
-    config_url = host_url + url_for('api_config.r_get')
-    config_ret = requests.get(url=config_url, cookies=request.cookies)
-    config_ret = json.loads(config_ret.content)
-
-    if disk_ret['data']['sequence'] != -1:
-        guest_url = host_url + url_for('api_guests.r_get', uuids=disk_ret['data']['guest_uuid'])
-
-        guest_ret = requests.get(url=guest_url, cookies=request.cookies)
-        guest_ret = json.loads(guest_ret.content)
-
-        os_template_image_url = host_url + url_for('api_os_templates_image.r_get',
-                                                   ids=guest_ret['data']['os_template_image_id'].__str__())
-
-        os_template_image_ret = requests.get(url=os_template_image_url, cookies=request.cookies)
-        os_template_image_ret = json.loads(os_template_image_ret.content)
-
-    return render_template('disk_detail.html', uuid=uuid, guest_ret=guest_ret,
-                           os_template_image_ret=os_template_image_ret, disk_ret=disk_ret, config_ret=config_ret)
-
+    return render_template('disk_detail.html', uuid=uuid, guest=disk_detail_ret['data']['guest'],
+                           os_template_image=disk_detail_ret['data']['os_template_image'],
+                           disk=disk_detail_ret['data']['disk'],
+                           config=disk_detail_ret['data']['config'])
 

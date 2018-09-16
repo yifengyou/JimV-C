@@ -126,6 +126,12 @@ class Disk(ORM):
         self.bps_rd = 0
         self.bps_wr = 0
 
+    def wrap_device(self, dev_table):
+        self.device = None
+
+        if self.sequence >= 0:
+            self.device = u'/dev/' + dev_table[self.sequence]
+
     @staticmethod
     def get_filter_keywords():
         return {
