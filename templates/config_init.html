@@ -40,6 +40,58 @@
         });
     });
 
+    function create() {
+        var data = {
+            jimv_edition: 0,
+            storage_mode: parseInt($('#storage_mode').val()),
+            vm_network: $('#vm_network').val(),
+            vm_manage_network: $('#vm_manage_network').val(),
+            start_ip: $('#start_ip').val(),
+            end_ip: $('#end_ip').val(),
+            netmask: $('#netmask').val(),
+            gateway: $('#gateway').val(),
+            dns1: $('#dns1').val(),
+            dns2: $('#dns2').val(),
+            start_vnc_port: parseInt($('#start_vnc_port').val()),
+            dfs_volume: $('#dfs_volume').val(),
+            storage_path: $('#storage_path').val(),
+            hdd_type: $('#hdd_type').val(),
+
+            iops_base: parseInt($('#iops_base').val()),
+            iops_pre_unit: parseInt($('#iops_pre_unit').val()),
+            iops_cap: parseInt($('#iops_cap').val()),
+            iops_max: parseInt($('#iops_max').val()),
+            iops_max_length: parseInt($('#iops_max_length').val()),
+            bps_base: parseInt($('#bps_base').val()),
+            bps_pre_unit: parseInt($('#bps_pre_unit').val()),
+            bps_cap: parseInt($('#bps_cap').val()),
+            bps_max: parseInt($('#bps_max').val()),
+            bps_max_length: parseInt($('#bps_max_length').val())
+        };
+
+        var go_back_url = '/';
+
+        $.ajax({
+            url : '/api/config',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('初始化失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('JimV 已被初始化。页面将在3秒钟后自动跳转到首页！！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.href=go_back_url;
+        }, 3000);
+    }
+
     function hdd_type_select(me) {
         var hdd_type = $(me).val();
 
@@ -97,51 +149,51 @@
                     初始化 JimV
                 </h3>
                 <div class="example-box-wrapper">
-                    <form class="form-horizontal bordered-row" action="/config/create" method="post">
+                    <form class="form-horizontal bordered-row" action="javascript:;">
                         <div class="form-group">
                             <label class="col-sm-2 control-label">网桥(业务网络)</label>
                             <div class="col-sm-3">
-                                <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" value="net-br0">
+                                <input title="Guest 业务网络" class="form-control" id="vm_network" name="vm_network" type="text" value="net-br0">
                             </div>
                             <label class="col-sm-2 control-label">网桥(管理网络)</label>
                             <div class="col-sm-3">
-                                <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" value="net-br0">
+                                <input title="Guest 管理网络" class="form-control" id="vm_manage_network" name="vm_manage_network" type="text" value="net-br0">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">起始 IP</label>
                             <div class="col-sm-3">
-                                <input title="起始 IP" class="form-control" name="start_ip" type="text" value="10.10.1.1">
+                                <input title="起始 IP" class="form-control" id="start_ip" name="start_ip" type="text" value="10.10.1.1">
                             </div>
                             <label class="col-sm-2 control-label">截止 IP</label>
                             <div class="col-sm-3">
-                                <input title="截止 IP" class="form-control" name="end_ip" type="text" value="10.10.15.253">
+                                <input title="截止 IP" class="form-control" id="end_ip" name="end_ip" type="text" value="10.10.15.253">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">子网掩码</label>
                             <div class="col-sm-3">
-                                <input title="子网掩码" class="form-control" name="netmask" type="text" value="255.255.240.0">
+                                <input title="子网掩码" class="form-control" id="netmask" name="netmask" type="text" value="255.255.240.0">
                             </div>
                             <label class="col-sm-2 control-label">网关</label>
                             <div class="col-sm-3">
-                                <input title="网关" class="form-control" name="gateway" type="text" value="10.10.15.254">
+                                <input title="网关" class="form-control" id="gateway" name="gateway" type="text" value="10.10.15.254">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">DNS1</label>
                             <div class="col-sm-3">
-                                <input title="DNS1" class="form-control" name="dns1" type="text" value="223.5.5.5">
+                                <input title="DNS1" class="form-control" id="dns1" name="dns1" type="text" value="223.5.5.5">
                             </div>
                             <label class="col-sm-2 control-label">DNS2</label>
                             <div class="col-sm-3">
-                                <input title="DNS2" class="form-control" name="dns2" type="text" value="8.8.8.8">
+                                <input title="DNS2" class="form-control" id="dns2" name="dns2" type="text" value="8.8.8.8">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">起始 VNC 端口</label>
                             <div class="col-sm-3">
-                                <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" value="15900">
+                                <input title="起始 VNC 端口" class="form-control" id="start_vnc_port" name="start_vnc_port" type="text" value="15900">
                             </div>
                         </div>
                         <div class="form-group">
@@ -162,7 +214,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
                             <div class="col-sm-3">
-                                <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" value="/opt/Images">
+                                <input title="虚拟机磁盘存放路径" class="form-control" id="storage_path" name="storage_path" type="text" value="/opt/Images">
                             </div>
                             <!-- HDD for Hard Disk Drive -->
                             <label id="hdd_type_label" class="col-sm-2 control-label">磁盘类型</label>
@@ -191,7 +243,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label"></label>
                             <div class="col-sm-3 pull-right">
-                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;">初始化</button>
+                                <button class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" onclick="create()">初始化</button>
                             </div>
                         </div>
                     </form>

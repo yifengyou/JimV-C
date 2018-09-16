@@ -22,7 +22,7 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 
 add_rule_views(config.blueprint, '', views_func='config.show', methods=['GET'])
-add_rule_views(config.blueprint, '/create', views_func='config.create', methods=['GET', 'POST'])
+add_rule_views(config.blueprint, '/create', views_func='config.create', methods=['GET'])
 
 add_rule_views(misc.blueprint, 'login', views_func='misc.login', methods=['GET'])
 add_rule_views(misc.blueprint, 'change_password', views_func='misc.change_password', methods=['GET'])
@@ -37,8 +37,8 @@ add_rule_views(guest.blueprint, '/vnc/<uuid>', views_func='guest.vnc', methods=[
 add_rule_views(guest.blueprint, '/detail/<uuid>', views_func='guest.detail', methods=['GET'])
 
 add_rule_views(disk.blueprints, '', views_func='disk.show', methods=['GET'])
-add_rule_views(disk.blueprints, '/create', views_func='disk.create', methods=['GET', 'POST'])
-add_rule_views(disk.blueprint, '/detail/<uuid>', views_func='disk.detail', methods=['GET', 'POST'])
+add_rule_views(disk.blueprints, '/create', views_func='disk.create', methods=['GET'])
+add_rule_views(disk.blueprint, '/detail/<uuid>', views_func='disk.detail', methods=['GET'])
 
 add_rule_views(log.blueprints, '', views_func='log.show', methods=['GET'])
 

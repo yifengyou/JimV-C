@@ -265,68 +265,68 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">网桥(业务网络)</label>
                         <div class="col-sm-3">
-                            <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" disabled value="{{ config_ret.data.vm_network }}">
+                            <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" disabled value="{{ config.vm_network }}">
                         </div>
                         <label class="col-sm-2 control-label">网桥(管理网络)</label>
                         <div class="col-sm-3">
-                            <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" disabled value="{{ config_ret.data.vm_manage_network }}">
+                            <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" disabled value="{{ config.vm_manage_network }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">起始 IP</label>
                         <div class="col-sm-3">
-                            <input title="起始 IP" class="form-control" name="start_ip" type="text" disabled value="{{ config_ret.data.start_ip }}">
+                            <input title="起始 IP" class="form-control" name="start_ip" type="text" disabled value="{{ config.start_ip }}">
                         </div>
                         <label class="col-sm-2 control-label">截止 IP</label>
                         <div class="col-sm-3">
-                            <input title="截止 IP" class="form-control" name="end_ip" type="text" disabled value="{{ config_ret.data.end_ip }}">
+                            <input title="截止 IP" class="form-control" name="end_ip" type="text" disabled value="{{ config.end_ip }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">子网掩码</label>
                         <div class="col-sm-3">
-                            <input title="子网掩码" class="form-control" name="netmask" type="text" disabled value="{{ config_ret.data.netmask }}">
+                            <input title="子网掩码" class="form-control" name="netmask" type="text" disabled value="{{ config.netmask }}">
                         </div>
                         <label class="col-sm-2 control-label">网关</label>
                         <div class="col-sm-3">
-                            <input title="网关" class="form-control" name="gateway" type="text" disabled value="{{ config_ret.data.gateway }}">
+                            <input title="网关" class="form-control" name="gateway" type="text" disabled value="{{ config.gateway }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">DNS1</label>
                         <div class="col-sm-3">
-                            <input title="DNS1" class="form-control" name="dns1" type="text" disabled value="{{ config_ret.data.dns1 }}">
+                            <input title="DNS1" class="form-control" name="dns1" type="text" disabled value="{{ config.dns1 }}">
                         </div>
                         <label class="col-sm-2 control-label">DNS2</label>
                         <div class="col-sm-3">
-                            <input title="DNS2" class="form-control" name="dns2" type="text" disabled value="{{ config_ret.data.dns2 }}">
+                            <input title="DNS2" class="form-control" name="dns2" type="text" disabled value="{{ config.dns2 }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">起始 VNC 端口</label>
                         <div class="col-sm-3">
-                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" disabled value="{{ config_ret.data.start_vnc_port }}">
+                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" disabled value="{{ config.start_vnc_port }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">虚拟机磁盘存储模式</label>
                         <div class="col-sm-3">
                             <select id="storage_mode" title="虚拟机磁盘存储模式" class="selectpicker" name="storage_mode" data-width="100%" disabled>
-                                <option {% if config_ret.data.storage_mode == 0 %}selected{% endif %} value="0">本地存储</option>
-                                <option {% if config_ret.data.storage_mode == 1 %}selected{% endif %} value="1" data-subtext="NFS">挂载共享</option>
-                                <option {% if config_ret.data.storage_mode == 2 %}selected{% endif %} value="2">Ceph</option>
-                                <option {% if config_ret.data.storage_mode == 3 %}selected{% endif %} value="3">GlusterFS</option>
+                                <option {% if config.storage_mode == 0 %}selected{% endif %} value="0">本地存储</option>
+                                <option {% if config.storage_mode == 1 %}selected{% endif %} value="1" data-subtext="NFS">挂载共享</option>
+                                <option {% if config.storage_mode == 2 %}selected{% endif %} value="2">Ceph</option>
+                                <option {% if config.storage_mode == 3 %}selected{% endif %} value="3">GlusterFS</option>
                             </select>
                         </div>
-                        <label id="dfs_volume_label" class="col-sm-2 control-label" style="display: {% if config_ret.data.storage_mode in [3] %}unset{% else %}none{% endif %};">分布式文件系统存储卷</label>
+                        <label id="dfs_volume_label" class="col-sm-2 control-label" style="display: {% if config.storage_mode in [3] %}unset{% else %}none{% endif %};">分布式文件系统存储卷</label>
                         <div class="col-sm-3">
-                            <input id="dfs_volume" title="分布式文件系统存储卷" class="form-control" name="dfs_volume" type="text" style="display: {% if config_ret.data.storage_mode in [3] %}unset{% else %}none{% endif %};" disabled value="{{ config_ret.data.dfs_volume }}">
+                            <input id="dfs_volume" title="分布式文件系统存储卷" class="form-control" name="dfs_volume" type="text" style="display: {% if config.storage_mode in [3] %}unset{% else %}none{% endif %};" disabled value="{{ config.dfs_volume }}">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
                         <div class="col-sm-3">
-                            <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" disabled value="{{ config_ret.data.storage_path }}">
+                            <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" disabled value="{{ config.storage_path }}">
                         </div>
                     </div>
                 </form>
@@ -339,12 +339,12 @@
                             &nbsp;&nbsp;IOPS 基准值
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_base" title="IOPS 基准值" class="form-control" type="text" value="{{ config_ret.data.iops_base }}" name="iops_base">
+                            <input id="iops_base" title="IOPS 基准值" class="form-control" type="text" value="{{ config.iops_base }}" name="iops_base">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 基准值</label>
                         <div class="col-sm-3">
-                            <input id="bps_base" title="BPS 基准值" class="form-control" type="text" value="{{ (config_ret.data.bps_base / 1024 / 1024) | int }}" name="bps_base">
+                            <input id="bps_base" title="BPS 基准值" class="form-control" type="text" value="{{ (config.bps_base / 1024 / 1024) | int }}" name="bps_base">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -354,12 +354,12 @@
                             &nbsp;&nbsp;IOPS/GiB 增益
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_pre_unit" title="IOPS/GiB 增益" class="form-control" type="text" value="{{ config_ret.data.iops_pre_unit }}" name="iops_pre_unit">
+                            <input id="iops_pre_unit" title="IOPS/GiB 增益" class="form-control" type="text" value="{{ config.iops_pre_unit }}" name="iops_pre_unit">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS/GiB 增益</label>
                         <div class="col-sm-3">
-                            <input id="bps_pre_unit" title="BPS/GiB 增益 (MiB)" class="form-control" type="text" value="{{ '%0.2f'|format(config_ret.data.bps_pre_unit / 1024 / 1024) }}" name="bps_pre_unit">
+                            <input id="bps_pre_unit" title="BPS/GiB 增益 (MiB)" class="form-control" type="text" value="{{ '%0.2f'|format(config.bps_pre_unit / 1024 / 1024) }}" name="bps_pre_unit">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -369,12 +369,12 @@
                             &nbsp;&nbsp;IOPS 增益上限
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_cap" title="IOPS 增益上限" class="form-control" type="text" value="{{ config_ret.data.iops_cap }}" name="iops_cap">
+                            <input id="iops_cap" title="IOPS 增益上限" class="form-control" type="text" value="{{ config.iops_cap }}" name="iops_cap">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 增益上限</label>
                         <div class="col-sm-3">
-                            <input id="bps_cap" title="BPS 增益上限 (MiB)" class="form-control" type="text" value="{{ (config_ret.data.bps_cap / 1024 / 1024) | int }}" name="bps_cap">
+                            <input id="bps_cap" title="BPS 增益上限 (MiB)" class="form-control" type="text" value="{{ (config.bps_cap / 1024 / 1024) | int }}" name="bps_cap">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -385,12 +385,12 @@
                             &nbsp;&nbsp;IOPS 桶宽
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ config_ret.data.iops_max }}" name="iops_max">
+                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ config.iops_max }}" name="iops_max">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶宽</label>
                         <div class="col-sm-3">
-                            <input id="bps_max" title="BPS 桶宽 (MiB)" class="form-control" type="text" value="{{ (config_ret.data.bps_max / 1024 / 1024) | int }}" name="bps_max">
+                            <input id="bps_max" title="BPS 桶宽 (MiB)" class="form-control" type="text" value="{{ (config.bps_max / 1024 / 1024) | int }}" name="bps_max">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -401,12 +401,12 @@
                             &nbsp;&nbsp;IOPS 桶高
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max_length" title="IOPS 桶高 (秒)" class="form-control" type="text" value="{{ config_ret.data.iops_max_length }}" name="iops_max_length">
+                            <input id="iops_max_length" title="IOPS 桶高 (秒)" class="form-control" type="text" value="{{ config.iops_max_length }}" name="iops_max_length">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶高</label>
                         <div class="col-sm-3">
-                            <input id="bps_max_length" title="BPS 桶高 (秒)" class="form-control" type="text" value="{{ config_ret.data.bps_max_length }}" name="bps_max_length">
+                            <input id="bps_max_length" title="BPS 桶高 (秒)" class="form-control" type="text" value="{{ config.bps_max_length }}" name="bps_max_length">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
