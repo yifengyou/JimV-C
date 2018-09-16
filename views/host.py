@@ -5,7 +5,6 @@
 import json
 from flask import Blueprint, render_template, url_for, request
 import requests
-from math import ceil
 
 
 __author__ = 'James Iter'
@@ -28,42 +27,27 @@ blueprints = Blueprint(
 
 
 def show():
-    args = list()
-    page = int(request.args.get('page', 1))
-    page_size = int(request.args.get('page_size', 10))
-    keyword = request.args.get('keyword', None)
-    resource_path = request.path
+    url = url_for('api_hosts.r_show', _external=True)
+    if request.args.__len__() >= 1:
+        args = list()
 
-    if page is not None:
-        args.append('page=' + page.__str__())
+        for k, v in request.args.items():
+            args.append('='.join([k, v]))
 
-    if page_size is not None:
-        args.append('page_size=' + page_size.__str__())
+        url += '?' + '&'.join(args)
 
-    if keyword is not None:
-        args.append('keyword=' + keyword.__str__())
+    ret = requests.get(url=url, cookies=request.cookies)
+    ret = json.loads(ret.content)
 
-    host_url = request.host_url.rstrip('/')
-
-    hosts_url = host_url + url_for('api_hosts.r_get_by_filter')
-    if keyword is not None:
-        hosts_url = host_url + url_for('api_hosts.r_content_search')
-
-    if args.__len__() > 0:
-        hosts_url = hosts_url + '?' + '&'.join(args)
-
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
-    hosts_ret = json.loads(hosts_ret.content)
-
-    return render_template('hosts_show.html', hosts_ret=hosts_ret, resource_path=resource_path, keyword=keyword)
+    return render_template('hosts_show.html', hosts=ret['data']['hosts'], resource_path=request.path,
+                           keyword=ret['data']['keyword'])
 
 
 def detail(node_id):
-    host_url = request.host_url.rstrip('/')
+    host_url = url_for('api_hosts.r_get', nodes_id=node_id, _external=True)
 
-    _host_url = host_url + url_for('api_hosts.r_get', nodes_id=node_id)
-
-    host_ret = requests.get(url=_host_url, cookies=request.cookies)
+    host_ret = requests.get(url=host_url, cookies=request.cookies)
     host_ret = json.loads(host_ret.content)
 
-    return render_template('host_detail.html', node_id=node_id, host_ret=host_ret)
+    return render_template('host_detail.html', node_id=node_id, host=host_ret['data'])
+

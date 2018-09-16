@@ -920,7 +920,7 @@
                 <div class="col-xs-4">
                     <div style="background: #F5f6FA; border: 1px solid #e1e6eb; padding: 10px; font-size: 14px; width: 100%;">
                         <span>
-                            {{ host_ret.data.hostname }}
+                            {{ host.hostname }}
                         </span>
                     </div>
                     <table class="table table-bordered">
@@ -929,7 +929,7 @@
                             <td>
                                 <span class="guest-label">NODE ID:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ host_ret.data.node_id }}
+                                {{ host.node_id }}
                                 </span>
                             </td>
                         </tr>
@@ -940,13 +940,13 @@
                                         <td>
                                             <span class="guest-label">节点健康状况:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
-                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                                             </span>
                                         </td>
                                         <td>
                                             <span class="guest-label">节点性能收集引擎:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
-                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.host_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.host_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                                             </span>
                                         </td>
                                     </tr>
@@ -954,13 +954,13 @@
                                         <td>
                                             <span class="guest-label">状态汇送引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
-                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.host_state_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.host_state_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                                             </span>
                                         </td>
                                         <td>
                                             <span class="guest-label">虚拟机性能收集引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
-                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.guest_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.guest_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                                             </span>
                                         </td>
                                     </tr>
@@ -968,13 +968,13 @@
                                         <td>
                                             <span class="guest-label">指令处理引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
-                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.instruction_process_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.instruction_process_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                                             </span>
                                         </td>
                                         <td>
                                             <span class="guest-label">虚拟机创建进度引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                             <span class="guest-desc">
-                                                <i class="glyph-icon icon-circle font-size-14 {% if host_ret.data.threads_status.guest_creating_progress_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.guest_creating_progress_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
                                             </span>
                                         </td>
                                     </tr>
@@ -985,7 +985,7 @@
                             <td>
                                 <span class="guest-label">CPU:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ host_ret.data.cpu }} 核
+                                {{ host.cpu }} 核
                                 </span>
                             </td>
                         </tr>
@@ -993,12 +993,12 @@
                             <td>
                                 <span class="guest-label">内存:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ (host_ret.data.memory / 1024 / 1024 / 1024)|int }} GB
+                                {{ (host.memory / 1024 / 1024 / 1024)|int }} GB
                                 </span>
                             </td>
                         </tr>
 
-                        {% for nic_name, nic in host_ret.data.interfaces.iteritems() %}
+                        {% for nic_name, nic in host.interfaces.iteritems() %}
                             <tr>
                                 <td style="padding: 0;">
                                     <table style="width: 100%;">
@@ -1008,7 +1008,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% for mountpoint, disk in host_ret.data.disks.iteritems() %}
+                        {% for mountpoint, disk in host.disks.iteritems() %}
                             <tr>
                                 <td style="padding: 0;">
                                     <table style="width: 100%;">
@@ -1022,7 +1022,7 @@
                             <td>
                                 <span class="guest-label">启动时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_datetime_by_tus(host_ret.data.boot_time * 1000 * 1000) }}
+                                {{ format_datetime_by_tus(host.boot_time * 1000 * 1000) }}
                                 </span>
                             </td>
                         </tr>
@@ -1030,7 +1030,7 @@
                             <td>
                                 <span class="guest-label">更新时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ format_datetime_by_tus(host_ret.data.timestamp * 1000 * 1000) }}
+                                {{ format_datetime_by_tus(host.timestamp * 1000 * 1000) }}
                                 </span>
                             </td>
                         </tr>

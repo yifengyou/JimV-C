@@ -147,6 +147,7 @@ add_rule_api(host.blueprints, '', api_func='host.r_get_by_filter', methods=['GET
 add_rule_api(host.blueprints, '/_search', api_func='host.r_content_search', methods=['GET'])
 add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_delete', methods=['DELETE'])
 add_rule_api(host.blueprints, '/<hosts_name>/<random>', api_func='host.r_nonrandom', methods=['PUT'])
+add_rule_api(host.blueprints, '/_show', api_func='host.r_show', methods=['GET'])
 
 # SSH Key 操作
 add_rule_api(ssh_key.blueprint, '', api_func='ssh_key.r_create', methods=['POST'])

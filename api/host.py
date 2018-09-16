@@ -3,7 +3,9 @@
 
 
 import json
-from flask import Blueprint, request
+
+import requests
+from flask import Blueprint, request, url_for
 import jimit as ji
 
 from models import Database as db
@@ -144,7 +146,7 @@ def r_content_search():
         ret['data'] = list()
 
         for host in Host.get_all():
-            if -1 != host['hostname'].find(keyword):
+            if -1 != host['hostname'].lower().find(keyword.lower()):
                 ret['data'].append(host)
 
         return ret
@@ -190,4 +192,42 @@ def r_delete(nodes_id):
 
     except ji.PreviewingError, e:
         return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_show():
+    args = list()
+    page = int(request.args.get('page', 1))
+    page_size = int(request.args.get('page_size', 100))
+    keyword = request.args.get('keyword', None)
+
+    if page is not None:
+        args.append('page=' + page.__str__())
+
+    if page_size is not None:
+        args.append('page_size=' + page_size.__str__())
+
+    if keyword is not None:
+        args.append('keyword=' + keyword.__str__())
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    if keyword is not None:
+        hosts_url = url_for('api_hosts.r_content_search', _external=True)
+
+    if args.__len__() > 0:
+        hosts_url = hosts_url + '?' + '&'.join(args)
+
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'hosts': hosts_ret['data'],
+        'keyword': keyword
+    }
+
+    return ret
+
 
