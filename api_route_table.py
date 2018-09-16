@@ -162,6 +162,7 @@ add_rule_api(ssh_key.blueprint, '/_bound/<ssh_key_id>', api_func='ssh_key.r_boun
 add_rule_api(ssh_key.blueprint, '/_unbound/<ssh_key_id>', api_func='ssh_key.r_unbound', methods=['GET'])
 add_rule_api(ssh_key.blueprint, '/_bind/<ssh_key_id>/<uuids>', api_func='ssh_key.r_bind', methods=['PUT'])
 add_rule_api(ssh_key.blueprint, '/_unbind/<ssh_key_id>/<uuids>', api_func='ssh_key.r_unbind', methods=['PUT'])
+add_rule_api(ssh_key.blueprints, '/_show', api_func='ssh_key.r_show', methods=['GET'])
 
 # 快照操作
 add_rule_api(snapshot.blueprint, '', api_func='snapshot.r_create', methods=['POST'])

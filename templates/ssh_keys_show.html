@@ -180,8 +180,8 @@
                     validators: {
                         notEmpty: {},
                         stringLength: {
-                            min: 380,
-                            max: 420
+                            min: 200,
+                            max: 1000
                         }
                     }
                 }
@@ -191,6 +191,8 @@
             if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
                 data.fv.disableSubmitButtons(true);
             }
+        }).on('success.form.fv', function (e, data) {
+            create();
         });
 
         init_multi_selector($('#bind_multi_selector'));
@@ -459,6 +461,35 @@
             }
         });
     }
+
+    function create() {
+        var data = {
+            label: $('#label').val(),
+            public_key: $('#public_key').val()
+        };
+
+        var go_back_url = '/ssh_keys';
+
+        $.ajax({
+            url : '/api/ssh_key',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('添加 SSH Key 失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('您所提交的 SSH Key 已创建。页面将在3秒钟后自动跳转到模板列表页面！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.href=go_back_url;
+        }, 3000);
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
@@ -491,7 +522,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in ssh_keys_ret.data %}
+                {% for item in ssh_keys %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
                     <td style="display: none;">{{ item.id }}</td>
                     <td><input title="选中" type="checkbox"></td>
@@ -543,7 +574,7 @@
                                 <div class="col-sm-6">
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                    共有{{ ssh_keys_ret.paging.total }}条，每页显示：
+                                    共有{{ paging.total }}条，每页显示：
                                     <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
                                         <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
                                         <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
@@ -639,7 +670,7 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form id="add_ssh_key_form" class="form-horizontal bordered-row" action="/ssh_key" method="post">
+                    <form id="add_ssh_key_form" class="form-horizontal bordered-row" action="javascript:;">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
