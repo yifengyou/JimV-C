@@ -132,6 +132,7 @@ add_rule_api(disk.blueprints, '/<uuids>', api_func='disk.r_get', methods=['GET']
 add_rule_api(disk.blueprints, '', api_func='disk.r_get_by_filter', methods=['GET'])
 add_rule_api(disk.blueprints, '/_search', api_func='disk.r_content_search', methods=['GET'])
 add_rule_api(disk.blueprints, '/_distribute_count', api_func='disk.r_distribute_count', methods=['GET'])
+add_rule_api(disk.blueprints, '/_show', api_func='disk.r_show', methods=['GET'])
 
 # 日志查询
 # 系统模板操作

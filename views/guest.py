@@ -68,3 +68,11 @@ def detail(uuid):
                            hosts_mapping_by_node_id=guest_detail_ret['data']['hosts_mapping_by_node_id'],
                            disks=guest_detail_ret['data']['disks'], config=guest_detail_ret['data']['config'])
 
+
+def create():
+        hosts_url = url_for('api_hosts.r_get_by_filter', alive=True, _external=True)
+        hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+        hosts_ret = json.loads(hosts_ret.content)
+
+        return render_template('guest_create.html', hosts_ret=hosts_ret)
+

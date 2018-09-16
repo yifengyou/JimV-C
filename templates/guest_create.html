@@ -185,17 +185,17 @@
     }
 
     function create() {
-        var adjust_ability_value = $('#create_guest_form input:radio[name="ability"]:checked').val();
+        var ability_value = $('#create_guest_form input:radio[name="ability"]:checked').val();
 
-        adjust_ability_value = adjust_ability_value.match(/^(\d+)c(\d+)g$/i);
+        ability_value = ability_value.match(/^(\d+)c(\d+)g$/i);
 
-        if (adjust_ability_value === null) {
+        if (ability_value === null) {
             alter_danger('指定的配置取值有误！');
             return
         }
 
-        var cpu = adjust_ability_value[1];
-        var memory = adjust_ability_value[2];
+        var cpu = ability_value[1];
+        var memory = ability_value[2];
 
         var data = {
             cpu: parseInt(cpu),

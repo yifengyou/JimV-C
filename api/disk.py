@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from math import ceil
 
-
-from flask import Blueprint, request
+from flask import Blueprint, request, url_for
 import json
+import requests
 from uuid import uuid4
 import jimit as ji
 
@@ -433,6 +434,179 @@ def r_distribute_count():
             ret['data']['kind']['data_mounted'] += 1
 
         ret['data']['total_size'] += disk['size']
+
+    return ret
+
+
+@Utils.dumps2response
+def r_show():
+    args = list()
+
+    page = request.args.get('page', 1)
+    if page == '':
+        page = 1
+    page = int(page)
+
+    page_size = int(request.args.get('page_size', 10))
+    keyword = request.args.get('keyword', None)
+    show_area = request.args.get('show_area', 'unmount')
+    guest_uuid = request.args.get('guest_uuid', None)
+    sequence = request.args.get('sequence', None)
+    order_by = request.args.get('order_by', None)
+    order = request.args.get('order', None)
+    filters = list()
+
+    if page is not None:
+        args.append('page=' + page.__str__())
+
+    if page_size is not None:
+        args.append('page_size=' + page_size.__str__())
+
+    if keyword is not None:
+        args.append('keyword=' + keyword.__str__())
+
+    if guest_uuid is not None:
+        filters.append('guest_uuid:in:' + guest_uuid.__str__())
+        show_area = 'all'
+
+    if sequence is not None:
+        filters.append('sequence:in:' + sequence.__str__())
+        show_area = 'all'
+
+    if show_area in ['unmount', 'data_disk', 'all']:
+        if show_area == 'unmount':
+            filters.append('sequence:eq:-1')
+
+        elif show_area == 'data_disk':
+            filters.append('sequence:gt:0')
+
+        else:
+            pass
+
+    else:
+        # 与前端页面相照应，首次打开时，默认只显示未挂载的磁盘
+        filters.append('sequence:eq:-1')
+
+    if order_by is not None:
+        args.append('order_by=' + order_by)
+
+    if order is not None:
+        args.append('order=' + order)
+
+    if filters.__len__() > 0:
+        args.append('filter=' + ','.join(filters))
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    disks_url = url_for('api_disks.r_get_by_filter', _external=True)
+
+    if keyword is not None:
+        disks_url = url_for('api_disks.r_content_search', _external=True)
+        # 关键字检索，不支持显示域过滤
+        show_area = 'all'
+
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
+
+    if args.__len__() > 0:
+        disks_url = disks_url + '?' + '&'.join(args)
+
+    disks_ret = requests.get(url=disks_url, cookies=request.cookies)
+    disks_ret = json.loads(disks_ret.content)
+
+    guests_uuid = list()
+    disks_uuid = list()
+
+    for disk in disks_ret['data']:
+        disks_uuid.append(disk['uuid'])
+
+        if disk['guest_uuid'].__len__() == 36:
+            guests_uuid.append(disk['guest_uuid'])
+
+    if guests_uuid.__len__() > 0:
+        guests, _ = Guest.get_by_filter(filter_str='uuid:in:' + ','.join(guests_uuid))
+
+        guests_uuid_mapping = dict()
+        for guest in guests:
+            guests_uuid_mapping[guest['uuid']] = guest
+
+        for i, disk in enumerate(disks_ret['data']):
+            if disk['guest_uuid'].__len__() == 36:
+                disks_ret['data'][i]['guest'] = guests_uuid_mapping[disk['guest_uuid']]
+
+    if disks_uuid.__len__() > 0:
+        snapshots_id_mapping_by_disks_uuid_url = url_for('api_snapshots.r_get_snapshots_by_disks_uuid',
+                                                         disks_uuid=','.join(disks_uuid), _external=True)
+        snapshots_id_mapping_by_disks_uuid_ret = requests.get(url=snapshots_id_mapping_by_disks_uuid_url,
+                                                              cookies=request.cookies)
+        snapshots_id_mapping_by_disks_uuid_ret = json.loads(snapshots_id_mapping_by_disks_uuid_ret.content)
+
+        snapshots_id_mapping_by_disk_uuid = dict()
+
+        for snapshot_id_mapping_by_disk_uuid in snapshots_id_mapping_by_disks_uuid_ret['data']:
+
+            disk_uuid = snapshot_id_mapping_by_disk_uuid['disk_uuid']
+            snapshot_id = snapshot_id_mapping_by_disk_uuid['snapshot_id']
+
+            if disk_uuid not in snapshots_id_mapping_by_disk_uuid:
+                snapshots_id_mapping_by_disk_uuid[disk_uuid] = list()
+
+            snapshots_id_mapping_by_disk_uuid[disk_uuid].append(snapshot_id)
+
+        for i, disk in enumerate(disks_ret['data']):
+            if disk['uuid'] in snapshots_id_mapping_by_disk_uuid:
+                disks_ret['data'][i]['snapshot'] = snapshots_id_mapping_by_disk_uuid[disk['uuid']]
+
+    config = Config()
+    config.id = 1
+    config.get()
+
+    show_on_host = False
+    if config.storage_mode == StorageMode.local.value:
+        show_on_host = True
+
+    last_page = int(ceil(disks_ret['paging']['total'] / float(page_size)))
+    page_length = 5
+    pages = list()
+    if page < int(ceil(page_length / 2.0)):
+        for i in range(1, page_length + 1):
+            pages.append(i)
+            if i == last_page or last_page == 0:
+                break
+
+    elif last_page - page < page_length / 2:
+        for i in range(last_page - page_length + 1, last_page + 1):
+            if i < 1:
+                continue
+            pages.append(i)
+
+    else:
+        for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
+            pages.append(i)
+            if i == last_page or last_page == 0:
+                break
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    ret['data'] = {
+        'disks': disks_ret['data'],
+        'hosts_mapping_by_node_id': hosts_mapping_by_node_id,
+        'order_by': order_by,
+        'order': order,
+        'show_area': show_area,
+        'config': config.__dict__,
+        'show_on_host': show_on_host,
+        'paging': disks_ret['paging'],
+        'page': page,
+        'page_size': page_size,
+        'keyword': keyword,
+        'pages': pages,
+        'last_page': last_page
+    }
 
     return ret
 

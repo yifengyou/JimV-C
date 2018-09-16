@@ -462,7 +462,7 @@
 
     $(function() { "use strict";
         $("#iops").TouchSpin({
-            max: {{ config_ret.data.iops_cap }},
+            max: {{ config.iops_cap }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -472,7 +472,7 @@
 
     $(function() { "use strict";
         $("#iops_rd").TouchSpin({
-            max: {{ config_ret.data.iops_cap }},
+            max: {{ config.iops_cap }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -482,7 +482,7 @@
 
     $(function() { "use strict";
         $("#iops_wr").TouchSpin({
-            max: {{ config_ret.data.iops_cap }},
+            max: {{ config.iops_cap }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -492,7 +492,7 @@
 
     $(function() { "use strict";
         $("#iops_max").TouchSpin({
-            max: {{ config_ret.data.iops_max }},
+            max: {{ config.iops_max }},
             min: 0,
             verticalbuttons: true,
             verticalupclass: 'glyph-icon icon-plus',
@@ -502,7 +502,7 @@
 
     $(function() { "use strict";
         $("#iops_max_length").TouchSpin({
-            max: {{ config_ret.data.iops_max_length }},
+            max: {{ config.iops_max_length }},
             min: 0,
             postfix: '秒',
             verticalbuttons: true,
@@ -513,7 +513,7 @@
 
     $(function() { "use strict";
         $("#bps").TouchSpin({
-            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            max: {{ (config.bps_cap / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -524,7 +524,7 @@
 
     $(function() { "use strict";
         $("#bps_rd").TouchSpin({
-            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            max: {{ (config.bps_cap / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -535,7 +535,7 @@
 
     $(function() { "use strict";
         $("#bps_wr").TouchSpin({
-            max: {{ (config_ret.data.bps_cap / 1024 / 1024) | int }},
+            max: {{ (config.bps_cap / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -546,7 +546,7 @@
 
     $(function() { "use strict";
         $("#bps_max").TouchSpin({
-            max: {{ (config_ret.data.bps_max / 1024 / 1024) | int }},
+            max: {{ (config.bps_max / 1024 / 1024) | int }},
             min: 0,
             postfix: 'MiB',
             verticalbuttons: true,
@@ -557,7 +557,7 @@
 
     $(function() { "use strict";
         $("#bps_max_length").TouchSpin({
-            max: {{ config_ret.data.bps_max_length }},
+            max: {{ config.bps_max_length }},
             min: 0,
             postfix: '秒',
             verticalbuttons: true,
@@ -638,7 +638,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in disks_ret.data %}
+                {% for item in disks %}
                 <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
                     <td style="display: none;">{{ item.uuid }}</td>
                     <td><input title="选中" type="checkbox"></td>
@@ -666,7 +666,7 @@
                         {{ item.guest.label }}/{{ item.guest.remark }}
                     {% endif %}</a>
                     </td>
-                    <td style="{% if not show_on_host %}display: none;{% endif %}">{{ hosts_mapping_by_node_id[item.node_id].hostname }}</td>
+                    <td style="{% if not show_on_host %}display: none;{% endif %}">{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</td>
                     <td style="display: none;">{{ item.node_id }}</td>
                     <td>
                         {% if item.sequence == 0 %}
@@ -725,7 +725,7 @@
                                     <button class="btn btn-default btn-shortcut disabled" data-toggle="modal" data-target="#batch_change_disk_quota_modal">变更配额</button>
                                 </div>
                                 <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
-                                    共有{{ disks_ret.paging.total }}条，每页显示：
+                                    共有{{ paging.total }}条，每页显示：
                                     <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
                                         <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
                                         <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
@@ -865,12 +865,12 @@
                             &nbsp;&nbsp;IOPS
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ config_ret.data.iops_base }}" name="iops">
+                            <input id="iops" title="IOPS" class="form-control" type="text" value="{{ config.iops_base }}" name="iops">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS</label>
                         <div class="col-sm-3">
-                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ (config_ret.data.bps_base / 1024 / 1024) | int }}" name="bps">
+                            <input id="bps" title="BPS" class="form-control" type="text" value="{{ (config.bps_base / 1024 / 1024) | int }}" name="bps">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -911,12 +911,12 @@
                             &nbsp;&nbsp;IOPS 桶宽
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ config_ret.data.iops_max }}" name="iops_max">
+                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ config.iops_max }}" name="iops_max">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶宽</label>
                         <div class="col-sm-3">
-                            <input id="bps_max" title="BPS 桶宽" class="form-control" type="text" value="{{ (config_ret.data.bps_max / 1024 / 1024) | int }}" name="bps_max">
+                            <input id="bps_max" title="BPS 桶宽" class="form-control" type="text" value="{{ (config.bps_max / 1024 / 1024) | int }}" name="bps_max">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
@@ -927,12 +927,12 @@
                             &nbsp;&nbsp;IOPS 桶高
                         </label>
                         <div class="col-sm-3">
-                            <input id="iops_max_length" title="IOPS 桶高" class="form-control" type="text" value="{{ config_ret.data.iops_max_length }}" name="iops_max_length">
+                            <input id="iops_max_length" title="IOPS 桶高" class="form-control" type="text" value="{{ config.iops_max_length }}" name="iops_max_length">
                         </div>
                         <span class="col-sm-1"></span>
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶高</label>
                         <div class="col-sm-3">
-                            <input id="bps_max_length" title="BPS 桶高" class="form-control" type="text" value="{{ config_ret.data.bps_max_length }}" name="bps_max_length">
+                            <input id="bps_max_length" title="BPS 桶高" class="form-control" type="text" value="{{ config.bps_max_length }}" name="bps_max_length">
                         </div>
                         <span class="col-sm-1"></span>
                     </div>
