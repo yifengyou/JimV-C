@@ -51,6 +51,7 @@ add_rule_api(os_template_image.blueprints, '/<ids>', api_func='os_template_image
 add_rule_api(os_template_image.blueprints, '/<ids>', api_func='os_template_image.r_get', methods=['GET'])
 add_rule_api(os_template_image.blueprints, '', api_func='os_template_image.r_get_by_filter', methods=['GET'])
 add_rule_api(os_template_image.blueprints, '/_search', api_func='os_template_image.r_content_search', methods=['GET'])
+add_rule_api(os_template_image.blueprints, '/_show', api_func='os_template_image.r_show', methods=['GET'])
 
 # 系统模板描述文件操作
 add_rule_api(os_template_profile.blueprint, '', api_func='os_template_profile.r_create', methods=['POST'])

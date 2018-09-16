@@ -212,10 +212,46 @@
             if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
                 data.fv.disableSubmitButtons(true);
             }
+        }).on('success.form.fv', function (e, data) {
+            create();
         });
 
         nav_to_sheet_tag();
     });
+
+    function create() {
+        var data = {
+            label: $('#label').val(),
+            description: $('#description').val(),
+            path: $('#path').val(),
+            logo: $('#logo').val(),
+            active: $('#active').val(),
+            os_template_profile_id: parseInt($('#os_template_profile_id').val()),
+            kind: 0
+        };
+
+        var go_back_url = '/os_templates_image';
+
+        $.ajax({
+            url : '/api/os_template_image',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('创建模板镜像失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('您所提交的模板镜像已创建。页面将在3秒钟后自动跳转到模板列表页面！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.href=go_back_url;
+        }, 3000);
+    }
 
     function refresh() {
         if (keyword !== undefined && keyword.length > 0) {
@@ -560,7 +596,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in os_templates_image_ret.data if item.kind == 0 %}
+                {% for item in os_templates_image if item.kind == 0 %}
                     <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
                         <td style="display: none;">{{ item.id }}</td>
                         <td><input title="选中" type="checkbox"></td>
@@ -590,12 +626,12 @@
                             <div>
                                 <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
                                     {% if item.logo == "" %}
-                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].icon }}"></span>
+                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].icon }}"></span>
                                     {% else %}
                                         <span class="{{ item.logo }}"></span>
                                     {% endif %}
                                 </a>
-                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].os_product_name }}</p>
+                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].os_product_name }}</p>
                             </div>
                         </td>
                         <td>
@@ -683,7 +719,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for item in os_templates_image_ret.data if item.kind == 1 %}
+                {% for item in os_templates_image if item.kind == 1 %}
                     <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
                         <td style="display: none;">{{ item.id }}</td>
                         <td><input title="选中" type="checkbox"></td>
@@ -717,12 +753,12 @@
                             <div>
                                 <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
                                     {% if item.logo == "" %}
-                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].icon }}"></span>
+                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].icon }}"></span>
                                     {% else %}
                                         <span class="{{ item.logo }}"></span>
                                     {% endif %}
                                 </a>
-                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id].os_product_name }}</p>
+                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].os_product_name }}</p>
                             </div>
                         </td>
                         <td>
@@ -849,7 +885,7 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form id="add_os_template_image_form" class="form-horizontal bordered-row" action="/os_template_image" method="post">
+                    <form id="add_os_template_image_form" class="form-horizontal bordered-row" action="javascript:;">
                         <input id="active" name="active" value="1" type="hidden" title="激活" class="form-control">
                         <div class="form-group">
                             <div class="col-sm-2"></div>

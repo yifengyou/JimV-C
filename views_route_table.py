@@ -43,7 +43,6 @@ add_rule_views(disk.blueprint, '/detail/<uuid>', views_func='disk.detail', metho
 add_rule_views(log.blueprints, '', views_func='log.show', methods=['GET'])
 
 add_rule_views(os_template_image.blueprints, '', views_func='os_template_image.show', methods=['GET'])
-add_rule_views(os_template_image.blueprint, '', views_func='os_template_image.create', methods=['POST'])
 
 add_rule_views(host.blueprints, '', views_func='host.show', methods=['GET'])
 add_rule_views(host.blueprint, '/detail/<node_id>', views_func='host.detail', methods=['GET'])
