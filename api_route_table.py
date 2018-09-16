@@ -140,6 +140,7 @@ add_rule_api(disk.blueprint, '/_detail/<uuid>', api_func='disk.r_detail', method
 add_rule_api(log.blueprints, '/<ids>', api_func='log.r_get', methods=['GET'])
 add_rule_api(log.blueprints, '', api_func='log.r_get_by_filter', methods=['GET'])
 add_rule_api(log.blueprints, '/_search', api_func='log.r_content_search', methods=['GET'])
+add_rule_api(log.blueprints, '/_show', api_func='log.r_show', methods=['GET'])
 
 # 计算节点操作
 add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_get', methods=['GET'])
@@ -175,7 +176,6 @@ add_rule_api(snapshot.blueprints, '/_mapping_by_disks_uuid/<disks_uuid>',
 add_rule_api(snapshot.blueprint, '/_convert_to_os_template_image/<snapshot_id>/<disk_uuid>',
              api_func='snapshot.r_convert_to_os_template_image', methods=['PUT'])
 
-# 日志查询
 # Guest 性能查询
 add_rule_api(guest_performance.blueprint, '/cpu_memory',
              api_func='guest_performance.r_cpu_memory_get_by_filter', methods=['GET'])

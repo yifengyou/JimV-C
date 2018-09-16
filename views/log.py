@@ -5,7 +5,6 @@
 import json
 from flask import Blueprint, render_template, url_for, request
 import requests
-from math import ceil
 
 
 __author__ = 'James Iter'
@@ -28,64 +27,23 @@ blueprints = Blueprint(
 
 
 def show():
-    args = list()
-    page = int(request.args.get('page', 1))
-    page_size = int(request.args.get('page_size', 50))
-    keyword = request.args.get('keyword', None)
-    order_by = request.args.get('order_by', None)
-    order = request.args.get('order', 'desc')
-    resource_path = request.path
+    url = url_for('api_logs.r_show', _external=True)
+    if request.args.__len__() >= 1:
+        args = list()
 
-    if page is not None:
-        args.append('page=' + page.__str__())
+        for k, v in request.args.items():
+            args.append('='.join([k, v]))
 
-    if page_size is not None:
-        args.append('page_size=' + page_size.__str__())
+        url += '?' + '&'.join(args)
 
-    if keyword is not None:
-        args.append('keyword=' + keyword.__str__())
+    ret = requests.get(url=url, cookies=request.cookies)
+    ret = json.loads(ret.content)
 
-    if order_by is not None:
-        args.append('order_by=' + order_by)
-
-    if order is not None:
-        args.append('order=' + order)
-
-    host_url = request.host_url.rstrip('/')
-
-    logs_url = host_url + url_for('api_logs.r_get_by_filter')
-    if keyword is not None:
-        logs_url = host_url + url_for('api_logs.r_content_search')
-
-    if args.__len__() > 0:
-        logs_url = logs_url + '?' + '&'.join(args)
-
-    logs_ret = requests.get(url=logs_url, cookies=request.cookies)
-    logs_ret = json.loads(logs_ret.content)
-
-    last_page = int(ceil(logs_ret['paging']['total'] / float(page_size)))
-    page_length = 5
-    pages = list()
-    if page < int(ceil(page_length / 2.0)):
-        for i in range(1, page_length + 1):
-            pages.append(i)
-            if i == last_page or last_page == 0:
-                break
-
-    elif last_page - page < page_length / 2:
-        for i in range(last_page - page_length + 1, last_page + 1):
-            if i < 1:
-                continue
-            pages.append(i)
-
-    else:
-        for i in range(page - page_length / 2, page + int(ceil(page_length / 2.0))):
-            pages.append(i)
-            if i == last_page or last_page == 0:
-                break
-
-    return render_template('logs.html', logs_ret=logs_ret, resource_path=resource_path, page=page,
-                           page_size=page_size, keyword=keyword, pages=pages, order_by=order_by, order=order,
-                           last_page=last_page)
+    return render_template('logs.html', logs=ret['data']['logs'],
+                           resource_path=request.path, page=ret['data']['page'],
+                           page_size=ret['data']['page_size'], keyword=ret['data']['keyword'],
+                           paging=ret['data']['paging'],
+                           pages=ret['data']['pages'], order_by=ret['data']['order_by'], order=ret['data']['order'],
+                           last_page=ret['data']['last_page'])
 
 
