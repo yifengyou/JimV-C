@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import Blueprint, g
+from flask import Blueprint
 from flask import request
 import jimit as ji
 import json
 
-from models import Config, Disk, Guest
+from models import Config, Disk
 from models import Rules
 from models import Utils
 

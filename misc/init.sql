@@ -423,6 +423,7 @@ ALTER TABLE snapshot_disk_mapping ADD INDEX (disk_uuid);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-Systemd', '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。', 1);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-SysV', '用作 Redhat SysV 系列的系统初始化。初始化操作依据 CentOS 6.8 来实现。', 1);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('Gentoo-OpenRC', '用作 Gentoo OpenRC 系列的系统初始化。', 1);
+INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CoreOS', '用作 CoreOS 系列的系统初始化。', 1);
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('Windows', '用作 MS-Windows 系列的系统初始化。初始化操作依据 Windows 2012 来实现。', 1);
 
 -- For CentOS-Systemd
@@ -472,8 +473,21 @@ INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_i
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (3, 0, 4, '', '', 'mkdir -p /root/.ssh');
 INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (3, 1, 5, '/root/.ssh/authorized_keys', '{SSH-KEY}', '');
 
+-- For CoreOS
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (4, 1, 0, '/etc/resolv.conf', 'nameserver {DNS1}
+nameserver {DNS2}', '');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (4, 1, 1, '/etc/systemd/network/00-eth0.network', '[Match]
+Name=eth0
+
+[Network]
+DNS={DNS1}
+Address={IP}/{NETMASK}
+Gateway={GATEWAY}', '');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (4, 1, 2, '/etc/hostname', '{HOSTNAME}', '');
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (4, 1, 5, '/home/core/.ssh/authorized_keys', '{SSH-KEY}', '');
+
 -- For Windows
-INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (4, 1, 0, '/Windows/jimv_init.bat', 'netsh interface ip set address name="Ethernet" source=static {IP} {NETMASK} {GATEWAY}
+INSERT INTO os_template_initialize_operate (os_template_initialize_operate_set_id, kind, sequence, path, content, command) VALUES (5, 1, 0, '/Windows/jimv_init.bat', 'netsh interface ip set address name="Ethernet" source=static {IP} {NETMASK} {GATEWAY}
 netsh interface ip set dns "Ethernet" static {DNS1} primary
 netsh interface ip add dns "Ethernet" {DNS2}
 wmic computersystem where name="%COMPUTERNAME%" call rename name="{HOSTNAME}"
@@ -492,4 +506,6 @@ VALUES ('CentOS-6.8', 'CentOS 6.8。', 'linux', 'centos', 6, 8, 'x86_64', 'CentO
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('Gentoo-2.2', 'Gentoo 2.2。', 'linux', 'gentoo', 2, 2, 'x86_64', 'Gentoo Base System release 2.2', 1, 'icon-os icon-os-gentoo', 3);
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
-VALUES ('Windows-2012-R2-Standard', 'Windows 2012 R2 Standard。', 'windows', 'windows', 6, 3, 'x86_64', 'Windows Server 2012 R2 Standard', 1, 'icon-os icon-os-windows', 4);
+VALUES ('CoreOS-1855.4.0', 'CoreOS 1855.4.0。', 'linux', 'coreos', 1855, 4, 'x86_64', 'CoreOS Linux release 1855.4.0', 1, 'icon-os icon-os-centos', 4);
+INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
+VALUES ('Windows-2012-R2-Standard', 'Windows 2012 R2 Standard。', 'windows', 'windows', 6, 3, 'x86_64', 'Windows Server 2012 R2 Standard', 1, 'icon-os icon-os-windows', 5);

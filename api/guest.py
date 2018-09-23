@@ -4,6 +4,7 @@
 
 import copy
 from math import ceil
+from IPy import IP
 
 import requests
 import json
@@ -234,6 +235,9 @@ def r_create():
                 for ssh_key_id in ssh_keys_id:
                     ssh_key_guest_mapping.ssh_key_id = ssh_key_id
                     ssh_key_guest_mapping.create()
+
+            if os_template_profile.os_distro == 'coreos':
+                config.netmask = IP(guest.ip).make_net(config.netmask).prefixlen().__str__()
 
             # 替换占位符为有效内容
             _os_template_initialize_operates = copy.deepcopy(os_template_initialize_operates)
