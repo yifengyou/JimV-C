@@ -3,8 +3,9 @@
 
 
 import json
-from flask import Blueprint, render_template, url_for, request
+from flask import Blueprint, url_for, request
 import requests
+from . import render
 
 
 __author__ = 'James Iter'
@@ -25,12 +26,12 @@ def show():
     ret = requests.get(url=url, cookies=request.cookies)
     ret = json.loads(ret.content)
 
-    return render_template('dashboard.html', hosts_sum=ret['data']['hosts_sum'],
-                           guests_distribute_count_ret=ret['data']['guests_distribute_count_ret'],
-                           disks_distribute_count_ret=ret['data']['disks_distribute_count_ret'],
-                           guests_current_top_10_ret=ret['data']['guests_current_top_10_ret'],
-                           guests_mapping_by_uuid=ret['data']['guests_mapping_by_uuid'],
-                           disks_mapping_by_uuid=ret['data']['disks_mapping_by_uuid'],
-                           hosts_current_top_10_ret=ret['data']['hosts_current_top_10_ret'],
-                           hosts_mapping_by_node_id=ret['data']['hosts_mapping_by_node_id'])
+    return render('dashboard.html', hosts_sum=ret['data']['hosts_sum'],
+                  guests_distribute_count_ret=ret['data']['guests_distribute_count_ret'],
+                  disks_distribute_count_ret=ret['data']['disks_distribute_count_ret'],
+                  guests_current_top_10_ret=ret['data']['guests_current_top_10_ret'],
+                  guests_mapping_by_uuid=ret['data']['guests_mapping_by_uuid'],
+                  disks_mapping_by_uuid=ret['data']['disks_mapping_by_uuid'],
+                  hosts_current_top_10_ret=ret['data']['hosts_current_top_10_ret'],
+                  hosts_mapping_by_node_id=ret['data']['hosts_mapping_by_node_id'])
 

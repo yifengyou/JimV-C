@@ -8,6 +8,7 @@ import time
 from IPy import IP
 import jimit as ji
 
+from models import logger, app_config
 from models import Database as db, Config, GuestCPUMemory, GuestTraffic, GuestDiskIO, SSHKeyGuestMapping
 from models import Guest
 from models import Disk
@@ -17,7 +18,6 @@ from models import Utils
 from models import EmitKind
 from models import ResponseState, GuestState, DiskState
 from models.guest import GuestMigrateInfo
-from models.initialize import app, logger
 from models.status import GuestCollectionPerformanceDataKind, HostCollectionPerformanceDataKind
 from models import HostCPUMemory, HostTraffic, HostDiskUsageIO
 
@@ -148,7 +148,7 @@ class EventProcessor(object):
             'timestamp': ji.Common.ts()
         }
 
-        db.r.hset(app.config['hosts_info'], key=key, value=json.dumps(value, ensure_ascii=False))
+        db.r.hset(app_config['hosts_info'], key=key, value=json.dumps(value, ensure_ascii=False))
 
     @classmethod
     def response_processor(cls):
@@ -187,13 +187,13 @@ class EventProcessor(object):
                     cls.guest.get_by('uuid')
 
                     if IP(cls.config.start_ip).int() <= IP(cls.guest.ip).int() <= IP(cls.config.end_ip).int():
-                        if db.r.srem(app.config['ip_used_set'], cls.guest.ip):
-                            db.r.sadd(app.config['ip_available_set'], cls.guest.ip)
+                        if db.r.srem(app_config['ip_used_set'], cls.guest.ip):
+                            db.r.sadd(app_config['ip_available_set'], cls.guest.ip)
 
                     if (cls.guest.vnc_port - cls.config.start_vnc_port) <= \
                             (IP(cls.config.end_ip).int() - IP(cls.config.start_ip).int()):
-                        if db.r.srem(app.config['vnc_port_used_set'], cls.guest.vnc_port):
-                            db.r.sadd(app.config['vnc_port_available_set'], cls.guest.vnc_port)
+                        if db.r.srem(app_config['vnc_port_used_set'], cls.guest.vnc_port):
+                            db.r.sadd(app_config['vnc_port_available_set'], cls.guest.vnc_port)
 
                     cls.guest.delete()
 
@@ -456,7 +456,7 @@ class EventProcessor(object):
                 return
 
             try:
-                report = db.r.lpop(app.config['upstream_queue'])
+                report = db.r.lpop(app_config['upstream_queue'])
 
                 if report is None:
                     time.sleep(1)

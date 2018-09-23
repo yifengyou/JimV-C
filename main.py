@@ -12,19 +12,26 @@ import json
 
 import os
 import threading
-from flask import g, request, redirect, url_for, Response, session
+from flask import g, request, redirect, url_for, Response, session, Flask
 
 try:
     from flask_session import Session
 except ImportError as e:
     # 兼容老版本
     from flask.ext.session import Session
-
+from flask.ext.themes2 import Themes, packaged_themes_loader
 from werkzeug.debug import get_current_traceback
+
+from models.initialize import logger, Init, app_config, dev_table
+
+app = Flask(__name__)
+app.jinja_env.add_extension('jinja2.ext.i18n')
+app.jinja_env.add_extension('jinja2.ext.do')
+app.config = dict(app.config, **app_config)
+app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
 from models import Utils
 from models.event_processor import EventProcessor
-from models.initialize import logger, Init
 import api_route_table
 import views_route_table
 from models import Database as db
@@ -88,10 +95,150 @@ __date__ = '2017/3/31'
 __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
-
 # 替换为Flask-Session
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=app.config['PERMANENT_SESSION_LIFETIME'])
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=app_config['PERMANENT_SESSION_LIFETIME'])
 Session(app)
+Themes(app, app_identifier="JimV-C")
+l = packaged_themes_loader(app)
+pass
+
+
+@app.context_processor
+def utility_processor():
+
+    def format_price(amount, currency=u'￥'):
+        return u'{0:.2f}{1}'.format(amount, currency)
+
+    def format_datetime_by_ts(ts, fmt='%Y-%m-%d %H:%M'):
+        return time.strftime(fmt, time.localtime(ts))
+
+    def format_datetime_by_tus(tus, fmt='%y-%m-%d %H:%M'):
+        return time.strftime(fmt, time.localtime(tus/1000/1000))
+
+    def format_guest_status(_status, progress):
+        from models.status import GuestState
+
+        color = 'FF645B'
+        icon = 'glyph-icon icon-bolt'
+        desc = '未知状态'
+
+        if _status == GuestState.booting.value:
+            color = '00BBBB'
+            icon = 'glyph-icon icon-circle'
+            desc = '启动中'
+
+        elif _status == GuestState.running.value:
+            color = '00BB00'
+            icon = 'glyph-icon icon-circle'
+            desc = '运行中'
+
+        elif _status in [GuestState.no_state.value, GuestState.creating.value]:
+            color = 'FFC543'
+            icon = 'glyph-icon icon-spinner'
+            desc = ' '.join(['创建中', str(progress)+'%'])
+
+        elif _status == GuestState.blocked.value:
+            color = '3D4245'
+            icon = 'glyph-icon icon-minus-square'
+            desc = '被阻塞'
+
+        elif _status == GuestState.paused.value:
+            color = 'B7B904'
+            icon = 'glyph-icon icon-pause'
+            desc = '暂停'
+
+        elif _status == GuestState.shutdown.value:
+            color = '4E5356'
+            icon = 'glyph-icon icon-terminal'
+            desc = '关闭'
+
+        elif _status == GuestState.shutoff.value:
+            color = 'FFC543'
+            icon = 'glyph-icon icon-plug'
+            desc = '断电'
+
+        elif _status == GuestState.crashed.value:
+            color = '9E2927'
+            icon = 'glyph-icon icon-question'
+            desc = '已崩溃'
+
+        elif _status == GuestState.pm_suspended.value:
+            color = 'FCFF07'
+            icon = 'glyph-icon icon-anchor'
+            desc = '悬挂'
+
+        elif _status == GuestState.migrating.value:
+            color = '1CF5E7'
+            icon = 'glyph-icon icon-space-shuttle'
+            desc = '迁移中'
+
+        elif _status == GuestState.dirty.value:
+            color = 'FF0707'
+            icon = 'glyph-icon icon-remove'
+            desc = '创建失败，待清理'
+
+        else:
+            pass
+
+        return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
+            icon=icon, color=color, desc=desc)
+
+    def format_sequence_to_device_name(sequence):
+        # sequence 不能大于 25。dev_table 序数从 0 开始。
+        if sequence == -1:
+            return u'无'
+
+        if sequence >= dev_table.__len__():
+            return 'Unknown'
+
+        return dev_table[sequence]
+
+    def format_disk_state(state):
+        from models.status import DiskState
+
+        color = 'FF645B'
+        icon = 'glyph-icon icon-bolt'
+        desc = '未知状态'
+
+        if state == DiskState.pending.value:
+            color = 'FFC543'
+            icon = 'glyph-icon icon-spinner'
+            desc = '创建中'
+
+        elif state == DiskState.idle.value:
+            color = '0077BB'
+            icon = 'glyph-icon icon-unlink'
+            desc = '待挂载'
+
+        elif state == DiskState.mounted.value:
+            color = '00BB00'
+            icon = 'glyph-icon icon-link'
+            desc = '使用中'
+
+        elif state == DiskState.mounting.value:
+            color = '00BBBB'
+            icon = 'glyph-icon icon-elusive-upload'
+            desc = '挂载中'
+
+        elif state == DiskState.unloading.value:
+            color = '93969B'
+            icon = 'glyph-icon icon-elusive-download'
+            desc = '卸载中'
+
+        elif state == DiskState.dirty.value:
+            color = 'FF0707'
+            icon = 'glyph-icon icon-remove'
+            desc = '创建失败，待清理'
+
+        else:
+            pass
+
+        return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
+            icon=icon, color=color, desc=desc)
+
+    return dict(format_price=format_price, format_datetime_by_tus=format_datetime_by_tus,
+                format_datetime_by_ts=format_datetime_by_ts, format_guest_status=format_guest_status,
+                format_sequence_to_device_name=format_sequence_to_device_name, format_disk_state=format_disk_state)
 
 
 def instantiation_ws_vnc(listen_port, target_host, target_port):
@@ -106,7 +253,7 @@ def ws_engine_for_vnc():
     logger.info(msg='VNC ws engine is launched.')
 
     while True:
-        payload = db.r.lpop(app.config['ipc_queue'])
+        payload = db.r.lpop(app_config['ipc_queue'])
 
         if payload is None:
             time.sleep(1)
@@ -203,7 +350,7 @@ def r_after_request(response):
 
         # 少于session生命周期一半时,自动对其续期
         if not is_not_need_to_auth(request.endpoint) and hasattr(g, 'token') and \
-                        g.token['exp'] < (ji.Common.ts() + (app.config['token_ttl'] / 2)):
+                        g.token['exp'] < (ji.Common.ts() + (app_config['token_ttl'] / 2)):
             token = Utils.generate_token(g.token['uid'])
             # 清除原有session，由新session代替
             for key in session.keys():
@@ -313,7 +460,7 @@ if __name__ == '__main__':
     # noinspection PyBroadException
     try:
 
-        app.run(host=app.config['listen'], port=app.config['port'], use_reloader=False, threaded=True)
+        app.run(host=app_config['listen'], port=app_config['port'], use_reloader=False, threaded=True)
 
         while True:
             if Utils.exit_flag:

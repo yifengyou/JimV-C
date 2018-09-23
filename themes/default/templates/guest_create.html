@@ -1,0 +1,445 @@
+{% extends theme("layout.html") %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+        
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+
+        .btn-ability {
+            margin-right: 16px;
+            height: 50px;
+            padding: 8px 50px;
+            margin-bottom: 30px;
+        }
+
+        .btn-ability-line {
+        }
+
+    </style>
+{% endblock head %}
+{% block body %}
+<script>
+    $(document).ready(function() {
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+
+        $('#create_guest_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                ability: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                },
+                os_template_image_id: {
+                    validators: {
+                        notEmpty: {
+                        }
+                    }
+                },
+                quantity: {
+                    validators: {
+                        between: {
+                            min: 1,
+                            max: 20
+                        }
+                    }
+                },
+                password: {
+                    validators: {
+                        identical: {
+                            field: 'confirm_password'
+                        },
+                        stringLength: {
+                            max: 128
+                        }
+                    }
+                },
+                confirm_password: {
+                    validators: {
+                        identical: {
+                            field: 'password'
+                        }
+                    }
+                },
+                remark: {
+                    validators: {
+                        stringLength: {
+                            max: 64
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                data.fv.disableSubmitButtons(true);
+            }
+        }).on('success.form.fv', function (e, data) {
+            create();
+        });
+
+        refresh_os_template_image_id_selectpicker($('#os_template_image_id'));
+        refresh_ssh_keys_checkboxer($('#ssh_keys_id_div'));
+
+        $('#bandwidth_unit').on('changed.bs.select', function (me) {
+            render_bandwidth_slider($("#bandwidth"), 'update', $('#bandwidth_unit').val())
+        });
+
+        render_bandwidth_slider($("#bandwidth"), 'create', 'm');
+    });
+
+    function get_os_templates_profile_mapping_by_id() {
+        var os_templates_profile_mapping_by_id = {};
+
+        $.ajax({
+            url : '/api/os_templates_profile',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                $.each(data.data, function(k, v) {
+                    os_templates_profile_mapping_by_id[v['id']] = v;
+                });
+            }
+        });
+
+        return os_templates_profile_mapping_by_id;
+    }
+
+    function refresh_os_template_image_id_selectpicker(selectpicker) {
+        $.ajax({
+            url : '/api/os_templates_image?filter=active:eq:1',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                var os_templates_profile_mapping_by_id = get_os_templates_profile_mapping_by_id();
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    if (v['logo'] === "") {
+                        v['logo'] = os_templates_profile_mapping_by_id[v['os_template_profile_id']].icon;
+                    }
+                    selectpicker.append(
+                        $('<option>', {value: v['id'], text: '\xa0\xa0' + v['label'], 'data-icon': v['logo']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+            }
+        });
+    }
+    
+    function refresh_ssh_keys_checkboxer(checkboxer) {
+        $.ajax({
+            url : '/api/ssh_keys',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                checkboxer.empty();
+                $.each(data.data, function(k, v) {
+                    checkboxer.append(
+                        '<label class="checkbox-inline"><input type="checkbox" name="ssh_keys_id" value="' + v['id'] + '">' + v['label'] + '</label>'
+                    );
+                });
+            }
+        });
+    }
+
+    function create() {
+        var ability_value = $('#create_guest_form input:radio[name="ability"]:checked').val();
+
+        ability_value = ability_value.match(/^(\d+)c(\d+)g$/i);
+
+        if (ability_value === null) {
+            alter_danger('指定的配置取值有误！');
+            return
+        }
+
+        var cpu = ability_value[1];
+        var memory = ability_value[2];
+
+        var data = {
+            cpu: parseInt(cpu),
+            memory: parseInt(memory),
+            bandwidth: parseInt($('#bandwidth').val()),
+            bandwidth_unit: $('#bandwidth_unit').val(),
+            os_template_image_id: parseInt($('#os_template_image_id').val()),
+            quantity: parseInt($('#quantity').val()),
+            remark: $('#remark').val(),
+            password: $('#password').val(),
+            ssh_keys_id: $('#ssh_key_id').val(),
+            lease_term: 100
+        };
+
+        if (!$('#allocation_by_random').prop('checked')) {
+            data['node_id'] = $('#node_id').val()
+        }
+
+        var go_back_url = '/guests';
+
+        $.ajax({
+            url : '/api/guest',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('创建实例失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('您所提交的资源正在创建中。根据所提交资源的大小，需要等待几到十几分钟。页面将在3秒钟后自动跳转到实例列表页面！');
+
+                $.ajax({
+                    url: '/api/guests',
+                    type : 'GET',
+                    dataType: "json",
+                    error : function(data, textStatus, xhr) {
+                    },
+                    success : function(data, textStatus, xhr) {
+                        var page_size = 10;
+                        var last_page = Math.ceil(data['paging']['total'] / page_size);
+                        go_back_url = "/guests?page_size=" + page_size + "&page=" + last_page;
+                    }
+                });
+            }
+        });
+
+        setTimeout(function() {
+            window.location.href=go_back_url;
+        }, 3000);
+    }
+
+    $(function() { "use strict";
+        $("#quantity").TouchSpin({
+            max: 20,
+            min: 1,
+            verticalbuttons: true,
+            verticalupclass: 'glyph-icon icon-plus',
+            verticaldownclass: 'glyph-icon icon-minus'
+        });
+    });
+
+    function allocation_by_random_click_handler(me) {
+        if ($(me).prop('checked')) {
+            $('#create_guest_form').formValidation('removeField', 'node_id');
+            $('#node_id').parent().parent().css('display', 'none');
+        } else {
+            $('#create_guest_form').formValidation('addField', 'node_id', {validators: {notEmpty: {}}});
+            $('#node_id').parent().parent().css('display', 'unset');
+        }
+    }
+</script>
+<div id="page-content-wrapper">
+    <div id="alert-success-tip" class="alert alert-success alert-top">
+    </div>
+    <div id="alert-warning-tip" class="alert alert-warning alert-top">
+    </div>
+    <div id="alert-danger-tip" class="alert alert-danger alert-top">
+    </div>
+</div>
+<div class="container" style="padding-top: 100px;">
+    <div class="panel">
+        <div class="panel-body">
+            <h3 class="title-hero" style="display: inline;">
+                创建实例
+            </h3>
+            <a href="/guests" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
+                <span class="glyph-icon icon-separator" style="transform: rotateY(-180deg);">
+                    <i class="glyph-icon icon-level-up"></i>
+                </span>
+                <span class="button-content">
+                    返回虚拟机列表
+                </span>
+            </a>
+            <div class="example-box-wrapper">
+                <form id="create_guest_form" class="form-horizontal bordered-row" action="javascript:;">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-gauge"></span>&nbsp;&nbsp;运算能力</label>
+                        <div class="col-sm-10">
+                            <div class="btn-ability-line" data-toggle="buttons">
+                                <label class="btn btn-default btn-ability">
+                                    <input title="1 CPU 1GB Memory" name="ability" type="radio" value="1c1g">1&nbsp;&nbsp;核&nbsp;&nbsp;1&nbsp;&nbsp;GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="1 CPU 2GB Memory" name="ability" type="radio" value="1c2g">1&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="2 CPU 2GB Memory" name="ability" type="radio" value="2c2g">2&nbsp;&nbsp;核&nbsp;&nbsp;2&nbsp;&nbsp;GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="2 CPU 4GB Memory" name="ability" type="radio" value="2c4g">2&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="4 CPU 4GB Memory" name="ability" type="radio" value="4c4g">4&nbsp;&nbsp;核&nbsp;&nbsp;4&nbsp;&nbsp;GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="4 CPU 8GB Memory" name="ability" type="radio" value="4c8g">4&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="8 CPU 8GB Memory" name="ability" type="radio" value="8c8g">8&nbsp;&nbsp;核&nbsp;&nbsp;8&nbsp;&nbsp;GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="8 CPU 16GB Memory" name="ability" type="radio" value="8c16g">8&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="1 CPU 16GB Memory" name="ability" type="radio" value="1c16g">1&nbsp;&nbsp;核&nbsp;&nbsp;16GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="4 CPU 32GB Memory" name="ability" type="radio" value="4c32g">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="4 CPU 64GB Memory" name="ability" type="radio" value="4c64g">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="8 CPU 64GB Memory" name="ability" type="radio" value="8c64g">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="16 CPU 16GB Memory" name="ability" type="radio" value="16c16g">16核&nbsp;&nbsp;16GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="24 CPU 24GB Memory" name="ability" type="radio" value="24c24g">24核&nbsp;&nbsp;24GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="32 CPU 32GB Memory" name="ability" type="radio" value="32c32g">32核&nbsp;&nbsp;32GB
+                                </label>
+                                <label class="btn btn-default btn-ability">
+                                    <input title="64 CPU 64GB Memory" name="ability" type="radio" value="64c64g">64核&nbsp;&nbsp;64GB
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;系统模板</label>
+                        <div class="col-sm-6">
+                            <select id="os_template_image_id" name="os_template_image_id" title="请选择系统模板..." class="selectpicker" data-width="100%">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-th-list"></span>&nbsp;&nbsp;数量</label>
+                        <div class="col-sm-6">
+                            <input id="quantity" title="实例数量" class="form-control" type="text" value="1" name="quantity">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;标识&密码</label>
+                        <div class="col-sm-6">
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">登录密码：</label>
+                                <div class="col-sm-6">
+                                    <input type="password" name="password" title="实例密码" class="form-control" id="password" placeholder="如不填写，系统自动生成16位随机密码">
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">确认密码：</label>
+                                <div class="col-sm-6">
+                                    <input type="password" name="confirm_password" title="确认实例密码" class="form-control" id="confirm_password">
+                                </div>
+                            </div>
+                            <div style="height: 10px;"></div>
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">实例名称：</label>
+                                <div class="col-sm-6">
+                                    <input id="remark" name="remark" type="text" title="实例名称" class="form-control" placeholder="如不填写，系统自动默认生成">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-signal"></span>&nbsp;&nbsp;带宽</label>
+                        <div class="col-sm-7">
+                            <input id="bandwidth" title="带宽" type="text" name="bandwidth">
+                        </div>
+                        <div class="col-sm-1" style="bottom: -10px;">
+                            <select id="bandwidth_unit" name="bandwidth_unit" title="单位..." class="selectpicker" data-width="120%">
+                                <option value="k">&nbsp;&nbsp;Kbps</option>
+                                <option value="m" selected>&nbsp;&nbsp;Mbps</option>
+                                <option value="g">&nbsp;&nbsp;Gbps</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-key"></span>&nbsp;&nbsp;SSH-KEY</label>
+                        <div class="col-sm-6" id="ssh_keys_id_div">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="ssh_keys_id" value="option1">
+                                Checkbox 1
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="ssh_keys_id" value="option2">
+                                Checkbox 2
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-shuffle"></span>&nbsp;&nbsp;创建模式</label>
+                        <div class="col-sm-6">
+                            <div class="row form-group">
+                                <label class="col-sm-2 control-label">随机分配：</label>
+                                <div class="col-sm-6">
+                                    <input onclick="allocation_by_random_click_handler(this);" type="checkbox" name="allocation_by_random" title="随机分配" class="form-control" id="allocation_by_random" checked>
+                                </div>
+                            </div>
+                            <div class="row form-group" style="display: none;">
+                                <select id="node_id" name="node_id" title="请选择计算节点..." class="selectpicker" data-width="100%">
+                                    {% for item in hosts_ret.data %}
+                                        <option value="{{ item.node_id }}" data-icon="{{ item.icon }}">&nbsp;&nbsp;{{ item.hostname }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-3 pull-right">
+                            <button id="create_guest_form_button" type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

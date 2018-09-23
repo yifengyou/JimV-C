@@ -8,9 +8,9 @@ import requests
 from flask import Blueprint, request, url_for
 import jimit as ji
 
+from models import app_config
 from models import Database as db
 from models import Utils, Rules, Host
-from models.initialize import app
 
 
 __author__ = 'James Iter'
@@ -76,16 +76,16 @@ def r_get(nodes_id):
 
         if -1 == nodes_id.find(','):
             node_id = nodes_id
-            if db.r.hexists(app.config['hosts_info'], node_id):
-                v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
+            if db.r.hexists(app_config['hosts_info'], node_id):
+                v = json.loads(db.r.hget(app_config['hosts_info'], node_id))
                 v = Host.alive_check(v)
                 v['node_id'] = node_id
                 ret['data'] = v
 
         else:
             for node_id in nodes_id.split(','):
-                if db.r.hexists(app.config['hosts_info'], node_id):
-                    v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
+                if db.r.hexists(app_config['hosts_info'], node_id):
+                    v = json.loads(db.r.hget(app_config['hosts_info'], node_id))
                     v = Host.alive_check(v)
                     v['node_id'] = node_id
                     ret['data'].append(v)
@@ -171,19 +171,19 @@ def r_delete(nodes_id):
 
         if -1 == nodes_id.find(','):
             node_id = nodes_id
-            if db.r.hexists(app.config['hosts_info'], node_id):
-                v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
+            if db.r.hexists(app_config['hosts_info'], node_id):
+                v = json.loads(db.r.hget(app_config['hosts_info'], node_id))
                 v['node_id'] = node_id
                 ret['data'] = v
-                db.r.hdel(app.config['hosts_info'], node_id)
+                db.r.hdel(app_config['hosts_info'], node_id)
 
         else:
             for node_id in nodes_id.split(','):
-                if db.r.hexists(app.config['hosts_info'], node_id):
-                    v = json.loads(db.r.hget(app.config['hosts_info'], node_id))
+                if db.r.hexists(app_config['hosts_info'], node_id):
+                    v = json.loads(db.r.hget(app_config['hosts_info'], node_id))
                     v['node_id'] = node_id
                     ret['data'].append(v)
-                    db.r.hdel(app.config['hosts_info'], node_id)
+                    db.r.hdel(app_config['hosts_info'], node_id)
 
             if ret['data'].__len__() > 1:
                 ret['data'].sort(key=lambda _k: _k['boot_time'])

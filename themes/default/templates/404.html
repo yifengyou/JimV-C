@@ -1,0 +1,58 @@
+{% extends theme("layout.html") %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+
+        html,body {
+            height: 100%;
+        }
+        .page-box {
+            min-height: 200px;
+        }
+
+        .page-box .server-message {
+            padding: 35px 0;
+        }
+        body {
+            overflow: hidden;
+        }
+    </style>
+{% endblock head %}
+{% block body %}
+<script type="text/javascript" src="{{ theme_static('widgets/wow/wow.js') }}"></script>
+<script type="text/javascript">
+    /* WOW animations */
+
+    wow = new WOW({
+        animateClass: 'animated',
+        offset: 100
+    });
+    wow.init();
+</script>
+<div class="center-vertical">
+    <div class="center-content row">
+        <div class="col-md-6 wow bounceInDown center-margin">
+            <div class="server-message">
+                <h1>Error 404</h1>
+                <h2>Page not found</h2>
+                <form>
+                    <a href="/" class="btn btn-lg btn-success">返回首页</a>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock body %}
+

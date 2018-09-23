@@ -1,0 +1,439 @@
+{% extends theme("layout.html") %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        #batch_change_disk_quota_form label {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+    </style>
+{% endblock head %}
+{% block content %}
+    <script>
+        $(document).ready(function() {
+            $('body').addClass('add-transition');
+            $('.add-page-transition').on('click', function(){
+                var transAttr = $(this).attr('data-transition');
+                $('.add-transition').attr('class', 'add-transition');
+                $('.add-transition').addClass(transAttr);
+            });
+
+            $('#storage_mode').on('changed.bs.select', function (me) {
+                if ($('#storage_mode').val() == '2' || $('#storage_mode').val() == '3') {
+                    $('#dfs_volume_label').css('display', 'unset');
+                    $('#dfs_volume').css('display', 'unset');
+                } else {
+                    $('#dfs_volume_label').css('display', 'none');
+                    $('#dfs_volume').css('display', 'none');
+                }
+            });
+
+            register_iops_bps_event();
+        });
+
+        function refresh() {
+            window.location.href=window.location.pathname;
+        }
+
+        function select_this(me) {
+            $(me).parent().parent().children().removeClass('active');
+            $(me).parent().addClass('active');
+
+            $('#jimv_system_config, #quota, #auxiliary').css('display', 'none');
+
+            if (me.id === 'quota_label') {
+                $('#quota').css('display', 'unset');
+
+            } else if (me.id === 'auxiliary_label') {
+                $('#auxiliary').css('display', 'unset');
+
+            } else {
+                $('#jimv_system_config').css('display', 'unset');
+            }
+        }
+
+        $(function() { "use strict";
+            $("#iops_base").TouchSpin({
+                max: 10000,
+                min: 0,
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#iops_pre_unit").TouchSpin({
+                max: 100,
+                min: 0,
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#iops_cap").TouchSpin({
+                max: 100000,
+                min: 0,
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#iops_max").TouchSpin({
+                max: 200000,
+                min: 0,
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#iops_max_length").TouchSpin({
+                max: 600,
+                min: 0,
+                postfix: '秒',
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#bps_base").TouchSpin({
+                max: 1024,
+                min: 0,
+                postfix: 'MiB',
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#bps_pre_unit").TouchSpin({
+                max: 10,
+                min: 0,
+                step: 0.01,
+                decimals: 2,
+                postfix: 'MiB',
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#bps_cap").TouchSpin({
+                max: 1024 * 2,
+                min: 0,
+                postfix: 'MiB',
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#bps_max").TouchSpin({
+                max: 1024 * 10,
+                min: 0,
+                postfix: 'MiB',
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#bps_max_length").TouchSpin({
+                max: 600,
+                min: 0,
+                postfix: '秒',
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        function register_iops_bps_event() {
+            $('#iops').on('change', function () {
+                $("#iops_rd").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_wr').val()});
+                $("#iops_wr").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_rd').val()});
+            });
+
+            $('#iops_rd').on('change', function () {
+                $("#iops_wr").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_rd').val()});
+            });
+
+            $('#iops_wr').on('change', function () {
+                $("#iops_rd").trigger("touchspin.updatesettings", {max: $('#iops').val() - $('#iops_wr').val()});
+            });
+
+            $('#bps').on('change', function () {
+                $("#bps_rd").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_wr').val()});
+                $("#bps_wr").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_rd').val()});
+            });
+
+            $('#bps_rd').on('change', function () {
+                $("#bps_wr").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_rd').val()});
+            });
+
+            $('#bps_wr').on('change', function () {
+                $("#bps_rd").trigger("touchspin.updatesettings", {max: $('#bps').val() - $('#bps_wr').val()});
+            });
+        }
+
+        function update_quota() {
+            $.ajax({
+                url : '/api/config/_quota',
+                type : 'PATCH',
+                contentType: "application/json; charset=utf-8",
+                data : JSON.stringify({
+                    iops_base: parseInt($('#iops_base').val()),
+                    iops_pre_unit: parseInt($('#iops_pre_unit').val()),
+                    iops_cap: parseInt($('#iops_cap').val()),
+                    iops_max: parseInt($('#iops_max').val()),
+                    iops_max_length: parseInt($('#iops_max_length').val()),
+                    bps_base: parseInt($('#bps_base').val()) * 1024 * 1024,
+                    bps_pre_unit: parseFloat($('#bps_pre_unit').val()) * 1024 * 1024,
+                    bps_cap: parseInt($('#bps_cap').val()) * 1024 * 1024,
+                    bps_max: parseInt($('#bps_max').val()) * 1024 * 1024,
+                    bps_max_length: parseInt($('#bps_max_length').val()),
+                    influence_current_guest: $('#influence_current_guest').prop('checked')
+                }),
+                error : function() {
+                    alter_danger('性能配额更新失败！');
+                },
+                success : function() {
+                    alter_success('性能配额更新成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+
+        function refresh_guest_state() {
+            $.ajax({
+                url : '/api/guests/_refresh_guest_state',
+                type : 'PATCH',
+                error : function() {
+                    alter_danger('刷新虚拟机状态失败！');
+                },
+                success : function() {
+                    alter_success('刷新虚拟机状态成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+
+    </script>
+    <div class="panel">
+        <div class="panel-body">
+            <ul class="nav nav-tabs mrg25B">
+                <li class="active"><a href="javascript:;" onclick="select_this(this);" id="jimv_system_config_label">JimV 系统配置</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="quota_label">性能配额</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="auxiliary_label">辅助</a></li>
+            </ul>
+            <div id="jimv_system_config" class="example-box-wrapper">
+                <form class="form-horizontal bordered-row" style="padding-left: 8%;">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">网桥(业务网络)</label>
+                        <div class="col-sm-3">
+                            <input title="Guest 业务网络" class="form-control" name="vm_network" type="text" disabled value="{{ config.vm_network }}">
+                        </div>
+                        <label class="col-sm-2 control-label">网桥(管理网络)</label>
+                        <div class="col-sm-3">
+                            <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" disabled value="{{ config.vm_manage_network }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">起始 IP</label>
+                        <div class="col-sm-3">
+                            <input title="起始 IP" class="form-control" name="start_ip" type="text" disabled value="{{ config.start_ip }}">
+                        </div>
+                        <label class="col-sm-2 control-label">截止 IP</label>
+                        <div class="col-sm-3">
+                            <input title="截止 IP" class="form-control" name="end_ip" type="text" disabled value="{{ config.end_ip }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">子网掩码</label>
+                        <div class="col-sm-3">
+                            <input title="子网掩码" class="form-control" name="netmask" type="text" disabled value="{{ config.netmask }}">
+                        </div>
+                        <label class="col-sm-2 control-label">网关</label>
+                        <div class="col-sm-3">
+                            <input title="网关" class="form-control" name="gateway" type="text" disabled value="{{ config.gateway }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">DNS1</label>
+                        <div class="col-sm-3">
+                            <input title="DNS1" class="form-control" name="dns1" type="text" disabled value="{{ config.dns1 }}">
+                        </div>
+                        <label class="col-sm-2 control-label">DNS2</label>
+                        <div class="col-sm-3">
+                            <input title="DNS2" class="form-control" name="dns2" type="text" disabled value="{{ config.dns2 }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">起始 VNC 端口</label>
+                        <div class="col-sm-3">
+                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" disabled value="{{ config.start_vnc_port }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">虚拟机磁盘存储模式</label>
+                        <div class="col-sm-3">
+                            <select id="storage_mode" title="虚拟机磁盘存储模式" class="selectpicker" name="storage_mode" data-width="100%" disabled>
+                                <option {% if config.storage_mode == 0 %}selected{% endif %} value="0">本地存储</option>
+                                <option {% if config.storage_mode == 1 %}selected{% endif %} value="1" data-subtext="NFS">挂载共享</option>
+                                <option {% if config.storage_mode == 2 %}selected{% endif %} value="2">Ceph</option>
+                                <option {% if config.storage_mode == 3 %}selected{% endif %} value="3">GlusterFS</option>
+                            </select>
+                        </div>
+                        <label id="dfs_volume_label" class="col-sm-2 control-label" style="display: {% if config.storage_mode in [3] %}unset{% else %}none{% endif %};">分布式文件系统存储卷</label>
+                        <div class="col-sm-3">
+                            <input id="dfs_volume" title="分布式文件系统存储卷" class="form-control" name="dfs_volume" type="text" style="display: {% if config.storage_mode in [3] %}unset{% else %}none{% endif %};" disabled value="{{ config.dfs_volume }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">虚拟机磁盘存放路径</label>
+                        <div class="col-sm-3">
+                            <input title="虚拟机磁盘存放路径" class="form-control" name="storage_path" type="text" disabled value="{{ config.storage_path }}">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="quota" class="example-box-wrapper" style="display: none;">
+                <form class="form-horizontal bordered-row" style="padding-left: 8%;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            &nbsp;&nbsp;IOPS 基准值
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_base" title="IOPS 基准值" class="form-control" type="text" value="{{ config.iops_base }}" name="iops_base">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 基准值</label>
+                        <div class="col-sm-3">
+                            <input id="bps_base" title="BPS 基准值" class="form-control" type="text" value="{{ (config.bps_base / 1024 / 1024) | int }}" name="bps_base">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            &nbsp;&nbsp;IOPS/GiB 增益
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_pre_unit" title="IOPS/GiB 增益" class="form-control" type="text" value="{{ config.iops_pre_unit }}" name="iops_pre_unit">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS/GiB 增益</label>
+                        <div class="col-sm-3">
+                            <input id="bps_pre_unit" title="BPS/GiB 增益 (MiB)" class="form-control" type="text" value="{{ '%0.2f'|format(config.bps_pre_unit / 1024 / 1024) }}" name="bps_pre_unit">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            &nbsp;&nbsp;IOPS 增益上限
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_cap" title="IOPS 增益上限" class="form-control" type="text" value="{{ config.iops_cap }}" name="iops_cap">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span>&nbsp;&nbsp;BPS 增益上限</label>
+                        <div class="col-sm-3">
+                            <input id="bps_cap" title="BPS 增益上限 (MiB)" class="form-control" type="text" value="{{ (config.bps_cap / 1024 / 1024) | int }}" name="bps_cap">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            <span class="glyph-icon icon-bitbucket" style="margin-left: -4px;"></span>
+                            &nbsp;&nbsp;IOPS 桶宽
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_max" title="IOPS 桶宽" class="form-control" type="text" value="{{ config.iops_max }}" name="iops_max">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶宽</label>
+                        <div class="col-sm-3">
+                            <input id="bps_max" title="BPS 桶宽 (MiB)" class="form-control" type="text" value="{{ (config.bps_max / 1024 / 1024) | int }}" name="bps_max">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="col-sm-2 control-label">
+                            <span class="glyph-icon icon-exchange" style="transform: rotate(90deg); display: inline-flex;"></span>
+                            <span class="glyph-icon icon-bitbucket" style="margin-left: -4px;"></span>
+                            &nbsp;&nbsp;IOPS 桶高
+                        </label>
+                        <div class="col-sm-3">
+                            <input id="iops_max_length" title="IOPS 桶高 (秒)" class="form-control" type="text" value="{{ config.iops_max_length }}" name="iops_max_length">
+                        </div>
+                        <span class="col-sm-1"></span>
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-openid"></span><span class="glyph-icon icon-bitbucket"></span>&nbsp;&nbsp;BPS 桶高</label>
+                        <div class="col-sm-3">
+                            <input id="bps_max_length" title="BPS 桶高 (秒)" class="form-control" type="text" value="{{ config.bps_max_length }}" name="bps_max_length">
+                        </div>
+                        <span class="col-sm-1"></span>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <div class="col-sm-6">
+                            <label>
+                                <input id="influence_current_guest" type="checkbox" name="influence_current_guest">
+                                同时更新已存在的实例
+                            </label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div style="padding: 0; text-align: right;">
+                                <button type="button" class="btn btn-sm btn-primary" style="right: 10%;" onclick="update_quota();">更新</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="auxiliary" class="example-box-wrapper" style="display: none;">
+                <form class="form-horizontal bordered-row" style="padding-left: 8%;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <div class="col-sm-3">
+                            <button type="button" class="btn btn-primary" onclick="refresh_guest_state();">刷新虚拟机状态</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

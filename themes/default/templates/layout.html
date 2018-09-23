@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    {% block head %}
+
+    <style>
+        /* Loading Spinner */
+        .spinner{margin:0;width:70px;height:18px;margin:-35px 0 0 -9px;position:absolute;top:50%;left:50%;text-align:center}.spinner > div{width:18px;height:18px;background-color:#333;border-radius:100%;display:inline-block;-webkit-animation:bouncedelay 1.4s infinite ease-in-out;animation:bouncedelay 1.4s infinite ease-in-out;-webkit-animation-fill-mode:both;animation-fill-mode:both}.spinner .bounce1{-webkit-animation-delay:-.32s;animation-delay:-.32s}.spinner .bounce2{-webkit-animation-delay:-.16s;animation-delay:-.16s}@-webkit-keyframes bouncedelay{0%,80%,100%{-webkit-transform:scale(0.0)}40%{-webkit-transform:scale(1.0)}}@keyframes bouncedelay{0%,80%,100%{transform:scale(0.0);-webkit-transform:scale(0.0)}40%{transform:scale(1.0);-webkit-transform:scale(1.0)}}
+
+        .affix {
+            top: 10px;
+            position: sticky;
+        }
+
+        .affix-top {
+        }
+
+        .affix-bottom {
+        }
+
+        .alert-top {
+            display: none;
+            position: fixed !important;
+            float: right !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            margin-right: 30px !important;
+            padding-top: .5rem !important;
+            padding-bottom: .5rem !important;
+        }
+
+        .panel-gray {
+            -webkit-filter:grayscale(100%);
+            -moz-filter:grayscale(100%);
+            -ms-filter:grayscale(100%);
+            -o-filter:grayscale(100%);
+            filter:grayscale(100%);
+            filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);
+        }
+
+        .dropdown-menu {
+            min-width: 100% !important;
+        }
+
+        @font-face {
+            font-family: 'Baskerville';
+            src: url('/static/fonts/Baskerville/Baskerville-Italic.eot');
+            src: url('/static/fonts/Baskerville/Baskerville-Italic.eot?#iefix') format('embedded-opentype'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.woff2') format('woff2'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.woff') format('woff'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.ttf') format('truetype'),
+            url('/static/fonts/Baskerville/Baskerville-Italic.svg#Baskerville-Italic') format('svg');
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .a-disabled {
+            color: #5e6c73 !important;
+            opacity: 0.5;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        select {
+            padding: 0 0 !important;
+        }
+
+        option {
+            font-weight: normal;
+            display: block;
+            white-space: pre;
+            min-height: 1.2em;
+            padding: 0 2px 1px;
+        }
+
+    </style>
+
+
+    <meta charset="UTF-8">
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+    <title>JimV</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+
+    <!-- Favicons -->
+
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ theme_static('images/icons/JimV-icon_144X144.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ theme_static('images/icons/JimV-icon_114X114.png') }}">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ theme_static('images/icons/JimV-icon_72X72.png') }}">
+    <link rel="apple-touch-icon-precomposed" href="{{ theme_static('images/icons/JimV-icon_57X57.png') }}">
+    <link rel="shortcut icon" href="{{ theme_static('images/icons/JimV-icon_32X32.png') }}">
+    <link rel="Bookmark" href="favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('bootstrap/css/bootstrap.min.css') }}">
+
+    <!-- HELPERS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/animate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/backgrounds.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/boilerplate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/border-radius.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/grid.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/page-transitions.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/spacing.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/typography.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/utils.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/colors.css') }}">
+
+    <!-- ELEMENTS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/badges.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/buttons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/content-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/dashboard-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/forms.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/images.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/info-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/invoice.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/loading-indicators.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/menus.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/panel-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/response-messages.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/responsive-tables.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/ribbon.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/social-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/tables.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/tile-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('elements/timeline.css') }}">
+
+    <!-- ICONS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons/whhg-font/css/whhg.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons-min/fontawesome/fontawesome.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons-min/linecons/linecons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons-min/spinnericon/spinnericon.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons/iconic/iconic.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons/elusive/elusive.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons/meteocons/meteocons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('icons/typicons/typicons.css') }}">
+
+    <!-- Components theme -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('themes/components/default.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('themes/components/border-radius.css') }}">
+
+    <!-- WIDGETS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/accordion-ui/accordion.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/calendar/calendar.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/carousel/carousel.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/charts/justgage/justgage.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/charts/morris/morris.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/charts/piegage/piegage.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/charts/xcharts/xcharts.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/chosen/chosen.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/colorpicker/colorpicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/datatable/datatable.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/datepicker/datepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/datepicker-ui/datepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/daterangepicker/daterangepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/dialog/dialog.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/dropdown/dropdown.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/dropzone/dropzone.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/file-input/fileinput.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/input-switch/inputswitch.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/input-switch/inputswitch-alt.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/ionrangeslider/ionrangeslider.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/ionrangeslider/sprite-skin-modern.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/jcrop/jcrop.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/jgrowl-notifications/jgrowl.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/loading-bar/loadingbar.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/maps/vector-maps/vectormaps.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/markdown/markdown.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/modal/modal.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/multi-upload/fileupload.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/nestable/nestable.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/noty-notifications/noty.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/popover/popover.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/pretty-photo/prettyphoto.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/progressbar/progressbar.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/range-slider/rangeslider.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/slidebars/slidebars.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/slider-ui/slider.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/summernote-wysiwyg/summernote-wysiwyg.css') }}">
+    <!--<link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/tabs-ui/tabs.css') }}">-->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/theme-switcher/themeswitcher.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/timepicker/timepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/tocify/tocify.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/tooltip/tooltip.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/touchspin/touchspin.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/uniform/uniform.css') }}">
+    <!--<link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/wizard/wizard.css') }}">-->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('widgets/xeditable/xeditable.css') }}">
+
+    <!-- SNIPPETS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/chat.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/files-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/login-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/notification-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/progress-box.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/todo.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/user-profile.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('snippets/mobile-navigation.css') }}">
+
+    <!-- APPLICATIONS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('applications/mailbox.css') }}">
+
+    <!-- Admin theme -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('themes/admin/layout.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('themes/admin/color-schemes/default.css') }}">
+
+    <!-- Admin responsive -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/responsive-elements.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('helpers/admin-responsive.css') }}">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('bootstrap-select/css/bootstrap-select.min.css') }}">
+
+    <!-- smartwizard CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('smartwizard/css/smart_wizard.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('smartwizard/css/smart_wizard_theme_arrows.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('smartwizard/css/smart_wizard_theme_circles.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('smartwizard/css/smart_wizard_theme_dots.min.css') }}">
+
+    <!-- formvalidation CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('formvalidation/css/formValidation.min.css') }}">
+
+    <!-- Multi-select CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('multi-select/css/multi-select.css') }}">
+
+    <!-- JimV -->
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('css/icons.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ theme_static('css/host-table.css') }}">
+
+    <!-- JS Core -->
+    <script type="text/javascript" src="{{ theme_static('js-core-min/jquery-core.js') }}"></script>
+    <script type="text/javascript" src="{{ theme_static('js-core-min/jquery-ui-widget.js') }}"></script>
+    <script type="text/javascript" src="{{ theme_static('js-core-min/jquery-ui-mouse.js') }}"></script>
+    <script type="text/javascript" src="{{ theme_static('js-core-min/jquery-ui-position.js') }}"></script>
+    <script type="text/javascript" src="{{ theme_static('js-core-min/modernizr.js') }}"></script>
+    <script type="text/javascript" src="{{ theme_static('js-core-min/jquery-cookie.js') }}"></script>
+    <script type="text/javascript" src="{{ theme_static('js-core-min/jquery-cookie.js') }}"></script>
+
+    <script type="text/javascript">
+
+        function alter_success(message) {
+            $('#alert-success-tip').text(message);
+            $('#alert-success-tip').css('display', 'block');
+            setTimeout(function () {
+                $('#alert-success-tip').css('display', 'none');
+            }, 3000);
+        }
+
+        function alter_warning(message) {
+            $('#alert-warning-tip').text(message);
+            $('#alert-warning-tip').css('display', 'block');
+            setTimeout(function () {
+                $('#alert-warning-tip').css('display', 'none');
+            }, 3000);
+        }
+
+        function alter_danger(message) {
+            $('#alert-danger-tip').text(message);
+            $('#alert-danger-tip').css('display', 'block');
+            setTimeout(function () {
+                $('#alert-danger-tip').css('display', 'none');
+            }, 3000);
+        }
+
+        function logout() {
+            $.ajax({
+                url: '/api/user/_sign_out',
+                type: 'GET',
+                dataType: 'json',
+                error: function () {
+                    alter_danger('注销失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    window.location.href="/";
+                }
+            })
+        }
+    </script>
+
+    {% endblock head %}
+
+</head>
+<body>
+    <div id="sb-site" style="height: 100%;">
+        <!--<div id="loading">
+            <div class="spinner">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+        </div>-->
+
+        {% block body %}
+        <div id="page-wrapper">
+            <div id="page-header" class="font-inverse" style="background-color: rgba(2, 117, 216, 0.88)!important;">
+                <div id="header-logo" class="logo-bg">
+                    <a href="/" class="logo-content-big" title="JimV" style="font-family: Baskerville; font-size: 60px; color: #fff; text-decoration: none;">
+                        JimV
+                    </a>
+                    <a id="close-sidebar" href="#" title="Close sidebar">
+                        <i class="glyph-icon icon-angle-left"></i>
+                    </a>
+                </div>
+                <div id="header-nav-left">
+                    <div class="user-account-btn dropdown">
+                        <a href="#" title="Admin" class="user-profile clearfix" data-toggle="dropdown">
+                            <img width="28" src="{{ theme_static('avatar/Burung-Pelatuk_144x144.png') }}" alt="Avatar">
+                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Admin</span>
+                            <i class="glyph-icon icon-angle-down"></i>
+                        </a>
+                        <div class="dropdown-menu float-left">
+                            <div class="box-xs">
+                                <div class="login-box clearfix">
+                                    <div class="user-img">
+                                        <a href="#" title="" class="change-img">Change photo</a>
+                                        <img src="{{ theme_static('avatar/Burung-Pelatuk_144x144.png') }}" alt="Avatar">
+                                    </div>
+                                    <div class="user-info">
+                                        <span>
+                                            Admin
+                                            <i>管理员</i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <ul class="reset-ul mrg5B" style="text-align: center;">
+                                    <li>
+                                        <a href="{{ url_for('v_misc.change_password') }}">
+                                            修改密码
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="pad5A button-pane button-pane-alt text-center">
+                                    <a href="#" class="btn display-block font-normal btn-danger" onclick="logout();">
+                                        <i class="glyph-icon icon-power-off"></i>
+                                        安全退出
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- #header-nav-left -->
+
+                <div id="header-nav-right">
+                    <a class="header-btn" id="logout-btn" href="#" title="安全退出" onclick="logout();">
+                        <i class="glyph-icon icon-power-off"></i>
+                    </a>
+                </div><!-- #header-nav-right -->
+            </div><!-- #page-header -->
+
+            {% block page_sidebar %}
+            <div id="page-sidebar" style="margin-top: 20px;">
+                <div class="scroll-sidebar">
+                    <ul id="sidebar-menu" data-spy="affix" data-offset-top="10">
+                        <li class="header"><span>虚拟化管理平台</span></li>
+                        <li>
+                            <a href="{{ url_for('v_dashboard.show') }}" title="Dashboard">
+                                <i class="glyph-icon icon-linecons-shop"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_guests.show') }}" title="虚拟机实例">
+                                <i class="glyph-icon icon-linecons-cloud"></i>
+                                <span>虚拟机实例</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_disks.show') }}" title="磁盘实例列表">
+                                <i class="glyph-icon icon-hdd-o"></i>
+                                <span>磁盘</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_hosts.show') }}" title="计算节点列表">
+                                <i class="glyph-icon icon-linecons-desktop"></i>
+                                <span>计算节点</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_logs.show') }}" title="JimV 虚拟化平台日志">
+                                <i class="glyph-icon icon-linecons-eye"></i>
+                                <span>平台日志</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_snapshots.show') }}" title="虚拟机实例快照列表">
+                                <i class="glyph-icon icon-linecons-camera"></i>
+                                <span>实例快照</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_os_templates_image.show') }}" title="虚拟机模板镜像列表">
+                                <i class="glyph-icon icon-linecons-inbox"></i>
+                                <span>模板镜像</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_ssh_keys.show') }}" title="SSH Keys">
+                                <i class="glyph-icon icon-linecons-key"></i>
+                                <span>SSH Keys</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_config.show') }}" title="JimV 虚拟化平台系统配置">
+                                <i class="glyph-icon icon-linecons-cog"></i>
+                                <span>系统配置</span>
+                            </a>
+                        </li>
+                    </ul><!-- #sidebar-menu -->
+                </div><!-- #scroll-sidebar -->
+            </div><!-- #page-sidebar -->
+            {% endblock page_sidebar %}
+            <div id="page-content-wrapper">
+                <div id="alert-success-tip" class="alert alert-success alert-top">
+                </div>
+                <div id="alert-warning-tip" class="alert alert-warning alert-top">
+                </div>
+                <div id="alert-danger-tip" class="alert alert-danger alert-top">
+                </div>
+                <div id="page-content">
+                    <div class="container">
+                    {% block content %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endblock body %}
+
+        <!-- WIDGETS -->
+        <script type="text/javascript" src="{{ theme_static('tether/js/tether.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('bootstrap/js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('bootstrap/js/affix.js') }}"></script>
+        <!-- <script type="text/javascript" src="{{ theme_static('bootstrap/js/bootstrap-tooltip.js') }}"></script> -->
+        <!-- Bootstrap Dropdown -->
+        <!-- <script type="text/javascript" src="{{ theme_static('widgets/dropdown/dropdown.js') }}"></script> -->
+        <!-- Bootstrap Tooltip -->
+        <!-- <script type="text/javascript" src="{{ theme_static('widgets/tooltip/tooltip.js') }}"></script> -->
+        <!-- Bootstrap Popover -->
+        <!-- <script type="text/javascript" src="{{ theme_static('widgets/popover/popover.js') }}"></script> -->
+        <!-- Bootstrap Progress Bar -->
+        <script type="text/javascript" src="{{ theme_static('widgets/progressbar/progressbar.js') }}"></script>
+        <!-- Bootstrap Buttons -->
+        <!-- <script type="text/javascript" src="{{ theme_static('widgets/button/button.js') }}"></script> -->
+        <!-- Bootstrap Collapse -->
+        <!-- <script type="text/javascript" src="{{ theme_static('widgets/collapse/collapse.js') }}"></script> -->
+        <!-- Superclick -->
+        <script type="text/javascript" src="{{ theme_static('widgets/superclick/superclick.js') }}"></script>
+        <!-- Input switch alternate -->
+        <script type="text/javascript" src="{{ theme_static('widgets/input-switch/inputswitch-alt.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('widgets/ionrangeslider/ionrangeslider.js') }}"></script>
+        <!-- Bootstrap Wizard -->
+        <!--<script type="text/javascript" src="{{ theme_static('widgets/wizard/wizard.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('widgets/wizard/wizard-demo.js') }}"></script>-->
+        <!-- Boostrap Tabs -->
+        <!--<script type="text/javascript" src="{{ theme_static('widgets/tabs/tabs.js') }}"></script>-->
+        <!-- Slim scroll -->
+        <script type="text/javascript" src="{{ theme_static('widgets/slimscroll/slimscroll.js') }}"></script>
+        <!-- Slidebars -->
+        <script type="text/javascript" src="{{ theme_static('widgets/slidebars/slidebars.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('widgets/slidebars/slidebars-demo.js') }}"></script>
+        <!-- PieGage -->
+        <script type="text/javascript" src="{{ theme_static('widgets/charts/piegage/piegage.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('widgets/charts/piegage/piegage-demo.js') }}"></script>
+        <!-- Screenfull -->
+        <script type="text/javascript" src="{{ theme_static('widgets/screenfull/screenfull.js') }}"></script>
+        <!-- Content box -->
+        <script type="text/javascript" src="{{ theme_static('widgets/content-box/contentbox.js') }}"></script>
+        <!-- Overlay -->
+        <script type="text/javascript" src="{{ theme_static('widgets/overlay/overlay.js') }}"></script>
+        <!-- Widgets init for demo -->
+        <script type="text/javascript" src="{{ theme_static('js-init/widgets-init.js') }}"></script>
+        <!-- Theme layout -->
+        <script type="text/javascript" src="{{ theme_static('themes/admin/layout.js') }}"></script>
+        <!-- Theme switcher -->
+        <script type="text/javascript" src="{{ theme_static('widgets/theme-switcher/themeswitcher.js') }}"></script>
+        <!-- Chosen -->
+        <script type="text/javascript" src="{{ theme_static('widgets/chosen/chosen.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('widgets/chosen/chosen-demo.js') }}"></script>
+        <!-- Touchspin -->
+        <script type="text/javascript" src="{{ theme_static('widgets/touchspin/touchspin.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('js-core/echarts.min.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('js-core/date_format.js') }}"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script type="text/javascript" src="{{ theme_static('bootstrap-select/js/bootstrap-select.min.js') }}"></script>
+        <!-- (Optional) Latest compiled and minified JavaScript translation files -->
+        <!--<script type="text/javascript" src="{{ theme_static('bootstrap-select/js/i18n/defaults-zh_CN.min.js') }}"></script>-->
+        <!-- smartwizard JavaScript -->
+        <script type="text/javascript" src="{{ theme_static('smartwizard/js/jquery.smartWizard.min.js') }}"></script>
+        <!-- formvalidation JavaScript -->
+        <script type="text/javascript" src="{{ theme_static('formvalidation/js/formValidation.min.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('formvalidation/js/framework/bootstrap4.min.js') }}"></script>
+        <!--<script type="text/javascript" src="{{ theme_static('formvalidation/js/formValidation.popular.min.js') }}"></script>-->
+        <script type="text/javascript" src="{{ theme_static('formvalidation/js/language/zh_CN.js') }}"></script>
+
+        <!-- Multi-select -->
+        <script type="text/javascript" src="{{ theme_static('multi-select/js/jquery.multi-select.js') }}"></script>
+        <!-- Quicksearch -->
+        <script type="text/javascript" src="{{ theme_static('js-core/jquery.quicksearch.js') }}"></script>
+
+        <!-- jsPlumb -->
+        <script type="text/javascript" src="{{ theme_static('jsplumb/jsplumb.min.js') }}"></script>
+
+        <!-- JS-URL -->
+        <script type="text/javascript" src="{{ theme_static('js-core/url.js') }}"></script>
+        <!-- JimV -->
+        <script type="text/javascript" src="{{ theme_static('utils.js') }}"></script>
+    </div>
+</body>
+</html>

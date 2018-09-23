@@ -1,0 +1,1029 @@
+{% extends theme("layout.html") %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+            line-height: 20px;
+        }
+        .table > thead > tr > th,
+        .table > tfoot > tr > th {
+            color: #999999;
+            font-weight: normal;
+            border-bottom: 0 solid #e1e6eb;
+            background-color: #F5F6FA;
+        }
+        
+        .table > tbody > tr > td {
+            color: #424547;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
+        .btn,
+        .form-control,
+        .modal-content {
+            border-radius: 0 !important;
+        }
+
+        .btn-shortcut {
+            font-size: 12px !important;
+            padding: 0 26px;
+        }
+
+        .show {
+            display: inline-block !important;
+        }
+
+        .tr-selected td,
+        .tr-selected {
+            color: #000 !important;
+            background: #fafaff !important;
+        }
+    </style>
+
+{% endblock head %}
+{% block content %}
+
+<script type="text/javascript">
+    var keyword = '';
+    var resource_path = window.location.pathname;
+    var cur_url = resource_path;
+    var sheet_tag = window.location.hash;
+
+    $(document).ready(function() {
+        keyword = url('?keyword', window.location.href);
+
+        if (keyword !== undefined && typeof(keyword) === 'string') {
+            $('#content_search_by_public').val(keyword);
+            $('#content_search_by_custom').val(keyword);
+        }
+
+        var last_ready = null;
+        $('#content_search_by_public').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
+            }
+            last_ready = setTimeout(function () {
+                keyword = $('#content_search_by_public').val();
+                refresh();
+            }, 1000);
+        });
+
+        $('#content_search_by_custom').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
+            }
+            last_ready = setTimeout(function () {
+                keyword = $('#content_search_by_custom').val();
+                refresh();
+            }, 1000);
+        });
+
+        $("thead").on('click', ".all_selector", function() {
+            if ($("thead .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+
+            select_item_action();
+        });
+
+        $("tfoot").on('click', ".all_selector", function() {
+            if ($("tfoot .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+
+            select_item_action();
+        });
+
+        $("tbody tr").on('click', "input[type='checkbox']", function() {
+            select_item_action();
+        });
+
+        $('#edit_label_modal').on('show.bs.modal', function (me) {
+            $('#os_template_image_id').val($(me.relatedTarget).parent().parent().prev().prev().text());
+            $('#edit_label').val($(me.relatedTarget).prev().text());
+        });
+
+        $('#edit_path_modal').on('show.bs.modal', function (me) {
+            $('#os_template_image_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().text());
+            $('#edit_path').val($(me.relatedTarget).prev().text());
+        });
+
+        $('#add_os_template_image_modal').on('show.bs.modal', function (me) {
+            refresh_os_template_profile_os_distro_selectpicker($('#os_distro'));
+        });
+
+        $('#os_distro').on('changed.bs.select', function (me) {
+            refresh_os_template_profile_id_selectpicker($('#os_template_profile_id'), me.currentTarget.value);
+            $('#os_template_profile_id').removeAttr('disabled');
+        });
+
+        $('#update_os_template_image_profile_id_modal').on('show.bs.modal', function (me) {
+            refresh_os_template_profile_os_distro_selectpicker($('#update_os_distro'));
+        });
+
+        $('#update_os_distro').on('changed.bs.select', function (me) {
+            refresh_os_template_profile_id_selectpicker($('#update_os_template_profile_id'), me.currentTarget.value);
+            $('#update_os_template_profile_id').removeAttr('disabled');
+        });
+
+        $('#update_logo_modal').on('show.bs.modal', function (me) {
+            $('#os_template_image_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().prev().text());
+            $('#update_logo_instance_desc').text($(me.relatedTarget).parent().parent().prev().prev().prev().text());
+        });
+
+        $('#add_os_template_image_form').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                label: {
+                    validators: {
+                        notEmpty: {},
+                        stringLength: {
+                            min: 2,
+                            max: 255
+                        }
+                    }
+                },
+                logo: {
+                    validators: {
+                        notEmpty: {}
+                    }
+                },
+                path: {
+                    validators: {
+                        notEmpty: {},
+                        stringLength: {
+                            min: 2,
+                            max: 255
+                        }
+                    }
+                },
+                os_template_profile_id: {
+                    validators: {
+                        notEmpty: {}
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                data.fv.disableSubmitButtons(true);
+            }
+        }).on('success.form.fv', function (e, data) {
+            create();
+        });
+
+        nav_to_sheet_tag();
+    });
+
+    function create() {
+        var data = {
+            label: $('#label').val(),
+            description: $('#description').val(),
+            path: $('#path').val(),
+            logo: $('#logo').val(),
+            active: $('#active').val(),
+            os_template_profile_id: parseInt($('#os_template_profile_id').val()),
+            kind: 0
+        };
+
+        var go_back_url = '/os_templates_image';
+
+        $.ajax({
+            url : '/api/os_template_image',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('创建模板镜像失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('您所提交的模板镜像已创建。页面将在3秒钟后自动跳转到模板列表页面！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.href=go_back_url;
+        }, 3000);
+    }
+
+    function refresh() {
+        if (keyword !== undefined && keyword.length > 0) {
+            cur_url = resource_path + '?keyword=' + keyword + '&r=' + new RandomPassword().create(16);
+        }
+
+        sheet_tag = window.location.hash;
+        if (sheet_tag !== '') {
+
+            if (keyword === undefined) {
+                cur_url = '?r=' + new RandomPassword().create(16);
+            }
+
+            cur_url += sheet_tag;
+        }
+
+        window.location.href = cur_url;
+    }
+
+    function select_this(me) {
+        $(me).parent().parent().children().removeClass('active');
+        $(me).parent().addClass('active');
+
+        $('#public_os_templates_image, #custom_os_templates_image').css('display', 'none');
+
+        if (me.id === 'custom_os_templates_image_label') {
+            $('#custom_os_templates_image').css('display', 'unset');
+            window.location.hash = "custom";
+        } else {
+            $('#public_os_templates_image').css('display', 'unset');
+            history.replaceState(null, null, ' ');
+        }
+    }
+
+    function nav_to_sheet_tag() {
+        var public_os_templates_image_label = $('#public_os_templates_image_label');
+        var custom_os_templates_image_label = $('#custom_os_templates_image_label');
+
+        public_os_templates_image_label.parent().parent().children().removeClass('active');
+
+        $('#public_os_templates_image, #custom_os_templates_image').css('display', 'none');
+
+        if (sheet_tag === '#custom') {
+            custom_os_templates_image_label.parent().addClass('active');
+            $('#custom_os_templates_image').css('display', 'unset');
+        } else {
+            public_os_templates_image_label.parent().addClass('active');
+            $('#public_os_templates_image').css('display', 'unset');
+        }
+    }
+
+    function row_onmouseover(me) {
+        $(me).find(".edit_label_trigger, .edit_path_trigger").css('display','inline-flex');
+    }
+
+    function row_onmouseout(me) {
+        $(me).find(".edit_label_trigger, .edit_path_trigger").css('display','none');
+    }
+
+    function refresh_os_template_profile_os_distro_selectpicker(selectpicker) {
+        $.ajax({
+            url : '/api/os_templates_profile?filter=active:eq:1',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                var os_distro = [];
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    if (jQuery.inArray(v['os_distro'], os_distro) >= 0) {
+                        return;
+                    }
+                    os_distro.push(v['os_distro']);
+                    selectpicker.append(
+                        $('<option>', {value: v['os_distro'], text: v['os_distro'], 'data-icon': v['icon']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+            }
+        });
+    }
+
+    function refresh_os_template_profile_id_selectpicker(selectpicker, os_distro) {
+        $.ajax({
+            url : '/api/os_templates_profile?filter=os_distro:eq:' + os_distro,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    selectpicker.append(
+                        $('<option>', {value: v['id'], text: v['label'], 'data-subtext': v['os_product_name']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+            }
+        });
+    }
+
+    function label_update(me) {
+        var os_template_image_id = $('#os_template_image_id').val();
+        var label = $('#edit_label').val();
+        $('#edit_label_modal').modal('hide');
+        $.ajax({
+            url : '/api/os_template_image/' + os_template_image_id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                label: label
+            }),
+            error : function() {
+                alter_danger('模板镜像名称更新失败！');
+            },
+            success : function() {
+                alter_success('模板镜像名称更新成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function path_update(me) {
+        var os_template_image_id = $('#os_template_image_id').val();
+        var path = $('#edit_path').val();
+        $('#edit_path_modal').modal('hide');
+        $.ajax({
+            url : '/api/os_template_image/' + os_template_image_id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                path: path
+            }),
+            error : function() {
+                alter_danger('模板镜像路径更新失败！');
+            },
+            success : function() {
+                alter_success('模板镜像路径更新成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function update_os_template_image_profile_id(id) {
+        $.ajax({
+            url : '/api/os_template_image/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                os_template_profile_id: parseInt($('#update_os_template_profile_id').val())
+            }),
+            error : function() {
+                alter_danger('变更模板系统发行版本指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更模板系统发行版本指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function update_logo(id) {
+        $.ajax({
+            url : '/api/os_template_image/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                logo: $('#update_logo').val()
+            }),
+            error : function() {
+                alter_danger('变更 LOGO 指令发送失败！');
+            },
+            success : function() {
+                alter_success('变更 LOGO 指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function get_selected_element(checked) {
+        if (checked === null) {
+            checked = true;
+        }
+
+        if (checked) {
+            return $('tbody :checked');
+        } else {
+
+            return $('tbody input:not(:checked)');
+        }
+    }
+    
+    function highlight_selected_element() {
+        var selected_element = get_selected_element(true);
+        var no_selected_element = get_selected_element(false);
+
+        selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', true);
+        });
+
+        no_selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', false);
+        });
+    }
+    
+    function shortcut_bar_enable() {
+        var selected_element = get_selected_element(true);
+
+        if (selected_element.length > 0) {
+            $('.btn-shortcut').toggleClass('disabled', false);
+        } else {
+            $('.btn-shortcut').toggleClass('disabled', true);
+        }
+    }
+
+    function select_item_action() {
+        highlight_selected_element();
+        shortcut_bar_enable();
+    }
+
+    function enable(id) {
+        $.ajax({
+            url : '/api/os_template_image/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                active: true
+            }),
+            error : function() {
+                alter_danger('启用指令发送失败！');
+            },
+            success : function() {
+                alter_success('启用指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function disable(id) {
+        $.ajax({
+            url : '/api/os_template_image/' + id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                active: false
+            }),
+            error : function() {
+                alter_danger('禁用指令发送失败！');
+            },
+            success : function() {
+                alter_success('禁用指令发送成功！');
+                refresh();
+            }
+        });
+    }
+
+    function remove(id) {
+        $.ajax({
+            url : '/api/os_templates_image/' + id,
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('模板镜像删除指令发送失败！');
+            },
+            success : function() {
+                alter_success('模板镜像删除指令发送成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function enable_at(me) {
+        var id = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        enable(id);
+    }
+
+    function disable_at(me) {
+        var id = $(me).parent().parent().parent().parent().parent().children()[0].textContent;
+        disable(id);
+    }
+
+    function delete_at(me) {
+        var id = $('#os_template_image_id').val();
+        remove(id);
+        $('#delete_modal').modal('hide');
+    }
+
+    function update_os_template_image_profile_id_at(me) {
+        var id = $('#os_template_image_id').val();
+        update_os_template_image_profile_id(id);
+        $('#update_os_template_image_profile_id_modal').modal('hide');
+    }
+
+    function update_logo_at(me) {
+        var id = $('#os_template_image_id').val();
+        update_logo(id);
+        $('#update_logo_modal').modal('hide');
+    }
+</script>
+<div class="panel">
+    <div class="panel-body">
+        <ul class="nav nav-tabs mrg25B">
+            <li class="active"><a href="javascript:;" onclick="select_this(this);" id="public_os_templates_image_label">公共镜像</a></li>
+            <li><a href="javascript:;" onclick="select_this(this);" id="custom_os_templates_image_label">自定义镜像</a></li>
+        </ul>
+        <div id="public_os_templates_image" class="dataTables_wrapper form-inline">
+            <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                <div class="col-sm-12" style="padding-right: 0;">
+                    <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                        <input id="content_search_by_public" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                        <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_os_template_image_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加模板</a>
+                    </div>
+                </div>
+            </div>
+            <table id="os_templates_image_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                   style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <thead>
+                <tr role="row">
+                    <th style="display: none;">ID</th>
+                    <th><input class="all_selector" title="选取所有" type="checkbox"></th>
+                    <th width="180px;">名称</th>
+                    <th>状态</th>
+                    <th width="500px;">路径</th>
+                    <th>发行版本</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in os_templates_image if item.kind == 0 %}
+                    <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                        <td style="display: none;">{{ item.id }}</td>
+                        <td><input title="选中" type="checkbox"></td>
+                        <td>
+                            <div>
+                                <p style="display: inline-block;">{{ item.label }}</p>
+                                <a href="javascript:;" class="edit_label_trigger" data-toggle="modal" data-target="#edit_label_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>{% if item.active == 0 %}
+                            <span style="color: #990000;">未启用</span>
+                        {% else %}
+                            <span style="color: #00BB00;">启用</span>
+                        {% endif %}
+                        </td>
+                        <td>
+                            <div>
+                                <p style="display: inline-block;">{{ item.path }}</p>
+                                <a href="javascript:;" class="edit_path_trigger" data-toggle="modal" data-target="#edit_path_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
+                                    {% if item.logo == "" %}
+                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].icon }}"></span>
+                                    {% else %}
+                                        <span class="{{ item.logo }}"></span>
+                                    {% endif %}
+                                </a>
+                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].os_product_name }}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="dropdown inline-block">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                    更多
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{% if item.active == true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="enable_at(this);">
+                                            启用
+                                        </a>
+                                    </li>
+                                    <li class="{% if item.active != true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="disable_at(this);">
+                                            禁用
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#update_os_template_image_profile_id_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                        $('#update_os_template_image_profile_id_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
+                                            变更发行版本
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li class="{% if 'guests' in item %} disabled {% endif %}">
+                                        <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                       $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
+                                            删除
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                <tfoot>
+                <tr style="height: 70px;">
+                    <th><input type="checkbox" title="选取所有" class="all_selector"></th>
+                    <th>
+                        <div class="row">
+                            <div class="col-sm-6">
+                            </div>
+                            <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                共有{{ public_count }}条
+                            </div>
+                            <div class="col-sm-3" style="text-align: left;">
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div id="custom_os_templates_image" class="dataTables_wrapper form-inline" style="display: none;">
+            <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                <div class="col-sm-12" style="padding-right: 0;">
+                    <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                        <input id="content_search_by_custom" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                    </div>
+                    <div class="pull-right">
+                        <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                    </div>
+                </div>
+            </div>
+            <table id="os_templates_image_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                   style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <thead>
+                <tr role="row">
+                    <th style="display: none;">ID</th>
+                    <th><input class="all_selector" title="选取所有" type="checkbox"></th>
+                    <th width="220px;">名称</th>
+                    <th>状态</th>
+                    <th>进度</th>
+                    <th>创建时间</th>
+                    <th>发行版本</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in os_templates_image if item.kind == 1 %}
+                    <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                        <td style="display: none;">{{ item.id }}</td>
+                        <td><input title="选中" type="checkbox"></td>
+                        <td>
+                            <div>
+                                <p style="display: inline-block;">{{ item.label }}</p>
+                                <a href="javascript:;" class="edit_label_trigger" data-toggle="modal" data-target="#edit_label_modal" style="display: none; float: right;">
+                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>{% if item.active == 0 %}
+                            <span style="color: #990000;">未启用</span>
+                        {% else %}
+                            <span style="color: #00BB00;">启用</span>
+                        {% endif %}
+                        </td>
+                        <td>
+                            {% if item.progress == 255 %}
+                                <span style="color: #990000;">创建失败</span>
+                            {% elif item.progress == 254 %}
+                                <span style="color: #ff0000dd;">删除中...</span>
+                            {% elif item.progress == 100 %}
+                                <span style="color: #00BB00;">{{ item.progress }}%</span>
+                            {% else %}
+                                <span style="color: #e5b715;">{{ item.progress }}%</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ format_datetime_by_tus(item.create_time) }}</td>
+                        <td>
+                            <div>
+                                <a href="javascript:;" data-toggle="modal" data-target="#update_logo_modal">
+                                    {% if item.logo == "" %}
+                                        <span class="{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].icon }}"></span>
+                                    {% else %}
+                                        <span class="{{ item.logo }}"></span>
+                                    {% endif %}
+                                </a>
+                                <p style="display: inline-block;">{{ os_templates_profile_mapping_by_id[item.os_template_profile_id | string].os_product_name }}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="dropdown inline-block">
+                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                    更多
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="{% if item.active == true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="enable_at(this);">
+                                            启用
+                                        </a>
+                                    </li>
+                                    <li class="{% if item.active != true %} disabled {% endif %}" style="{% if item.sequence == 0 %} display: none; {% endif %}">
+                                        <a href="javascript:;" onclick="disable_at(this);">
+                                            禁用
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li>
+                                        <a href="javascript:;" data-toggle="modal" data-target="#update_os_template_image_profile_id_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                        $('#update_os_template_image_profile_id_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
+                                            变更发行版本
+                                        </a>
+                                    </li>
+                                    <li class="divider" style="{% if item.sequence == 0 %} display: none; {% endif %}"></li>
+                                    <li class="{% if item.progress != 100 or 'guests' in item %} disabled {% endif %}">
+                                        <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                           onclick="$('#os_template_image_id').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);
+                                       $('#delete_instance_desc').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">
+                                            删除
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                <tfoot>
+                <tr style="height: 70px;">
+                    <th><input type="checkbox" title="选取所有" class="all_selector"></th>
+                    <th>
+                        <div class="row">
+                            <div class="col-sm-6">
+                            </div>
+                            <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                共有{{ custom_count }}条
+                            </div>
+                            <div class="col-sm-3" style="text-align: left;">
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<input id="os_template_image_id" title="模板 ID" class="form-control" name="os_template_image_id" hidden>
+
+<div class="modal" id="edit_label_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑模板镜像名称：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_label" title="系统模板镜像名称" class="form-control" name="os_template_image_label">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="label_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="edit_path_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑模板镜像路径：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_path" title="系统模板镜像路径" class="form-control" name="os_template_image_path">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="path_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除模板：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除该模板镜像吗？</p>
+                <h3 style="color: orangered;" id="delete_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="add_os_template_image_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">添加模板镜像：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
+                <div class="example-box-wrapper">
+                    <form id="add_os_template_image_form" class="form-horizontal bordered-row" action="javascript:;">
+                        <input id="active" name="active" value="1" type="hidden" title="激活" class="form-control">
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板镜像名称</label>
+                            <div class="col-sm-6">
+                                <input id="label" name="label" type="text" title="模板镜像名称" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-stumbleupon"></span>&nbsp;&nbsp;模板路径</label>
+                            <div class="col-sm-6">
+                                <input id="path" name="path" type="text" title="模板路径" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-child"></span>&nbsp;&nbsp;LOGO</label>
+                            <div class="col-sm-6">
+                                <select id="logo" name="logo" title="请选择 LOGO" class="selectpicker">
+                                    <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos">CentOS</option>
+                                    <option value="icon-os icon-os-linux" data-icon="icon-os icon-os-linux">Linux</option>
+                                    <option value="icon-os icon-os-ubuntu" data-icon="icon-os icon-os-ubuntu">Ubuntu</option>
+                                    <option value="icon-os icon-os-suse" data-icon="icon-os icon-os-suse">Suse</option>
+                                    <option value="icon-os icon-os-gentoo" data-icon="icon-os icon-os-gentoo">Gentoo</option>
+                                    <option value="icon-os icon-os-debian" data-icon="icon-os icon-os-debian">Debian</option>
+                                    <option value="icon-os icon-os-redhat" data-icon="icon-os icon-os-redhat">Redhat</option>
+                                    <option value="icon-os icon-os-bsd" data-icon="icon-os icon-os-bsd">BSD</option>
+                                    <option value="icon-os icon-os-coreos" data-icon="icon-os icon-os-coreos">CoreOS</option>
+                                    <option value="icon-os icon-os-windows" data-icon="icon-os icon-os-windows">Windows</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;发行版本</label>
+                            <div class="col-sm-8">
+                                <select id="os_distro" name="os_distro" title="请选择发行版" class="selectpicker" data-width="140px">
+                                </select>
+                                <select id="os_template_profile_id" name="os_template_profile_id" title="请选择版本" class="selectpicker" data-width="237px" disabled>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-newspaper-o"></span>&nbsp;&nbsp;模板镜像描述</label>
+                            <div class="col-sm-6">
+                                <textarea id="description" name="description" title="模板镜像描述" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-6 pull-right">
+                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="update_os_template_image_profile_id_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更模板系统发行版：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板镜像名称</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_os_template_image_profile_id_instance_desc"></h3>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-bookmark-o"></span>&nbsp;&nbsp;发行版本</label>
+                        <div class="col-sm-8">
+                            <select id="update_os_distro" name="os_distro" title="请选择发行版" class="selectpicker" data-width="140px">
+                            </select>
+                            <select id="update_os_template_profile_id" name="os_template_profile_id" title="请选择版本" class="selectpicker" data-width="237px" disabled>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_os_template_image_profile_id_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="update_logo_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更 LOGO：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0;">
+                <form class="form-horizontal bordered-row">
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;模板镜像名称</label>
+                        <div class="col-sm-8">
+                            <h3 style="color: orangered;" id="update_logo_instance_desc"></h3>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-1"></div>
+                        <label class="col-sm-3 control-label"><span class="glyph-icon icon-child"></span>&nbsp;&nbsp;LOGO</label>
+                        <div class="col-sm-8">
+                            <select id="update_logo" name="logo" title="模板 LOGO" class="selectpicker">
+                                <option value="icon-os icon-os-centos" data-icon="icon-os icon-os-centos" selected>CentOS</option>
+                                <option value="icon-os icon-os-linux" data-icon="icon-os icon-os-linux">Linux</option>
+                                <option value="icon-os icon-os-ubuntu" data-icon="icon-os icon-os-ubuntu">Ubuntu</option>
+                                <option value="icon-os icon-os-suse" data-icon="icon-os icon-os-suse">Suse</option>
+                                <option value="icon-os icon-os-gentoo" data-icon="icon-os icon-os-gentoo">Gentoo</option>
+                                <option value="icon-os icon-os-debian" data-icon="icon-os icon-os-debian">Debian</option>
+                                <option value="icon-os icon-os-redhat" data-icon="icon-os icon-os-redhat">Redhat</option>
+                                <option value="icon-os icon-os-bsd" data-icon="icon-os icon-os-bsd">BSD</option>
+                                <option value="icon-os icon-os-coreos" data-icon="icon-os icon-os-coreos">CoreOS</option>
+                                <option value="icon-os icon-os-windows" data-icon="icon-os icon-os-windows">Windows</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="update_logo_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

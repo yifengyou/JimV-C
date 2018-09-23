@@ -3,7 +3,7 @@
 
 
 from flask import Blueprint
-from flask import request, g
+from flask import request
 import jimit as ji
 import json
 

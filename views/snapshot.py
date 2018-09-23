@@ -3,8 +3,9 @@
 
 
 import json
-from flask import Blueprint, render_template, url_for, request
+from flask import Blueprint, url_for, request
 import requests
+from . import render
 
 
 __author__ = 'James Iter'
@@ -39,10 +40,10 @@ def show():
     ret = requests.get(url=url, cookies=request.cookies)
     ret = json.loads(ret.content)
 
-    return render_template('snapshots_show.html', paging=ret['data']['paging'],
-                           page=ret['data']['page'], page_size=ret['data']['page_size'], keyword=ret['data']['keyword'],
-                           pages=ret['data']['pages'], order_by=ret['data']['order_by'], order=ret['data']['order'],
-                           last_page=ret['data']['last_page'], snapshots=ret['data']['snapshots'],
-                           guests_mapping_by_uuid=ret['data']['guests_mapping_by_uuid'])
+    return render('snapshots_show.html', paging=ret['data']['paging'],
+                  page=ret['data']['page'], page_size=ret['data']['page_size'], keyword=ret['data']['keyword'],
+                  pages=ret['data']['pages'], order_by=ret['data']['order_by'], order=ret['data']['order'],
+                  last_page=ret['data']['last_page'], snapshots=ret['data']['snapshots'],
+                  guests_mapping_by_uuid=ret['data']['guests_mapping_by_uuid'])
 
 

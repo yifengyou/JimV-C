@@ -4,7 +4,9 @@
 
 import requests
 import json
-from flask import Blueprint, render_template, request
+from flask import Blueprint, request
+
+from . import render
 
 
 __author__ = 'James Iter'
@@ -21,11 +23,11 @@ blueprint = Blueprint(
 
 
 def login():
-    return render_template('login.html')
+    return render('login.html')
 
 
 def change_password():
-    return render_template('change_password.html')
+    return render('change_password.html')
 
 
 def recover_password():
@@ -39,14 +41,14 @@ def recover_password():
         r = requests.put(url)
         j_r = json.loads(r.content)
 
-        return render_template('success.html',
-                               go_back_url='/login',
-                               timeout=10000, title=u'提交成功',
-                               message_title=u'恢复密码的请求已被接受',
-                               message=u'恢复密码的URL已发送至您的邮箱，请查看您预留的邮箱：' + j_r['data']['email'] + u'。页面将在10秒钟后自动跳转到登录页面！')
+        return render('success.html',
+                      go_back_url='/login',
+                      timeout=10000, title=u'提交成功',
+                      message_title=u'恢复密码的请求已被接受',
+                      message=u'恢复密码的URL已发送至您的邮箱，请查看您预留的邮箱：' + j_r['data']['email'] + u'。页面将在10秒钟后自动跳转到登录页面！')
 
     else:
-        return render_template('recover_password.html')
+        return render('recover_password.html')
 
 
 def reset_password(token):
@@ -65,19 +67,19 @@ def reset_password(token):
         j_r = json.loads(r.content)
 
         if j_r['state']['code'] == '200':
-            return render_template('success.html',
-                                   go_back_url='/login',
-                                   timeout=10000, title=u'提交成功',
-                                   message_title=u'重置密码成功',
-                                   message=u'页面将在10秒钟后自动跳转到登录页面！')
+            return render('success.html',
+                          go_back_url='/login',
+                          timeout=10000, title=u'提交成功',
+                          message_title=u'重置密码成功',
+                          message=u'页面将在10秒钟后自动跳转到登录页面！')
 
         else:
-            return render_template('failure.html',
-                                   go_back_url='/login',
-                                   timeout=10000, title=u'提交失败',
-                                   message_title=u'重置密码失败',
-                                   message=j_r['state']['sub']['zh-cn'] + u'，页面将在10秒钟后自动跳转到登录页面！')
+            return render('failure.html',
+                          go_back_url='/login',
+                          timeout=10000, title=u'提交失败',
+                          message_title=u'重置密码失败',
+                          message=j_r['state']['sub']['zh-cn'] + u'，页面将在10秒钟后自动跳转到登录页面！')
 
     else:
-        return render_template('reset_password.html', token=token)
+        return render('reset_password.html', token=token)
 

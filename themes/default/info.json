@@ -1,0 +1,9 @@
+{
+    "application": "JimV-C",
+    "identifier": "default",
+    "name": "default",
+    "author": "JamesIter",
+    "license": "GPL3",
+    "description": "JimV-C default theme. this will be used, if other not exist.",
+    "version": "1.0.0"
+}

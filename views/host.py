@@ -3,8 +3,9 @@
 
 
 import json
-from flask import Blueprint, render_template, url_for, request
+from flask import Blueprint, url_for, request
 import requests
+from . import render
 
 
 __author__ = 'James Iter'
@@ -39,8 +40,8 @@ def show():
     ret = requests.get(url=url, cookies=request.cookies)
     ret = json.loads(ret.content)
 
-    return render_template('hosts_show.html', hosts=ret['data']['hosts'], resource_path=request.path,
-                           keyword=ret['data']['keyword'])
+    return render('hosts_show.html', hosts=ret['data']['hosts'], resource_path=request.path,
+                  keyword=ret['data']['keyword'])
 
 
 def detail(node_id):
@@ -49,5 +50,5 @@ def detail(node_id):
     host_ret = requests.get(url=host_url, cookies=request.cookies)
     host_ret = json.loads(host_ret.content)
 
-    return render_template('host_detail.html', node_id=node_id, host=host_ret['data'])
+    return render('host_detail.html', node_id=node_id, host=host_ret['data'])
 

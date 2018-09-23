@@ -15,7 +15,8 @@ import jimit as ji
 from flask import Blueprint, url_for, request
 
 from api.base import Base
-from models.initialize import app, dev_table
+from models.initialize import dev_table
+from models import app_config
 from models import DiskState, Host
 from models import Database as db
 from models import Config
@@ -110,7 +111,7 @@ def r_create():
                 filter_str='os_template_initialize_operate_set_id:eq:' +
                            os_template_profile.os_template_initialize_operate_set_id.__str__())
 
-        if db.r.scard(app.config['ip_available_set']) < 1:
+        if db.r.scard(app_config['ip_available_set']) < 1:
             ret['state'] = ji.Common.exchange_state(50350)
             return ret
 
@@ -189,14 +190,14 @@ def r_create():
             if guest.password is None or guest.password.__len__() < 1:
                 guest.password = ji.Common.generate_random_code(length=16)
 
-            guest.ip = db.r.spop(app.config['ip_available_set'])
-            db.r.sadd(app.config['ip_used_set'], guest.ip)
+            guest.ip = db.r.spop(app_config['ip_available_set'])
+            db.r.sadd(app_config['ip_used_set'], guest.ip)
 
             guest.network = config.vm_network
             guest.manage_network = config.vm_manage_network
 
-            guest.vnc_port = db.r.spop(app.config['vnc_port_available_set'])
-            db.r.sadd(app.config['vnc_port_used_set'], guest.vnc_port)
+            guest.vnc_port = db.r.spop(app_config['vnc_port_available_set'])
+            db.r.sadd(app_config['vnc_port_used_set'], guest.vnc_port)
 
             guest.vnc_password = ji.Common.generate_random_code(length=16)
 
@@ -1408,7 +1409,7 @@ def r_vnc(uuid):
     payload = {'listen_port': port, 'target_host': hosts_mapping_by_node_id[guest_ret['data']['node_id']]['hostname'],
                'target_port': guest_ret['data']['vnc_port']}
 
-    db.r.rpush(app.config['ipc_queue'], json.dumps(payload, ensure_ascii=False))
+    db.r.rpush(app_config['ipc_queue'], json.dumps(payload, ensure_ascii=False))
     time.sleep(1)
 
     ret = dict()

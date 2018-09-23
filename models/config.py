@@ -6,7 +6,7 @@ import json
 import jimit as ji
 from IPy import IP, intToIp
 
-from initialize import app
+from models import app_config
 from models import Database as db
 from models import ORM
 from models import status
@@ -99,21 +99,21 @@ class Config(ORM):
 
     def generate_available_ip2set(self):
         # 删除现有的可用IP集合
-        db.r.delete(app.config['ip_available_set'])
+        db.r.delete(app_config['ip_available_set'])
 
         for ip_dec in range(int(IP(self.start_ip).strDec()), int(IP(self.end_ip).strDec()) + 1):
-            db.r.sadd(app.config['ip_available_set'], intToIp(ip_dec, 4))
+            db.r.sadd(app_config['ip_available_set'], intToIp(ip_dec, 4))
 
     def generate_available_vnc_port(self):
         # 删除现有的可用 vnc 端口集合
-        db.r.delete(app.config['vnc_port_available_set'])
+        db.r.delete(app_config['vnc_port_available_set'])
 
         i = 0
         # 借用可用 IP 范围生成需要的 vnc 端口集合
         for ip_dec in range(int(IP(self.start_ip).strDec()), int(IP(self.end_ip).strDec()) + 1):
             i += 1
-            db.r.sadd(app.config['vnc_port_available_set'], self.start_vnc_port + i)
+            db.r.sadd(app_config['vnc_port_available_set'], self.start_vnc_port + i)
 
     def update_global_config(self):
-        db.r.hmset(app.config['global_config'], self.__dict__)
+        db.r.hmset(app_config['global_config'], self.__dict__)
 

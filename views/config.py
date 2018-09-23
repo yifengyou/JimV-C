@@ -3,8 +3,9 @@
 
 
 import json
-from flask import Blueprint, render_template, request, abort, url_for
+from flask import Blueprint, request, abort, url_for
 import requests
+from . import render
 
 
 __author__ = 'James Iter'
@@ -29,7 +30,7 @@ def show():
     if config_ret['state']['code'] == '404':
         abort(404)
 
-    return render_template('config_show.html', config=config_ret['data'])
+    return render('config_show.html', config=config_ret['data'])
 
 
 def create():
@@ -39,7 +40,7 @@ def create():
 
     # 检测 JimV 的配置是否已被初始化，只有未被初始化时，才展现初始化配置页面
     if config_ret['state']['code'] == '404':
-        return render_template('config_init.html')
+        return render('config_init.html')
     else:
         abort(404)
 

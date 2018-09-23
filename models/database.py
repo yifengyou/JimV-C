@@ -11,7 +11,8 @@ from mysql.connector import errorcode
 import time
 import jimit as ji
 
-from initialize import app, logger
+from models import app_config
+from models import logger
 
 
 __author__ = 'James Iter'
@@ -32,14 +33,14 @@ class Database(object):
     def init_conn_mysql(cls):
         try:
             cls.cnxpool = mysql.connector.pooling.MySQLConnectionPool(
-                host=app.config["db_host"],
-                user=app.config["db_user"],
-                password=app.config["db_password"],
-                port=app.config["db_port"],
-                database=app.config["db_name"],
-                raise_on_warnings=app.config["DEBUG"],
-                pool_size=app.config["db_pool_size"],
-                charset=app.config["db_charset"]
+                host=app_config["db_host"],
+                user=app_config["db_user"],
+                password=app_config["db_password"],
+                port=app_config["db_port"],
+                database=app_config["db_name"],
+                raise_on_warnings=app_config["DEBUG"],
+                pool_size=app_config["db_pool_size"],
+                charset=app_config["db_charset"]
             )
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -89,9 +90,9 @@ class Database(object):
             TCP_KEEPCNT 关闭一个非活跃连接之前的最大重试次数
         """
         import socket
-        cls.r = redis.StrictRedis(host=app.config.get('redis_host', '127.0.0.1'),
-                                  port=app.config.get('redis_port', 6379),
-                                  db=app.config.get('redis_dbid', 0), decode_responses=True, socket_timeout=5,
+        cls.r = redis.StrictRedis(host=app_config.get('redis_host', '127.0.0.1'),
+                                  port=app_config.get('redis_port', 6379),
+                                  db=app_config.get('redis_dbid', 0), decode_responses=True, socket_timeout=5,
                                   socket_connect_timeout=5, socket_keepalive=True,
                                   socket_keepalive_options={socket.TCP_KEEPIDLE: 2, socket.TCP_KEEPINTVL: 5,
                                                             socket.TCP_KEEPCNT: 10},
@@ -101,9 +102,9 @@ class Database(object):
             cls.r.ping()
         except redis.exceptions.ResponseError as e:
             logger.warn(e.message)
-            cls.r = redis.StrictRedis(host=app.config.get('redis_host', '127.0.0.1'),
-                                      port=app.config.get('redis_port', 6379),
-                                      db=app.config.get('redis_dbid', 0), password=app.config.get('redis_password', ''),
+            cls.r = redis.StrictRedis(host=app_config.get('redis_host', '127.0.0.1'),
+                                      port=app_config.get('redis_port', 6379),
+                                      db=app_config.get('redis_dbid', 0), password=app_config.get('redis_password', ''),
                                       decode_responses=True, socket_timeout=5,
                                       socket_connect_timeout=5, socket_keepalive=True,
                                       socket_keepalive_options={socket.TCP_KEEPIDLE: 2, socket.TCP_KEEPINTVL: 5,

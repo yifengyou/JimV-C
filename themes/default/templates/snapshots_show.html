@@ -1,0 +1,581 @@
+{% extends theme("layout.html") %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+            line-height: 20px;
+        }
+        .table > thead > tr > th,
+        .table > tfoot > tr > th {
+            color: #999999;
+            font-weight: normal;
+            border-bottom: 0 solid #e1e6eb;
+            background-color: #F5F6FA;
+        }
+        
+        .table > tbody > tr > td {
+            color: #424547;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
+        .btn,
+        .form-control,
+        .modal-content {
+            border-radius: 0 !important;
+        }
+
+        .btn-shortcut {
+            font-size: 12px !important;
+            padding: 0 26px;
+        }
+
+        .show {
+            display: inline-block !important;
+        }
+
+        .tr-selected td,
+        .tr-selected {
+            color: #000 !important;
+            background: #fafaff !important;
+        }
+    </style>
+
+{% endblock head %}
+{% block content %}
+
+<script type="text/javascript">
+    var page = 1;
+    var page_size = 10;
+    var keyword = '';
+    var resource_path = window.location.pathname;
+    var cur_url = resource_path;
+
+    $(document).ready(function() {
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+
+        var last_ready = null;
+        $('#content_search').keydown(function() {
+            if (last_ready !== null) {
+                clearTimeout(last_ready);
+            }
+            last_ready = setTimeout(function () {
+                keyword = $('#content_search').val();
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+                if (keyword.length > 0) {
+                    cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+                }
+                window.location.href=cur_url;
+            }, 1000);
+        });
+
+        $('#page_size').change(function () {
+            keyword = $('#content_search').val();
+            page_size = $('#page_size').val();
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+            if (keyword.length > 0) {
+                cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+            }
+            window.location.href=cur_url;
+        });
+
+        $("thead").on('click', ".all_selector", function() {
+            if ($("thead .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+
+            select_item_action();
+        });
+
+        $("tfoot").on('click', ".all_selector", function() {
+            if ($("tfoot .all_selector").is(':checked')) {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', true);
+                $(".all_selector").prop('checked', true);
+            } else {
+                $("tbody tr").find('td input[type="checkbox"]:eq(0)').prop('checked', false);
+                $(".all_selector").prop('checked', false);
+            }
+
+            select_item_action();
+        });
+
+        $("tbody tr").on('click', "input[type='checkbox']", function() {
+            select_item_action();
+        });
+
+        $('#edit_label_modal').on('show.bs.modal', function (me) {
+            $('#snapshot_id').val($(me.relatedTarget).parent().parent().prev().prev().text());
+            $('#edit_label').val($(me.relatedTarget).prev().text());
+        });
+
+    });
+
+    function refresh() {
+        keyword = $('#content_search').val();
+        page = $('#pagination li.active a').text();
+        page_size = $('#page_size').val();
+        cur_url = resource_path + '?page=' + page + '&page_size=' + page_size;
+        if (keyword.length > 0) {
+            cur_url = resource_path + '?page=' + page + '&page_size=' + page_size + '&keyword=' + keyword;
+        }
+        window.location.href=cur_url;
+    }
+
+    function row_onmouseover(me) {
+        $(me).find(".edit_label_trigger").css('display','inline-flex');
+    }
+
+    function row_onmouseout(me) {
+        $(me).find(".edit_label_trigger").css('display','none');
+    }
+
+    function label_update(me) {
+        var snapshot_id = $('#snapshot_id').val();
+        var label = $('#edit_label').val();
+        $('#edit_label_modal').modal('hide');
+        $.ajax({
+            url : '/api/snapshot/' + snapshot_id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                label: label
+            }),
+            error : function() {
+                alter_danger('快照名称更新失败！');
+            },
+            success : function() {
+                alter_success('快照名称更新成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function revert_snapshot(me) {
+        var snapshot_id = $('#snapshot_id').val();
+        $('#snapshot_revert_modal').modal('hide');
+        $.ajax({
+            url : '/api/snapshot/_revert/' + snapshot_id,
+            type : 'PUT',
+            error : function() {
+                alter_danger('快照恢复失败！');
+            },
+            success : function() {
+                alter_success('快照恢复成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function delete_snapshot(me) {
+        var snapshot_id = $('#snapshot_id').val();
+        $('#snapshot_delete_modal').modal('hide');
+        $.ajax({
+            url : '/api/snapshots/' + snapshot_id,
+            type : 'DELETE',
+            error : function() {
+                alter_danger('快照删除失败！');
+            },
+            success : function() {
+                alter_success('快照删除成功！');
+                setTimeout(function() {
+                    refresh();
+                }, 1000);
+            }
+        });
+    }
+
+    function get_selected_element(checked) {
+        if (checked === null) {
+            checked = true;
+        }
+
+        if (checked) {
+            return $('tbody :checked');
+        } else {
+
+            return $('tbody input:not(:checked)');
+        }
+    }
+    
+    function highlight_selected_element() {
+        var selected_element = get_selected_element(true);
+        var no_selected_element = get_selected_element(false);
+
+        selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', true);
+        });
+
+        no_selected_element.each(function(i, e) {
+            $(e).parent().parent().toggleClass('tr-selected', false);
+        });
+    }
+    
+    function shortcut_bar_enable() {
+        var selected_element = get_selected_element(true);
+
+        if (selected_element.length > 0) {
+            $('.btn-shortcut').toggleClass('disabled', false);
+        } else {
+            $('.btn-shortcut').toggleClass('disabled', true);
+        }
+    }
+
+    function select_item_action() {
+        highlight_selected_element();
+        shortcut_bar_enable();
+    }
+    
+    function make_list_of_disks(me) {
+        var snapshot_id = $('#snapshot_id').val();
+        var disks_uuid = [];
+
+        $.ajax({
+            url : '/api/snapshot/_disks/' + snapshot_id,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+                alter_danger('获取实例磁盘列表失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                disks_uuid = data.data;
+            }
+        });
+
+        $.ajax({
+            url : '/api/disks?order_by=sequence&filter=uuid:in:' + disks_uuid.join(','),
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+                alter_danger('获取实例磁盘列表失败！');
+            },
+            success : function(data, textStatus, xhr) {
+                var disks_list_tbody = $("#disks_list").find("tbody");
+                var disk_kind = '系统盘';
+                disks_list_tbody.empty();
+
+                $.each(data.data, function(k, v) {
+                    if (v['sequence'] === 0) {
+                        disk_kind = '系统盘';
+                    } else {
+                        disk_kind = '数据盘';
+                    }
+                    disks_list_tbody.append(
+                        '<tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">' +
+                        '<td>' +
+                            '<div>' + v['uuid'] + '</div>' +
+                            '<div>' + '<p style="display: inline-block;">' + v['remark'] + '</p></div>' +
+                        '</td>' +
+                        '<td>' + v['device'] + '</td>' +
+                        '<td>' + v['size'] + ' GB</td>' +
+                        '<td>' + disk_kind + '</td>' +
+                        '<td><a href="javascript:;" style="color: #0066cc" data-toggle="modal" data-target="#create_os_template_image_from_disk_snapshot_modal" ' +
+                        'onclick="$(\'#os_template_image_label\').val($(this).parent().prev().prev().prev().prev().children()[1].textContent);$(\'#disk_uuid\').val(\'' + v['uuid'] + '\');' +
+                        '$(\'#create_os_template_image_from_disk_snapshot_desc\').text($(this).parent().prev().prev().prev().text());$(\'#snapshot_convert_to_os_template_image_modal\').modal(\'hide\');">创建</a></td>' +
+                        '</tr>'
+                        );
+                });
+            }
+        });
+    }
+    
+    function create_os_template_image_from_disk_snapshot() {
+        var snapshot_id = $('#snapshot_id').val();
+        var disk_uuid = $('#disk_uuid').val();
+        var label = $('#os_template_image_label').val();
+
+        $('#create_os_template_image_from_disk_snapshot_modal').modal('hide');
+
+        $.ajax({
+            url : '/api/snapshot/_convert_to_os_template_image/' + snapshot_id + '/' + disk_uuid,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                label: label
+            }),
+            error : function() {
+                alter_danger('从磁盘快照创建自定义镜像失败！');
+            },
+            success : function() {
+                alter_success('从磁盘快照创建自定义镜像成功！');
+                setTimeout(function() {
+                    window.location.href="/os_templates_image#custom";
+                }, 1000);
+            }
+        });
+    }
+</script>
+<div class="panel">
+    <div class="panel-body">
+        <h3 class="title-hero" style="font-size: 24px;">
+            虚拟机实例快照
+        </h3>
+        <div>
+            <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
+                <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                    <div class="col-sm-12" style="padding-right: 0;">
+                        <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
+                            <input id="content_search" type="search" class="form-control" placeholder="模糊搜索..." value="{%- if keyword -%} {{ keyword }} {%- endif -%}" style="margin-left: 0; border-radius: 0;">
+                        </div>
+                        <div class="pull-right">
+                            <button class="btn btn-default" onclick="refresh()" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                        </div>
+                    </div>
+                </div>
+                <table id="snapshots_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                       style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <thead>
+                <tr role="row">
+                    <th style="display: none;">ID</th>
+                    <th><input class="all_selector" title="选取所有" type="checkbox"></th>
+                    <th width="220px;">名称</th>
+                    <th>进度</th>
+                    <th>状态</th>
+                    <th>所属虚拟机</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in snapshots %}
+                <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                    <td style="display: none;">{{ item.snapshot_id }}</td>
+                    <td><input title="选中" type="checkbox"></td>
+                    <td>
+                        <div>
+                            <a href="javascript:;">{{ item.snapshot_id }}</a>
+                        </div>
+                        <div>
+                            <p style="display: inline-block;">{{ item.label }}</p>
+                            <a href="javascript:;" class="edit_label_trigger" data-toggle="modal" data-target="#edit_label_modal" style="display: none; float: right;">
+                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        {% if item.progress == 255 %}
+                            <span style="color: #990000;">创建失败</span>
+                        {% elif item.progress == 254 %}
+                            <span style="color: #ff0000dd;">删除中...</span>
+                        {% elif item.progress == 253 %}
+                            <span style="color: #009cc5;">恢复中...</span>
+                        {% elif item.progress == 252 %}
+                            <span style="color: #009cc5;">创建镜像中...</span>
+                        {% elif item.progress == 100 %}
+                            <span style="color: #00BB00;">{{ item.progress }}%</span>
+                        {% else %}
+                            <span style="color: #e5b715;">{{ item.progress }}%</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ format_guest_status(item.status, 100)|safe }}</td>
+                    <td><a href="/guest/detail/{{ item.guest_uuid }}" {% if 'guest' not in item %}style="display: none"{% endif %}>
+                        {% if 'guest' in item %}
+                            {{ item.guest.label }}/{{ item.guest.remark }}
+                        {% endif %}</a>
+                    </td>
+                    <td>{{ format_datetime_by_tus(item.create_time) }}</td>
+                    <td>
+                        <div class="dropdown inline-block">
+                            <a href="javascript:;" class="{% if item.progress not in [100] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_revert_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
+                                                                                                                                            $('#revert_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">恢复</a>
+                            <span> | </span>
+                            <a href="javascript:;" data-guest_uuid="{{ item.guest_uuid }}" class="{% if item.progress not in [100] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_convert_to_os_template_image_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
+                                                                                                                                            make_list_of_disks(this);
+                                                                                                                                            $('#convert_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">创建镜像</a>
+                            <span> | </span>
+                            <a href="javascript:;" class="{% if item.progress not in [100, 255] %} a-disabled {% endif %}" style="color: #0066cc" data-toggle="modal" data-target="#snapshot_delete_modal" onclick="$('#snapshot_id').val($(this).parent().parent().parent().children()[0].textContent);
+                                                                                                                                            $('#delete_snapshot_instance_desc').text($($(this).parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().children()[2]).find('div p')[0].textContent)">删除</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+
+                <table class="table table-bordered" style="border-top-width: 0; z-index: 99; position: sticky; bottom: 0;">
+                    <tfoot>
+                    <tr style="height: 70px;">
+                        <th><input type="checkbox" title="选取所有" class="all_selector"></th>
+                        <th>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                </div>
+                                <div class="col-sm-3" style="font-size: 12px; padding-top: 5px; text-align: right;">
+                                    共有{{ paging.total }}条，每页显示：
+                                    <select id="page_size" name="datatable-row-highlight_length" title="page_size" class="form-control" style="height: 22px; vertical-align: baseline;">
+                                        <option value="10" {% if page_size == 10 %} selected {% endif %}>10</option>
+                                        <option value="20" {% if page_size == 20 %} selected {% endif %}>20</option>
+                                        <option value="50" {% if page_size == 50  %} selected {% endif %}>50</option>
+                                    </select>&nbsp;&nbsp;条
+                                </div>
+                                <div class="col-sm-3" style="text-align: left;">
+                                    <div class="dataTables_paginate paging_bootstrap" id="datatable-row-highlight_paginate">
+                                        <ul id="pagination" class="pagination">
+                                            <li class="{% if page == 1 %} disabled {% endif %}">
+                                                <a href="{{ resource_path }}?page={{ page - 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">«</a>
+                                            </li>
+                                            {% for item in pages %}
+                                            <li class="{% if item == page %} active {% endif %}">
+                                                <a href="{{ resource_path }}?page={{ item }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">{{ item }}</a>
+                                            </li>
+                                            {% endfor %}
+                                            <li class="{% if page == last_page %} disabled {% endif %}">
+                                                <a href="{{ resource_path }}?page={{ page + 1 }}&page_size={{ page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}{% if order %}&order={{ order }}{% endif %}">»</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input id="snapshot_id" title="快照 ID" class="form-control" name="snapshot_id" hidden>
+<input id="disk_uuid" title="磁盘 UUID" class="form-control" name="disk_uuid" hidden>
+
+<div class="modal" id="edit_label_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑实例快照名称：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_label" title="实例快照名称" class="form-control" name="snapshot_label">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="label_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="snapshot_revert_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">恢复实例快照：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要使该虚拟机恢复至此快照吗？</p>
+                <h3 style="color: orangered;" id="revert_snapshot_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="revert_snapshot();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="snapshot_convert_to_os_template_image_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">请选择自定义镜像的磁盘：</h4>
+            </div>
+            <div class="modal-body">
+                <h3 style="color: orangered;" id="convert_snapshot_instance_desc"></h3>
+                <p></p>
+                <table id="disks_list" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                       style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                    <thead>
+                    <tr role="row">
+                        <th width="280px;">UUID</th>
+                        <th>设备路径</th>
+                        <th>大小</th>
+                        <th>磁盘性别</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="create_os_template_image_from_disk_snapshot_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">创建自定义镜像：</h4>
+            </div>
+            <div class="modal-body">
+                <h3 style="color: orangered;" id="create_os_template_image_from_disk_snapshot_desc"></h3>
+                <p></p>
+                <input id="os_template_image_label" title="自定义镜像名称" class="form-control" name="os_template_image_label">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="create_os_template_image_from_disk_snapshot();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="snapshot_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除实例快照：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除此快照吗？</p>
+                <h3 style="color: orangered;" id="delete_snapshot_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_snapshot();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

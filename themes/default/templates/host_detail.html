@@ -1,0 +1,1063 @@
+{% extends theme("layout.html") %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        @media (min-width: 768px) {
+            .form-horizontal .control-label {
+                text-align: left;
+            }
+        }
+        
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+            line-height: 22px;
+        }
+
+        .table > tbody > tr > td {
+            color: #424547;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
+        .guest-label {
+            color: #999999;
+        }
+
+        .guest-desc {
+            color: #333333;
+        }
+
+    </style>
+{% endblock head %}
+{% block body %}
+<script>
+    var resource_path = window.location.pathname;
+    var resource_path_array = resource_path.split('/');
+    var node_id = resource_path_array[resource_path_array.length - 1];
+    var cpu_chart = null;
+    var memory_chart = null;
+    var host_info = null;
+
+    var datetime_format_type = 'time';
+
+    function format_time(timestamp, i) {
+        if (datetime_format_type === 'time') {
+            return new Date(timestamp).format('HH:MM');
+        } else {
+            return new Date(timestamp).format('mm-dd');
+        }
+    }
+
+    function render_cpu_chart(granularity) {
+        var url = '/api/host_performance/cpu_memory/last_hour/' + node_id;
+        if (granularity === 'hour') {
+            url = '/api/host_performance/cpu_memory/last_hour/' + node_id
+        } else if (granularity === 'six_hours') {
+            url = '/api/host_performance/cpu_memory/last_six_hours/' + node_id
+        } else if (granularity === 'day') {
+            url = '/api/host_performance/cpu_memory/last_day/' + node_id
+        } else {
+            url = '/api/host_performance/cpu_memory/last_seven_days/' + node_id
+        }
+
+        $.ajax({
+            url : url,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
+                    }
+                }
+
+                var option = {
+                    color: ['#3BC0FF'],
+                    title: {
+                        text: 'CPU'
+                    },
+                    legend: {
+                        data:['CPU使用率(%)'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var cpu_load = params[0].data[1];
+                            var seriesName = params[0].seriesName;
+                            var marker = params[0].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (cpu_load === null) {
+                                cpu_load = '无数据';
+                            }
+
+                            return datetime + '<br />' + [marker, seriesName, cpu_load].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'CPU使用率(%)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['cpu_load']
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                cpu_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_traffic_chart(nic_name, granularity) {
+        var url = '/api/host_performance/traffic/last_hour/' + node_id + '/' + nic_name;
+        if (granularity === 'hour') {
+            url = '/api/host_performance/traffic/last_hour/' + node_id + '/' + nic_name
+        } else if (granularity === 'six_hours') {
+            url = '/api/host_performance/traffic/last_six_hours/' + node_id + '/' + nic_name
+        } else if (granularity === 'day') {
+            url = '/api/host_performance/traffic/last_day/' + node_id + '/' + nic_name
+        } else {
+            url = '/api/host_performance/traffic/last_seven_days/' + node_id + '/' + nic_name
+        }
+
+        $.ajax({
+            url : url,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
+                    }
+                }
+
+                var option = {
+                    color: ['#3BC0FF', '#FAB406'],
+                    title: {
+                        text: '网络(' + nic_name + ')'
+                    },
+                    legend: {
+                        data:['流入(kbps)', '流出(kbps)'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var inflowSeriesName = params[0].seriesName;
+                            var outflowSeriesName = params[1].seriesName;
+                            var inflow = params[0].data[1];
+                            var outflow = params[1].data[1];
+                            var inflowMarker = params[0].marker;
+                            var outflowMarker = params[1].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (inflow === null) {
+                                inflow = '无数据';
+                            }
+
+                            if (outflow === null) {
+                                outflow = '无数据';
+                            }
+
+                            return datetime + '<br />' + [inflowMarker, inflowSeriesName, inflow].join(' ') +
+                                '<br />' + [outflowMarker, outflowSeriesName, outflow].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '流入(kbps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['rx_bytes'] !== null ? Math.floor(ele['rx_bytes'] * 8 / 1000) : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    },{
+                        name: '流出(kbps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['tx_bytes'] !== null ? Math.floor(ele['tx_bytes'] * 8 / 1000) : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                var traffic_chart = echarts.init(document.getElementById(nic_name));
+                traffic_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_memory_chart(granularity) {
+        var url = '/api/host_performance/cpu_memory/last_hour/' + node_id;
+        if (granularity === 'hour') {
+            url = '/api/host_performance/cpu_memory/last_hour/' + node_id
+        } else if (granularity === 'six_hours') {
+            url = '/api/host_performance/cpu_memory/last_six_hours/' + node_id
+        } else if (granularity === 'day') {
+            url = '/api/host_performance/cpu_memory/last_day/' + node_id
+        } else {
+            url = '/api/host_performance/cpu_memory/last_seven_days/' + node_id
+        }
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error: function () {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success: function (data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
+                    }
+                }
+
+                var option = {
+                    color: ['#35CD03'],
+                    title: {
+                        text: '内存'
+                    },
+                    legend: {
+                        data: ['可用量'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var seriesName = params[0].seriesName;
+                            var free = params[0].data[1];
+                            var marker = params[0].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (free === null) {
+                                free = '无数据';
+                            }
+
+                            return datetime + '<br />' + [marker, seriesName, free].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: Math.floor(host_info['memory'] / 1024 / 1024 / 1024),
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '可用量(GB)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        areaStyle: {normal: {}},
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function (i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    // 保留一位小数
+                                    ele['memory_available'] !== null ? Math.floor(ele['memory_available'] / 1024 / 1024 / 102.4) / 10 : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                memory_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_disk_throughput_chart(granularity, dev_id, mountpoint) {
+
+        mountpoint = window.btoa(mountpoint);
+
+        var url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint;
+        if (granularity === 'hour') {
+            url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint
+        } else if (granularity === 'six_hours') {
+            url = '/api/host_performance/disk_io/last_six_hours/' + node_id + '/' + mountpoint
+        } else if (granularity === 'day') {
+            url = '/api/host_performance/disk_io/last_day/' + node_id + '/' + mountpoint
+        } else {
+            url = '/api/host_performance/disk_io/last_seven_days/' + node_id + '/' + mountpoint
+        }
+
+        mountpoint = window.atob(mountpoint);
+
+        $.ajax({
+            url : url,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
+                    }
+                }
+
+                var option = {
+                    color: ['#3BC0FF', '#FAB406'],
+                    title: {
+                        text: '磁盘吞吐量 - ' + host_info['disks'][mountpoint]['device']
+                    },
+                    legend: {
+                        data:['读(MBps)', '写(MBps)'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var readSeriesName = params[0].seriesName;
+                            var writeSeriesName = params[1].seriesName;
+                            var read = params[0].data[1];
+                            var write = params[1].data[1];
+                            var readMarker = params[0].marker;
+                            var writeMarker = params[1].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (read === null) {
+                                read = '无数据';
+                            }
+
+                            if (write === null) {
+                                write = '无数据';
+                            }
+
+                            return datetime + '<br />' + [readMarker, readSeriesName, read].join(' ') +
+                                '<br />' + [writeMarker, writeSeriesName, write].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '读(MBps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['rd_bytes'] !== null ? Math.floor(ele['rd_bytes'] / 1024 / 1024 * 1000) / 1000 : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    },{
+                        name: '写(MBps)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['wr_bytes'] !== null ? Math.floor(ele['wr_bytes'] / 1024 / 1024 * 1000) / 1000 : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                var disk_chart = echarts.init(document.getElementById(dev_id));
+                disk_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_disk_iops_chart(granularity, dev_id, mountpoint) {
+
+        mountpoint = window.btoa(mountpoint);
+
+        var url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint;
+        if (granularity === 'hour') {
+            url = '/api/host_performance/disk_io/last_hour/' + node_id + '/' + mountpoint
+        } else if (granularity === 'six_hours') {
+            url = '/api/host_performance/disk_io/last_six_hours/' + node_id + '/' + mountpoint
+        } else if (granularity === 'day') {
+            url = '/api/host_performance/disk_io/last_day/' + node_id + '/' + mountpoint
+        } else {
+            url = '/api/host_performance/disk_io/last_seven_days/' + node_id + '/' + mountpoint
+        }
+
+        mountpoint = window.atob(mountpoint);
+
+        $.ajax({
+            url : url,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+                alter_danger('获取图表数据失败失败！');
+            },
+            success : function(data, textStatus, xhr) {
+
+                if (data.data.length > 1) {
+                    if ((data.data[data.data.length - 1]['timestamp'] - data.data[0]['timestamp']) >= 86400) {
+                        datetime_format_type = 'date';
+                    } else {
+                        datetime_format_type = 'time';
+                    }
+                }
+
+                var option = {
+                    color: ['#3BC0FF', '#FAB406'],
+                    title: {
+                        text: '磁盘IOPS - ' + host_info['disks'][mountpoint]['device']
+                    },
+                    legend: {
+                        data:['读(IOPS)', '写(IOPS)'],
+                        bottom: 5
+                    },
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            magicType: {type: ['line', 'bar']},
+                            saveAsImage: {
+                                show: true,
+                                pixelRatio: 4
+                            }
+                        }
+                    },
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        formatter: (function (params, ticket, callback) {
+                            var readSeriesName = params[0].seriesName;
+                            var writeSeriesName = params[1].seriesName;
+                            var read = params[0].data[1];
+                            var write = params[1].data[1];
+                            var readMarker = params[0].marker;
+                            var writeMarker = params[1].marker;
+                            var datetime = new Date(params[0].data[0]).format('yyyy-mm-dd HH:MM:ss');
+
+                            if (read === null) {
+                                read = '无数据';
+                            }
+
+                            if (write === null) {
+                                write = '无数据';
+                            }
+
+                            return datetime + '<br />' + [readMarker, readSeriesName, read].join(' ') +
+                                '<br />' + [writeMarker, writeSeriesName, write].join(' ')
+                        })
+                    },
+                    xAxis: {
+                        type: 'time',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0.1,
+                                color: '#3d4245'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            formatter: format_time
+                        }
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: 'dataMax',
+                        minInterval: 2,
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                opacity: 0,
+                                color: '#8c8f91'
+                            }
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                width: 1,
+                                opacity: 0.5
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '读(IOPS)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['rd_req'] !== null ? ele['rd_req'] : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    },{
+                        name: '写(IOPS)',
+                        type: 'line',
+                        showSymbol: false,
+                        smooth: true,
+                        lineStyle: {
+                            normal: {
+                                width: 1
+                            }
+                        },
+                        data: (function () {
+                            var d = [];
+                            $.each(data.data, function(i, ele) {
+                                d.push([
+                                    ele['timestamp'] * 1000,
+                                    ele['wr_req'] !== null ? ele['wr_req'] : null
+                                ])
+                            });
+                            return d;
+                        })()
+                    }]
+                };
+
+                var disk_chart = echarts.init(document.getElementById(dev_id));
+                disk_chart.setOption(option);
+            }
+        });
+    }
+
+    function render_traffics_chart(granularity) {
+        $('#traffics_chart').empty();
+        $.each(host_info['interfaces'], function(key, ele) {
+            $('#traffics_chart').append($('<div id=' + key +' style="width: 800px;height:280px;"></div>'));
+            render_traffic_chart(key,granularity);
+        });
+    }
+
+    function render_disks_chart(granularity) {
+        $('#disks_chart').empty();
+        $.each(host_info['disks'], function(key, ele) {
+            var mountpoint = key;
+            var dev_id_throughput = 'throughput_' + key;
+            var dev_id_iops = 'iops_' + key;
+
+            $('#disks_chart').append($('<div id=' + dev_id_throughput +' style="width: 800px;height:280px;"></div>'));
+            render_disk_throughput_chart(granularity, dev_id_throughput, mountpoint);
+
+            $('#disks_chart').append($('<div id=' + dev_id_iops +' style="width: 800px;height:280px;"></div>'));
+            render_disk_iops_chart(granularity, dev_id_iops, mountpoint);
+        });
+    }
+
+    $(document).ready(function() {
+        $('body').addClass('add-transition');
+        $('.add-page-transition').on('click', function(){
+            var transAttr = $(this).attr('data-transition');
+            $('.add-transition').attr('class', 'add-transition');
+            $('.add-transition').addClass(transAttr);
+        });
+
+        var url = '/api/hosts/' + node_id;
+        $.ajax({
+            url: url,
+            type: 'GET',
+            async: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error: function () {
+                alter_danger('获取计算节点数据失败失败！');
+            },
+            success: function (data, textStatus, xhr) {
+                host_info = data.data;
+            }
+        });
+
+        cpu_chart = echarts.init(document.getElementById('cpu_chart'));
+        memory_chart = echarts.init(document.getElementById('memory_chart'));
+
+        render_cpu_chart('hour');
+        render_memory_chart('hour');
+        render_traffics_chart('hour');
+        render_disks_chart('hour')
+    });
+    
+    function refresh_render_with_specify_granularity(granularity) {
+        render_cpu_chart(granularity);
+        render_memory_chart(granularity);
+        render_traffics_chart(granularity);
+        render_disks_chart(granularity)
+    }
+</script>
+<div class="container" style="padding-top: 100px; width: 90%; max-width: 100%;">
+    <div class="panel">
+        <div class="panel-body">
+            <a href="javascript:history.go(-1)" class="btn btn-xs btn-default add-page-transition" data-transition="pt-page-moveFromLeft-init" style="margin-bottom: 4px; margin-left: 10px;">
+                <span class="glyph-icon icon-separator" style="transform: rotateY(-180deg);">
+                    <i class="glyph-icon icon-level-up"></i>
+                </span>
+                <span class="button-content">
+                    返回
+                </span>
+            </a>
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-xs-4">
+                    <div style="background: #F5f6FA; border: 1px solid #e1e6eb; padding: 10px; font-size: 14px; width: 100%;">
+                        <span>
+                            {{ host.hostname }}
+                        </span>
+                    </div>
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <td>
+                                <span class="guest-label">NODE ID:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ host.node_id }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td>
+                                            <span class="guest-label">节点健康状况:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="guest-label">节点性能收集引擎:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.host_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="guest-label">状态汇送引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.host_state_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="guest-label">虚拟机性能收集引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.guest_performance_collection_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="guest-label">指令处理引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.instruction_process_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="guest-label">虚拟机创建进度引擎:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                            <span class="guest-desc">
+                                                <i class="glyph-icon icon-circle font-size-14 {% if host.threads_status.guest_creating_progress_report_engine.alive == true %}font-green{% else %}font-red{% endif %}"></i>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">CPU:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ host.cpu }} 核
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">内存:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ (host.memory / 1024 / 1024 / 1024)|int }} GB
+                                </span>
+                            </td>
+                        </tr>
+
+                        {% for nic_name, nic in host.interfaces.iteritems() %}
+                            <tr>
+                                <td style="padding: 0;">
+                                    <table style="width: 100%;">
+                                        <tr class="guest-label"><th>网络接口</th><th width="30%">IP</th><th width="30%">MAC</th></tr>
+                                        <tr><th>{{ nic_name }}</th><th>{{ nic.ip }}</th><th>{{ nic.mac }}</th></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% for mountpoint, disk in host.disks.iteritems() %}
+                            <tr>
+                                <td style="padding: 0;">
+                                    <table style="width: 100%;">
+                                        <tr class="guest-label"><th>挂载点</th><th width="20%">设备路径</th><th width="20%">磁盘大小</th><th width="20%">使用率</th></tr>
+                                        <tr class="guest-desc"><th>{{ mountpoint }}</th><th>{{ disk.device }}</th><th>{{ (disk.total / 1024 / 1024 / 1024) | int  }} GB</th><th>{{ disk.percent }}</th></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>
+                                <span class="guest-label">启动时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ format_datetime_by_tus(host.boot_time * 1000 * 1000) }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span class="guest-label">更新时间:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <span class="guest-desc">
+                                {{ format_datetime_by_tus(host.timestamp * 1000 * 1000) }}
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-xs-8">
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-xs-8"></div>
+                        <div class="col-xs-4">
+                            <div class="btn-group btn-group-justified btn-group-xs">
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('hour');">1小时</a>
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('six_hours');">6小时</a>
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('day');">1天</a>
+                                <a class="btn btn-default" role="button" onclick="refresh_render_with_specify_granularity('seven_days');">7天</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div id="cpu_chart" style="width: 800px;height:280px;"></div>
+                        <div id="memory_chart" style="width: 800px;height:280px;"></div>
+                    </div>
+                    <div id="traffics_chart"></div>
+                    <div id="disks_chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

@@ -3,8 +3,9 @@
 
 
 import json
-from flask import Blueprint, render_template, url_for, request
+from flask import Blueprint, url_for, request
 import requests
+from . import render
 
 
 __author__ = 'James Iter'
@@ -39,18 +40,18 @@ def show():
     ret = requests.get(url=url, cookies=request.cookies)
     ret = json.loads(ret.content)
 
-    return render_template('disks_show.html', disks=ret['data']['disks'],
-                           resource_path=request.path,
-                           hosts_mapping_by_node_id=ret['data']['hosts_mapping_by_node_id'],
-                           page=ret['data']['page'], page_size=ret['data']['page_size'], keyword=ret['data']['keyword'],
-                           pages=ret['data']['pages'], order_by=ret['data']['order_by'], order=ret['data']['order'],
-                           last_page=ret['data']['last_page'], paging=ret['data']['paging'],
-                           show_area=ret['data']['show_area'], config=ret['data']['config'],
-                           show_on_host=ret['data']['show_on_host'])
+    return render('disks_show.html', disks=ret['data']['disks'],
+                  resource_path=request.path,
+                  hosts_mapping_by_node_id=ret['data']['hosts_mapping_by_node_id'],
+                  page=ret['data']['page'], page_size=ret['data']['page_size'], keyword=ret['data']['keyword'],
+                  pages=ret['data']['pages'], order_by=ret['data']['order_by'], order=ret['data']['order'],
+                  last_page=ret['data']['last_page'], paging=ret['data']['paging'],
+                  show_area=ret['data']['show_area'], config=ret['data']['config'],
+                  show_on_host=ret['data']['show_on_host'])
 
 
 def create():
-    return render_template('disk_create.html')
+    return render('disk_create.html')
 
 
 def detail(uuid):
@@ -58,8 +59,8 @@ def detail(uuid):
     disk_detail_ret = requests.get(url=disk_detail_url, cookies=request.cookies)
     disk_detail_ret = json.loads(disk_detail_ret.content)
 
-    return render_template('disk_detail.html', uuid=uuid, guest=disk_detail_ret['data']['guest'],
-                           os_template_image=disk_detail_ret['data']['os_template_image'],
-                           disk=disk_detail_ret['data']['disk'],
-                           config=disk_detail_ret['data']['config'])
+    return render('disk_detail.html', uuid=uuid, guest=disk_detail_ret['data']['guest'],
+                  os_template_image=disk_detail_ret['data']['os_template_image'],
+                  disk=disk_detail_ret['data']['disk'],
+                  config=disk_detail_ret['data']['config'])
 

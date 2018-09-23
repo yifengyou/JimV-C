@@ -5,13 +5,15 @@
 from functools import wraps
 import socket
 import commands
+import jimit as ji
+import json
 
 from flask import make_response, g, request
 from flask.wrappers import Response
 from werkzeug.utils import import_string, cached_property
 import jwt
 
-from models.initialize import *
+from models import app_config, logger
 from database import Database as db
 
 
@@ -87,7 +89,7 @@ class Utils(object):
         return _superuser
 
     @staticmethod
-    def generate_token(uid, ttl=app.config['token_ttl'], audience=None):
+    def generate_token(uid, ttl=app_config['token_ttl'], audience=None):
         payload = {
             'iat': ji.Common.ts(),                                                  # 创建于
             'nbf': ji.Common.ts(),                                                  # 在此之前不可用
@@ -98,7 +100,7 @@ class Utils(object):
         if audience is not None:
             payload['aud'] = audience
 
-        return jwt.encode(payload=payload, key=app.config['jwt_secret'], algorithm=app.config['jwt_algorithm'])
+        return jwt.encode(payload=payload, key=app_config['jwt_secret'], algorithm=app_config['jwt_algorithm'])
 
     @staticmethod
     def verify_token(token, audience=None):
@@ -106,9 +108,9 @@ class Utils(object):
         ret['state'] = ji.Common.exchange_state(20000)
         try:
             if audience is None:
-                payload = jwt.decode(jwt=token, key=app.config['jwt_secret'], algorithms=app.config['jwt_algorithm'])
+                payload = jwt.decode(jwt=token, key=app_config['jwt_secret'], algorithms=app_config['jwt_algorithm'])
             else:
-                payload = jwt.decode(jwt=token, key=app.config['jwt_secret'], algorithms=app.config['jwt_algorithm'],
+                payload = jwt.decode(jwt=token, key=app_config['jwt_secret'], algorithms=app_config['jwt_algorithm'],
                                      audience=audience)
 
             return payload
@@ -119,7 +121,7 @@ class Utils(object):
 
     @staticmethod
     def emit_instruction(message):
-        db.r.publish(app.config['instruction_channel'], message=message)
+        db.r.publish(app_config['instruction_channel'], message=message)
 
     @staticmethod
     def port_is_opened(port):
@@ -156,141 +158,4 @@ def add_rule_api(blueprint, rule, api_func=None, **options):
 def add_rule_views(blueprint, rule, views_func=None, **options):
     blueprint.add_url_rule(rule=rule, view_func=LazyView(''.join(['views.', views_func])), **options)
 
-
-@app.context_processor
-def utility_processor():
-
-    def format_price(amount, currency=u'￥'):
-        return u'{0:.2f}{1}'.format(amount, currency)
-
-    def format_datetime_by_ts(ts, fmt='%Y-%m-%d %H:%M'):
-        return time.strftime(fmt, time.localtime(ts))
-
-    def format_datetime_by_tus(tus, fmt='%y-%m-%d %H:%M'):
-        return time.strftime(fmt, time.localtime(tus/1000/1000))
-
-    def format_guest_status(_status, progress):
-        from status import GuestState
-
-        color = 'FF645B'
-        icon = 'glyph-icon icon-bolt'
-        desc = '未知状态'
-
-        if _status == GuestState.booting.value:
-            color = '00BBBB'
-            icon = 'glyph-icon icon-circle'
-            desc = '启动中'
-
-        elif _status == GuestState.running.value:
-            color = '00BB00'
-            icon = 'glyph-icon icon-circle'
-            desc = '运行中'
-
-        elif _status in [GuestState.no_state.value, GuestState.creating.value]:
-            color = 'FFC543'
-            icon = 'glyph-icon icon-spinner'
-            desc = ' '.join(['创建中', str(progress)+'%'])
-
-        elif _status == GuestState.blocked.value:
-            color = '3D4245'
-            icon = 'glyph-icon icon-minus-square'
-            desc = '被阻塞'
-
-        elif _status == GuestState.paused.value:
-            color = 'B7B904'
-            icon = 'glyph-icon icon-pause'
-            desc = '暂停'
-
-        elif _status == GuestState.shutdown.value:
-            color = '4E5356'
-            icon = 'glyph-icon icon-terminal'
-            desc = '关闭'
-
-        elif _status == GuestState.shutoff.value:
-            color = 'FFC543'
-            icon = 'glyph-icon icon-plug'
-            desc = '断电'
-
-        elif _status == GuestState.crashed.value:
-            color = '9E2927'
-            icon = 'glyph-icon icon-question'
-            desc = '已崩溃'
-
-        elif _status == GuestState.pm_suspended.value:
-            color = 'FCFF07'
-            icon = 'glyph-icon icon-anchor'
-            desc = '悬挂'
-
-        elif _status == GuestState.migrating.value:
-            color = '1CF5E7'
-            icon = 'glyph-icon icon-space-shuttle'
-            desc = '迁移中'
-
-        elif _status == GuestState.dirty.value:
-            color = 'FF0707'
-            icon = 'glyph-icon icon-remove'
-            desc = '创建失败，待清理'
-
-        else:
-            pass
-
-        return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
-            icon=icon, color=color, desc=desc)
-
-    def format_sequence_to_device_name(sequence):
-        # sequence 不能大于 25。dev_table 序数从 0 开始。
-        if sequence == -1:
-            return u'无'
-
-        if sequence >= dev_table.__len__():
-            return 'Unknown'
-
-        return dev_table[sequence]
-
-    def format_disk_state(state):
-        from status import DiskState
-
-        color = 'FF645B'
-        icon = 'glyph-icon icon-bolt'
-        desc = '未知状态'
-
-        if state == DiskState.pending.value:
-            color = 'FFC543'
-            icon = 'glyph-icon icon-spinner'
-            desc = '创建中'
-
-        elif state == DiskState.idle.value:
-            color = '0077BB'
-            icon = 'glyph-icon icon-unlink'
-            desc = '待挂载'
-
-        elif state == DiskState.mounted.value:
-            color = '00BB00'
-            icon = 'glyph-icon icon-link'
-            desc = '使用中'
-
-        elif state == DiskState.mounting.value:
-            color = '00BBBB'
-            icon = 'glyph-icon icon-elusive-upload'
-            desc = '挂载中'
-
-        elif state == DiskState.unloading.value:
-            color = '93969B'
-            icon = 'glyph-icon icon-elusive-download'
-            desc = '卸载中'
-
-        elif state == DiskState.dirty.value:
-            color = 'FF0707'
-            icon = 'glyph-icon icon-remove'
-            desc = '创建失败，待清理'
-
-        else:
-            pass
-
-        return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
-            icon=icon, color=color, desc=desc)
-
-    return dict(format_price=format_price, format_datetime_by_tus=format_datetime_by_tus,
-                format_datetime_by_ts=format_datetime_by_ts, format_guest_status=format_guest_status,
-                format_sequence_to_device_name=format_sequence_to_device_name, format_disk_state=format_disk_state)
 

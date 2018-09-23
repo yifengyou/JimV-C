@@ -3,7 +3,6 @@
 
 
 import traceback
-from flask import Flask
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import json
@@ -27,11 +26,6 @@ __author__ = 'James Iter'
 __date__ = '2017/3/21'
 __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
-
-
-app = Flask(__name__, template_folder='../templates', static_folder='../static')
-app.jinja_env.add_extension('jinja2.ext.i18n')
-app.jinja_env.add_extension('jinja2.ext.do')
 
 
 class Init(object):
@@ -147,7 +141,7 @@ class Init(object):
                     return
 
                 time.sleep(10)
-                db.r.publish(app.config['instruction_channel'], message=json.dumps({'action': 'ping'}))
+                db.r.publish(app_config['instruction_channel'], message=json.dumps({'action': 'ping'}))
 
             except:
                 logger.error(traceback.format_exc())
@@ -197,10 +191,8 @@ class Init(object):
 regex_sql_str = re.compile('\\\+"')
 regex_dsl_str = re.compile('^\w+:\w+:[\S| ]+$')
 
-config = Init.load_config()
+app_config = Init.load_config()
 logger = Init.init_logger()
-
-app.config = dict(app.config, **config)
 
 ji.index_state['branch'] = dict(ji.index_state['branch'], **own_state_branch)
 
@@ -210,4 +202,3 @@ dev_table = list()
 for i in range(26):
     dev_table.append('vd' + chr(97 + i))
 
-app.jinja_env.add_extension('jinja2.ext.loopcontrols')

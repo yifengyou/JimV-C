@@ -5,7 +5,7 @@
 import json
 from flask import g
 
-from initialize import app
+from models import app_config
 from models import Database as db
 
 
@@ -82,19 +82,19 @@ class Host(object):
             raise ValueError('The hosts_name must be a list.')
 
         if random:
-            db.r.sadd(app.config['compute_nodes_of_allocation_by_nonrandom'], *hosts_name)
+            db.r.sadd(app_config['compute_nodes_of_allocation_by_nonrandom'], *hosts_name)
 
         else:
-            db.r.srem(app.config['compute_nodes_of_allocation_by_nonrandom'], *hosts_name)
+            db.r.srem(app_config['compute_nodes_of_allocation_by_nonrandom'], *hosts_name)
 
     @classmethod
     def get_all(cls):
 
         ret = list()
         compute_nodes_of_allocation_by_nonrandom = \
-            list(db.r.smembers(app.config['compute_nodes_of_allocation_by_nonrandom']))
+            list(db.r.smembers(app_config['compute_nodes_of_allocation_by_nonrandom']))
 
-        for k, v in db.r.hgetall(app.config['hosts_info']).items():
+        for k, v in db.r.hgetall(app_config['hosts_info']).items():
             v = json.loads(v)
             v = cls.alive_check(v)
             v['node_id'] = k
@@ -142,7 +142,7 @@ class Host(object):
     def get_lightest_host():
         # 负载最小的宿主机
         lightest_host = None
-        for k, v in db.r.hgetall(app.config['hosts_info']).items():
+        for k, v in db.r.hgetall(app_config['hosts_info']).items():
             v = json.loads(v)
 
             if lightest_host is None:

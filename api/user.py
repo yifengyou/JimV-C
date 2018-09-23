@@ -8,8 +8,8 @@ from flask import session
 import json
 import jimit as ji
 
-from models.initialize import app
 from api.base import Base
+from models import app_config
 from models import User
 from models import Utils
 from models import Rules
@@ -167,11 +167,11 @@ def r_send_reset_password_email(login_name):
 
         reset_password_url = '/'.join([host_url, 'reset_password', token])
 
-        smtp_server = ji.NetUtils.smtp_init(host=app.config['smtp_host'], port=app.config.get('smtp_port', None),
-                                            login_name=app.config['smtp_user'], password=app.config['smtp_password'],
-                                            tls=app.config['smtp_starttls'])
+        smtp_server = ji.NetUtils.smtp_init(host=app_config['smtp_host'], port=app_config.get('smtp_port', None),
+                                            login_name=app_config['smtp_user'], password=app_config['smtp_password'],
+                                            tls=app_config['smtp_starttls'])
 
-        ji.NetUtils.send_mail(smtp_server=smtp_server, sender=app.config['smtp_user'],
+        ji.NetUtils.send_mail(smtp_server=smtp_server, sender=app_config['smtp_user'],
                               receivers=[user.email], title=u'重置登录密码',
                               message=u'请复制以下地址到浏览器中打开：' + reset_password_url)
 
