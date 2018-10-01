@@ -99,8 +99,7 @@ app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=app_config['PERMANENT_SESSION_LIFETIME'])
 Session(app)
 Themes(app, app_identifier="JimV-C")
-l = packaged_themes_loader(app)
-pass
+themes_list = packaged_themes_loader(app)
 
 
 def instantiation_ws_vnc(listen_port, target_host, target_port):

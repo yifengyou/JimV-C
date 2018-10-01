@@ -141,6 +141,7 @@
                                 {% for mountpoint, disk in item.disks.iteritems() %}
                                     <li>挂载点: {{ mountpoint }} | {{ (disk.total / 1024 / 1024 / 1024) | int }} GB | 使用率: {{ disk.percent }}%</li>
                                 {% endfor %}
+                                <li>版本: {{ item.version }}</li>
                             </ul>
                         </div>
                     </div>

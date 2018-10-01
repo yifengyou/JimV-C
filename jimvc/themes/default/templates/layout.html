@@ -343,6 +343,12 @@
                 </div><!-- #header-nav-left -->
 
                 <div id="header-nav-right">
+                    <a href="#" class="header-btn" id="fullscreen-btn" title="全屏">
+                        <i class="glyph-icon icon-arrows-alt"></i>
+                    </a>
+                    <a href="#" class="header-btn" id="fullscreen-exit-btn" title="退出全屏" style="display: none;">
+                        <i class="glyph-icon icon-compress"></i>
+                    </a>
                     <a class="header-btn" id="logout-btn" href="#" title="安全退出" onclick="logout();">
                         <i class="glyph-icon icon-power-off"></i>
                     </a>
@@ -406,6 +412,12 @@
                             <a href="{{ url_for('v_config.show') }}" title="JimV 虚拟化平台系统配置">
                                 <i class="glyph-icon icon-linecons-cog"></i>
                                 <span>系统配置</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('v_config.show') }}" title="关于 JimV">
+                                <i class="glyph-icon icon-info"></i>
+                                <span>关于 JimV</span>
                             </a>
                         </li>
                     </ul><!-- #sidebar-menu -->

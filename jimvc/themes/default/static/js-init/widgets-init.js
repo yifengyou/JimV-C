@@ -136,7 +136,7 @@ var getUIColor = function (name) {
     } else {
         return mUIColors['default'];
     }
-}
+};
 
 /* Screenfull */
 
@@ -144,6 +144,18 @@ if(document.getElementById('fullscreen-btn')) {
   document.getElementById('fullscreen-btn').addEventListener('click', function () {
     if (screenfull.enabled) {
         screenfull.request();
+        $('#fullscreen-btn').hide();
+        $('#fullscreen-exit-btn').show();
     }
   });
+}
+
+if(document.getElementById('fullscreen-exit-btn')) {
+    document.getElementById('fullscreen-exit-btn').addEventListener('click', function () {
+        if (screenfull.enabled) {
+            screenfull.exit();
+            $('#fullscreen-exit-btn').hide();
+            $('#fullscreen-btn').show();
+        }
+    });
 }
