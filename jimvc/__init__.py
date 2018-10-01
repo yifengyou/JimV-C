@@ -141,7 +141,8 @@ def is_not_need_to_auth(endpoint):
         'v_misc.reset_password',
         'api_user.r_sign_in',
         'api_user.r_reset_password',
-        'api_user.r_send_reset_password_email'
+        'api_user.r_send_reset_password_email',
+        '_themes.static'
     ]
 
     if endpoint in not_auth_table:
