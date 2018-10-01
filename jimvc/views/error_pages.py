@@ -12,9 +12,9 @@ __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
 
-# @app.errorhandler(404)
-# def page_not_found(error):
-#     return render('404.html'), 404
+@app.errorhandler(404)
+def page_not_found(error):
+    return render('404.html'), 404
 
 
 # @app.errorhandler(500)

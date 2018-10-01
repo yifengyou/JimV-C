@@ -83,3 +83,7 @@ def reset_password(token):
     else:
         return render('reset_password.html', token=token)
 
+
+def about():
+    return render('about.html')
+

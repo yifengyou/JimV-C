@@ -5,8 +5,7 @@
 from jimvc.models import add_rule_api
 from jimvc.api import config, os_template_profile, snapshot, os_template_initialize_operate, user, ssh_key, \
     os_template_image, guest_performance, disk, log, os_template_initialize_operate_set, dashboard, guest, host, \
-    host_performance
-
+    host_performance, about
 
 __author__ = 'James Iter'
 __date__ = '2017/03/30'
@@ -16,6 +15,8 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 # JimV 配置操作
 add_rule_api(config.blueprint, '', api_func='config.r_create', methods=['POST'])
+# JimV 关于操作
+add_rule_api(about.blueprint, '', api_func='about.r_get', methods=['GET'])
 # 只有一条记录，所以不指定 id
 add_rule_api(config.blueprint, '', api_func='config.r_update', methods=['PATCH'])
 add_rule_api(config.blueprint, '/_quota', api_func='config.r_update_quota', methods=['PATCH'])

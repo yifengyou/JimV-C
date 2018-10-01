@@ -1,0 +1,54 @@
+{% extends theme("layout.html") %}
+{% block head %}
+    {{ super() }}
+
+    <style type="text/css">
+
+        label>span {
+            color: deepskyblue;
+        }
+
+        .btn,
+        .form-group>div>div,
+        .form-control {
+            border-radius: 0;
+        }
+    </style>
+{% endblock head %}
+{% block content %}
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/about',
+                type : 'GET',
+                dataType: "json",
+                error : function(data, textStatus, xhr) {
+                },
+                success : function(data, textStatus, xhr) {
+                    $('#desc').text(data['data']['desc']);
+                    $('#version').text(data['data']['version']);
+                    $('#copyright').text(data['data']['copyright']);
+                }
+            });
+        });
+    </script>
+    <div class="panel">
+        <div class="panel-body" style="padding-bottom: 120px;">
+            <h3 class="title-hero" style="text-transform: unset;">
+                关于 JimV
+            </h3>
+            <div class="example-box-wrapper" style="text-align: center; top: 50px;">
+                <a href="javascript:;" class="logo-content-big" title="JimV" style="font-family: Baskerville; font-size: 120px; color: #0275d8; text-decoration: none; display: block; text-align: center;">
+                    JimV
+                </a>
+                <pre style="width: 800px; text-align: left; padding: 80px; display: inline-block;">
+                    <span id="desc"></span>
+</pre>
+                <pre style="width: 800px; display: inline-block;">
+版本 <span id="version"></span>
+<span id="copyright"></span>
+                </pre>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

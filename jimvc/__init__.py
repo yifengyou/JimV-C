@@ -31,8 +31,8 @@ from jimvc.models import EventProcessor
 from jimvc.models import Database as db
 from jimvc.models import Config
 from jimvc.models import User
-from jimvc.api.user import blueprint as user_blueprint
 
+from jimvc.api.user import blueprint as user_blueprint
 from jimvc.api.os_template_image import blueprint as os_template_image_blueprint
 from jimvc.api.os_template_image import blueprints as os_template_image_blueprints
 from jimvc.api.os_template_initialize_operate_set import blueprint as os_template_initialize_operate_set_blueprint
@@ -60,6 +60,7 @@ from jimvc.api.host_performance import blueprint as host_performance_blueprint
 from jimvc.api.host_performance import blueprints as host_performance_blueprints
 from jimvc.api.dashboard import blueprint as dashboard_blueprint
 from jimvc.api.dashboard import blueprints as dashboard_blueprints
+from jimvc.api.about import blueprint as about_blueprint
 
 from jimvc.views.error_pages import *
 from jimvc.views.config import blueprint as view_config_blueprint
@@ -263,6 +264,7 @@ try:
     app.register_blueprint(host_performance_blueprints)
     app.register_blueprint(dashboard_blueprint)
     app.register_blueprint(dashboard_blueprints)
+    app.register_blueprint(about_blueprint)
 
     app.register_blueprint(view_config_blueprint)
     app.register_blueprint(view_misc_blueprint)
