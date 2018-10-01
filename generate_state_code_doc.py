@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    Usage: python generate_state_code_doc.py > docs/state_code.md
+    Usage: python generate_state_code_doc.py > ../docs/state_code.md
 """
 
 
 from collections import OrderedDict
 
 import jimit as ji
-from state_code import *
+from jimvc.state_code import *
 
 
 __author__ = 'James Iter'
