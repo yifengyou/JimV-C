@@ -244,7 +244,8 @@ def r_unbound(ssh_key_id):
             guests_uuid.append('_')
 
         request.__setattr__('args', ImmutableMultiDict([
-            ('filter', ':'.join(['uuid', 'notin', ','.join(guests_uuid)])),
+            ('filter', ':'.join(['uuid', 'notin', ','.join(guests_uuid)]) + ';' +
+             ':'.join(['status', 'eq', str(GuestState.running.value)])),
             ('page_size', 10000)
         ]))
 

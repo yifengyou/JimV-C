@@ -1451,6 +1451,10 @@ def r_detail(uuid):
 
     for row in rows:
         row['url'] = url_for('v_ssh_keys.show')
+
+        if row['id'].__str__() not in ssh_keys_id:
+            continue
+
         guest.ssh_keys.append(row)
 
     os_template_image = OSTemplateImage()
