@@ -206,7 +206,7 @@
             quantity: parseInt($('#quantity').val()),
             remark: $('#remark').val(),
             password: $('#password').val(),
-            ssh_keys_id: $('#ssh_key_id').val(),
+            ssh_keys_id: $("input[name=ssh_keys_id]:checked").map(function () {return this.value}).get(),
             lease_term: 100
         };
 
@@ -403,14 +403,6 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label"><span class="glyph-icon icon-key"></span>&nbsp;&nbsp;SSH-KEY</label>
                         <div class="col-sm-6" id="ssh_keys_id_div">
-                            <label class="checkbox-inline">
-                                <input type="checkbox" name="ssh_keys_id" value="option1">
-                                Checkbox 1
-                            </label>
-                            <label class="checkbox-inline">
-                                <input type="checkbox" name="ssh_keys_id" value="option2">
-                                Checkbox 2
-                            </label>
                         </div>
                     </div>
                     <div class="form-group">
