@@ -288,7 +288,7 @@ function initialization_db() {
     mysql -u root -p${RDB_ROOT_PSWD} -e "grant all on jimv.* to jimv@localhost identified by \"${RDB_JIMV_PSWD}\"; flush privileges"
 
     # 初始化数据库
-    mysql -u jimv -p${RDB_JIMV_PSWD} < ~/sites/JimV-C/misc/init.sql
+    mysql -u jimv -p${RDB_JIMV_PSWD} < ${JIMVC_PATH}/misc/init.sql
 
     # 确认是否初始化成功
     mysql -u jimv -p${RDB_JIMV_PSWD} -e 'show databases'
