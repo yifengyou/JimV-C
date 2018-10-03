@@ -16,7 +16,13 @@ try:
 except ImportError as e:
     # 兼容老版本
     from flask.ext.session import Session
-from flask.ext.themes2 import Themes, packaged_themes_loader
+
+try:
+    from flask_themes2 import Themes, packaged_themes_loader
+except ImportError as e:
+    # 兼容老版本
+    from flask.ext.themes2 import Themes, packaged_themes_loader
+
 from werkzeug.debug import get_current_traceback
 
 app = Flask(__name__)
