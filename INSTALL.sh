@@ -14,18 +14,13 @@
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/jamesiter/JimV-C/dev/INSTALL.sh)" -- --version dev
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
-export JIMVC_REPOSITORY_URL='https://github.com/jamesiter/JimV-C.git'
-export JIMVC_REPOSITORY_URL_CN='https://gitee.com/jimit/JimV-C.git'
 export JIMVC_REPOSITORY_RAW_URL='https://raw.githubusercontent.com/jamesiter/JimV-C'
-export COUNTRY=`curl http://iit.im/ip/country`
+export JIMVC_DOWNLOAD_URL='https://github.com/jamesiter/JimV-C/archive/master.tar.gz'
+export JIMVC_PATH='/usr/local/JimV-C'
 export GENERATE_PASSWORD_SCRIPT_TMP_PATH='/tmp/gen_pswd.sh'
 export SMTP_HOST=''
 export SMTP_USER=''
 export SMTP_PASSWORD=''
-
-if [ ${COUNTRY} = 'CN' ]; then
-    export JIMVC_REPOSITORY_URL=${JIMVC_REPOSITORY_URL_CN}
-fi
 
 ARGS=`getopt -o h --long rdb_root_password:,rdb_jimv_password:,redis_password:,jwt_secret:,secret_key:,version:,help -n 'INSTALL.sh' -- "$@"`
 
@@ -56,6 +51,7 @@ do
             ;;
         --version)
             export JIMV_VERSION=$2
+            export JIMVC_DOWNLOAD_URL=$(sed s@master@${JIMV_VERSION}@ <<< ${JIMVC_DOWNLOAD_URL})
             shift 2
             ;;
         -h|--help)
@@ -259,46 +255,32 @@ function install_Nginx() {
 }
 
 function create_web_user() {
-    useradd -m www
+    useradd -M www
 }
 
-function create_web_sites_directory() {
-    su - www -c "mkdir ~/sites"
-}
-
-function clone_and_checkout_JimVC() {
-    su - www -c "git clone ${JIMVC_REPOSITORY_URL} ~/sites/JimV-C"
-    su - www -c "cd ~/sites/JimV-C && git checkout ${JIMV_VERSION}"
+function get_JimVC() {
+    mkdir -p ${JIMVC_PATH}
+    curl -sL ${JIMVC_DOWNLOAD_URL} | tar -zxf - --strip-components 1 -C ${JIMVC_PATH}
 }
 
 function install_dependencies_library() {
-    # 指定 www 用户 pip 源
-    su - www -c "mkdir -p ~/.pip"
-    su - www -c "cat > ~/.pip/pip.conf << EOF
+    mkdir -p ~/.pip
+    cat > ~/.pip/pip.conf << EOF
 [global]
 index-url = ${PYPI}
 EOF
-"
 
     # 创建 python 虚拟环境
-    su - www -c "virtualenv --system-site-packages ~/venv"
+    virtualenv --system-site-packages /usr/local/venv-jimv
 
     # 导入 python 虚拟环境
-    su - www -c "source ~/venv/bin/activate"
+    source /usr/local/venv-jimv/bin/activate
 
-    # 使切入 www 用户时自动导入 python 虚拟环境
-    su - www -c "echo '. ~/venv/bin/activate' >> .bashrc"
+    # 自动导入 python 虚拟环境
+    echo '. /usr/local/venv-jimv/bin/activate' >> .bashrc
 
     # 安装 JimV-C 所需扩展库
-    su - www -c "pip install -r ~/sites/JimV-C/requirements.txt -i ${PYPI}"
-}
-
-function fit_www_user_permission() {
-    mkdir -p /var/log/jimv
-    chown www.www /var/log/jimv
-
-    mkdir -p /run/jimv
-    chown www.www /run/jimv
+    pip install -r ${JIMVC_PATH}/requirements.txt -i ${PYPI}
 }
 
 function initialization_db() {
@@ -306,7 +288,7 @@ function initialization_db() {
     mysql -u root -p${RDB_ROOT_PSWD} -e "grant all on jimv.* to jimv@localhost identified by \"${RDB_JIMV_PSWD}\"; flush privileges"
 
     # 初始化数据库
-    su - www -c "mysql -u jimv -p${RDB_JIMV_PSWD} < ~/sites/JimV-C/misc/init.sql"
+    mysql -u jimv -p${RDB_JIMV_PSWD} < ~/sites/JimV-C/misc/init.sql
 
     # 确认是否初始化成功
     mysql -u jimv -p${RDB_JIMV_PSWD} -e 'show databases'
@@ -321,13 +303,9 @@ function generate_config_file() {
     sed -i "s/\"smtp_host\".*$/\"smtp_host\": \"${SMTP_HOST}\",/" /etc/jimvc.conf
     sed -i "s/\"smtp_user\".*$/\"smtp_user\": \"${SMTP_USER}\",/" /etc/jimvc.conf
     sed -i "s/\"smtp_password\".*$/\"smtp_password\": \"${SMTP_PASSWORD}\",/" /etc/jimvc.conf
-}
 
-function generate_pid_directory_ad_reboot() {
-    chmod +x /etc/rc.d/rc.local
-    echo '' >> /etc/rc.d/rc.local
-    echo 'mkdir /run/jimv' >> /etc/rc.d/rc.local
-    echo 'chown www.www /run/jimv' >> /etc/rc.d/rc.local
+    cp -v /usr/local/JimV-C/misc/jimvc.service /etc/systemd/system/jimvc.service
+    systemctl daemon-reload
 }
 
 function display_summary_information() {
@@ -342,7 +320,8 @@ function display_summary_information() {
     echo "JimV-C 已经安装完成，您再需如下几步就能完成整个 JimV 的部署: "
     echo
     echo "--->"
-    echo "1: 执行 '/home/www/sites/JimV-C/startup.sh' 启动 JimV-C。"
+    echo "1: 现在可以通过命令 'systemctl start jimvc.service' 启动运行 JimV-C。"
+    echo "可通过 'systemctl enable jimvc.service' 把 JimV-C 注册为随系统启动服务。"
     echo
     echo "--->"
     echo "2: 通过 Web 页面 http://`hostname -I` 初始化 JimV-C。"
@@ -365,15 +344,12 @@ function deploy() {
     prepare
     set_ntp
     create_web_user
-    create_web_sites_directory
-    clone_and_checkout_JimVC
-    fit_www_user_permission
+    get_JimVC
     install_MariaDB
     install_Redis
     install_Nginx
     install_dependencies_library
     initialization_db
-    generate_pid_directory_ad_reboot
     generate_config_file
     display_summary_information
 }

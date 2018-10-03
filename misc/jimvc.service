@@ -1,0 +1,25 @@
+[Unit]
+Requisite=network-online.target mariadb.service redis.service nginx.service
+After=network-online.target network.target mariadb.service redis.service nginx.service
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+PIDFile=/run/jimv/jimvc.pid
+Type=idle
+User=www
+Group=www
+RestartSec=2s
+ExecStartPre=/usr/bin/mkdir -p /run/jimv
+ExecStartPre=/usr/bin/mkdir -p /var/log/jimv
+ExecStartPre=/usr/bin/chown -R www.www /run/jimv
+ExecStartPre=/usr/bin/chown -R www.www /var/log/jimv
+ExecStartPre=-/usr/bin/chown -R www.www /tmp/jimv
+PermissionsStartOnly=true
+#工作目录
+WorkingDirectory=/usr/local/JimV-C/
+#命令行(必须使用绝对路径)
+ExecStart=/usr/local/venv-jimv/bin/gunicorn -c gunicorn_config.py main:app
+#启动或者停止服务最大允许花费60秒
+TimeoutSec=60s

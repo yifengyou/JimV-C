@@ -26,7 +26,7 @@ bind = _config['listen'] + ':' + _config['port'].__str__()
 workers = multiprocessing.cpu_count() * 2 + 1
 worker_class = 'gevent'
 worker_connections = 1000
-daemon = True
+daemon = False
 
 accesslog = '/'.join([log_file_dir, 'access.log'])
 errorlog = '/'.join([log_file_dir, 'error.log'])
