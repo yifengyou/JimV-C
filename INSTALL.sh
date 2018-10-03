@@ -295,7 +295,7 @@ function initialization_db() {
 }
 
 function generate_config_file() {
-    cp -v /home/www/sites/JimV-C/jimvc.conf /etc/jimvc.conf
+    cp -v ${JIMVC_PATH}/jimvc.conf /etc/jimvc.conf
     sed -i "s/\"db_password\".*$/\"db_password\": \"${RDB_JIMV_PSWD}\",/" /etc/jimvc.conf
     sed -i "s/\"redis_password\".*$/\"redis_password\": \"${REDIS_PSWD}\",/" /etc/jimvc.conf
     sed -i "s/\"jwt_secret\".*$/\"jwt_secret\": \"${JWT_SECRET}\",/" /etc/jimvc.conf
