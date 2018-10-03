@@ -13,6 +13,7 @@ Group=www
 RestartSec=2s
 ExecStartPre=/usr/bin/mkdir -p /run/jimv
 ExecStartPre=/usr/bin/mkdir -p /var/log/jimv
+ExecStartPre=/usr/bin/mkdir -p /tmp/jimv
 ExecStartPre=/usr/bin/chown -R www.www /run/jimv
 ExecStartPre=/usr/bin/chown -R www.www /var/log/jimv
 ExecStartPre=-/usr/bin/chown -R www.www /tmp/jimv

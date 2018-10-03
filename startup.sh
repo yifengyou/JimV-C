@@ -16,18 +16,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-if [ `id -u` -eq 0 ]; then
-
-    su - www -c "cd ~/sites/JimV-C; gunicorn -c gunicorn_config.py main:app"
-
-elif [ `whoami` = 'www' ]; then
-
-    cd ~/sites/JimV-C; gunicorn -c gunicorn_config.py main:app
-
-else
-
-    echo "Permission denied."
-    exit 1
-
-fi
+systemctl start jimvc.service
+systemctl status jimvc.service -l
 

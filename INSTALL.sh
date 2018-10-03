@@ -280,7 +280,7 @@ EOF
     echo '. /usr/local/venv-jimv/bin/activate' >> .bashrc
 
     # 安装 JimV-C 所需扩展库
-    pip install -r ${JIMVC_PATH}/requirements.txt -i ${PYPI}
+    grep -v "^#" ${JIMVC_PATH}/requirements.txt | xargs -n 1 pip install -i ${PYPI}
 }
 
 function initialization_db() {
@@ -308,6 +308,11 @@ function generate_config_file() {
     systemctl daemon-reload
 }
 
+function start_JimVC() {
+    systemctl start jimvc.service
+    systemctl enable jimvc.service
+}
+
 function display_summary_information() {
     echo
     echo "=== 信息汇总"
@@ -320,18 +325,14 @@ function display_summary_information() {
     echo "JimV-C 已经安装完成，您再需如下几步就能完成整个 JimV 的部署: "
     echo
     echo "--->"
-    echo "1: 现在可以通过命令 'systemctl start jimvc.service' 启动运行 JimV-C。"
-    echo "可通过 'systemctl enable jimvc.service' 把 JimV-C 注册为随系统启动服务。"
+    echo "1: 通过 Web 页面 http://`hostname -I` 初始化 JimV-C。"
     echo
     echo "--->"
-    echo "2: 通过 Web 页面 http://`hostname -I` 初始化 JimV-C。"
-    echo
-    echo "--->"
-    echo "3: 到 [计算节点] 执行如下命令，进行 JimV-N 的部署。"
+    echo "2: 到 [计算节点] 执行如下命令，进行 JimV-N 的部署。"
     echo "curl https://raw.githubusercontent.com/jamesiter/JimV-N/master/INSTALL.sh | bash -s -- --redis_host `hostname -I` --redis_password ${REDIS_PSWD} --redis_port 6379"
     echo
     echo "--->"
-    echo "4: 享受 JimV 给您带来的 '简单、快速、灵活' 开创虚拟机实例的快乐。。。。。"
+    echo "3: 享受 JimV 给您带来的 '简单、快速、灵活' 开创虚拟机实例的快乐。。。。。"
     echo
 }
 
@@ -351,6 +352,7 @@ function deploy() {
     install_dependencies_library
     initialization_db
     generate_config_file
+    start_JimVC
     display_summary_information
 }
 
