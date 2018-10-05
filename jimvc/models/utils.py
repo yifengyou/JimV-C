@@ -190,7 +190,7 @@ def utility_processor():
             icon = 'glyph-icon icon-circle'
             desc = '运行中'
 
-        elif _status in [GuestState.no_state.value, GuestState.creating.value]:
+        elif _status == GuestState.creating.value:
             color = 'FFC543'
             icon = 'glyph-icon icon-spinner'
             desc = ' '.join(['创建中', str(progress) + '%'])

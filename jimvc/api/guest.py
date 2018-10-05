@@ -16,7 +16,7 @@ from flask import Blueprint, url_for, request
 
 from jimvc.api.base import Base
 from jimvc.models.initialize import dev_table
-from jimvc.models import app_config
+from jimvc.models import app_config, GuestState
 from jimvc.models import DiskState, Host
 from jimvc.models import Database as db
 from jimvc.models import Config
@@ -833,6 +833,14 @@ def r_get(uuids):
         row['url'] = url_for('v_ssh_keys.show')
         ssh_key_id_mapping[row['id']] = row
 
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
+
     if -1 == uuids.find(','):
         if 'ssh_keys' not in ret['data']:
             ret['data']['ssh_keys'] = list()
@@ -844,6 +852,9 @@ def r_get(uuids):
                     continue
 
                 ret['data']['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
+
+            if not hosts_mapping_by_node_id[ret['data']['node_id']]['alive']:
+                ret['data']['status'] = GuestState.no_state.value
 
     else:
         for i, guest in enumerate(ret['data']):
@@ -857,6 +868,9 @@ def r_get(uuids):
                         continue
 
                     ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
+
+            if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
+                ret['data'][i]['status'] = GuestState.no_state.value
 
     return ret
 
@@ -902,6 +916,14 @@ def r_get_by_filter():
 
         snapshots_guest_uuid_mapping[guest_uuid].append(row)
 
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
+
     for i, guest in enumerate(ret['data']):
 
         guest_uuid = ret['data'][i]['uuid']
@@ -932,6 +954,9 @@ def r_get_by_filter():
 
                 else:
                     ret['data'][i]['snapshot']['creatable'] = False
+
+        if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
+            ret['data'][i]['status'] = GuestState.no_state.value
 
     return ret
 
@@ -977,6 +1002,14 @@ def r_content_search():
 
         snapshots_guest_uuid_mapping[guest_uuid].append(row)
 
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_node_id = dict()
+    for host in hosts_ret['data']:
+        hosts_mapping_by_node_id[int(host['node_id'])] = host
+
     for i, guest in enumerate(ret['data']):
 
         guest_uuid = ret['data'][i]['uuid']
@@ -1007,6 +1040,9 @@ def r_content_search():
 
                 else:
                     ret['data'][i]['snapshot']['creatable'] = False
+
+        if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
+            ret['data'][i]['status'] = GuestState.no_state.value
 
     return ret
 
@@ -1470,6 +1506,9 @@ def r_detail(uuid):
     disks_url = url_for('api_disks.r_get_by_filter', filter='guest_uuid:in:' + guest.uuid, _external=True)
     disks_ret = requests.get(url=disks_url, cookies=request.cookies)
     disks = json.loads(disks_ret.content)['data']
+
+    if not hosts_mapping_by_node_id[guest.node_id]['alive']:
+        guest.status = GuestState.no_state.value
 
     config = Config()
     config.id = 1
