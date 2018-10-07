@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS guest(
     status TINYINT UNSIGNED NOT NULL DEFAULT 0,
     progress TINYINT UNSIGNED NOT NULL DEFAULT 0,
     node_id BIGINT UNSIGNED NOT NULL,
+    service_id BIGINT UNSIGNED NOT NULL default 1,
     cpu TINYINT UNSIGNED NOT NULL,
     memory INT UNSIGNED NOT NULL,
     -- bps
@@ -56,6 +57,7 @@ CREATE TABLE IF NOT EXISTS guest(
 ALTER TABLE guest ADD INDEX (uuid);
 ALTER TABLE guest ADD INDEX (label);
 ALTER TABLE guest ADD INDEX (node_id);
+ALTER TABLE guest ADD INDEX (service_id);
 ALTER TABLE guest ADD INDEX (ip);
 ALTER TABLE guest ADD INDEX (remark);
 
@@ -418,6 +420,36 @@ CREATE TABLE IF NOT EXISTS snapshot_disk_mapping(
 
 ALTER TABLE snapshot_disk_mapping ADD UNIQUE INDEX (snapshot_id, disk_uuid);
 ALTER TABLE snapshot_disk_mapping ADD INDEX (disk_uuid);
+
+
+CREATE TABLE IF NOT EXISTS project(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(127) NOT NULL,
+    description TEXT,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE project ADD INDEX (name);
+
+
+CREATE TABLE IF NOT EXISTS service(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    project_id BIGINT UNSIGNED NOT NULL,
+    name VARCHAR(127) NOT NULL,
+    description TEXT,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE service ADD INDEX (project_id);
+ALTER TABLE service ADD INDEX (name);
+
+
+INSERT INTO project (name, description, create_time) VALUES ('我的项目', '由 JimV 创建的默认项目。', UNIX_TIMESTAMP(NOW()) * 1000000);
+INSERT INTO service (project_id, name, description, create_time) VALUES (1, '服务组', '由 JimV 创建的默认服务组。', UNIX_TIMESTAMP(NOW()) * 1000000);
 
 
 INSERT INTO os_template_initialize_operate_set (label, description, active) VALUES ('CentOS-Systemd', '用作 Redhat Systemd 系列的系统初始化。初始化操作依据 CentOS 7 来实现。', 1);

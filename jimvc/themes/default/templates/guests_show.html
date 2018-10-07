@@ -80,6 +80,57 @@
 
         .btn-ability-line {
         }
+
+        .project {
+            position: relative;
+            float: left;
+            display: block;
+            margin: 0 10px 20px 10px;
+            width: 338px;
+            height: 208px;
+            border-radius: 8px;
+            background-color: #F6F6F6;
+        }
+
+        .project:hover {
+            background-color: #EFEFEF;
+        }
+
+        .project:hover > .project_name {
+            color: #0275d8;
+        }
+
+        .project_name {
+            font-size: 36px;
+            color: #292b2c;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .project-nav-tabs {
+            font-size: smaller;
+        }
+
+        .project-nav-tabs > .active > a {
+            background: #379cfb !important;
+        }
+
+        .project-service-name {
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.25;
+            margin-top: 24px;
+            margin-bottom: 16px;
+        }
+
+        .table-bordered-project-service > tbody > tr {
+            height: 70px;
+        }
     </style>
 
 {% endblock head %}
@@ -92,6 +143,7 @@
     var resource_path = window.location.pathname;
     var cur_url = resource_path;
     var show_real_password_for_renew = false;
+    var sheet_tag = window.location.hash;
 
     $(document).ready(function() {
         page_size = $('#page_size').val();
@@ -283,6 +335,8 @@
             $('#batch_adjust_ability_form_button').prop('disabled', true);
             $('#batch_adjust_ability_modal .form-group').removeClass('has-success');
         });
+
+        nav_to_sheet_tag();
     });
 
     function refresh() {
@@ -791,6 +845,18 @@
         }
     }
 
+    function change_display_password_for_row(me) {
+        if ($(me).hasClass("icon-elusive-eye")) {
+            $(me).removeClass("icon-elusive-eye").addClass("icon-elusive-eye-off");
+            $(me).parent().children(".real_password").toggle();
+            $(me).parent().children(".unreal_password").toggle();
+        } else {
+            $(me).removeClass("icon-elusive-eye-off").addClass("icon-elusive-eye");
+            $(me).parent().children(".unreal_password").toggle();
+            $(me).parent().children(".real_password").toggle();
+        }
+    }
+
     function change_display_password_for_renew(me) {
         if (show_real_password_for_renew) {
             show_real_password_for_renew = false;
@@ -802,14 +868,137 @@
             $('#new_password').attr({type: "text"});
         }
     }
+
+    function select_this(me) {
+        $(me).parent().parent().children().removeClass('active');
+        $(me).parent().addClass('active');
+
+        $('#view_by_original, #view_by_project').css('display', 'none');
+
+        if (me.id === 'view_by_project_label') {
+            $('#view_by_project').css('display', 'grid');
+            history.replaceState(null, null, window.location.pathname);
+            window.location.hash = "project";
+            refresh_project();
+        } else {
+            $('#view_by_original').css('display', 'unset');
+            history.replaceState(null, null, ' ');
+        }
+    }
+
+    function nav_to_sheet_tag() {
+        var view_by_original_label = $('#view_by_original_label');
+        var view_by_project_label = $('#view_by_project_label');
+
+        view_by_original_label.parent().parent().children().removeClass('active');
+
+        $('#view_by_original, #view_by_project').css('display', 'none');
+
+        if (sheet_tag.indexOf('#project') != -1) {
+            view_by_project_label.parent().addClass('active');
+            $('#view_by_project').css('display', 'grid');
+            refresh_project();
+        } else {
+            view_by_original_label.parent().addClass('active');
+            $('#view_by_original').css('display', 'unset');
+        }
+    }
+
+    function go_into_project(me) {
+        var project_id = $(me).data('project_id');
+        window.location.hash = ['project', project_id].join('#');
+        refresh_project();
+    }
+
+    function refresh_project_cards() {
+        $.ajax({
+            url : '/api/projects',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                $('#project_tool_bar').css('display', 'unset');
+                $('#project_cards').css('display', 'unset');
+                $('#project_cards').empty();
+                $.each(data.data, function(k, v) {
+                    $('#project_cards').append(
+                        '<a class="project" href="javascript:;" onclick="go_into_project(this);" data-project_id="' + v['id'] + '"><span class="project_name">' + v['name'] + '</span></a>'
+                    );
+                });
+            }
+        });
+    }
+
+    function refresh_services(project_id) {
+        $('#project_services').css('display', 'unset');
+    }
+
+    function refresh_project() {
+        var project_id = window.location.hash.replace(/\#/, "").split('#');
+
+        $('#project_tool_bar').css('display', 'none');
+        $('#project_cards').css('display', 'none');
+        $('#project_tabs').css('display', 'none');
+        $('#project_desc').css('display', 'none');
+        $('#project_services').css('display', 'none');
+
+        if (project_id.length === 2) {
+            project_id = project_id[1];
+
+            $.ajax({
+                url : '/api/projects',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    $('#project_tabs').css('display', 'unset');
+                    $('#project_tabs').empty();
+                    $('#project_tabs').append('<ul class="nav nav-tabs project-nav-tabs mrg25B"></ul>');
+                    $.each(data.data, function(k, v) {
+                        if (v['id'].toString() === project_id) {
+                            $('#project_tabs > ul').append(
+                                '<li class="active"><a href="javascript:;" onclick="go_into_project(this);" data-project_id="' + v['id'] + '">' + v['name'] + '</a></li>'
+                            );
+                        } else {
+                            $('#project_tabs > ul').append(
+                                '<li><a href="javascript:;" onclick="go_into_project(this);" data-project_id="' + v['id'] + '">' + v['name'] + '</a></li>'
+                            );
+                        }
+                    });
+                }
+            });
+
+            $.ajax({
+                url : '/api/projects/' + project_id,
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    $('#project_desc').css('display', 'unset');
+                    $('#project_desc').text(data.data['description']);
+                }
+            });
+
+            refresh_services(project_id);
+        } else {
+            refresh_project_cards();
+        }
+    }
 </script>
 <div class="panel">
     <div class="panel-body">
-        <h3 class="title-hero" style="font-size: 24px;">
-            虚拟机实例
-        </h3>
+        <ul class="nav nav-tabs mrg25B">
+            <li class="active"><a href="javascript:;" onclick="select_this(this);" id="view_by_original_label">原始视图</a></li>
+            <li><a href="javascript:;" onclick="select_this(this);" id="view_by_project_label">项目视图</a></li>
+        </ul>
         <div>
-            <div id="datatable-row-highlight_wrapper" class="dataTables_wrapper form-inline">
+            <div id="view_by_original" class="dataTables_wrapper form-inline">
                 <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
                     <div class="col-sm-12" style="padding-right: 0;">
                         <div id="datatable-row-highlight_filter" class="dataTables_filter" style="display: inline-block;">
@@ -1086,6 +1275,193 @@
                     </tr>
                     </tfoot>
                 </table>
+            </div>
+            <div id="view_by_project" class="dataTables_wrapper form-inline" style="display: none;">
+                <div id="project_tool_bar" class="row" style="padding: 10px 10px 10px 0; width: 100%; display: none;">
+                    <div class="col-sm-12" style="padding-right: 0;">
+                        <div class="pull-right">
+                            <a class="btn btn-info add-page-transition" href="/guests/create" data-transition="pt-page-moveFromRight-init" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">新建项目</a>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div id="project_tabs" style="display: none;"></div>
+                    <div id="project_desc" style="display: none;"></div>
+                    <div id="project_services" style="display: none;">
+                        <div id="project_service_name" class="project-service-name">Web</div>
+                        <div id="project_service_guests">
+                            <table id="guest_list" class="table-hover table-bordered-project-service" cellspacing="0" width="100%" role="grid"
+                                   style="width: 100%; margin-bottom: 4px; border-bottom-width: 0;">
+                                <tbody>
+                                {% for item in guests %}
+                                    <tr role="row" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">
+                                        <td style="display: none;">{{ item.uuid }}</td>
+                                        <td><input title="选中" type="checkbox"></td>
+                                        <td width="180px;">
+                                            <div>
+                                                <a href="/guest/detail/{{ item.uuid }}">{{ item.label }}</a>
+                                            </div>
+                                            <div>
+                                                <p style="display: inline-block;">{{ item.remark }}</p>
+                                                <a href="javascript:;" class="edit_remark_trigger" data-toggle="modal" data-target="#edit_remark_modal" style="display: none; float: right;">
+                                                    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td width="40px" style="padding-left: 12px;">
+                                            {% if os_templates_image_mapping_by_id[item.os_template_image_id | string].logo == "" %}
+                                                <span class="{{ os_templates_profile_mapping_by_id[os_templates_image_mapping_by_id[item.os_template_image_id | string].os_template_profile_id].icon }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].label }}"></span>
+                                            {% else %}
+                                                <span class="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].logo }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].label }}"></span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
+                                        <td>{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</td>
+                                        <td>
+                                            CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />
+                                            内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB<br />
+                                            带宽 :&nbsp;
+                                            {% if item.bandwidth == 0 %}
+                                                <span style="font-size: 16px;" title="无限带宽">
+                                &nbsp;∞
+                                </span>
+                                            {% elif item.bandwidth > 0 and item.bandwidth < 1000**2 %}
+                                                {{ item.bandwidth // 1000 }}
+
+                                            {% elif item.bandwidth >= 1000**2 and item.bandwidth < 1000**3 %}
+                                                {{ item.bandwidth // 1000**2 }}
+
+                                            {% else %}
+                                                {{ item.bandwidth // 1000**3 }}
+
+                                            {% endif %}
+
+                                            {% if item.bandwidth == 0 %}
+                                            {% elif item.bandwidth > 0 and item.bandwidth < 1000**2 %}
+                                                Kbps
+                                            {% elif item.bandwidth >= 1000**2 and item.bandwidth < 1000**3 %}
+                                                Mbps
+                                            {% else %}
+                                                Gbps
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ item.ip }}</td>
+                                        <td width="150px;"><a href="#" class="glyph-icon icon-elusive-eye-off" onclick="change_display_password_for_row(this);" style="color: #014c8c;"></a><span class="unreal_password">******</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>
+                                        <td>
+                                            <div class="dropdown inline-block">
+                                                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                                                    更多
+                                                </a>
+                                                <ul class="dropdown-menu">
+                                                    <li class="{% if item.status not in [5, 6, 7] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#boot_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#boot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            启动
+                                                        </a>
+                                                    </li>
+                                                    <li class="{% if item.status not in [2] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#reboot_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#reboot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            重启
+                                                        </a>
+                                                    </li>
+                                                    <li class="{% if item.status not in [2] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#force_reboot_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#force_reboot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            强制重启
+                                                        </a>
+                                                    </li>
+                                                    <li class="{% if item.status not in [2] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#shutdown_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#shutdown_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            停止
+                                                        </a>
+                                                    </li>
+                                                    <li class="{% if item.status not in [2] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#force_shutdown_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#force_shutdown_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            强制停止
+                                                        </a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li class="{% if not item.snapshot.creatable %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#create_snapshot_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#create_snapshot_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent);
+                                                $('#snapshot_label').val($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            创建快照
+                                                        </a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li class="{% if item.status not in [2] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#suspend_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#suspend_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            暂停
+                                                        </a>
+                                                    </li>
+                                                    <li class="{% if item.status not in [4] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#resume_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#resume_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            恢复
+                                                        </a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li class="{% if item.status not in [1, 2] %} disabled {% endif %}">
+                                                        <a href="/guest/vnc/{{ item.uuid }}" target="_blank">远程连接</a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li class="">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#allocate_bandwidth_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#allocate_bandwidth_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            分配带宽
+                                                        </a>
+                                                    </li>
+                                                    <li class="{% if item.status not in [6] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#adjust_ability_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#adjust_ability_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            变更配置
+                                                        </a>
+                                                    <li class="divider"></li>
+                                                    <li class="{% if item.status not in [2] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"
+                                                           onclick="$('#reset_password_type').val('single')">
+                                                            密码重置
+                                                        </a>
+                                                    </li>
+                                                    <li class="{% if item.status not in [2, 4, 5, 6, 7] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#migrate_modal"
+                                                           onclick="$('#migrate_type').val('single')">
+                                                            迁移到
+                                                        </a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li class="{% if item.status not in [5, 6, 7, 255] %} disabled {% endif %}">
+                                                        <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
+                                                           onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#delete_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                            删除
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="project_cards" style="display: none;"></div>
+                </div>
             </div>
         </div>
     </div>

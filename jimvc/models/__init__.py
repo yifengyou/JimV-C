@@ -46,6 +46,11 @@ from guest import (
     GuestMigrateInfo
 )
 
+from project import (
+    Project,
+    Service
+)
+
 from ssh_key import (
     SSHKey
 )
@@ -133,6 +138,6 @@ __all__ = [
     'OSTemplateInitializeOperate', 'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO',
     'HostCPUMemory', 'HostTraffic', 'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping', 'OSTemplateImageKind',
     'GuestMigrateInfo', 'GuestCollectionPerformanceDataKind', 'HostCollectionPerformanceDataKind', 'StorageMode',
-    'OSTemplateInitializeOperateKind', 'dev_table'
+    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service'
 ]
 

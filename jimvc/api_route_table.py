@@ -3,9 +3,25 @@
 
 
 from jimvc.models import add_rule_api
-from jimvc.api import config, os_template_profile, snapshot, os_template_initialize_operate, user, ssh_key, \
-    os_template_image, guest_performance, disk, log, os_template_initialize_operate_set, dashboard, guest, host, \
-    host_performance, about
+from jimvc.api import config
+from jimvc.api import os_template_profile
+from jimvc.api import snapshot
+from jimvc.api import os_template_initialize_operate
+from jimvc.api import user
+from jimvc.api import ssh_key
+from jimvc.api import os_template_image
+from jimvc.api import guest_performance
+from jimvc.api import disk
+from jimvc.api import log
+from jimvc.api import os_template_initialize_operate_set
+from jimvc.api import dashboard
+from jimvc.api import guest
+from jimvc.api import host
+from jimvc.api import host_performance
+from jimvc.api import about
+from jimvc.api import project
+from jimvc.api import service
+
 
 __author__ = 'James Iter'
 __date__ = '2017/03/30'
@@ -167,6 +183,22 @@ add_rule_api(snapshot.blueprints, '/_mapping_by_disks_uuid/<disks_uuid>',
 add_rule_api(snapshot.blueprint, '/_convert_to_os_template_image/<snapshot_id>/<disk_uuid>',
              api_func='snapshot.r_convert_to_os_template_image', methods=['PUT'])
 add_rule_api(snapshot.blueprints, '/_show', api_func='snapshot.r_show', methods=['GET'])
+
+# 项目操作
+add_rule_api(project.blueprint, '', api_func='project.r_create', methods=['POST'])
+add_rule_api(project.blueprint, '/<_id>', api_func='project.r_update', methods=['PATCH'])
+add_rule_api(project.blueprints, '/<ids>', api_func='project.r_delete', methods=['DELETE'])
+add_rule_api(project.blueprints, '/<ids>', api_func='project.r_get', methods=['GET'])
+add_rule_api(project.blueprints, '', api_func='project.r_get_by_filter', methods=['GET'])
+add_rule_api(project.blueprints, '/_search', api_func='project.r_content_search', methods=['GET'])
+
+# 服务组操作
+add_rule_api(service.blueprint, '', api_func='service.r_create', methods=['POST'])
+add_rule_api(service.blueprint, '/<_id>', api_func='service.r_update', methods=['PATCH'])
+add_rule_api(service.blueprints, '/<ids>', api_func='service.r_delete', methods=['DELETE'])
+add_rule_api(service.blueprints, '/<ids>', api_func='service.r_get', methods=['GET'])
+add_rule_api(service.blueprints, '', api_func='service.r_get_by_filter', methods=['GET'])
+add_rule_api(service.blueprints, '/_search', api_func='service.r_content_search', methods=['GET'])
 
 # Guest 性能查询
 add_rule_api(guest_performance.blueprint, '/cpu_memory',

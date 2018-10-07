@@ -67,6 +67,10 @@ from jimvc.api.host_performance import blueprints as host_performance_blueprints
 from jimvc.api.dashboard import blueprint as dashboard_blueprint
 from jimvc.api.dashboard import blueprints as dashboard_blueprints
 from jimvc.api.about import blueprint as about_blueprint
+from jimvc.api.project import blueprint as project_blueprint
+from jimvc.api.project import blueprints as project_blueprints
+from jimvc.api.service import blueprint as service_blueprint
+from jimvc.api.service import blueprints as service_blueprints
 
 from jimvc.views.error_pages import *
 from jimvc.views.config import blueprint as view_config_blueprint
@@ -272,6 +276,10 @@ try:
     app.register_blueprint(dashboard_blueprint)
     app.register_blueprint(dashboard_blueprints)
     app.register_blueprint(about_blueprint)
+    app.register_blueprint(project_blueprint)
+    app.register_blueprint(project_blueprints)
+    app.register_blueprint(service_blueprint)
+    app.register_blueprint(service_blueprints)
 
     app.register_blueprint(view_config_blueprint)
     app.register_blueprint(view_misc_blueprint)

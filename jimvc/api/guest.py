@@ -16,7 +16,7 @@ from flask import Blueprint, url_for, request
 
 from jimvc.api.base import Base
 from jimvc.models.initialize import dev_table
-from jimvc.models import app_config, GuestState
+from jimvc.models import app_config, GuestState, Service
 from jimvc.models import DiskState, Host
 from jimvc.models import Database as db
 from jimvc.models import Config
@@ -81,6 +81,11 @@ def r_create():
     if 'ssh_keys_id' in request.json:
         args_rules.append(
             Rules.SSH_KEYS_ID.value
+        )
+
+    if 'service_id' in request.json:
+        args_rules.append(
+            Rules.SERVICE_ID.value
         )
 
     try:
@@ -148,6 +153,11 @@ def r_create():
 
             for row in rows:
                 ssh_keys.append(row['public_key'])
+
+        # 确保目标 服务组 存在
+        service = Service()
+        service.id = request.json.get('service_id', 1)
+        service.get()
 
         bandwidth = request.json.get('bandwidth')
         bandwidth_unit = request.json.get('bandwidth_unit')
@@ -222,6 +232,7 @@ def r_create():
                 chosen_host = available_hosts_mapping_by_node_id[node_id]
 
             guest.node_id = chosen_host['node_id']
+            guest.service_id = service.id
 
             guest_xml = GuestXML(host=chosen_host, guest=guest, disk=disk, config=config,
                                  os_type=os_template_profile.os_type)
@@ -1094,12 +1105,18 @@ def r_distribute_count():
 def r_update(uuid):
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUID.value,
+        Rules.SERVICE_ID.value
     ]
 
     if 'remark' in request.json:
         args_rules.append(
             Rules.REMARK.value,
+        )
+
+    if 'service_id' in request.json:
+        args_rules.append(
+            Rules.SERVICE_ID.value,
         )
 
     if args_rules.__len__() < 2:
@@ -1116,6 +1133,7 @@ def r_update(uuid):
         guest.get_by('uuid')
 
         guest.remark = request.json.get('remark', guest.label)
+        guest.service_id = request.json.get('service_id', guest.service_id)
 
         guest.update()
         guest.get()
