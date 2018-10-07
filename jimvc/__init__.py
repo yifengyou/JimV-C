@@ -97,10 +97,11 @@ __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2017 by James Iter.'
 
 
+app.config = dict(app.config, **app_config)
 app.jinja_env.add_extension('jinja2.ext.i18n')
 app.jinja_env.add_extension('jinja2.ext.do')
-app.config = dict(app.config, **app_config)
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
+app.jinja_env.auto_reload = app.config['DEBUG']
 
 # 替换为Flask-Session
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(seconds=app_config['PERMANENT_SESSION_LIFETIME'])

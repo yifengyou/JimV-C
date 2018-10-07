@@ -17,6 +17,8 @@ ExecStartPre=/usr/bin/mkdir -p /tmp/jimv
 ExecStartPre=/usr/bin/chown -R www.www /run/jimv
 ExecStartPre=/usr/bin/chown -R www.www /var/log/jimv
 ExecStartPre=-/usr/bin/chown -R www.www /tmp/jimv
+ExecStartPre=-/usr/bin/chown -R www.www /var/log/nginx
+ExecStartPre=-/usr/bin/chown -R www.www /var/lib/nginx
 PermissionsStartOnly=true
 #工作目录
 WorkingDirectory=/usr/local/JimV-C/
