@@ -55,7 +55,7 @@ function body_sizer() {
 
         $('#page-sidebar').css('height', contentHeight);
         $('.scroll-sidebar').css('height', contentHeight);
-        $('#page-content').css('min-height', contentHeight);
+        // $('#page-content').css('min-height', contentHeight);
 
     } else {
 
@@ -65,7 +65,7 @@ function body_sizer() {
 
         $('#page-sidebar').css('height', contentHeight);
         $('.scroll-sidebar').css('height', contentHeight);
-        $('#page-content').css('min-height', contentHeight);
+        // $('#page-content').css('min-height', contentHeight);
 
     }
 

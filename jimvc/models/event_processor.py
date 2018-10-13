@@ -171,6 +171,11 @@ class EventProcessor(object):
                     cls.disk.size = data['disk_info']['virtual-size'] / (1024 ** 3)
                     cls.disk.update()
 
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+                    cls.guest.progress = 100
+                    cls.guest.update()
+
                 else:
                     cls.guest.uuid = uuid
                     cls.guest.get_by('uuid')

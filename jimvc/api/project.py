@@ -11,6 +11,7 @@ from jimvc.api.base import Base
 from jimvc.models import Utils
 from jimvc.models import Rules
 from jimvc.models import Project
+from jimvc.models import Service
 
 
 __author__ = 'James Iter'
@@ -114,17 +115,86 @@ def r_update(_id):
 
 @Utils.dumps2response
 def r_get(ids):
-    return project_base.get(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+    ret = project_base.get(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+
+    project_ids = list()
+
+    if -1 == ids.find(','):
+        project_ids.append(ret['data']['id'])
+
+    else:
+        for project in ret['data']:
+            project_ids.append(project['id'])
+
+    rows, _ = Service.get_by_filter(filter_str=':'.join([
+        'project_id', 'in', ','.join(project_id.__str__() for project_id in project_ids)]))
+
+    services_mapping_by_project_id = dict()
+
+    for row in rows:
+        if row['project_id'] not in services_mapping_by_project_id:
+            services_mapping_by_project_id[row['project_id']] = list()
+
+        services_mapping_by_project_id[row['project_id']].append(row)
+
+    if -1 == ids.find(','):
+        ret['data']['services'] = services_mapping_by_project_id[ret['data']['id']]
+
+    else:
+        for i, project in enumerate(ret['data']):
+            ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
+
+    return ret
 
 
 @Utils.dumps2response
 def r_get_by_filter():
-    return project_base.get_by_filter()
+    ret = project_base.get_by_filter()
+
+    project_ids = list()
+    for project in ret['data']:
+        project_ids.append(project['id'])
+
+    rows, _ = Service.get_by_filter(filter_str=':'.join([
+        'project_id', 'in', ','.join(project_id.__str__() for project_id in project_ids)]))
+
+    services_mapping_by_project_id = dict()
+
+    for row in rows:
+        if row['project_id'] not in services_mapping_by_project_id:
+            services_mapping_by_project_id[row['project_id']] = list()
+
+        services_mapping_by_project_id[row['project_id']].append(row)
+
+    for i, project in enumerate(ret['data']):
+        ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
+
+    return ret
 
 
 @Utils.dumps2response
 def r_content_search():
-    return project_base.content_search()
+    ret = project_base.content_search()
+
+    project_ids = list()
+    for project in ret['data']:
+        project_ids.append(project['id'])
+
+    rows, _ = Service.get_by_filter(filter_str=':'.join([
+        'project_id', 'in', ','.join(project_id.__str__() for project_id in project_ids)]))
+
+    services_mapping_by_project_id = dict()
+
+    for row in rows:
+        if row['project_id'] not in services_mapping_by_project_id:
+            services_mapping_by_project_id[row['project_id']] = list()
+
+        services_mapping_by_project_id[row['project_id']].append(row)
+
+    for i, project in enumerate(ret['data']):
+        ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
+
+    return ret
 
 
 @Utils.dumps2response

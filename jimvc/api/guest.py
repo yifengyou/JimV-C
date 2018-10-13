@@ -886,6 +886,108 @@ def r_get(uuids):
     return ret
 
 
+def exchange_guest_os_templates_logo(os_templates_image_mapping_by_id=None, os_templates_profile_mapping_by_id=None,
+                                     os_template_image_id=None):
+    assert isinstance(os_templates_image_mapping_by_id, dict)
+    assert isinstance(os_templates_profile_mapping_by_id, dict)
+    assert isinstance(os_template_image_id, int)
+
+    if os_templates_image_mapping_by_id[os_template_image_id]['logo'] == "":
+        logo = os_templates_profile_mapping_by_id[os_templates_image_mapping_by_id[os_template_image_id]['os_template_profile_id']]['icon']
+    else:
+        logo = os_templates_image_mapping_by_id[os_template_image_id]['logo']
+
+    label = os_templates_image_mapping_by_id[os_template_image_id]['label']
+    return logo, label
+
+
+def format_guest_status(_status, progress):
+    from jimvc.models import GuestState
+
+    color = 'FF645B'
+    icon = 'glyph-icon icon-bolt'
+    desc = '未知状态'
+
+    if _status == GuestState.booting.value:
+        color = '00BBBB'
+        icon = 'glyph-icon icon-circle'
+        desc = '启动中'
+
+    elif _status == GuestState.running.value:
+        color = '00BB00'
+        icon = 'glyph-icon icon-circle'
+        desc = '运行中'
+
+    elif _status == GuestState.creating.value:
+        color = 'FFC543'
+        icon = 'glyph-icon icon-spinner'
+        desc = ' '.join(['创建中', str(progress) + '%'])
+
+    elif _status == GuestState.blocked.value:
+        color = '3D4245'
+        icon = 'glyph-icon icon-minus-square'
+        desc = '被阻塞'
+
+    elif _status == GuestState.paused.value:
+        color = 'B7B904'
+        icon = 'glyph-icon icon-pause'
+        desc = '暂停'
+
+    elif _status == GuestState.shutdown.value:
+        color = '4E5356'
+        icon = 'glyph-icon icon-terminal'
+        desc = '关闭'
+
+    elif _status == GuestState.shutoff.value:
+        color = 'FFC543'
+        icon = 'glyph-icon icon-plug'
+        desc = '断电'
+
+    elif _status == GuestState.crashed.value:
+        color = '9E2927'
+        icon = 'glyph-icon icon-question'
+        desc = '已崩溃'
+
+    elif _status == GuestState.pm_suspended.value:
+        color = 'FCFF07'
+        icon = 'glyph-icon icon-anchor'
+        desc = '悬挂'
+
+    elif _status == GuestState.migrating.value:
+        color = '1CF5E7'
+        icon = 'glyph-icon icon-space-shuttle'
+        desc = '迁移中'
+
+    elif _status == GuestState.dirty.value:
+        color = 'FF0707'
+        icon = 'glyph-icon icon-remove'
+        desc = '创建失败，待清理'
+
+    else:
+        pass
+
+    return '<span class="{icon}" style="color: #{color};">&nbsp;&nbsp;{desc}</span>'.format(
+        icon=icon, color=color, desc=desc)
+
+
+def exchange_guest_bandwidth(bandwidth=None):
+    assert isinstance(bandwidth, int)
+
+    if bandwidth == 0:
+        bandwidth = '<span style="font-size: 16px;" title="无限带宽">&nbsp;∞</span>'
+
+    elif 0 < bandwidth < 1000 ** 2:
+        bandwidth = str(bandwidth // 1000) + ' Kbps'
+
+    elif 1000 ** 2 <= bandwidth < 1000 ** 3:
+        bandwidth = str(bandwidth // 1000 ** 2) + ' Mbps'
+
+    else:
+        bandwidth = str(bandwidth // 1000 ** 3) + ' Gbps'
+
+    return bandwidth
+
+
 @Utils.dumps2response
 def r_get_by_filter():
     ret = guest_base.get_by_filter()
@@ -935,6 +1037,16 @@ def r_get_by_filter():
     for host in hosts_ret['data']:
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
+    os_templates_image, _ = OSTemplateImage.get_by_filter()
+    os_templates_image_mapping_by_id = dict()
+    for os_template_image in os_templates_image:
+        os_templates_image_mapping_by_id[os_template_image['id']] = os_template_image
+
+    os_templates_profile, _ = OSTemplateProfile.get_by_filter()
+    os_templates_profile_mapping_by_id = dict()
+    for os_template_profile in os_templates_profile:
+        os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
+
     for i, guest in enumerate(ret['data']):
 
         guest_uuid = ret['data'][i]['uuid']
@@ -968,6 +1080,17 @@ def r_get_by_filter():
 
         if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
             ret['data'][i]['status'] = GuestState.no_state.value
+
+        ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname']
+
+        ret['data'][i]['html'] = dict()
+        ret['data'][i]['html']['logo'], ret['data'][i]['html']['os_template_label'] = exchange_guest_os_templates_logo(
+            os_templates_image_mapping_by_id=os_templates_image_mapping_by_id,
+            os_templates_profile_mapping_by_id=os_templates_profile_mapping_by_id,
+            os_template_image_id=guest['os_template_image_id'])
+
+        ret['data'][i]['html']['status'] = format_guest_status(_status=guest['status'], progress=guest['progress'])
+        ret['data'][i]['html']['bandwidth'] = exchange_guest_bandwidth(bandwidth=guest['bandwidth'])
 
     return ret
 
@@ -1021,6 +1144,16 @@ def r_content_search():
     for host in hosts_ret['data']:
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
+    os_templates_image, _ = OSTemplateImage.get_by_filter()
+    os_templates_image_mapping_by_id = dict()
+    for os_template_image in os_templates_image:
+        os_templates_image_mapping_by_id[os_template_image['id']] = os_template_image
+
+    os_templates_profile, _ = OSTemplateProfile.get_by_filter()
+    os_templates_profile_mapping_by_id = dict()
+    for os_template_profile in os_templates_profile:
+        os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
+
     for i, guest in enumerate(ret['data']):
 
         guest_uuid = ret['data'][i]['uuid']
@@ -1054,6 +1187,17 @@ def r_content_search():
 
         if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
             ret['data'][i]['status'] = GuestState.no_state.value
+
+        ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname']
+
+        ret['data'][i]['html'] = dict()
+        ret['data'][i]['html']['logo'], ret['data'][i]['html']['os_template_label'] = exchange_guest_os_templates_logo(
+            os_templates_image_mapping_by_id=os_templates_image_mapping_by_id,
+            os_templates_profile_mapping_by_id=os_templates_profile_mapping_by_id,
+            os_template_image_id=guest['os_template_image_id'])
+
+        ret['data'][i]['html']['status'] = format_guest_status(_status=guest['status'], progress=guest['progress'])
+        ret['data'][i]['html']['bandwidth'] = exchange_guest_bandwidth(bandwidth=guest['bandwidth'])
 
     return ret
 
@@ -1105,8 +1249,7 @@ def r_distribute_count():
 def r_update(uuid):
 
     args_rules = [
-        Rules.UUID.value,
-        Rules.SERVICE_ID.value
+        Rules.UUID.value
     ]
 
     if 'remark' in request.json:
