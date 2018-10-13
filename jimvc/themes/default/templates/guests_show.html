@@ -368,6 +368,37 @@
         }).on('success.form.fv', function (e, data) {
             project_create();
         });
+
+        $('#create_service_modal').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                name: {
+                    validators: {
+                        notEmpty: {},
+                        stringLength: {
+                            min: 2,
+                            max: 255
+                        }
+                    }
+                }
+            }
+        })
+            .on('success.field.fv', function(e, data) {
+                if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                    data.fv.disableSubmitButtons(true);
+                }
+            }).on('success.form.fv', function (e, data) {
+            service_create();
+        });
     });
 
     function refresh() {
@@ -936,12 +967,12 @@
     }
 
     function project_create() {
+        $('#create_project_modal').modal('hide');
+
         var data = {
             name: $('#project_create_name').val(),
             description: $('#project_create_desc').val()
         };
-
-        var go_back_url = '/guests#project';
 
         $.ajax({
             url : '/api/project',
@@ -960,7 +991,7 @@
         });
 
         setTimeout(function() {
-            window.location.href=go_back_url;
+            window.location.reload();
         }, 3000);
     }
 
@@ -1166,6 +1197,15 @@
             success : function(data, textStatus, xhr) {
                 $('#project_desc').css('display', 'unset');
                 $('#project_desc').text(data.data['description']);
+                $('#project_services').append(
+                    '<div id="service_tool_bar" class="row" style="padding: 10px 10px 10px 0; width: 100%; display: unset;">' +
+                    '    <div class="col-sm-12" style="padding-right: 0;">' +
+                    '        <div class="pull-right">' +
+                    '            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#create_service_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加服务组</a>' +
+                    '        </div>' +
+                    '    </div>' +
+                    '</div>'
+                );
 
                 $.each(data.data.services, function(k, v) {
                     var html = '<div class="project-service-name">' + v['name'] + '</div>' +
@@ -1224,6 +1264,36 @@
         } else {
             refresh_projects_card();
         }
+    }
+
+    function service_create() {
+        $('#create_service_modal').modal('hide');
+
+        var data = {
+            project_id: $('#projects_tab ul li.active a').data('project_id'),
+            name: $('#service_create_name').val(),
+            description: $('#service_create_desc').val()
+        };
+
+        $.ajax({
+            url : '/api/service',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('创建服务组失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('您所提交的服务组已创建。页面将在3秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 3000);
     }
 </script>
 <div class="panel">
@@ -1538,7 +1608,7 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form id="add_project_form" class="form-horizontal bordered-row" action="javascript:;">
+                    <form id="create_project_form" class="form-horizontal bordered-row" action="javascript:;">
                         <div class="form-group">
                             <div class="col-sm-2"></div>
                             <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
@@ -1551,6 +1621,43 @@
                             <label class="col-sm-2 control-label"><span class="glyph-icon icon-key"></span>&nbsp;&nbsp;描述</label>
                             <div class="col-sm-6">
                                 <textarea id="project_create_desc" name="project_desc" title="项目描述" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-6 pull-right">
+                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="create_service_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">添加服务组：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
+                <div class="example-box-wrapper">
+                    <form id="create_service_form" class="form-horizontal bordered-row" action="javascript:;">
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
+                            <div class="col-sm-6">
+                                <input id="service_create_name" name="name" type="text" title="服务组名称" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-key"></span>&nbsp;&nbsp;描述</label>
+                            <div class="col-sm-6">
+                                <textarea id="service_create_desc" name="project_desc" title="服务组描述" class="form-control"></textarea>
                             </div>
                         </div>
                         <div class="form-group">
