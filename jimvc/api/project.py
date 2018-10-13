@@ -138,11 +138,19 @@ def r_get(ids):
         services_mapping_by_project_id[row['project_id']].append(row)
 
     if -1 == ids.find(','):
-        ret['data']['services'] = services_mapping_by_project_id[ret['data']['id']]
+
+        ret['data']['services'] = list()
+
+        if ret['data']['id'] in services_mapping_by_project_id:
+            ret['data']['services'] = services_mapping_by_project_id[ret['data']['id']]
 
     else:
         for i, project in enumerate(ret['data']):
-            ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
+
+            ret['data'][i]['services'] = list()
+
+            if project['id'] in services_mapping_by_project_id:
+                ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
 
     return ret
 
@@ -167,7 +175,11 @@ def r_get_by_filter():
         services_mapping_by_project_id[row['project_id']].append(row)
 
     for i, project in enumerate(ret['data']):
-        ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
+
+        ret['data'][i]['services'] = list()
+
+        if project['id'] in services_mapping_by_project_id:
+            ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
 
     return ret
 
@@ -192,7 +204,11 @@ def r_content_search():
         services_mapping_by_project_id[row['project_id']].append(row)
 
     for i, project in enumerate(ret['data']):
-        ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
+
+        ret['data'][i]['services'] = list()
+
+        if project['id'] in services_mapping_by_project_id:
+            ret['data'][i]['services'] = services_mapping_by_project_id[project['id']]
 
     return ret
 

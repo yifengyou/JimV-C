@@ -337,6 +337,37 @@
         });
 
         nav_to_sheet_tag();
+
+        $('#create_project_modal').formValidation({
+            framework: 'bootstrap4',
+            icon: {
+                valid: 'fa fa-check',
+                invalid: 'fa fa-times',
+                validating: 'fa fa-refresh'
+            },
+            // Since the Bootstrap Button hides the radio and checkbox
+            // We exclude the disabled elements only
+            excluded: ':disabled',
+            locale: 'zh_CN',
+            fields: {
+                name: {
+                    validators: {
+                        notEmpty: {},
+                        stringLength: {
+                            min: 2,
+                            max: 255
+                        }
+                    }
+                }
+            }
+        })
+        .on('success.field.fv', function(e, data) {
+            if (data.fv.getInvalidFields().length > 0) {    // There is invalid field
+                data.fv.disableSubmitButtons(true);
+            }
+        }).on('success.form.fv', function (e, data) {
+            project_create();
+        });
     });
 
     function refresh() {
@@ -904,6 +935,35 @@
         }
     }
 
+    function project_create() {
+        var data = {
+            name: $('#project_create_name').val(),
+            description: $('#project_create_desc').val()
+        };
+
+        var go_back_url = '/guests#project';
+
+        $.ajax({
+            url : '/api/project',
+            type : 'POST',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: "json",
+            data : JSON.stringify(data),
+            error : function(data, textStatus, xhr) {
+                alter_warning('创建项目失败！');
+                alter_danger(data.responseText);
+            },
+            success : function(data, textStatus, xhr) {
+                alter_success('您所提交的项目已创建。页面将在3秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.href=go_back_url;
+        }, 3000);
+    }
+
     function go_into_project(me) {
         var project_id = $(me).data('project_id');
         window.location.hash = ['project', project_id].join('#');
@@ -1455,7 +1515,7 @@
                 <div id="project_tool_bar" class="row" style="padding: 10px 10px 10px 0; width: 100%; display: none;">
                     <div class="col-sm-12" style="padding-right: 0;">
                         <div class="pull-right">
-                            <a class="btn btn-info add-page-transition" href="/guests/create" data-transition="pt-page-moveFromRight-init" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">新建项目</a>
+                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#create_project_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">新建项目</a>
                         </div>
                     </div>
                 </div>
@@ -1464,6 +1524,43 @@
                     <div id="project_desc" style="display: none;"></div>
                     <div id="project_services" style="display: none;"></div>
                     <div id="projects_card" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="create_project_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">创建项目：</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
+                <div class="example-box-wrapper">
+                    <form id="add_project_form" class="form-horizontal bordered-row" action="javascript:;">
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-compass-circled"></span>&nbsp;&nbsp;名称</label>
+                            <div class="col-sm-6">
+                                <input id="project_create_name" name="name" type="text" title="项目名称" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-2 control-label"><span class="glyph-icon icon-key"></span>&nbsp;&nbsp;描述</label>
+                            <div class="col-sm-6">
+                                <textarea id="project_create_desc" name="project_desc" title="项目描述" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-6 pull-right">
+                                <button type="submit" class="btn btn-blue-alt" style="width: 180px; height: 40px; font-size: 16px;" disabled>创建</button>
+                                <button class="btn btn-default" style="width: 64px; height: 40px; font-size: 16px;" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
