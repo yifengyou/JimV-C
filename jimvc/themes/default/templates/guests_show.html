@@ -68,7 +68,7 @@
         }
 
         .dropdown-menu {
-            min-width: 100%;
+            min-width: 86px !important;
         }
 
         .btn-ability {
@@ -399,6 +399,8 @@
             }).on('success.form.fv', function (e, data) {
             service_create();
         });
+
+        refresh_prepared_by_menu();
     });
 
     function refresh() {
@@ -1125,6 +1127,12 @@
                         '<a href="/guest/vnc/' + guest.uuid+ '" target="_blank">远程连接</a>' +
                     '</li>' +
                     '<li class="divider"></li>' +
+                    '<li class="dropdown-submenu prepared-by">' +
+                        '<a href="javascript:;">变更编制</a>' +
+                            '<ul class="dropdown-menu" style="position: absolute; transform: translate3d(-80px, 0px, 0px); top: 0px; left: 0px; will-change: transform;">' +
+                            '</ul>' +
+                    '</li>' +
+                    '<li class="divider"></li>' +
                     '<li class="">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#allocate_bandwidth_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
@@ -1191,6 +1199,7 @@
             url : '/api/projects/' + project_id,
             type : 'GET',
             contentType: "application/json; charset=utf-8",
+            async: false,
             dataType: 'json',
             error : function() {
             },
@@ -1239,6 +1248,7 @@
                 url : '/api/projects',
                 type : 'GET',
                 contentType: "application/json; charset=utf-8",
+                async: false,
                 dataType: 'json',
                 error : function() {
                 },
@@ -1261,6 +1271,7 @@
             });
 
             refresh_services(project_id);
+            refresh_prepared_by_menu();
         } else {
             refresh_projects_card();
         }
@@ -1288,6 +1299,61 @@
             },
             success : function(data, textStatus, xhr) {
                 alter_success('您所提交的服务组已创建。页面将在3秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 3000);
+    }
+
+    function get_services_menu(services) {
+        var html = '<ul class="dropdown-menu" style="position: absolute; transform: translate3d(-80px, 0px, 0px); top: 0px; left: 0px; will-change: transform;">';
+        $.each(services, function(index, value) {
+            html += '<li><a href="javascript:;" onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().children()[0]).text());change_service(this);" data-service_id="' + value.id + '">' + value.name + '</a></li>';
+        });
+        html += '</ul>';
+        return html;
+    }
+
+    function refresh_prepared_by_menu() {
+        $.ajax({
+            url : '/api/projects',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            dataType: 'json',
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                var prepared_by_menu = $('.prepared-by > ul');
+                prepared_by_menu.empty();
+                $.each(data.data, function(k, v) {
+                    var html = '<li class="dropdown-submenu">';
+                    html += '<a href="javascript:;">' + v.name + '</a>';
+                    html += get_services_menu(v.services);
+                    html += '</li>';
+                    prepared_by_menu.append(html);
+                });
+            }
+        });
+    }
+
+    function change_service(me) {
+        var uuid = $('#instance_uuid').val();
+        var service_id = $(me).data('service_id');
+        $.ajax({
+            url : '/api/guest/' + uuid,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                service_id: service_id
+            }),
+            error : function() {
+                alter_danger('实例编制更新失败！');
+            },
+            success : function() {
+                alter_success('实例编制更新成功。页面将在3秒钟后自动跳转！');
             }
         });
 
@@ -1456,6 +1522,12 @@
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [1, 2] %} disabled {% endif %}">
                                     <a href="/guest/vnc/{{ item.uuid }}" target="_blank">远程连接</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="dropdown-submenu prepared-by">
+                                    <a href="javascript:;">变更编制</a>
+                                    <ul class="dropdown-menu" style="position: absolute; transform: translate3d(-80px, 0px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                    </ul>
                                 </li>
                                 <li class="divider"></li>
                                 <li class="">
