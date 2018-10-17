@@ -1056,8 +1056,8 @@
         });
     }
 
-    function exchange_disabled(status, set) {
-        if (status in set) {
+    function exchange_disabled_with_not(status, set) {
+        if (!(jQuery.inArray(status, set) >= 0)) {
             return 'disabled'
         }
     }
@@ -1095,35 +1095,35 @@
                     '<div class="dropdown inline-block">' +
                         '<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">更多</a>' +
                     '<ul class="dropdown-menu">' +
-                    '<li class="' + exchange_disabled(guest.status, [5, 6, 7]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [5, 6, 7]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#boot_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#boot_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
                             '启动' +
                         '</a>' +
                     '</li>' +
-                    '<li class="' + exchange_disabled(guest.status, [2]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [2]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#reboot_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#reboot_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
                             '重启' +
                         '</a>' +
                     '</li>' +
-                    '<li class="' + exchange_disabled(guest.status, [2]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [2]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#force_reboot_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#force_reboot_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
                             '强制重启' +
                         '</a>' +
                     '</li>' +
-                    '<li class="' + exchange_disabled(guest.status, [2]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [2]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#shutdown_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#shutdown_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
                             '停止' +
                         '</a>' +
                     '</li>' +
-                    '<li class="' + exchange_disabled(guest.status, [2]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [2]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#force_shutdown_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#force_shutdown_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
@@ -1140,14 +1140,14 @@
                         '</a>' +
                     '</li>' +
                     '<li class="divider"></li>' +
-                    '<li class="' + exchange_disabled(guest.status, [2]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [2]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#suspend_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#suspend_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
                             '暂停' +
                         '</a>' +
                     '</li>' +
-                    '<li class="' + exchange_disabled(guest.status, [4]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [4]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#resume_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#resume_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
@@ -1155,7 +1155,7 @@
                         '</a>' +
                     '</li>' +
                     '<li class="divider"></li>' +
-                    '<li class="' + exchange_disabled(guest.status, [1, 2]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [1, 2]) + '">' +
                         '<a href="/guest/vnc/' + guest.uuid+ '" target="_blank">远程连接</a>' +
                     '</li>' +
                     '<li class="divider"></li>' +
@@ -1172,25 +1172,25 @@
                             '分配带宽' +
                         '</a>' +
                     '</li>' +
-                    '<li class="' + exchange_disabled(guest.status, [6]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [6]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#adjust_ability_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#adjust_ability_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
                             '变更配置' +
                         '</a>' +
                     '<li class="divider"></li>' +
-                    '<li class="' + exchange_disabled(guest.status, [2]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [2]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"' +
                             'onclick="$(\'#reset_password_type\').val(\'single\')">密码重置</a>' +
                     '</li>' +
-                    '<li class="' + exchange_disabled(guest.status, [2, 4, 5, 6, 7]) + '">' +
+                    '<li class="' + exchange_disabled_with_not(guest.status, [2, 4, 5, 6, 7]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#migrate_modal"' +
                             'onclick="$(\'#migrate_type\').val(\'single\')">' +
                                 '迁移到' +
                         '</a>' +
                     '</li>' +
                     '<li class="divider"></li>' +
-                    '<li class=" ' + exchange_disabled(guest.status, [5, 6, 7, 255]) + '">' +
+                    '<li class=" ' + exchange_disabled_with_not(guest.status, [5, 6, 7, 255]) + '">' +
                         '<a href="javascript:;" data-toggle="modal" data-target="#delete_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());' +
                             '$(\'#delete_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent)">' +
