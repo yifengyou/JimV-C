@@ -111,7 +111,7 @@ add_rule_api(guest.blueprints, '/_migrate/<uuids>/<destination_host>', api_func=
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_get', methods=['GET'])
 add_rule_api(guest.blueprints, '', api_func='guest.r_get_by_filter', methods=['GET'])
 add_rule_api(guest.blueprints, '/_search', api_func='guest.r_content_search', methods=['GET'])
-add_rule_api(guest.blueprint, '/<uuid>', api_func='guest.r_update', methods=['PATCH'])
+add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_update', methods=['PATCH'])
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_delete', methods=['DELETE'])
 add_rule_api(guest.blueprints, '/_reset_password/<uuids>/<password>', api_func='guest.r_reset_password',
              methods=['PUT'])
@@ -120,6 +120,9 @@ add_rule_api(guest.blueprints, '/_allocate_bandwidth/<uuids>/<bandwidth>/<bandwi
              api_func='guest.r_allocate_bandwidth', methods=['PUT'])
 
 add_rule_api(guest.blueprints, '/_adjust_ability/<uuids>/<cpu>/<memory>', api_func='guest.r_adjust_ability',
+             methods=['PUT'])
+
+add_rule_api(guest.blueprints, '/_change_prepared_by/<uuids>/<service_id>', api_func='guest.r_change_prepared_by',
              methods=['PUT'])
 
 add_rule_api(guest.blueprints, '/_distribute_count', api_func='guest.r_distribute_count', methods=['GET'])

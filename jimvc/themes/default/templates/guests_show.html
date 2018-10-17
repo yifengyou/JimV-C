@@ -427,7 +427,7 @@
         var remark = $('#edit_remark').val();
         $('#edit_remark_modal').modal('hide');
         $.ajax({
-            url : '/api/guest/' + uuid,
+            url : '/api/guests/' + uuid,
             type : 'PATCH',
             contentType: "application/json; charset=utf-8",
             data : JSON.stringify({
@@ -671,6 +671,24 @@
         });
     }
 
+    function change_prepared_by(uuids, service_id) {
+        $.ajax({
+            url : '/api/guests/_change_prepared_by/' + uuids.join(',') + '/' + service_id,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例编制更新失败！');
+            },
+            success : function() {
+                alter_success('实例编制更新成功。页面将在3秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 3000);
+    }
+
     function boot_at(me) {
         var uuid = $('#instance_uuid').val();
         boot([uuid]);
@@ -752,9 +770,9 @@
     }
 
     function migrate_go() {
-        var migrate_type = $('#migrate_type').val();
+        var do_type = $('#migrate_type').val();
         var uuids = [];
-        if (migrate_type === 'single') {
+        if (do_type === 'single') {
             uuids = [$('#migrate_instance_uuid').val()];
         } else {
             uuids = get_checked_uuids();
@@ -765,9 +783,9 @@
     }
 
     function reset_password_go() {
-        var migrate_type = $('#reset_password_type').val();
+        var do_type = $('#reset_password_type').val();
         var uuids = [];
-        if (migrate_type === 'single') {
+        if (do_type === 'single') {
             uuids = [$('#reset_password_instance_uuid').val()];
         } else {
             uuids = get_checked_uuids();
@@ -775,6 +793,20 @@
         var password = $('#new_password').val();
         $('#reset_password_modal').modal('hide');
         reset_password([uuids], password);
+    }
+
+    function change_prepared_by_go(me) {
+        var do_type = $(me).data('do_type');
+        var service_id = $(me).data('service_id');
+        var uuids = [];
+
+        if (do_type === 'single') {
+            uuids = [$('#instance_uuid').val()];
+        } else {
+            uuids = get_checked_uuids();
+        }
+
+        change_prepared_by([uuids], service_id);
     }
 
     function get_selected_uuids() {
@@ -1310,7 +1342,16 @@
     function get_services_menu(services) {
         var html = '<ul class="dropdown-menu" style="position: absolute; transform: translate3d(-80px, 0px, 0px); top: 0px; left: 0px; will-change: transform;">';
         $.each(services, function(index, value) {
-            html += '<li><a href="javascript:;" onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().children()[0]).text());change_service(this);" data-service_id="' + value.id + '">' + value.name + '</a></li>';
+            html += '<li><a href="javascript:;" onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().children()[0]).text());change_prepared_by_go(this);" data-do_type="single" data-service_id="' + value.id + '">' + value.name + '</a></li>';
+        });
+        html += '</ul>';
+        return html;
+    }
+
+    function get_services_menu_for_bottom(services) {
+        var html = '<ul class="dropdown-menu">';
+        $.each(services, function(index, value) {
+            html += '<li><a href="javascript:;" onclick="change_prepared_by_go(this);" data-do_type="batch" data-service_id="' + value.id + '">' + value.name + '</a></li>';
         });
         html += '</ul>';
         return html;
@@ -1327,39 +1368,26 @@
             },
             success : function(data, textStatus, xhr) {
                 var prepared_by_menu = $('.prepared-by > ul');
+                var prepared_by_menu_bottom = $('.prepared-by-bottom > ul');
+
                 prepared_by_menu.empty();
+                prepared_by_menu_bottom.empty();
                 $.each(data.data, function(k, v) {
                     var html = '<li class="dropdown-submenu">';
+
                     html += '<a href="javascript:;">' + v.name + '</a>';
                     html += get_services_menu(v.services);
                     html += '</li>';
                     prepared_by_menu.append(html);
+
+                    var html_bottom = '<li class="dropdown-submenu">';
+                    html_bottom += '<a href="javascript:;">' + v.name + '</a>';
+                    html_bottom += get_services_menu_for_bottom(v.services);
+                    html_bottom += '</li>';
+                    prepared_by_menu_bottom.append(html_bottom);
                 });
             }
         });
-    }
-
-    function change_service(me) {
-        var uuid = $('#instance_uuid').val();
-        var service_id = $(me).data('service_id');
-        $.ajax({
-            url : '/api/guest/' + uuid,
-            type : 'PATCH',
-            contentType: "application/json; charset=utf-8",
-            data : JSON.stringify({
-                service_id: service_id
-            }),
-            error : function() {
-                alter_danger('实例编制更新失败！');
-            },
-            success : function() {
-                alter_success('实例编制更新成功。页面将在3秒钟后自动跳转！');
-            }
-        });
-
-        setTimeout(function() {
-            window.location.reload();
-        }, 3000);
     }
 </script>
 <div class="panel">
@@ -1604,6 +1632,12 @@
                                                    data-toggle="modal" data-target="#reset_password_modal">
                                                     密码重置
                                                 </a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li class="dropdown-submenu prepared-by-bottom">
+                                                <a href="javascript:;">变更编制</a>
+                                                <ul class="dropdown-menu">
+                                                </ul>
                                             </li>
                                             <li class="divider"></li>
                                             <li>

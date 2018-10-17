@@ -1246,10 +1246,14 @@ def r_distribute_count():
 
 
 @Utils.dumps2response
-def r_update(uuid):
+def r_update(uuids):
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = list()
 
     args_rules = [
-        Rules.UUID.value
+        Rules.UUIDS.value
     ]
 
     if 'remark' in request.json:
@@ -1257,33 +1261,29 @@ def r_update(uuid):
             Rules.REMARK.value,
         )
 
-    if 'service_id' in request.json:
-        args_rules.append(
-            Rules.SERVICE_ID.value,
-        )
-
     if args_rules.__len__() < 2:
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    request.json['uuid'] = uuid
+    request.json['uuids'] = uuids
 
     try:
         ji.Check.previewing(args_rules, request.json)
         guest = Guest()
-        guest.uuid = uuid
-        guest.get_by('uuid')
+        # 检测所指定的 UUDIs 实例都存在
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
 
-        guest.remark = request.json.get('remark', guest.label)
-        guest.service_id = request.json.get('service_id', guest.service_id)
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+            guest.remark = request.json.get('remark', guest.remark)
 
-        guest.update()
-        guest.get()
+            guest.update()
+            guest.get()
 
-        ret = dict()
-        ret['state'] = ji.Common.exchange_state(20000)
-        ret['data'] = guest.__dict__
+            ret['data'].append(guest.__dict__)
+
         return ret
     except ji.PreviewingError, e:
         return json.loads(e.message)
@@ -1463,6 +1463,44 @@ def r_adjust_ability(uuids, cpu, memory):
             }
 
             Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_change_prepared_by(uuids, service_id):
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = list()
+
+    args_rules = [
+        Rules.UUIDS.value,
+        Rules.SERVICE_ID_IN_URL.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'service_id': service_id})
+
+        guest = Guest()
+
+        # 检测所指定的 UUDIs 实例都存在
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+            guest.service_id = int(service_id)
+
+            guest.update()
+            guest.get()
+
+            ret['data'].append(guest.__dict__)
 
         return ret
 

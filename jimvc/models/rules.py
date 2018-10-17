@@ -126,4 +126,5 @@ class Rules(Enum):
     PROJECT_ID = (int, 'project_id')
     PROJECTS_ID = (REG_NUMBERS, 'projects_id')
     SERVICE_ID = (int, 'service_id')
+    SERVICE_ID_IN_URL = (REG_NUMBER, 'service_id')
     SERVICES_ID = (REG_NUMBERS, 'services_id')
