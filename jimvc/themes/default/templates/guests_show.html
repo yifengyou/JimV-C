@@ -131,6 +131,18 @@
         .table-bordered-project-service > tbody > tr {
             height: 70px;
         }
+
+        .project_edit_icon {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            right: 20px;
+            border-radius: 0;
+            color: #666666;
+        }
+        .project_edit_icon:hover {
+            color: #0a0a0a;
+        }
     </style>
 
 {% endblock head %}
@@ -213,6 +225,17 @@
             $('#edit_remark_instance_uuid').val($(me.relatedTarget).parent().parent().prev().prev().text());
             $('#edit_remark').val($(me.relatedTarget).prev().text());
         });
+
+        $('#service_label_edit_name_modal').on('show.bs.modal', function (me) {
+            $('#service_id').val($(me.relatedTarget).parent().data('service_id'));
+            $('#service_label_edit_name').val($(me.relatedTarget).parent().text().trim());
+        });
+
+        $('#project_edit_desc_modal').on('show.bs.modal', function (me) {
+            $('#project_id').val($(me.relatedTarget).parent().data('project_id'));
+            $('#project_edit_desc').val($(me.relatedTarget).parent().text().trim());
+        });
+
 
         $('#migrate_host').chosen({
             "disable_search": true
@@ -422,6 +445,38 @@
         $(me).find(".edit_remark_trigger").css('display','none');
     }
 
+    function service_label_onmouseover(me) {
+        $(me).find(".service_label_edit_name_trigger").css('display','inline-flex');
+        $(me).find(".service_delete_trigger").css('display','inline-flex');
+    }
+
+    function service_label_onmouseout(me) {
+        $(me).find(".service_label_edit_name_trigger").css('display','none');
+        $(me).find(".service_delete_trigger").css('display','none');
+    }
+
+    function project_card_onmouseover(me) {
+        $(me).find(".project_edit_icon").css('display','unset');
+    }
+
+    function project_card_onmouseout(me) {
+        $(me).find(".project_edit_icon").css('display','none');
+    }
+
+    function project_edit_name(event, me) {
+        event.stopPropagation();
+        $('#project_id').val($(me).parent().data('project_id'));
+        $('#project_edit_name').val($(me).parent().text().trim());
+        $('#project_edit_name_modal').modal('show');
+    }
+
+    function project_delete(event, me) {
+        event.stopPropagation();
+        $('#project_id').val($(me).parent().data('project_id'));
+        $('#delete_project_desc').text($(me).parent().text().trim());
+        $('#project_delete_modal').modal('show');
+    }
+
     function remark_update(me) {
         var uuid = $('#edit_remark_instance_uuid').val();
         var remark = $('#edit_remark').val();
@@ -441,6 +496,78 @@
                 alter_success('实例备注更新成功！');
             }
         });
+    }
+
+    function service_name_update(me) {
+        var _id = $('#service_id').val();
+        var name = $('#service_label_edit_name').val();
+        $('#service_label_edit_name_modal').modal('hide');
+        $.ajax({
+            url : '/api/service/' + _id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                name: name
+            }),
+            error : function() {
+                alter_danger('服务组名称更新失败！');
+            },
+            success : function() {
+                alter_success('服务组名称更新成功。页面将在1秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
+    }
+
+    function project_desc_update(me) {
+        var _id = $('#project_id').val();
+        var desc = $('#project_edit_desc').val();
+        $('#project_edit_desc_modal').modal('hide');
+        $.ajax({
+            url : '/api/project/' + _id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                description: desc
+            }),
+            error : function() {
+                alter_danger('项目描述更新失败！');
+            },
+            success : function() {
+                alter_success('项目描述更新成功。页面将在1秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
+    }
+
+    function project_name_update(me) {
+        var _id = $('#project_id').val();
+        var name = $('#project_edit_name').val();
+        $('#project_edit_name_modal').modal('hide');
+        $.ajax({
+            url : '/api/project/' + _id,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                name: name
+            }),
+            error : function() {
+                alter_danger('项目名称更新失败！');
+            },
+            success : function() {
+                alter_success('项目名称更新成功。页面将在1秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
     }
 
     function get_selected_element(checked) {
@@ -680,13 +807,49 @@
                 alter_danger('实例编制更新失败！');
             },
             success : function() {
-                alter_success('实例编制更新成功。页面将在3秒钟后自动跳转！');
+                alter_success('实例编制更新成功。页面将在1秒钟后自动跳转！');
             }
         });
 
         setTimeout(function() {
             window.location.reload();
-        }, 3000);
+        }, 1000);
+    }
+
+    function delete_service(ids) {
+        $.ajax({
+            url : '/api/services/' + ids.join(','),
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('服务组删除指令发送失败！');
+            },
+            success : function() {
+                alter_success('服务组删除成功。页面将在1秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
+    }
+
+    function delete_project(ids) {
+        $.ajax({
+            url : '/api/projects/' + ids.join(','),
+            type : 'DELETE',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('项目删除指令发送失败！');
+            },
+            success : function() {
+                alter_success('项目删除成功。页面将在1秒钟后自动跳转！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 1000);
     }
 
     function boot_at(me) {
@@ -767,6 +930,18 @@
         var uuid = $('#instance_uuid').val();
         remove([uuid]);
         $('#delete_modal').modal('hide');
+    }
+
+    function delete_service_at(me) {
+        var _id = $('#service_id').val();
+        delete_service([_id]);
+        $('#service_delete_modal').modal('hide');
+    }
+
+    function delete_project_at(me) {
+        var _id = $('#project_id').val();
+        delete_project([_id]);
+        $('#project_delete_modal').modal('hide');
     }
 
     function migrate_go() {
@@ -1020,13 +1195,13 @@
                 alter_danger(data.responseText);
             },
             success : function(data, textStatus, xhr) {
-                alter_success('您所提交的项目已创建。页面将在3秒钟后自动跳转！');
+                alter_success('您所提交的项目已创建。页面将在1秒钟后自动跳转！');
             }
         });
 
         setTimeout(function() {
             window.location.reload();
-        }, 3000);
+        }, 1000);
     }
 
     function go_into_project(me) {
@@ -1049,7 +1224,11 @@
                 $('#projects_card').empty();
                 $.each(data.data, function(k, v) {
                     $('#projects_card').append(
-                        '<a class="project" href="javascript:;" onclick="go_into_project(this);" data-project_id="' + v['id'] + '"><span class="project_name">' + v['name'] + '</span></a>'
+                        '<a class="project" onmouseover="project_card_onmouseover(this);" onmouseout="project_card_onmouseout(this);" href="javascript:;" onclick="go_into_project(this);" data-project_id="' + v['id'] + '">' +
+                        '   <span class="project_name">' + v['name'] + '</span>' +
+                        '   <span class="glyph-icon icon-elusive-pencil project_edit_icon" onclick="project_edit_name(event, this);" style="top: 30px; display: none;"></span>' +
+                        '   <span class="glyph-icon icon-elusive-trash project_edit_icon" onclick="project_delete(event, this);" style="top: 60px; display: none;"></span>' +
+                        '</a>'
                     );
                 });
             }
@@ -1237,7 +1416,26 @@
             },
             success : function(data, textStatus, xhr) {
                 $('#project_desc').css('display', 'unset');
-                $('#project_desc').text(data.data['description']);
+                $('#project_desc').data('project_id', data.data.id);
+                $('#project_desc').mouseover(function () {
+                    $(this).find('a').css('display', 'inline-flex');
+                });
+                $('#project_desc').mouseout(function () {
+                    $(this).find('a').css('display', 'none');
+                });
+
+                var project_desc = data.data['description'];
+                if (project_desc.length > 0) {
+                    $('#project_desc').text(project_desc);
+                } else {
+                    $('#project_desc').html('&nbsp;&nbsp;&nbsp;&nbsp;');
+                }
+
+                $('#project_desc').append(
+                    '<a href="javascript:;" class="project_edit_desc_trigger" data-toggle="modal" data-target="#project_edit_desc_modal" style="display: none;">' +
+                    '    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; font-size: 13px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>' +
+                    '</a>');
+
                 $('#project_services').append(
                     '<div id="service_tool_bar" class="row" style="padding: 10px 10px 10px 0; width: 100%; display: unset;">' +
                     '    <div class="col-sm-12" style="padding-right: 0;">' +
@@ -1249,7 +1447,13 @@
                 );
 
                 $.each(data.data.services, function(k, v) {
-                    var html = '<div class="project-service-name">' + v['name'] + '</div>' +
+                    var html = '<div class="project-service-name" data-service_id="' + v.id + '" onmouseover="service_label_onmouseover(this);" onmouseout="service_label_onmouseout(this);">' + v.name +
+                        '<a href="javascript:;" class="service_label_edit_name_trigger" data-toggle="modal" data-target="#service_label_edit_name_modal" style="display: none;">' +
+                        '    <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; font-size: 13px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>' +
+                        '</a>' +
+                        '<a href="javascript:;" class="service_delete_trigger" data-toggle="modal" data-target="#service_delete_modal" style="display: none;" onclick="$(\'#service_id\').val($(this).parent().data(\'service_id\'));$(\'#delete_service_desc\').text($(this).parent().text())">' +
+                        '    <span class="glyph-icon icon-elusive-trash" style="width: 20px; height: 20px; font-size: 13px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>' +
+                        '</a></div>' +
                         '<div>' +
                         '    <table class="table-hover table-bordered-project-service guest_list" cellspacing="0" width="100%" role="grid"' +
                         '           style="width: 100%; margin-bottom: 4px; border-bottom-width: 0;">' +
@@ -1330,13 +1534,13 @@
                 alter_danger(data.responseText);
             },
             success : function(data, textStatus, xhr) {
-                alter_success('您所提交的服务组已创建。页面将在3秒钟后自动跳转！');
+                alter_success('您所提交的服务组已创建。页面将在1秒钟后自动跳转！');
             }
         });
 
         setTimeout(function() {
             window.location.reload();
-        }, 3000);
+        }, 1000);
     }
 
     function get_services_menu(services) {
@@ -1848,6 +2052,8 @@
 </div>
 
 <input id="instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+<input id="service_id" title="服务组 ID" class="form-control" name="id" hidden>
+<input id="project_id" title="项目 ID" class="form-control" name="id" hidden>
 
 <div class="modal" id="delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog">
@@ -2391,6 +2597,93 @@
             </div>
             <div class="modal-footer">
                 <button id="batch_adjust_ability_form_button" type="button" class="btn btn-sm btn-primary" onclick="batch_adjust_ability();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="service_label_edit_name_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑服务组名称：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="service_label_edit_name" title="服务组名称" class="form-control" name="name">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="service_name_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="service_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除服务组：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除该服务组吗？</p>
+                <h3 style="color: orangered;" id="delete_service_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_service_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="project_edit_desc_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑项目描述：</h4>
+            </div>
+            <div class="modal-body">
+                <textarea id="project_edit_desc" title="项目描述" class="form-control" name="desc"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="project_desc_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="project_edit_name_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑项目名称：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="project_edit_name" title="项目名称" class="form-control" name="name">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="project_name_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="project_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除项目：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除该项目吗？</p>
+                <h3 style="color: orangered;" id="delete_project_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="delete_project_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

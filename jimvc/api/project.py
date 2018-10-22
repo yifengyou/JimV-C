@@ -9,6 +9,7 @@ from flask import request
 
 from jimvc.api.base import Base
 from jimvc.models import Utils
+from jimvc.models import Guest
 from jimvc.models import Rules
 from jimvc.models import Project
 from jimvc.models import Service
@@ -224,6 +225,7 @@ def r_delete(ids):
         ji.Check.previewing(args_rules, {'ids': ids})
 
         project = Project()
+        service = Service()
 
         # 检测所指定的 项目 都存在
         for _id in ids.split(','):
@@ -232,6 +234,27 @@ def r_delete(ids):
 
         # 执行删除操作
         for _id in ids.split(','):
+            if int(_id) == 1:
+                # 默认项目不允许被删除
+                continue
+
+            services_id = list()
+            rows, _ = Service.get_by_filter(filter_str=':'.join(['project_id', 'eq', _id]))
+
+            for row in rows:
+                services_id.append(row['id'])
+
+            if services_id.__len__() > 0:
+                Guest.update_by_filter(
+                    {'service_id': 1},
+                    filter_str=':'.join(['service_id', 'in',
+                                         ','.join(service_id.__str__() for service_id in services_id)]))
+
+            for service_id in services_id:
+                service.id = service_id
+                service.get()
+                service.delete()
+
             project.id = int(_id)
             project.get()
             project.delete()

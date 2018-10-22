@@ -9,6 +9,7 @@ from flask import request
 
 from jimvc.api.base import Base
 from jimvc.models import Utils
+from jimvc.models import Guest
 from jimvc.models import Rules
 from jimvc.models import Service
 
@@ -154,6 +155,11 @@ def r_delete(ids):
 
         # 执行删除操作
         for _id in ids.split(','):
+            if int(_id) == 1:
+                # 默认服务组不允许被删除
+                continue
+
+            Guest.update_by_filter({'service_id': 1}, filter_str='service_id:eq:' + _id)
             service.id = int(_id)
             service.get()
             service.delete()
