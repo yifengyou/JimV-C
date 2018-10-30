@@ -794,8 +794,8 @@ def r_migrate(uuids, destination_host):
 
             # 忽略宕机计算节点 上面的 虚拟机 迁移请求
             # 忽略目标计算节点 等于 当前所在 计算节点 的虚拟机 迁移请求
-            if guest.node_id not in available_hosts_mapping_by_node_id or \
-                    available_hosts_mapping_by_node_id[guest.node_id]['hostname'] == destination_host:
+            if guest.node_id.__str__() not in available_hosts_mapping_by_node_id or \
+                    available_hosts_mapping_by_node_id[guest.node_id.__str__()]['hostname'] == destination_host:
                 continue
 
             message = {
