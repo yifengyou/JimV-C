@@ -2,7 +2,7 @@ Flask==1.0.2
 mysql-connector-python-rf==2.2.2
 enum34==1.1.6
 jimit==0.63
-requests==2.19.1
+requests==2.20.0
 PyJWT==1.6.4
 Flask-Session==0.3.1
 IPy==0.83

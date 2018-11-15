@@ -162,8 +162,16 @@
         });
 
         $('#update_logo_modal').on('show.bs.modal', function (me) {
-            $('#os_template_image_id').val($(me.relatedTarget).parent().parent().prev().prev().prev().prev().prev().text());
-            $('#update_logo_instance_desc').text($(me.relatedTarget).parent().parent().prev().prev().prev().text());
+            var os_template_image_id = $(me.relatedTarget).parent().parent().prev().prev().prev().prev().prev().text();
+            var update_logo_instance_desc = $(me.relatedTarget).parent().parent().prev().prev().prev().text();
+
+            if (os_template_image_id === "") {
+                os_template_image_id = $(me.relatedTarget).parent().parent().prev().prev().prev().prev().prev().prev().text();
+                update_logo_instance_desc = $(me.relatedTarget).parent().parent().prev().prev().prev().prev().text();
+            }
+
+            $('#os_template_image_id').val(os_template_image_id);
+            $('#update_logo_instance_desc').text(update_logo_instance_desc);
         });
 
         $('#add_os_template_image_form').formValidation({
