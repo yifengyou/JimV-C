@@ -42,6 +42,7 @@ class Init(object):
         'upstream_queue': 'Q:Upstream',
         'ipc_queue': 'Q:IPC',
         'hosts_info': 'H:HostsInfo',
+        'global_lock': 'H:GlobalLock',
         'compute_nodes_of_allocation_by_nonrandom': 'S:ComputeNodesOfAllocationByNonrandom',
         'guest_boot_jobs': 'S:GuestBootJobs',
         'guest_boot_jobs_wait_time': 600,

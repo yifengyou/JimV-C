@@ -35,13 +35,20 @@ try:
         # 父进程退出时，会清理所有提前退出的子进程的环境。所以这里无需对子进程做等待操作。
         # 即：即使子进程提前退出，且因父进程没有做wait处理，使其变成了僵尸进程。但当父进程退出时，会对因其所产生的僵尸进程做统一清理操作。
 
-        t_ = threading.Thread(target=EventProcessor.launch, args=())
-        threads.append(t_)
+        from jimvc.models import Database as db
+
+        if db.r.hincrby(app.config['global_lock'], 'EventProcessor') == 1:
+            # 避免该进程奔溃，重启后无法再次启动如下线程。故对该 key 设定 10 秒生存周期。
+            # 即 10 秒钟后奔溃，被 gunicorn 重启后的进程，依然可以启动如下线程。
+            db.r.expire(app.config['global_lock'], 10)
+
+            t_ = threading.Thread(target=EventProcessor.launch, args=())
+            threads.append(t_)
+
+            t_ = threading.Thread(target=Init.clear_expire_monitor_log, args=())
+            threads.append(t_)
 
         t_ = threading.Thread(target=Init.pub_sub_ping_pong, args=())
-        threads.append(t_)
-
-        t_ = threading.Thread(target=Init.clear_expire_monitor_log, args=())
         threads.append(t_)
 
         for t in threads:

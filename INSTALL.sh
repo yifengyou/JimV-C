@@ -73,7 +73,7 @@ function check_precondition() {
     source /etc/os-release
     case ${ID} in
     centos|fedora|rhel)
-        if [ ${VERSION_ID} -lt 7 ]; then
+        if [[ ${VERSION_ID} -lt 7 ]]; then
             echo "System version must greater than or equal to 7, We found ${VERSION_ID}."
 	        exit 1
         fi
@@ -91,7 +91,7 @@ function ensure_hosts_layout() {
     echo
     read -p "您已经布局好 /etc/hosts 了吗 [Y/N]? " answer
 
-    if [  "x_"${answer} != "x_Y" ] && [ "x_"${answer} != "x_y" ]; then
+    if [[  "x_"${answer} != "x_Y" ]] && [[ "x_"${answer} != "x_y" ]]; then
         echo "OK, good bye!";
         exit 0
     fi
@@ -126,32 +126,32 @@ function sync_hosts_file() {
 
 function prepare() {
 
-    if [ ! ${JIMV_VERSION} ] || [ ${#JIMV_VERSION} -eq 0 ]; then
+    if [[ ! ${JIMV_VERSION} ]] || [[ ${#JIMV_VERSION} -eq 0 ]]; then
         export JIMV_VERSION='master'
     fi
 
-    if [ ! -e ${GENERATE_PASSWORD_SCRIPT_TMP_PATH} ]; then
+    if [[ ! -e ${GENERATE_PASSWORD_SCRIPT_TMP_PATH} ]]; then
         curl ${JIMVC_REPOSITORY_RAW_URL}'/'${JIMV_VERSION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
         chmod +x ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
     fi
 
-    if [ ! ${RDB_ROOT_PSWD} ] || [ ${#RDB_ROOT_PSWD} -eq 0 ]; then
+    if [[ ! ${RDB_ROOT_PSWD} ]] || [[ ${#RDB_ROOT_PSWD} -eq 0 ]]; then
         export RDB_ROOT_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH}`
     fi
 
-    if [ ! ${RDB_JIMV_PSWD} ] || [ ${#RDB_JIMV_PSWD} -eq 0 ]; then
+    if [[ ! ${RDB_JIMV_PSWD} ]] || [[ ${#RDB_JIMV_PSWD} -eq 0 ]]; then
         export RDB_JIMV_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH}`
     fi
 
-    if [ ! ${REDIS_PSWD} ] || [ ${#REDIS_PSWD} -eq 0 ]; then
+    if [[ ! ${REDIS_PSWD} ]] || [[ ${#REDIS_PSWD} -eq 0 ]]; then
         export REDIS_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
     fi
 
-    if [ ! ${JWT_SECRET} ] || [ ${#JWT_SECRET} -eq 0 ]; then
+    if [[ ! ${JWT_SECRET} ]] || [[ ${#JWT_SECRET} -eq 0 ]]; then
         export JWT_SECRET=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
     fi
 
-    if [ ! ${SECRET_KEY} ] || [ ${#SECRET_KEY} -eq 0 ]; then
+    if [[ ! ${SECRET_KEY} ]] || [[ ${#SECRET_KEY} -eq 0 ]]; then
         export SECRET_KEY=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
     fi
 

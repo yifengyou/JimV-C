@@ -23,7 +23,7 @@ if not os.path.isdir(log_file_dir):
 
 
 bind = _config['listen'] + ':' + _config['port'].__str__()
-workers = multiprocessing.cpu_count() * 2 + 1
+workers = 8 if multiprocessing.cpu_count() > 4 else multiprocessing.cpu_count() * 2 + 1
 worker_class = 'gevent'
 worker_connections = 1000
 daemon = False

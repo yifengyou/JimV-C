@@ -23,7 +23,7 @@ ALTER TABLE user ADD INDEX (mobile_phone);
 ALTER TABLE user ADD INDEX (email);
 INSERT INTO user (login_name, password, create_time) VALUES
     ('admin', 'ji_pbkdf2$sha1$1000$b8UzawEs5kJ68TmbqQEqD07jgZGCYJsa$d3593420edee742499a974f2f377e5b220927dc7', UNIX_TIMESTAMP(NOW()) * 1000000);
-# password jimv.pswd.com
+# password pswd.jimv.cn
 
 
 CREATE TABLE IF NOT EXISTS guest(
@@ -548,6 +548,8 @@ INSERT INTO os_template_profile (label, description, os_type, os_distro, os_majo
 VALUES ('CentOS-7.4', 'CentOS 7.4。', 'linux', 'centos', 7, 4, 'x86_64', 'CentOS Linux release 7.4.1708 (Core)', 1, 'icon-os icon-os-centos', 1);
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('CentOS-6.8', 'CentOS 6.8。', 'linux', 'centos', 6, 8, 'x86_64', 'CentOS release 6.8 (Final)', 1, 'icon-os icon-os-centos', 2);
+INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
+VALUES ('CentOS-6.10', 'CentOS 6.10。', 'linux', 'centos', 6, 10, 'x86_64', 'CentOS release 6.10 (Final)', 1, 'icon-os icon-os-centos', 2);
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('Gentoo-2.2', 'Gentoo 2.2。', 'linux', 'gentoo', 2, 2, 'x86_64', 'Gentoo Base System release 2.2', 1, 'icon-os icon-os-gentoo', 3);
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)

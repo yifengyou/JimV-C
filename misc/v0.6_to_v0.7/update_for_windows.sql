@@ -13,6 +13,8 @@ shutdown -r -t 0
 @ping 127.0.0.1 -n 2 > NUL', '');
 
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
+VALUES ('CentOS-6.10', 'CentOS 6.10。', 'linux', 'centos', 6, 10, 'x86_64', 'CentOS release 6.10 (Final)', 1, 'icon-os icon-os-centos', 2);
+INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('Windows-2016-Standard', 'Windows 2016 Standard。', 'windows', 'windows', 10, 0, 'x86_64', 'Windows Server 2016 Standard', 1, 'icon-os icon-os-windows', 5);
 INSERT INTO os_template_profile (label, description, os_type, os_distro, os_major, os_minor, os_arch, os_product_name, active, icon, os_template_initialize_operate_set_id)
 VALUES ('Windows-2008-R2-Enterprise', 'Windows 2008 R2 Enterprise。', 'windows', 'windows', 6, 1, 'x86_64', 'Windows Server 2008 R2 Enterprise', 1, 'icon-os icon-os-windows', 5);
