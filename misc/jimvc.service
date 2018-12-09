@@ -20,6 +20,8 @@ ExecStartPre=-/usr/bin/chown -R www.www /tmp/jimv
 ExecStartPre=-/usr/bin/chown -R www.www /var/log/nginx
 ExecStartPre=-/usr/bin/chown -R www.www /var/lib/nginx
 PermissionsStartOnly=true
+#工作目录
+WorkingDirectory=/usr/share/jimv/controller/
 #命令行(必须使用绝对路径)
 ExecStart=/usr/bin/gunicorn -c /usr/share/jimv/controller/gunicorn_config.pyc main:app
 #启动或者停止服务最大允许花费60秒
