@@ -14,10 +14,6 @@
 #   bash -c "$(curl -fsSL https://raw.githubusercontent.com/jamesiter/JimV-C/dev/INSTALL.sh)" -- --version dev
 
 export PYPI='https://mirrors.aliyun.com/pypi/simple/'
-export JIMVC_REPOSITORY_RAW_URL='https://raw.githubusercontent.com/jamesiter/JimV-C'
-export JIMVC_DOWNLOAD_URL='https://github.com/jamesiter/JimV-C/archive/master.tar.gz'
-export JIMVC_PATH='/usr/local/JimV-C'
-export GENERATE_PASSWORD_SCRIPT_TMP_PATH='/tmp/gen_pswd.sh'
 export SMTP_HOST=''
 export SMTP_USER=''
 export SMTP_PASSWORD=''
@@ -130,37 +126,7 @@ function prepare() {
         export JIMV_VERSION='master'
     fi
 
-    if [[ ! -e ${GENERATE_PASSWORD_SCRIPT_TMP_PATH} ]]; then
-        curl ${JIMVC_REPOSITORY_RAW_URL}'/'${JIMV_VERSION}'/misc/gen_pswd.sh' -o ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
-        chmod +x ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
-    fi
-
-    if [[ ! ${RDB_ROOT_PSWD} ]] || [[ ${#RDB_ROOT_PSWD} -eq 0 ]]; then
-        export RDB_ROOT_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH}`
-    fi
-
-    if [[ ! ${RDB_JIMV_PSWD} ]] || [[ ${#RDB_JIMV_PSWD} -eq 0 ]]; then
-        export RDB_JIMV_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH}`
-    fi
-
-    if [[ ! ${REDIS_PSWD} ]] || [[ ${#REDIS_PSWD} -eq 0 ]]; then
-        export REDIS_PSWD=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
-    fi
-
-    if [[ ! ${JWT_SECRET} ]] || [[ ${#JWT_SECRET} -eq 0 ]]; then
-        export JWT_SECRET=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
-    fi
-
-    if [[ ! ${SECRET_KEY} ]] || [[ ${#SECRET_KEY} -eq 0 ]]; then
-        export SECRET_KEY=`${GENERATE_PASSWORD_SCRIPT_TMP_PATH} 128`
-    fi
-
-    rm -f ${GENERATE_PASSWORD_SCRIPT_TMP_PATH}
-
     yum install epel-release -y
-    yum install python2-pip git psmisc -y
-    pip install --upgrade pip -i ${PYPI}
-    pip install virtualenv -i ${PYPI}
 }
 
 function set_ntp() {
@@ -181,6 +147,47 @@ function clear_up_environment() {
     sed -i 's@SELINUX=enforcing@SELINUX=disabled@g' /etc/sysconfig/selinux
     sed -i 's@SELINUX=enforcing@SELINUX=disabled@g' /etc/selinux/config
     setenforce 0
+}
+
+function install_JimVC() {
+    cat > /etc/yum.repos.d/JimV.repo << EOF
+[JimV]
+name=JimV - \$basearch
+baseurl=http://repo.iit.im/centos/7/os/\$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+EOF
+    yum install jimv-controller -y
+}
+
+function generate_passwords() {
+    export GENERATE_PASSWORD_SCRIPT='/usr/bin/gen_pswd.sh'
+
+    if [[ ! ${RDB_ROOT_PSWD} ]] || [[ ${#RDB_ROOT_PSWD} -eq 0 ]]; then
+        export RDB_ROOT_PSWD=`${GENERATE_PASSWORD_SCRIPT}`
+    fi
+
+    if [[ ! ${RDB_JIMV_PSWD} ]] || [[ ${#RDB_JIMV_PSWD} -eq 0 ]]; then
+        export RDB_JIMV_PSWD=`${GENERATE_PASSWORD_SCRIPT}`
+    fi
+
+    if [[ ! ${REDIS_PSWD} ]] || [[ ${#REDIS_PSWD} -eq 0 ]]; then
+        export REDIS_PSWD=`${GENERATE_PASSWORD_SCRIPT} 128`
+    fi
+
+    if [[ ! ${JWT_SECRET} ]] || [[ ${#JWT_SECRET} -eq 0 ]]; then
+        export JWT_SECRET=`${GENERATE_PASSWORD_SCRIPT} 128`
+    fi
+
+    if [[ ! ${SECRET_KEY} ]] || [[ ${#SECRET_KEY} -eq 0 ]]; then
+        export SECRET_KEY=`${GENERATE_PASSWORD_SCRIPT} 128`
+    fi
+}
+
+function create_web_user() {
+    useradd -M www
 }
 
 function install_MariaDB() {
@@ -228,7 +235,6 @@ function install_Redis() {
     sysctl -p
     sed -i 's@^daemonize no@daemonize yes@g' /etc/redis.conf
     sed -i 's@^bind 127.0.0.1@bind 0.0.0.0@g' /etc/redis.conf
-    sed -i 's@^appendonly no@appendonly yes@g' /etc/redis.conf
     echo "requirepass ${REDIS_PSWD}" >> /etc/redis.conf
 
     # 启动并使其随机启动
@@ -254,48 +260,18 @@ function install_Nginx() {
     systemctl start nginx.service
 }
 
-function create_web_user() {
-    useradd -M www
-}
-
-function get_JimVC() {
-    mkdir -p ${JIMVC_PATH}
-    curl -sL ${JIMVC_DOWNLOAD_URL} | tar -zxf - --strip-components 1 -C ${JIMVC_PATH}
-}
-
-function install_dependencies_library() {
-    mkdir -p ~/.pip
-    cat > ~/.pip/pip.conf << EOF
-[global]
-index-url = ${PYPI}
-EOF
-
-    # 创建 python 虚拟环境
-    virtualenv --system-site-packages /usr/local/venv-jimv
-
-    # 导入 python 虚拟环境
-    source /usr/local/venv-jimv/bin/activate
-
-    # 自动导入 python 虚拟环境
-    echo '. /usr/local/venv-jimv/bin/activate' >> ~/.bashrc
-
-    # 安装 JimV-C 所需扩展库
-    grep -v "^#" ${JIMVC_PATH}/requirements.txt | xargs -n 1 pip install -i ${PYPI}
-}
-
 function initialization_db() {
     # 建立 JimV 数据库专属用户
     mysql -u root -p${RDB_ROOT_PSWD} -e "grant all on jimv.* to jimv@localhost identified by \"${RDB_JIMV_PSWD}\"; flush privileges"
 
     # 初始化数据库
-    mysql -u jimv -p${RDB_JIMV_PSWD} < ${JIMVC_PATH}/misc/init.sql
+    mysql -u jimv -p${RDB_JIMV_PSWD} < /usr/share/jimv/controller/misc/init.sql
 
     # 确认是否初始化成功
     mysql -u jimv -p${RDB_JIMV_PSWD} -e 'show databases'
 }
 
 function generate_config_file() {
-    cp -v ${JIMVC_PATH}/jimvc.conf /etc/jimvc.conf
     sed -i "s/\"db_password\".*$/\"db_password\": \"${RDB_JIMV_PSWD}\",/" /etc/jimvc.conf
     sed -i "s/\"redis_password\".*$/\"redis_password\": \"${REDIS_PSWD}\",/" /etc/jimvc.conf
     sed -i "s/\"jwt_secret\".*$/\"jwt_secret\": \"${JWT_SECRET}\",/" /etc/jimvc.conf
@@ -303,9 +279,6 @@ function generate_config_file() {
     sed -i "s/\"smtp_host\".*$/\"smtp_host\": \"${SMTP_HOST}\",/" /etc/jimvc.conf
     sed -i "s/\"smtp_user\".*$/\"smtp_user\": \"${SMTP_USER}\",/" /etc/jimvc.conf
     sed -i "s/\"smtp_password\".*$/\"smtp_password\": \"${SMTP_PASSWORD}\",/" /etc/jimvc.conf
-
-    cp -v /usr/local/JimV-C/misc/jimvc.service /etc/systemd/system/jimvc.service
-    systemctl daemon-reload
 }
 
 function start_JimVC() {
@@ -345,11 +318,11 @@ function deploy() {
     prepare
     set_ntp
     create_web_user
-    get_JimVC
+    install_JimVC
+    generate_passwords
     install_MariaDB
     install_Redis
     install_Nginx
-    install_dependencies_library
     initialization_db
     generate_config_file
     start_JimVC
