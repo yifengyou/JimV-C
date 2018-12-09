@@ -129,15 +129,6 @@ function prepare() {
     yum install epel-release -y
 }
 
-function set_ntp() {
-    yum install ntp -y
-    systemctl start ntpd
-    systemctl enable ntpd
-    timedatectl set-timezone Asia/Shanghai
-    timedatectl set-ntp true
-    timedatectl status
-}
-
 function clear_up_environment() {
     systemctl stop firewalld
     systemctl disable firewalld
@@ -243,8 +234,6 @@ function install_Redis() {
 }
 
 function install_Nginx() {
-    export NGINX_JIMV_URL=${JIMVC_REPOSITORY_RAW_URL}'/'${JIMV_VERSION}'/misc/nginx_jimv.conf'
-
     # 安装 Nginx
     yum install nginx -y
 
@@ -253,7 +242,7 @@ function install_Nginx() {
     chown -R www.www /var/lib/nginx
     sed -i 's@user nginx.*$@user www;@' /etc/nginx/nginx.conf
     sed -i '/^.*server {/,$d' /etc/nginx/nginx.conf
-    curl ${NGINX_JIMV_URL} >> /etc/nginx/nginx.conf
+    cat /usr/share/jimv/controller/misc/nginx_jimv.conf >> /etc/nginx/nginx.conf
 
     # 启动并使其随机启动
     systemctl enable nginx.service
@@ -316,7 +305,6 @@ function deploy() {
     sync_ssh_key_pair
     sync_hosts_file
     prepare
-    set_ntp
     create_web_user
     install_JimVC
     generate_passwords
