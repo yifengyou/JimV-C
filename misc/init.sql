@@ -448,6 +448,24 @@ ALTER TABLE service ADD INDEX (project_id);
 ALTER TABLE service ADD INDEX (name);
 
 
+CREATE TABLE IF NOT EXISTS ip_pool(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    start_ip CHAR(15) NOT NULL,
+    end_ip CHAR(15) NOT NULL,
+    netmask CHAR(15) NOT NULL,
+    gateway CHAR(15) NOT NULL,
+    dns1 CHAR(15) NOT NULL DEFAULT '223.5.5.5',
+    dns2 CHAR(15) NOT NULL DEFAULT '8.8.8.8',
+    name VARCHAR(127) NOT NULL,
+    description TEXT,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE ip_pools ADD INDEX (name);
+
+
 INSERT INTO project (name, description, create_time) VALUES ('我的项目', '由 JimV 创建的默认项目。', UNIX_TIMESTAMP(NOW()) * 1000000);
 INSERT INTO service (project_id, name, description, create_time) VALUES (1, '服务组', '由 JimV 创建的默认服务组。', UNIX_TIMESTAMP(NOW()) * 1000000);
 
