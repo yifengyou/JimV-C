@@ -22,7 +22,7 @@ ALTER TABLE user ADD INDEX (login_name);
 ALTER TABLE user ADD INDEX (mobile_phone);
 ALTER TABLE user ADD INDEX (email);
 INSERT INTO user (login_name, password, create_time) VALUES
-    ('admin', 'ji_pbkdf2$sha1$1000$b8UzawEs5kJ68TmbqQEqD07jgZGCYJsa$d3593420edee742499a974f2f377e5b220927dc7', UNIX_TIMESTAMP(NOW()) * 1000000);
+    ('admin', 'ji_pbkdf2$sha1$1000$OckmCbiakJE67a1TOCyC3IzbWdJXOJyC$619e967c9b3fe5c8d3c1b03c093ce40e6dc73f3c', UNIX_TIMESTAMP(NOW()) * 1000000);
 # password pswd.jimv.cn
 
 
