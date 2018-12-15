@@ -31,13 +31,15 @@ class IPPool(ORM):
         self.dns1 = ''
         self.dns2 = ''
         self.name = ''
+        self.activity = 0
         self.description = ''
         self.create_time = ji.Common.tus()
 
     @staticmethod
     def get_filter_keywords():
         return {
-            'remark': FilterFieldType.STR.value
+            'name': FilterFieldType.STR.value,
+            'activity': FilterFieldType.INT.value
         }
 
     @staticmethod

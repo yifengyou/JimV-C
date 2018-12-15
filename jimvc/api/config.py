@@ -35,13 +35,6 @@ def r_create():
         Rules.STORAGE_PATH.value,
         Rules.VM_NETWORK.value,
         Rules.VM_MANAGE_NETWORK.value,
-        Rules.START_IP.value,
-        Rules.END_IP.value,
-        Rules.START_VNC_PORT.value,
-        Rules.NETMASK.value,
-        Rules.GATEWAY.value,
-        Rules.DNS1.value,
-        Rules.DNS2.value,
         Rules.IOPS_BASE.value,
         Rules.IOPS_PRE_UNIT.value,
         Rules.IOPS_CAP.value,
@@ -62,13 +55,6 @@ def r_create():
     config.storage_path = request.json.get('storage_path')
     config.vm_network = request.json.get('vm_network')
     config.vm_manage_network = request.json.get('vm_manage_network')
-    config.start_ip = request.json.get('start_ip')
-    config.end_ip = request.json.get('end_ip')
-    config.start_vnc_port = int(request.json.get('start_vnc_port', 15900))
-    config.netmask = request.json.get('netmask')
-    config.gateway = request.json.get('gateway')
-    config.dns1 = request.json.get('dns1')
-    config.dns2 = request.json.get('dns2')
     config.iops_base = int(request.json.get('iops_base', 1000))
     config.iops_pre_unit = int(request.json.get('iops_pre_unit', 1))
     config.iops_cap = int(request.json.get('iops_cap', 2000))
@@ -94,9 +80,6 @@ def r_create():
             ret['state'] = ji.Common.exchange_state(40901)
             return ret
 
-        config.check_ip()
-        config.generate_available_ip2set()
-        config.generate_available_vnc_port()
         config.create()
         config.update_global_config()
 
@@ -146,41 +129,6 @@ def r_update():
             Rules.VM_MANAGE_NETWORK.value,
         )
 
-    if 'start_ip' in request.json:
-        args_rules.append(
-            Rules.START_IP.value,
-        )
-
-    if 'end_ip' in request.json:
-        args_rules.append(
-            Rules.END_IP.value,
-        )
-
-    if 'start_vnc_port' in request.json:
-        args_rules.append(
-            Rules.START_VNC_PORT.value,
-        )
-
-    if 'netmask' in request.json:
-        args_rules.append(
-            Rules.NETMASK.value,
-        )
-
-    if 'gateway' in request.json:
-        args_rules.append(
-            Rules.GATEWAY.value,
-        )
-
-    if 'dns1' in request.json:
-        args_rules.append(
-            Rules.DNS1.value,
-        )
-
-    if 'dns2' in request.json:
-        args_rules.append(
-            Rules.DNS2.value,
-        )
-
     if args_rules.__len__() < 1:
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -197,17 +145,7 @@ def r_update():
         config.storage_path = request.json.get('storage_path', config.storage_path)
         config.vm_network = request.json.get('vm_network', config.vm_network)
         config.vm_manage_network = request.json.get('vm_manage_network', config.vm_manage_network)
-        config.start_ip = request.json.get('start_ip', config.start_ip)
-        config.end_ip = request.json.get('end_ip', config.end_ip)
-        config.start_vnc_port = int(request.json.get('start_vnc_port', config.start_vnc_port))
-        config.netmask = request.json.get('netmask', config.netmask)
-        config.gateway = request.json.get('gateway', config.gateway)
-        config.dns1 = request.json.get('dns1', config.dns1)
-        config.dns2 = request.json.get('dns2', config.dns2)
 
-        config.check_ip()
-        config.generate_available_ip2set()
-        config.generate_available_vnc_port()
         config.update()
         config.update_global_config()
 

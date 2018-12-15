@@ -456,6 +456,7 @@ CREATE TABLE IF NOT EXISTS ip_pool(
     gateway CHAR(15) NOT NULL,
     dns1 CHAR(15) NOT NULL DEFAULT '223.5.5.5',
     dns2 CHAR(15) NOT NULL DEFAULT '8.8.8.8',
+    activity TINYINT UNSIGNED NOT NULL DEFAULT 0,
     name VARCHAR(127) NOT NULL,
     description TEXT,
     create_time BIGINT UNSIGNED NOT NULL,

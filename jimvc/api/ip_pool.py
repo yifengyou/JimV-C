@@ -45,6 +45,7 @@ def r_create():
         Rules.GATEWAY.value,
         Rules.DNS1.value,
         Rules.DNS2.value,
+        Rules.ACTIVITY.value,
         Rules.NAME.value,
         Rules.DESCRIPTION.value
     ]
@@ -56,6 +57,7 @@ def r_create():
     ip_pool.gateway = request.json.get('gateway')
     ip_pool.dns1 = request.json.get('dns1')
     ip_pool.dns2 = request.json.get('dns2')
+    ip_pool.activity = request.json.get('activity')
     ip_pool.name = request.json.get('name', '')
     ip_pool.description = request.json.get('description', '')
 
@@ -66,6 +68,11 @@ def r_create():
         ret['state'] = ji.Common.exchange_state(20000)
 
         ip_pool.check_ip()
+
+        if ip_pool.activity:
+            # 如果新创建或被更新的 IP 池为活跃状态，则更新其它 IP 池为非活跃状态
+            IPPool.update_by_filter({'activity': 0}, filter_str='id:gt:0')
+
         ip_pool.create()
 
         ip_pool.get()
@@ -116,6 +123,11 @@ def r_update(ids):
             Rules.DNS2.value,
         )
 
+    if 'activity' in request.json:
+        args_rules.append(
+            Rules.ACTIVITY.value,
+        )
+
     if 'name' in request.json:
         args_rules.append(
             Rules.NAME.value,
@@ -150,10 +162,16 @@ def r_update(ids):
             ip_pool.gateway = request.json.get('gateway', ip_pool.gateway)
             ip_pool.dns1 = request.json.get('dns1', ip_pool.dns1)
             ip_pool.dns2 = request.json.get('dns2', ip_pool.dns2)
+            ip_pool.activity = request.json.get('activity', ip_pool.activity)
             ip_pool.name = request.json.get('name', ip_pool.name)
             ip_pool.description = request.json.get('description', ip_pool.description)
 
             ip_pool.check_ip()
+
+            if ip_pool.activity:
+                # 如果新创建或被更新的 IP 池为活跃状态，则更新其它 IP 池为非活跃状态
+                IPPool.update_by_filter({'activity': 0}, filter_str='id:gt:0')
+
             ip_pool.update()
             ip_pool.get()
 
