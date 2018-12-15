@@ -198,13 +198,6 @@ CREATE TABLE IF NOT EXISTS config(
     storage_path VARCHAR(255) NOT NULL,
     vm_network VARCHAR(255) NOT NULL,
     vm_manage_network VARCHAR(255) NOT NULL,
-    start_ip CHAR(15) NOT NULL,
-    end_ip CHAR(15) NOT NULL,
-    start_vnc_port INT UNSIGNED NOT NULL,
-    netmask CHAR(15) NOT NULL,
-    gateway CHAR(15) NOT NULL,
-    dns1 CHAR(15) NOT NULL DEFAULT '223.5.5.5',
-    dns2 CHAR(15) NOT NULL DEFAULT '8.8.8.8',
     iops_base BIGINT UNSIGNED NOT NULL DEFAULT 0,
     iops_pre_unit BIGINT UNSIGNED NOT NULL DEFAULT 0,
     iops_cap BIGINT UNSIGNED NOT NULL DEFAULT 0,
@@ -464,7 +457,7 @@ CREATE TABLE IF NOT EXISTS ip_pool(
     ENGINE=Innodb
     DEFAULT CHARSET=utf8;
 
-ALTER TABLE ip_pools ADD INDEX (name);
+ALTER TABLE ip_pool ADD INDEX (name);
 
 
 INSERT INTO project (name, description, create_time) VALUES ('我的项目', '由 JimV 创建的默认项目。', UNIX_TIMESTAMP(NOW()) * 1000000);
