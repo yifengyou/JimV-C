@@ -102,6 +102,10 @@ from guest_performance import (
     GuestDiskIO
 )
 
+from ip_pool import (
+    IPPool
+)
+
 from host import (
     Host
 )
@@ -138,6 +142,6 @@ __all__ = [
     'OSTemplateInitializeOperate', 'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO',
     'HostCPUMemory', 'HostTraffic', 'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping', 'OSTemplateImageKind',
     'GuestMigrateInfo', 'GuestCollectionPerformanceDataKind', 'HostCollectionPerformanceDataKind', 'StorageMode',
-    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service'
+    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service', 'IPPool'
 ]
 

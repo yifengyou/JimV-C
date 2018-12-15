@@ -35,6 +35,7 @@ class ORM(object):
         cursor = cnx.cursor(dictionary=True, buffered=True)
         try:
             cursor.execute(sql_stmt, self.__dict__)
+            self.__setattr__(self._primary_key, cursor.lastrowid)
             cnx.commit()
         except errors.IntegrityError, e:
             ret = dict()

@@ -52,6 +52,8 @@ from jimvc.api.guest import blueprints as guest_blueprints
 from jimvc.api.disk import blueprint as disk_blueprint
 from jimvc.api.disk import blueprints as disk_blueprints
 from jimvc.api.config import blueprint as config_blueprint
+from jimvc.api.ip_pool import blueprint as ip_pool_blueprint
+from jimvc.api.ip_pool import blueprints as ip_pool_blueprints
 from jimvc.api.log import blueprint as log_blueprint
 from jimvc.api.log import blueprints as log_blueprints
 from jimvc.api.host import blueprint as host_blueprint
@@ -261,6 +263,8 @@ try:
     app.register_blueprint(disk_blueprint)
     app.register_blueprint(disk_blueprints)
     app.register_blueprint(config_blueprint)
+    app.register_blueprint(ip_pool_blueprint)
+    app.register_blueprint(ip_pool_blueprints)
     app.register_blueprint(log_blueprint)
     app.register_blueprint(log_blueprints)
     app.register_blueprint(host_blueprint)

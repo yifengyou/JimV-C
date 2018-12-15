@@ -53,6 +53,7 @@ class EventProcessor(object):
                     full_message='' if cls.message['message'].__len__() < 255 else cls.message['message'])
 
         cls.log.create()
+        pass
 
     @classmethod
     def guest_event_processor(cls):

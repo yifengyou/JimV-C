@@ -4,6 +4,7 @@
 
 from jimvc.models import add_rule_api
 from jimvc.api import config
+from jimvc.api import ip_pool
 from jimvc.api import os_template_profile
 from jimvc.api import snapshot
 from jimvc.api import os_template_initialize_operate
@@ -37,6 +38,14 @@ add_rule_api(about.blueprint, '', api_func='about.r_get', methods=['GET'])
 add_rule_api(config.blueprint, '', api_func='config.r_update', methods=['PATCH'])
 add_rule_api(config.blueprint, '/_quota', api_func='config.r_update_quota', methods=['PATCH'])
 add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
+
+# IP 池操作
+add_rule_api(ip_pool.blueprint, '', api_func='ip_pool.r_create', methods=['POST'])
+add_rule_api(ip_pool.blueprints, '/<ids>', api_func='ip_pool.r_update', methods=['PATCH'])
+add_rule_api(ip_pool.blueprints, '/<ids>', api_func='ip_pool.r_delete', methods=['DELETE'])
+add_rule_api(ip_pool.blueprints, '/<ids>', api_func='ip_pool.r_get', methods=['GET'])
+add_rule_api(ip_pool.blueprints, '', api_func='ip_pool.r_get_by_filter', methods=['GET'])
+add_rule_api(ip_pool.blueprints, '/_search', api_func='ip_pool.r_content_search', methods=['GET'])
 
 # JimV 配置操作
 add_rule_api(dashboard.blueprint, '/_show', api_func='dashboard.r_show', methods=['GET'])
