@@ -24,6 +24,11 @@
         .form-control {
             border-radius: 0;
         }
+
+        .bootstrap-switch-handle-on {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
     </style>
 {% endblock head %}
 {% block content %}
@@ -47,6 +52,13 @@
             });
 
             register_iops_bps_event();
+            refresh_ip_pools();
+
+            $('input.input-switch[name="activity"]').on('switchChange.bootstrapSwitch', function(event, state) {
+                console.log(this); // DOM element
+                console.log(event); // jQuery event
+                console.log(state); // true | false
+            });
         });
 
         function refresh() {
@@ -57,10 +69,13 @@
             $(me).parent().parent().children().removeClass('active');
             $(me).parent().addClass('active');
 
-            $('#jimv_system_config, #quota, #auxiliary').css('display', 'none');
+            $('#jimv_system_config, #quota, #ip_pool, #auxiliary').css('display', 'none');
 
             if (me.id === 'quota_label') {
                 $('#quota').css('display', 'unset');
+
+            } else if (me.id === 'ip_pool_label') {
+                $('#ip_pool').css('display', 'unset');
 
             } else if (me.id === 'auxiliary_label') {
                 $('#auxiliary').css('display', 'unset');
@@ -252,11 +267,159 @@
             });
         }
 
+        function exchange_ip_pool_for_panel(ip_pool) {
+            return '<div class="panel">\n' +
+                '    <div class="panel-body">\n' +
+                '        <form class="form-horizontal bordered-row" style="padding-left: 8%;">\n' +
+                '            <div class="form-group">\n' +
+                '                <label class="col-sm-2 control-label">起始 IP</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <input title="起始 IP" class="form-control" name="start_ip" type="text" value="' + ip_pool.start_ip + '">\n' +
+                '                </div>\n' +
+                '                <label class="col-sm-2 control-label">截止 IP</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <input title="截止 IP" class="form-control" name="end_ip" type="text" value="' + ip_pool.end_ip + '">\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="form-group">\n' +
+                '                <label class="col-sm-2 control-label">子网掩码</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <input title="子网掩码" class="form-control" name="netmask" type="text" value="' + ip_pool.netmask + '">\n' +
+                '                </div>\n' +
+                '                <label class="col-sm-2 control-label">网关</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <input title="网关" class="form-control" name="gateway" type="text" value="' + ip_pool.gateway + '">\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="form-group">\n' +
+                '                <label class="col-sm-2 control-label">DNS1</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <input title="DNS1" class="form-control" name="dns1" type="text" value="' + ip_pool.dns1 + '">\n' +
+                '                </div>\n' +
+                '                <label class="col-sm-2 control-label">DNS2</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <input title="DNS2" class="form-control" name="dns2" type="text" value="' + ip_pool.dns2 + '">\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="form-group">\n' +
+                '                <label class="col-sm-2 control-label">名称</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <input title="名称" class="form-control" name="start_vnc_port" type="text" value="' + ip_pool.name + '">\n' +
+                '                </div>\n' +
+                '                <label class="col-sm-2 control-label">备注</label>\n' +
+                '                <div class="col-sm-3">\n' +
+                '                    <textarea title="备注" class="form-control" name="start_vnc_port">'+ip_pool.description+'</textarea>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="form-group" style="margin-bottom: 0;">\n' +
+                '                <div class="col-sm-6">\n' +
+                '                    <input type="checkbox" name="activity" data-on-color="info" class="input-switch" checked data-size="medium" data-on-text="活跃" data-off-text="非活跃">\n' +
+                '                </div>\n' +
+                '                <div class="col-sm-6">\n' +
+                '                    <div style="padding: 0; text-align: right;">\n' +
+                '                        <button type="button" class="btn btn-sm btn-primary" style="right: 10%;" onclick="update_ip_pool(this);">更新</button>\n' +
+                '                        <button type="button" class="btn btn-sm btn-danger" style="right: 4%;" onclick="delete_ip_pool(this);">删除</button>\n' +
+                '                    </div>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '        </form>\n' +
+                '    </div>\n' +
+                '</div>';
+        }
+
+
+        function get_ip_pools_html() {
+            var html = '<div class="row" style="padding: 10px 10px 10px 0; width: 100%;">\n' +
+                '    <div class="col-sm-12" style="padding-right: 0;">\n' +
+                '        <div class="pull-right">\n' +
+                '            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_ip_pool_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加 IP 池</a>\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</div>';
+
+            $.ajax({
+                url : '/api/ip_pools',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                async: false,
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    $.each(data.data, function(k, v) {
+                        html += exchange_ip_pool_for_panel(v);
+                    });
+                }
+            });
+            return html
+        }
+
+        function refresh_ip_pools() {
+            var html = get_ip_pools_html();
+            $('#ip_pool').append(html);
+        }
+
+        function get_ip_pool_field_value(me, name) {
+            return $(me).parent().parent().parent().parent().serializeArray().filter(
+                function(field) {return field.name == name})[0].value;
+        }
+
+        function update_ip_pool(me) {
+            var start_ip = get_ip_pool_field_value(me, 'start_ip');
+            console.log(start_ip);
+        }
+
+        function create_ip_pool(me) {
+            $('#add_ip_pool_modal').modal('hide');
+
+            var start_ip = get_ip_pool_field_value(me, 'start_ip');
+            var end_ip = get_ip_pool_field_value(me, 'end_ip');
+            var netmask = get_ip_pool_field_value(me, 'netmask');
+            var gateway = get_ip_pool_field_value(me, 'gateway');
+            var dns1 = get_ip_pool_field_value(me, 'dns1');
+            var dns2 = get_ip_pool_field_value(me, 'dns2');
+            var name = get_ip_pool_field_value(me, 'name');
+            var description = get_ip_pool_field_value(me, 'description');
+            var activity = $('#activity').prop('checked');
+
+            var data = {
+                start_ip: start_ip,
+                end_ip: end_ip,
+                netmask: netmask,
+                gateway: gateway,
+                dns1: dns1,
+                dns2: dns2,
+                name: name,
+                description: description,
+                activity: activity
+            };
+
+            $.ajax({
+                url : '/api/ip_pool',
+                type : 'POST',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                dataType: "json",
+                data : JSON.stringify(data),
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('添加 IP 池失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    alter_success('您所提交的 IP 池已创建。页面将在3秒钟后自动跳转到 IP 池列表页面！');
+                }
+            });
+
+            setTimeout(function() {
+                window.location.reload();
+            }, 3000);
+        }
     </script>
     <div class="panel">
         <div class="panel-body">
             <ul class="nav nav-tabs mrg25B">
                 <li class="active"><a href="javascript:;" onclick="select_this(this);" id="jimv_system_config_label">JimV 系统配置</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="ip_pool_label">IP 池</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="quota_label">性能配额</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="auxiliary_label">辅助</a></li>
             </ul>
@@ -270,42 +433,6 @@
                         <label class="col-sm-2 control-label">网桥(管理网络)</label>
                         <div class="col-sm-3">
                             <input title="Guest 管理网络" class="form-control" name="vm_manage_network" type="text" disabled value="{{ config.vm_manage_network }}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">起始 IP</label>
-                        <div class="col-sm-3">
-                            <input title="起始 IP" class="form-control" name="start_ip" type="text" disabled value="{{ config.start_ip }}">
-                        </div>
-                        <label class="col-sm-2 control-label">截止 IP</label>
-                        <div class="col-sm-3">
-                            <input title="截止 IP" class="form-control" name="end_ip" type="text" disabled value="{{ config.end_ip }}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">子网掩码</label>
-                        <div class="col-sm-3">
-                            <input title="子网掩码" class="form-control" name="netmask" type="text" disabled value="{{ config.netmask }}">
-                        </div>
-                        <label class="col-sm-2 control-label">网关</label>
-                        <div class="col-sm-3">
-                            <input title="网关" class="form-control" name="gateway" type="text" disabled value="{{ config.gateway }}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">DNS1</label>
-                        <div class="col-sm-3">
-                            <input title="DNS1" class="form-control" name="dns1" type="text" disabled value="{{ config.dns1 }}">
-                        </div>
-                        <label class="col-sm-2 control-label">DNS2</label>
-                        <div class="col-sm-3">
-                            <input title="DNS2" class="form-control" name="dns2" type="text" disabled value="{{ config.dns2 }}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">起始 VNC 端口</label>
-                        <div class="col-sm-3">
-                            <input title="起始 VNC 端口" class="form-control" name="start_vnc_port" type="text" disabled value="{{ config.start_vnc_port }}">
                         </div>
                     </div>
                     <div class="form-group">
@@ -425,6 +552,8 @@
                     </div>
                 </form>
             </div>
+            <div id="ip_pool" class="example-box-wrapper" style="display: none;">
+            </div>
             <div id="auxiliary" class="example-box-wrapper" style="display: none;">
                 <form class="form-horizontal bordered-row" style="padding-left: 8%;">
                     <div class="form-group" style="margin-bottom: 0;">
@@ -436,4 +565,76 @@
             </div>
         </div>
     </div>
+
+<div class="modal" id="add_ip_pool_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">添加 IP 池：</h4>
+            </div>
+            <div class="panel">
+                <div class="panel-body">
+                    <form class="form-horizontal bordered-row" style="padding-left: 16%;">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">起始 IP</label>
+                            <div class="col-sm-3">
+                                <input title="起始 IP" class="form-control" name="start_ip" type="text">
+                            </div>
+                            <label class="col-sm-2 control-label">截止 IP</label>
+                            <div class="col-sm-3">
+                                <input title="截止 IP" class="form-control" name="end_ip" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">子网掩码</label>
+                            <div class="col-sm-3">
+                                <input title="子网掩码" class="form-control" name="netmask" type="text">
+                            </div>
+                            <label class="col-sm-2 control-label">网关</label>
+                            <div class="col-sm-3">
+                                <input title="网关" class="form-control" name="gateway" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">DNS1</label>
+                            <div class="col-sm-3">
+                                <input title="DNS1" class="form-control" name="dns1" type="text">
+                            </div>
+                            <label class="col-sm-2 control-label">DNS2</label>
+                            <div class="col-sm-3">
+                                <input title="DNS2" class="form-control" name="dns2" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">名称</label>
+                            <div class="col-sm-3">
+                                <input title="名称" class="form-control" name="name" type="text">
+                            </div>
+                            <label class="col-sm-2 control-label">备注</label>
+                            <div class="col-sm-3">
+                                <textarea title="备注" class="form-control" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <div class="col-sm-6">
+                                <div class="checkbox checkbox-info">
+                                    <label>
+                                        <input id="activity" name="activity" type="checkbox" checked class="custom-checkbox">
+                                        设为默认
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div style="padding: 0; text-align: right;">
+                                    <button type="button" class="btn btn-sm btn-primary" style="right: 20%;" onclick="create_ip_pool(this);">创建</button>
+                                    <button type="button" class="btn btn-sm btn-default" style="right: 10%;" data-dismiss="modal">取消</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

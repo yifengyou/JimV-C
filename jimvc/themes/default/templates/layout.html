@@ -461,8 +461,14 @@
         <!-- Superclick -->
         <script type="text/javascript" src="{{ theme_static('widgets/superclick/superclick.js') }}"></script>
         <!-- Input switch alternate -->
+        <script type="text/javascript" src="{{ theme_static('widgets/input-switch/inputswitch.js') }}"></script>
         <script type="text/javascript" src="{{ theme_static('widgets/input-switch/inputswitch-alt.js') }}"></script>
         <script type="text/javascript" src="{{ theme_static('widgets/ionrangeslider/ionrangeslider.js') }}"></script>
+        <script type="text/javascript">
+            $(function() { "use strict";
+                $('.input-switch').bootstrapSwitch();
+            });
+        </script>
         <!-- Bootstrap Wizard -->
         <!--<script type="text/javascript" src="{{ theme_static('widgets/wizard/wizard.js') }}"></script>
         <script type="text/javascript" src="{{ theme_static('widgets/wizard/wizard-demo.js') }}"></script>-->
@@ -491,6 +497,10 @@
         <!-- Chosen -->
         <script type="text/javascript" src="{{ theme_static('widgets/chosen/chosen.js') }}"></script>
         <script type="text/javascript" src="{{ theme_static('widgets/chosen/chosen-demo.js') }}"></script>
+        <!-- Uniform -->
+        <script type="text/javascript" src="{{ theme_static('widgets/uniform/uniform.js') }}"></script>
+        <script type="text/javascript" src="{{ theme_static('widgets/uniform/uniform-demo.js') }}"></script>
+
         <!-- Touchspin -->
         <script type="text/javascript" src="{{ theme_static('widgets/touchspin/touchspin.js') }}"></script>
         <script type="text/javascript" src="{{ theme_static('js-core/echarts.min.js') }}"></script>
