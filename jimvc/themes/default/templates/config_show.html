@@ -58,11 +58,14 @@
                 console.log(this); // DOM element
                 console.log(event); // jQuery event
                 console.log(state); // true | false
+                if (state) {
+                    put_ip_pool_activity($(this).data('id'));
+                }
             });
         });
 
         function refresh() {
-            window.location.href=window.location.pathname;
+            window.location.reload();
         }
 
         function select_this(me) {
@@ -268,6 +271,11 @@
         }
 
         function exchange_ip_pool_for_panel(ip_pool) {
+            var activity_checked = '';
+            if (ip_pool.activity > 0) {
+                activity_checked = 'checked';
+            }
+
             return '<div class="panel">\n' +
                 '    <div class="panel-body">\n' +
                 '        <form class="form-horizontal bordered-row" style="padding-left: 8%;">\n' +
@@ -313,7 +321,7 @@
                 '            </div>\n' +
                 '            <div class="form-group" style="margin-bottom: 0;">\n' +
                 '                <div class="col-sm-6">\n' +
-                '                    <input type="checkbox" name="activity" data-on-color="info" class="input-switch" checked data-size="medium" data-on-text="活跃" data-off-text="非活跃">\n' +
+                '                    <input type="checkbox" name="activity" data-on-color="info" class="input-switch" data-id="' + ip_pool.id + '" ' + activity_checked + ' data-size="medium" data-on-text="活跃" data-off-text="非活跃">\n' +
                 '                </div>\n' +
                 '                <div class="col-sm-6">\n' +
                 '                    <div style="padding: 0; text-align: right;">\n' +
@@ -332,6 +340,7 @@
             var html = '<div class="row" style="padding: 10px 10px 10px 0; width: 100%;">\n' +
                 '    <div class="col-sm-12" style="padding-right: 0;">\n' +
                 '        <div class="pull-right">\n' +
+                '            <button class="btn btn-default" onclick="window.location.reload();" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>\n' +
                 '            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_ip_pool_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加 IP 池</a>\n' +
                 '        </div>\n' +
                 '    </div>\n' +
@@ -407,6 +416,26 @@
                 },
                 success : function(data, textStatus, xhr) {
                     alter_success('您所提交的 IP 池已创建。页面将在3秒钟后自动跳转到 IP 池列表页面！');
+                }
+            });
+
+            setTimeout(function() {
+                window.location.reload();
+            }, 3000);
+        }
+        
+        function put_ip_pool_activity(id) {
+            $.ajax({
+                url : '/api/ip_pool/' + String(id),
+                type : 'PUT',
+                async: false,
+                dataType: "json",
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('IP 池激活失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    alter_success('IP 池激活成功！');
                 }
             });
 

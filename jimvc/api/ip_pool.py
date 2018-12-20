@@ -183,6 +183,42 @@ def r_update(ids):
 
 
 @Utils.dumps2response
+def r_activity(_id):
+
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+    ret['data'] = list()
+
+    args_rules = [
+        Rules.ID.value
+    ]
+
+    if args_rules.__len__() < 1:
+        return ret
+
+    try:
+        ji.Check.previewing(args_rules, {'id': _id})
+
+        ip_pool = IPPool()
+        ip_pool.id = _id
+        ip_pool.get()
+
+        ip_pool.activity = 1
+
+        # 如果新创建或被更新的 IP 池为活跃状态，则更新其它 IP 池为非活跃状态
+        IPPool.update_by_filter({'activity': 0}, filter_str='id:gt:0')
+
+        ip_pool.update()
+        ip_pool.get()
+
+        ret['data'].append(ip_pool.__dict__)
+
+        return ret
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
 def r_get(ids):
     return ip_pool_base.get(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 

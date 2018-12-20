@@ -38,13 +38,14 @@ class IPPool(ORM):
     @staticmethod
     def get_filter_keywords():
         return {
+            'id': FilterFieldType.INT.value,
             'name': FilterFieldType.STR.value,
             'activity': FilterFieldType.INT.value
         }
 
     @staticmethod
     def get_allow_update_keywords():
-        return []
+        return ['activity']
 
     @staticmethod
     def get_allow_content_search_keywords():

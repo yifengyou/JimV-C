@@ -46,6 +46,7 @@ add_rule_api(ip_pool.blueprints, '/<ids>', api_func='ip_pool.r_delete', methods=
 add_rule_api(ip_pool.blueprints, '/<ids>', api_func='ip_pool.r_get', methods=['GET'])
 add_rule_api(ip_pool.blueprints, '', api_func='ip_pool.r_get_by_filter', methods=['GET'])
 add_rule_api(ip_pool.blueprints, '/_search', api_func='ip_pool.r_content_search', methods=['GET'])
+add_rule_api(ip_pool.blueprint, '/<_id>', api_func='ip_pool.r_activity', methods=['PUT'])
 
 # JimV 配置操作
 add_rule_api(dashboard.blueprint, '/_show', api_func='dashboard.r_show', methods=['GET'])
