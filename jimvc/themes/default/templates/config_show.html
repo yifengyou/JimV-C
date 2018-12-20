@@ -279,6 +279,7 @@
             return '<div class="panel">\n' +
                 '    <div class="panel-body">\n' +
                 '        <form class="form-horizontal bordered-row" style="padding-left: 8%;">\n' +
+                '            <input title="IP Pool ID" class="form-control" name="id" type="text" value="' + ip_pool.id + '" hidden>\n' +
                 '            <div class="form-group">\n' +
                 '                <label class="col-sm-2 control-label">起始 IP</label>\n' +
                 '                <div class="col-sm-3">\n' +
@@ -312,11 +313,11 @@
                 '            <div class="form-group">\n' +
                 '                <label class="col-sm-2 control-label">名称</label>\n' +
                 '                <div class="col-sm-3">\n' +
-                '                    <input title="名称" class="form-control" name="start_vnc_port" type="text" value="' + ip_pool.name + '">\n' +
+                '                    <input title="名称" class="form-control" name="name" type="text" value="' + ip_pool.name + '">\n' +
                 '                </div>\n' +
                 '                <label class="col-sm-2 control-label">备注</label>\n' +
                 '                <div class="col-sm-3">\n' +
-                '                    <textarea title="备注" class="form-control" name="start_vnc_port">'+ip_pool.description+'</textarea>\n' +
+                '                    <textarea title="备注" class="form-control" name="description">'+ip_pool.description+'</textarea>\n' +
                 '                </div>\n' +
                 '            </div>\n' +
                 '            <div class="form-group" style="margin-bottom: 0;">\n' +
@@ -325,7 +326,7 @@
                 '                </div>\n' +
                 '                <div class="col-sm-6">\n' +
                 '                    <div style="padding: 0; text-align: right;">\n' +
-                '                        <button type="button" class="btn btn-sm btn-primary" style="right: 10%;" onclick="update_ip_pool(this);">更新</button>\n' +
+                '                        <button type="button" class="btn btn-sm btn-primary" style="right: 10%;" data-id="' + ip_pool.id + '" onclick="update_ip_pool(this);">更新</button>\n' +
                 '                        <button type="button" class="btn btn-sm btn-danger" style="right: 4%;" onclick="delete_ip_pool(this);">删除</button>\n' +
                 '                    </div>\n' +
                 '                </div>\n' +
@@ -374,8 +375,46 @@
         }
 
         function update_ip_pool(me) {
+            var id = get_ip_pool_field_value(me, 'id');
             var start_ip = get_ip_pool_field_value(me, 'start_ip');
-            console.log(start_ip);
+            var end_ip = get_ip_pool_field_value(me, 'end_ip');
+            var netmask = get_ip_pool_field_value(me, 'netmask');
+            var gateway = get_ip_pool_field_value(me, 'gateway');
+            var dns1 = get_ip_pool_field_value(me, 'dns1');
+            var dns2 = get_ip_pool_field_value(me, 'dns2');
+            var name = get_ip_pool_field_value(me, 'name');
+            var description = get_ip_pool_field_value(me, 'description');
+
+            var data = {
+                start_ip: start_ip,
+                end_ip: end_ip,
+                netmask: netmask,
+                gateway: gateway,
+                dns1: dns1,
+                dns2: dns2,
+                name: name,
+                description: description
+            };
+
+            $.ajax({
+                url : '/api/ip_pools/' + String(id),
+                type : 'PATCH',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                dataType: "json",
+                data : JSON.stringify(data),
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('更新 IP 池失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    alter_success('更新 IP 池成功！');
+                }
+            });
+
+            setTimeout(function() {
+                window.location.reload();
+            }, 3000);
         }
 
         function create_ip_pool(me) {
