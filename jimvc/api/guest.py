@@ -16,7 +16,10 @@ from flask import Blueprint, url_for, request
 
 from jimvc.api.base import Base
 from jimvc.models.initialize import dev_table
-from jimvc.models import app_config, GuestState, Service
+from jimvc.models import app_config
+from jimvc.models import GuestState
+from jimvc.models import Service
+from jimvc.models import IPPool
 from jimvc.models import DiskState, Host
 from jimvc.models import Database as db
 from jimvc.models import Config
@@ -116,10 +119,6 @@ def r_create():
                 filter_str='os_template_initialize_operate_set_id:eq:' +
                            os_template_profile.os_template_initialize_operate_set_id.__str__())
 
-        if db.r.scard(app_config['ip_available_set']) < 1:
-            ret['state'] = ji.Common.exchange_state(50350)
-            return ret
-
         node_id = request.json.get('node_id', None)
 
         # 默认只取可随机分配虚拟机的 hosts
@@ -184,6 +183,28 @@ def r_create():
 
         quantity = request.json.get('quantity')
 
+        occupied_ips = list()
+        occupied_vnc_ports = list()
+
+        rows, count = Guest.get_all()
+
+        for row in rows:
+            occupied_ips.append(row['ip'])
+            occupied_vnc_ports.append(row['vnc_port'])
+
+        rows, count = IPPool.get_by_filter(filter_str=':'.join(['activity', 'eq', '1']))
+        if count < 1:
+            ret['state'] = ji.Common.exchange_state(50350)
+            return ret
+
+        ip_pool = IPPool()
+        ip_pool.id = rows[0]['id']
+        ip_pool.get()
+        assert isinstance(ip_pool, IPPool)
+
+        guest_ip_generator = ip_pool.ip_generator(occupied_ips=occupied_ips)
+        guest_vnc_port_generator = ip_pool.vnc_port_generator(occupied_vnc_ports=occupied_vnc_ports)
+
         while quantity:
             quantity -= 1
             guest = Guest()
@@ -200,15 +221,11 @@ def r_create():
             if guest.password is None or guest.password.__len__() < 1:
                 guest.password = ji.Common.generate_random_code(length=16)
 
-            guest.ip = db.r.spop(app_config['ip_available_set'])
-            db.r.sadd(app_config['ip_used_set'], guest.ip)
+            guest.ip = guest_ip_generator.next()
+            guest.vnc_port = guest_vnc_port_generator.next()
 
             guest.network = config.vm_network
             guest.manage_network = config.vm_manage_network
-
-            guest.vnc_port = db.r.spop(app_config['vnc_port_available_set'])
-            db.r.sadd(app_config['vnc_port_used_set'], guest.vnc_port)
-
             guest.vnc_password = ji.Common.generate_random_code(length=16)
 
             disk = Disk()
@@ -249,7 +266,7 @@ def r_create():
                     ssh_key_guest_mapping.create()
 
             if os_template_profile.os_distro == 'coreos':
-                config.netmask = IP(guest.ip).make_net(config.netmask).prefixlen().__str__()
+                ip_pool.netmask = IP(guest.ip).make_net(ip_pool.netmask).prefixlen().__str__()
 
             # 替换占位符为有效内容
             _os_template_initialize_operates = copy.deepcopy(os_template_initialize_operates)
@@ -257,19 +274,19 @@ def r_create():
                 _os_template_initialize_operates[k]['content'] = v['content'].replace('{IP}', guest.ip).\
                     replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
-                    replace('{NETMASK}', config.netmask).\
-                    replace('{GATEWAY}', config.gateway).\
-                    replace('{DNS1}', config.dns1).\
-                    replace('{DNS2}', config.dns2). \
+                    replace('{NETMASK}', ip_pool.netmask).\
+                    replace('{GATEWAY}', ip_pool.gateway).\
+                    replace('{DNS1}', ip_pool.dns1).\
+                    replace('{DNS2}', ip_pool.dns2). \
                     replace('{SSH-KEY}', '\n'.join(ssh_keys))
 
                 _os_template_initialize_operates[k]['command'] = v['command'].replace('{IP}', guest.ip). \
                     replace('{HOSTNAME}', guest.label). \
                     replace('{PASSWORD}', guest.password). \
-                    replace('{NETMASK}', config.netmask). \
-                    replace('{GATEWAY}', config.gateway). \
-                    replace('{DNS1}', config.dns1). \
-                    replace('{DNS2}', config.dns2). \
+                    replace('{NETMASK}', ip_pool.netmask). \
+                    replace('{GATEWAY}', ip_pool.gateway). \
+                    replace('{DNS1}', ip_pool.dns1). \
+                    replace('{DNS2}', ip_pool.dns2). \
                     replace('{SSH-KEY}', '\n'.join(ssh_keys))
 
             message = {

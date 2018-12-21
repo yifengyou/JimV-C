@@ -206,18 +206,22 @@ class ORM(object):
 
         sql_stmt = ("SELECT * FROM " + cls._table_name + " ORDER BY " + order_by + " " + order +
                     " LIMIT %(offset)s, %(limit)s")
+        sql_stmt_count = ("SELECT count(" + cls._primary_key + ") FROM " + cls._table_name)
 
         where_str = Filter.filter_str_to_sql(allow_keywords=cls.get_filter_keywords(), filter_str=filter_str)
         if where_str != '':
             sql_stmt = ("SELECT * FROM " + cls._table_name + " WHERE " + where_str + " ORDER BY " + order_by + " " +
                         order + " LIMIT %(offset)s, %(limit)s")
+            sql_stmt_count = ("SELECT count(" + cls._primary_key + ") FROM " + cls._table_name + " WHERE " + where_str)
 
         cnx = db.cnxpool.get_connection()
         cursor = cnx.cursor(dictionary=True, buffered=True)
         try:
             cursor.execute(sql_stmt, {'offset': offset, 'limit': limit})
             rows = cursor.fetchall()
-            return rows, rows.__len__()
+            cursor.execute(sql_stmt_count)
+            count = cursor.fetchone()
+            return rows, count["count(" + cls._primary_key + ")"]
         finally:
             cursor.close()
             cnx.close()
@@ -290,6 +294,7 @@ class ORM(object):
         where_str = ' OR '.join([k + ' LIKE %(' + k + ')s' for k in _kv.keys()])
         sql_stmt = ("SELECT * FROM " + cls._table_name + " WHERE " + where_str + " ORDER BY " + order_by + " " + order +
                     " LIMIT %(offset)s, %(limit)s")
+        sql_stmt_count = ("SELECT count(" + cls._primary_key + ") FROM " + cls._table_name + " WHERE " + where_str)
 
         _kv.update({'offset': offset, 'limit': limit})
         cnx = db.cnxpool.get_connection()
@@ -297,7 +302,9 @@ class ORM(object):
         try:
             cursor.execute(sql_stmt, _kv)
             rows = cursor.fetchall()
-            return rows, rows.__len__()
+            cursor.execute(sql_stmt_count, _kv)
+            count = cursor.fetchone()
+            return rows, count["count(" + cls._primary_key + ")"]
         finally:
             cursor.close()
             cnx.close()
@@ -308,13 +315,16 @@ class ORM(object):
             order_by = cls._primary_key
 
         sql_stmt = ("SELECT * FROM " + cls._table_name + " ORDER BY " + order_by + " " + order)
+        sql_stmt_count = ("SELECT count(" + cls._primary_key + ") FROM " + cls._table_name)
 
         cnx = db.cnxpool.get_connection()
         cursor = cnx.cursor(dictionary=True, buffered=True)
         try:
             cursor.execute(sql_stmt)
             rows = cursor.fetchall()
-            return rows, rows.__len__()
+            cursor.execute(sql_stmt_count)
+            count = cursor.fetchone()
+            return rows, count["count(" + cls._primary_key + ")"]
         finally:
             cursor.close()
             cnx.close()

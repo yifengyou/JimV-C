@@ -191,16 +191,6 @@ class EventProcessor(object):
                     cls.config.get()
                     cls.guest.uuid = uuid
                     cls.guest.get_by('uuid')
-
-                    if IP(cls.config.start_ip).int() <= IP(cls.guest.ip).int() <= IP(cls.config.end_ip).int():
-                        if db.r.srem(app_config['ip_used_set'], cls.guest.ip):
-                            db.r.sadd(app_config['ip_available_set'], cls.guest.ip)
-
-                    if (cls.guest.vnc_port - cls.config.start_vnc_port) <= \
-                            (IP(cls.config.end_ip).int() - IP(cls.config.start_ip).int()):
-                        if db.r.srem(app_config['vnc_port_used_set'], cls.guest.vnc_port):
-                            db.r.sadd(app_config['vnc_port_available_set'], cls.guest.vnc_port)
-
                     cls.guest.delete()
 
                     # TODO: 加入是否删除使用的数据磁盘开关，如果为True，则顺便删除使用的磁盘。否则解除该磁盘被使用的状态。
