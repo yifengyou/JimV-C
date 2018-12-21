@@ -235,5 +235,23 @@ def r_content_search():
 
 @Utils.dumps2response
 def r_delete(ids):
-    return ip_pool_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+    ret = ip_pool_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+
+    rows, count = IPPool.get_all()
+
+    had_activity = False
+
+    for row in rows:
+        if row['activity'] == 1:
+            had_activity = True
+
+    if not had_activity and count > 0:
+        ip_pool = IPPool()
+        ip_pool.id = rows[0]['id']
+        ip_pool.get()
+        ip_pool.activity = 1
+        ip_pool.update()
+        ip_pool.get()
+
+    return ret
 
