@@ -46,13 +46,6 @@
             storage_mode: parseInt($('#storage_mode').val()),
             vm_network: $('#vm_network').val(),
             vm_manage_network: $('#vm_manage_network').val(),
-            start_ip: $('#start_ip').val(),
-            end_ip: $('#end_ip').val(),
-            netmask: $('#netmask').val(),
-            gateway: $('#gateway').val(),
-            dns1: $('#dns1').val(),
-            dns2: $('#dns2').val(),
-            start_vnc_port: parseInt($('#start_vnc_port').val()),
             dfs_volume: $('#dfs_volume').val(),
             storage_path: $('#storage_path').val(),
             hdd_type: $('#hdd_type').val(),
@@ -158,42 +151,6 @@
                             <label class="col-sm-2 control-label">网桥(管理网络)</label>
                             <div class="col-sm-3">
                                 <input title="Guest 管理网络" class="form-control" id="vm_manage_network" name="vm_manage_network" type="text" value="net-br0">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">起始 IP</label>
-                            <div class="col-sm-3">
-                                <input title="起始 IP" class="form-control" id="start_ip" name="start_ip" type="text" value="10.10.1.1">
-                            </div>
-                            <label class="col-sm-2 control-label">截止 IP</label>
-                            <div class="col-sm-3">
-                                <input title="截止 IP" class="form-control" id="end_ip" name="end_ip" type="text" value="10.10.15.253">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">子网掩码</label>
-                            <div class="col-sm-3">
-                                <input title="子网掩码" class="form-control" id="netmask" name="netmask" type="text" value="255.255.240.0">
-                            </div>
-                            <label class="col-sm-2 control-label">网关</label>
-                            <div class="col-sm-3">
-                                <input title="网关" class="form-control" id="gateway" name="gateway" type="text" value="10.10.15.254">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">DNS1</label>
-                            <div class="col-sm-3">
-                                <input title="DNS1" class="form-control" id="dns1" name="dns1" type="text" value="223.5.5.5">
-                            </div>
-                            <label class="col-sm-2 control-label">DNS2</label>
-                            <div class="col-sm-3">
-                                <input title="DNS2" class="form-control" id="dns2" name="dns2" type="text" value="8.8.8.8">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">起始 VNC 端口</label>
-                            <div class="col-sm-3">
-                                <input title="起始 VNC 端口" class="form-control" id="start_vnc_port" name="start_vnc_port" type="text" value="15900">
                             </div>
                         </div>
                         <div class="form-group">

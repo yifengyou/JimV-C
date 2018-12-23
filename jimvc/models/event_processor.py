@@ -5,7 +5,6 @@
 import traceback
 import json
 import time
-from IPy import IP
 import jimit as ji
 
 from jimvc.models import logger, app_config

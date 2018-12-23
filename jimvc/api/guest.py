@@ -200,7 +200,6 @@ def r_create():
         ip_pool = IPPool()
         ip_pool.id = rows[0]['id']
         ip_pool.get()
-        assert isinstance(ip_pool, IPPool)
 
         guest_ip_generator = ip_pool.ip_generator(occupied_ips=occupied_ips)
         guest_vnc_port_generator = ip_pool.vnc_port_generator(occupied_vnc_ports=occupied_vnc_ports)
@@ -1555,7 +1554,7 @@ def r_refresh_guest_state():
 def r_show():
     args = list()
     page = int(request.args.get('page', 1))
-    page_size = int(request.args.get('page_size', 10))
+    page_size = int(request.args.get('page_size', 20))
     keyword = request.args.get('keyword', None)
 
     if page is not None:

@@ -450,7 +450,7 @@ def r_show():
         page = 1
     page = int(page)
 
-    page_size = int(request.args.get('page_size', 10))
+    page_size = int(request.args.get('page_size', 20))
     keyword = request.args.get('keyword', None)
     show_area = request.args.get('show_area', 'unmount')
     guest_uuid = request.args.get('guest_uuid', None)
