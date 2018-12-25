@@ -106,6 +106,10 @@ from ip_pool import (
     IPPool
 )
 
+from reserved_ip import (
+    ReservedIP
+)
+
 from host import (
     Host
 )
@@ -142,6 +146,6 @@ __all__ = [
     'OSTemplateInitializeOperate', 'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO',
     'HostCPUMemory', 'HostTraffic', 'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping', 'OSTemplateImageKind',
     'GuestMigrateInfo', 'GuestCollectionPerformanceDataKind', 'HostCollectionPerformanceDataKind', 'StorageMode',
-    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service', 'IPPool'
+    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service', 'IPPool', 'ReservedIP'
 ]
 

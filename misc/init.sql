@@ -460,6 +460,17 @@ CREATE TABLE IF NOT EXISTS ip_pool(
 ALTER TABLE ip_pool ADD INDEX (name);
 
 
+CREATE TABLE IF NOT EXISTS reserved_ip(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ip CHAR(15) NOT NULL,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE reserved_ip ADD INDEX (ip);
+
+
 INSERT INTO project (name, description, create_time) VALUES ('我的项目', '由 JimV 创建的默认项目。', UNIX_TIMESTAMP(NOW()) * 1000000);
 INSERT INTO service (project_id, name, description, create_time) VALUES (1, '服务组', '由 JimV 创建的默认服务组。', UNIX_TIMESTAMP(NOW()) * 1000000);
 

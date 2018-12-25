@@ -29,3 +29,13 @@ ALTER TABLE config
     DROP COLUMN dns1,
     DROP COLUMN dns2;
 
+
+CREATE TABLE IF NOT EXISTS reserved_ip(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ip CHAR(15) NOT NULL,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE reserved_ip ADD INDEX (ip);

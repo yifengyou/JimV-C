@@ -5,6 +5,7 @@
 from jimvc.models import add_rule_api
 from jimvc.api import config
 from jimvc.api import ip_pool
+from jimvc.api import reserved_ip
 from jimvc.api import os_template_profile
 from jimvc.api import snapshot
 from jimvc.api import os_template_initialize_operate
@@ -48,6 +49,13 @@ add_rule_api(ip_pool.blueprints, '/<ids>', api_func='ip_pool.r_get', methods=['G
 add_rule_api(ip_pool.blueprints, '', api_func='ip_pool.r_get_by_filter', methods=['GET'])
 add_rule_api(ip_pool.blueprints, '/_search', api_func='ip_pool.r_content_search', methods=['GET'])
 add_rule_api(ip_pool.blueprint, '/<_id>', api_func='ip_pool.r_activity', methods=['PUT'])
+
+# 保留的 IP 操作
+add_rule_api(reserved_ip.blueprint, '', api_func='reserved_ip.r_create', methods=['POST'])
+add_rule_api(reserved_ip.blueprints, '/<ids>', api_func='reserved_ip.r_delete', methods=['DELETE'])
+add_rule_api(reserved_ip.blueprints, '/<ids>', api_func='reserved_ip.r_get', methods=['GET'])
+add_rule_api(reserved_ip.blueprints, '', api_func='reserved_ip.r_get_by_filter', methods=['GET'])
+add_rule_api(reserved_ip.blueprints, '/_search', api_func='reserved_ip.r_content_search', methods=['GET'])
 
 # JimV 配置操作
 add_rule_api(dashboard.blueprint, '/_show', api_func='dashboard.r_show', methods=['GET'])
