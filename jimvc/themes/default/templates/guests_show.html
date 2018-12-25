@@ -798,6 +798,23 @@
         });
     }
 
+    function revise_ip(uuid, ip) {
+        $.ajax({
+            url : '/api/guest/_revise_ip/' + uuid + '/' + ip,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例修正 IP 指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例修正 IP 指令发送成功！');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            }
+        });
+    }
+
     function change_prepared_by(uuids, service_id) {
         $.ajax({
             url : '/api/guests/_change_prepared_by/' + uuids.join(',') + '/' + service_id,
@@ -942,6 +959,13 @@
         var _id = $('#project_id').val();
         delete_project([_id]);
         $('#project_delete_modal').modal('hide');
+    }
+
+    function revise_ip_at(me) {
+        var uuid = $('#instance_uuid').val();
+        var ip = $('#revisional_ip').val();
+        revise_ip(uuid, ip)
+        $('#revise_ip_modal').modal('hide');
     }
 
     function migrate_go() {
@@ -1776,6 +1800,15 @@
                                                 $('#adjust_ability_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
                                        变更配置
                                     </a>
+                                </li>
+                                <li class="">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#revise_ip_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#revise_ip_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent);
+                                                $('#revisional_ip').val($($(this).parent().parent().parent().parent().parent().children()[7]).text());">
+                                       修正 IP
+                                    </a>
+                                </li>
                                 <li class="divider"></li>
                                 <li class="{% if item.status not in [2] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#reset_password_modal"
@@ -1793,7 +1826,7 @@
                                 <li class="{% if item.status not in [5, 6, 7, 255] %} disabled {% endif %}">
                                     <a href="javascript:;" data-toggle="modal" data-target="#delete_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
-                                                $('#delete_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent)">
+                                                $('#delete_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent);">
                                         删除
                                     </a>
                                 </li>
@@ -2598,6 +2631,26 @@
             </div>
             <div class="modal-footer">
                 <button id="batch_adjust_ability_form_button" type="button" class="btn btn-sm btn-primary" onclick="batch_adjust_ability();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="revise_ip_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">修正虚拟机 IP 地址：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要为该虚拟机修正 IP 地址吗？</p>
+                <h3 style="color: orangered;" id="revise_ip_instance_desc"></h3>
+                <p></p>
+                <input id="revisional_ip" title="新的 IP 地址" class="form-control" name="revisional_ip" placeholder="新的 IP 地址">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="revise_ip_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

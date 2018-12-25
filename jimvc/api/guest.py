@@ -1306,6 +1306,32 @@ def r_update(uuids):
 
 
 @Utils.dumps2response
+def r_revise_ip(uuid, ip):
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
+    args_rules = [
+        Rules.UUID.value,
+        Rules.IP.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuid': uuid, 'ip': ip})
+        guest = Guest()
+        guest.uuid = uuid
+        guest.get_by('uuid')
+        guest.ip = ip
+        guest.update()
+        guest.get()
+
+        ret['data'] = guest.__dict__
+
+        return ret
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
 def r_reset_password(uuids, password):
 
     args_rules = [

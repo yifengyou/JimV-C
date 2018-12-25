@@ -32,12 +32,13 @@ __copyright__ = '(c) 2017 by James Iter.'
 
 # JimV 配置操作
 add_rule_api(config.blueprint, '', api_func='config.r_create', methods=['POST'])
-# JimV 关于操作
-add_rule_api(about.blueprint, '', api_func='about.r_get', methods=['GET'])
 # 只有一条记录，所以不指定 id
 add_rule_api(config.blueprint, '', api_func='config.r_update', methods=['PATCH'])
 add_rule_api(config.blueprint, '/_quota', api_func='config.r_update_quota', methods=['PATCH'])
 add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
+
+# JimV 关于操作
+add_rule_api(about.blueprint, '', api_func='about.r_get', methods=['GET'])
 
 # IP 池操作
 add_rule_api(ip_pool.blueprint, '', api_func='ip_pool.r_create', methods=['POST'])
@@ -122,6 +123,7 @@ add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_get', methods=['GET
 add_rule_api(guest.blueprints, '', api_func='guest.r_get_by_filter', methods=['GET'])
 add_rule_api(guest.blueprints, '/_search', api_func='guest.r_content_search', methods=['GET'])
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_update', methods=['PATCH'])
+add_rule_api(guest.blueprint, '/_revise_ip/<uuid>/<ip>', api_func='guest.r_revise_ip', methods=['PUT'])
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_delete', methods=['DELETE'])
 add_rule_api(guest.blueprints, '/_reset_password/<uuids>/<password>', api_func='guest.r_reset_password',
              methods=['PUT'])

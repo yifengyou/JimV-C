@@ -81,7 +81,6 @@ def r_create():
             return ret
 
         config.create()
-        config.update_global_config()
 
         config.id = 1
         config.get()
@@ -147,8 +146,6 @@ def r_update():
         config.vm_manage_network = request.json.get('vm_manage_network', config.vm_manage_network)
 
         config.update()
-        config.update_global_config()
-
         config.get()
 
         ret = dict()
@@ -266,8 +263,6 @@ def r_update_quota():
                     Utils.emit_instruction(message=json.dumps(message))
 
         config.update()
-        config.update_global_config()
-
         config.get()
 
         ret = dict()

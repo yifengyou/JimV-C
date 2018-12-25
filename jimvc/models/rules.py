@@ -53,6 +53,7 @@ class Rules(Enum):
     BANDWIDTH_IN_URL = (REG_NUMBER, 'bandwidth')
     BANDWIDTH_UNIT = (basestring, 'bandwidth_unit', ['k', 'm', 'g'])
 
+    IP = (REG_IP, 'ip')
     START_IP = (REG_IP, 'start_ip')
     END_IP = (REG_IP, 'end_ip')
     START_VNC_PORT = (int, 'start_vnc_port')

@@ -52,6 +52,3 @@ class Config(ORM):
     def get_allow_content_search_keywords():
         return []
 
-    def update_global_config(self):
-        db.r.hmset(app_config['global_config'], self.__dict__)
-
