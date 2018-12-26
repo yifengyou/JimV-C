@@ -20,6 +20,7 @@ from jimvc.models import app_config
 from jimvc.models import GuestState
 from jimvc.models import Service
 from jimvc.models import IPPool
+from jimvc.models import ReservedIP
 from jimvc.models import DiskState, Host
 from jimvc.models import Database as db
 from jimvc.models import Config
@@ -191,6 +192,10 @@ def r_create():
         for row in rows:
             occupied_ips.append(row['ip'])
             occupied_vnc_ports.append(row['vnc_port'])
+
+        rows, count = ReservedIP.get_all()
+        for row in rows:
+            occupied_ips.append(row['ip'])
 
         rows, count = IPPool.get_by_filter(filter_str=':'.join(['activity', 'eq', '1']))
         if count < 1:
