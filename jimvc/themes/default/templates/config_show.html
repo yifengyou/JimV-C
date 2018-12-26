@@ -62,6 +62,16 @@
                     put_ip_pool_activity($(this).data('id'));
                 }
             });
+
+            $('#reserved_ip_modal').on('show.bs.modal', function (me) {
+                reserved_ip_refresh();
+            });
+
+            $("#reserved_ip_input").keydown(function() {
+                if (event.keyCode == "13") {//keyCode=13是回车键
+                    add_reserved_ip($('#reserved_ip_input').val())
+                }
+            });
         });
 
         function refresh() {
@@ -343,7 +353,7 @@
                 '        <div class="pull-right">\n' +
                 '            <button class="btn btn-default" onclick="window.location.reload();" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>\n' +
                 '            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_ip_pool_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加 IP 池</a>\n' +
-                '            <a class="btn btn-black" href="javascript:;" data-toggle="modal" data-target="#ip_black_list_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px; color: white;">保留 IP</a>\n' +
+                '            <a class="btn btn-black" href="javascript:;" data-toggle="modal" data-target="#reserved_ip_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px; color: white;">保留 IP</a>\n' +
                 '        </div>\n' +
                 '    </div>\n' +
                 '</div>';
@@ -503,6 +513,90 @@
                     setTimeout(function() {
                         refresh();
                     }, 1000);
+                }
+            });
+        }
+
+        function row_onmouseover(me) {
+            $(me).find(".delete_reserved_ip_trigger").css('display','inline-flex');
+        }
+
+        function row_onmouseout(me) {
+            $(me).find(".delete_reserved_ip_trigger").css('display','none');
+        }
+
+        function add_reserved_ip(ip) {
+            $.ajax({
+                url : '/api/reserved_ip',
+                type : 'POST',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                dataType: "json",
+                data : JSON.stringify({ip: ip}),
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('添加保留 IP 失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    var html = '<tr role="row" data-id="' + data['data']['id'] + '" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">\n' +
+                        '    <td class="text-center">\n' +
+                        data['data']['ip'] +
+                        '        <div style="display: inline;">\n' +
+                        '            <a href="javascript:;" class="delete_reserved_ip_trigger" style="display: none; float: right;">\n' +
+                        '                <span onclick="reserved_ip_delete(this);" class="glyph-icon icon-iconic-cancel" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; color: indianred;"></span>\n' +
+                        '            </a>\n' +
+                        '        </div>\n' +
+                        '    </td>\n' +
+                        '</tr>';
+                    $('#reserved_ip_table tbody').append(html);
+                    alter_success('添加保留 IP 成功！');
+                }
+            });
+        }
+        
+        function reserved_ip_refresh() {
+            $.ajax({
+                url : '/api/reserved_ips',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                async: false,
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    var html = NaN;
+                    $('#reserved_ip_table tbody').empty();
+                    $.each(data.data, function(k, v) {
+                        html = '<tr role="row" data-id="' + v['id'] + '" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">\n' +
+                        '    <td class="text-center">\n' +
+                        v['ip'] +
+                        '        <div style="display: inline;">\n' +
+                        '            <a href="javascript:;" class="delete_reserved_ip_trigger" style="display: none; float: right;">\n' +
+                        '                <span onclick="reserved_ip_delete(this);" class="glyph-icon icon-iconic-cancel" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; color: indianred;"></span>\n' +
+                        '            </a>\n' +
+                        '        </div>\n' +
+                        '    </td>\n' +
+                        '</tr>';
+                        $('#reserved_ip_table tbody').append(html);
+                    });
+                }
+            });
+        }
+
+        function reserved_ip_delete(me) {
+            var id = $(me).parent().parent().parent().parent().data('id');
+            $.ajax({
+                url : '/api/reserved_ips/' + id,
+                type : 'DELETE',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('添加保留 IP 失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    $('#reserved_ip_table tbody tr[data-id="' +id + '"]').remove()
+                    alter_success('删除保留 IP 成功！');
                 }
             });
         }
@@ -750,7 +844,7 @@
     </div>
 </div>
 
-<div class="modal" id="ip_black_list_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+<div class="modal" id="reserved_ip_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header">
@@ -761,24 +855,21 @@
             </div>
             <div class="modal-body" style="padding-top: 0; padding-bottom: 0;">
                 <div class="example-box-wrapper">
-                    <form id="ssh_key_bind_form" class="form-horizontal bordered-row" action="javascript;">
+                    <form id="reserved_ip_form" class="form-horizontal bordered-row" action="javascript:;">
                         <div class="form-group">
                             <div class="col-sm-1"></div>
-                            <div class="col-sm-10">
-                                <div id="reserved_ip_list" class="list-group" style="text-align: center;">
-                                    <a href="#" class="list-group-item list-group-item-action">192.168.1.1</a>
-                                    <a href="#" class="list-group-item list-group-item-action">192.168.1.1</a>
-                                    <a href="#" class="list-group-item list-group-item-action">192.168.1.1</a>
-                                    <a href="#" class="list-group-item list-group-item-action">192.168.1.1</a>
-                                    <a href="#" class="list-group-item list-group-item-action">192.168.1.1</a>
-                                </div>
+                            <div class="col-sm-10" style="height: 300px; overflow: auto;">
+                                <table id="reserved_ip_table" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid"
+                                       style="width: 100%; margin-bottom: 0;">
+                                    <tbody></tbody>
+                                </table>
                             </div>
                             <div class="col-sm-1"></div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-1"></div>
                             <div class="col-sm-10">
-                                <input class="form-control" style="text-align: center;" type="text" placeholder="将要保留的 IP">
+                                <input id="reserved_ip_input" class="form-control" style="text-align: center;" type="text" placeholder="将要保留的 IP">
                             </div>
                             <div class="col-sm-1"></div>
                         </div>

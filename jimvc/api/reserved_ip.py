@@ -51,6 +51,10 @@ def r_create():
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
+        if reserved_ip.exist_by('ip'):
+            ret['state'] = ji.Common.exchange_state(40901)
+            return ret
+
         reserved_ip.create()
 
         reserved_ip.get()
