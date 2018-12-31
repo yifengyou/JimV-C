@@ -42,7 +42,7 @@ add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
 add_rule_api(about.blueprint, '', api_func='about.r_get', methods=['GET'])
 
 # 杂项操作
-add_rule_api(misc.blueprint, '/_join/<node_id>/<_token>', api_func='about.r_join', methods=['GET'])
+add_rule_api(misc.blueprint, '/_join/<node_id>/<_token>', api_func='misc.r_join', methods=['GET'])
 
 # IP 池操作
 add_rule_api(ip_pool.blueprint, '', api_func='ip_pool.r_create', methods=['POST'])

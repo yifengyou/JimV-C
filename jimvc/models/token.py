@@ -38,7 +38,7 @@ class Token(object):
     def valid(self):
         score = db.r.zscore('Z:Token', self.token)
 
-        if score is not None and score <= ji.Common.ts():
+        if score is not None and score >= ji.Common.ts():
             return True
 
         return False

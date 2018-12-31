@@ -154,6 +154,7 @@ def is_not_need_to_auth(endpoint):
     not_auth_table = [
         'api_config.r_get',
         'api_config.r_create',
+        'api_misc.r_join',
         'v_config.create',
         'v_misc.login',
         'v_misc.recover_password',

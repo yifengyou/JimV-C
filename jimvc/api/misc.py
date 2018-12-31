@@ -49,7 +49,7 @@ def r_join(node_id, _token):
         ji.Check.previewing(args_rules, {'node_id': node_id, 'token': _token})
 
         token = Token()
-        token.token = token
+        token.token = _token
 
         # 检验 token 有效性
         if not token.valid():

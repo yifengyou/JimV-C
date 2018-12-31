@@ -62,7 +62,7 @@ class Utils(object):
 
             if isinstance(ret, dict) and 'state' in ret:
                 response = make_response()
-                response.data = json.dumps(ret, ensure_ascii=False)
+                response.set_data(json.dumps(ret, ensure_ascii=False))
                 response.status_code = int(ret['state']['code'])
                 if 'redirect' in ret and request.args.get('auto_redirect', 'True') == 'True':
                     response.status_code = int(ret['redirect'].get('code', ret['state']['code']))
