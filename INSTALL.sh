@@ -17,6 +17,7 @@ export PYPI='https://mirrors.aliyun.com/pypi/simple/'
 export SMTP_HOST=''
 export SMTP_USER=''
 export SMTP_PASSWORD=''
+export TOKEN=`echo $[$RANDOM]|md5sum|cut -c 1-32`
 
 ARGS=`getopt -o h --long rdb_root_password:,rdb_jimv_password:,redis_password:,jwt_secret:,secret_key:,version:,help -n 'INSTALL.sh' -- "$@"`
 
@@ -144,11 +145,13 @@ function install_JimVC() {
     cat > /etc/yum.repos.d/JimV.repo << EOF
 [JimV]
 name=JimV - \$basearch
-baseurl=http://repo.iit.im/centos/7/os/\$basearch
+baseurl=http://repo.jimv.cn/centos/7/os/\$basearch
+        http://repo.jimv.io/centos/7/os/\$basearch
+        http://repo.iit.im/centos/7/os/\$basearch
 failovermethod=priority
 enabled=1
 gpgcheck=0
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgkey=https://repo.jimv.cn/RPM-GPG-KEY-JIMV-114EA591
 EOF
     yum install jimv-controller -y
 }
@@ -260,6 +263,10 @@ function initialization_db() {
     mysql -u jimv -p${RDB_JIMV_PSWD} -e 'show databases'
 }
 
+function generate_token() {
+    redis-cli -a ${REDIS_PSWD} --raw ZADD Z:Token $(($(date +%s) + 86400)) ${TOKEN}
+}
+
 function generate_config_file() {
     sed -i "s/\"db_password\".*$/\"db_password\": \"${RDB_JIMV_PSWD}\",/" /etc/jimvc.conf
     sed -i "s/\"redis_password\".*$/\"redis_password\": \"${REDIS_PSWD}\",/" /etc/jimvc.conf
@@ -291,7 +298,7 @@ function display_summary_information() {
     echo
     echo "--->"
     echo "2: 到 [计算节点] 执行如下命令，进行 JimV-N 的部署。"
-    echo "curl https://raw.githubusercontent.com/jamesiter/JimV-N/master/INSTALL.sh | bash -s -- --redis_host `hostname -I` --redis_password ${REDIS_PSWD} --redis_port 6379"
+    echo "curl https://raw.githubusercontent.com/jamesiter/JimV-N/master/INSTALL.sh | bash -s -- --host `hostname -I` --token ${TOKEN}"
     echo
     echo "--->"
     echo "3: 享受 JimV 给您带来的 '简单、快速、灵活' 开创虚拟机实例的快乐。。。。。"
@@ -312,6 +319,7 @@ function deploy() {
     install_Redis
     install_Nginx
     initialization_db
+    generate_token
     generate_config_file
     start_JimVC
     display_summary_information

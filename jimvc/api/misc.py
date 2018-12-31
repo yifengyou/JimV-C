@@ -6,7 +6,10 @@ import jimit as ji
 import json
 from flask import Blueprint, request
 
-from jimvc.models import app_config, Rules, Token
+from jimvc.models import Config
+from jimvc.models import app_config
+from jimvc.models import Rules
+from jimvc.models import Token
 from jimvc.models import Utils
 from jimvc.models import Host
 
@@ -64,10 +67,16 @@ def r_join(node_id, _token):
             ret['state'] = ji.Common.exchange_state(40901)
 
         else:
+            config = Config()
+            config.id = 1
+            config.get()
+
             ret['data']['redis_host'] = request.host
             ret['data']['redis_port'] = app_config.get('redis_port', 6379)
             ret['data']['redis_password'] = app_config.get('redis_password', '')
             ret['data']['redis_dbid'] = app_config.get('redis_dbid', 0)
+            ret['data']['vm_network'] = config.vm_network
+            ret['data']['vm_manage_network'] = config.vm_manage_network
 
         return ret
 

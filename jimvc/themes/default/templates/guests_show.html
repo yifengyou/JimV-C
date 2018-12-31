@@ -255,7 +255,7 @@
                     $('#migrate_host').empty();
                     $.each(data.data, function(k, v) {
                         $('#migrate_host').append(
-                            $('<option>', {value: v['hostname'], text: v['hostname']})
+                            $('<option>', {value: v['node_id'], text: v['hostname']})
                         );
                     });
                     $('#migrate_host').trigger("chosen:updated");
@@ -770,9 +770,9 @@
         });
     }
 
-    function migrate(uuids, host) {
+    function migrate(uuids, node_id) {
         $.ajax({
-            url : '/api/guests/_migrate/' + uuids.join(',') + '/' + host,
+            url : '/api/guests/_migrate/' + uuids.join(',') + '/' + node_id,
             type : 'PUT',
             contentType: "application/json; charset=utf-8",
             error : function() {
@@ -976,9 +976,9 @@
         } else {
             uuids = get_checked_uuids();
         }
-        var host = $('#migrate_host').val();
+        var node_id = $('#migrate_host').val();
         $('#migrate_modal').modal('hide');
-        migrate([uuids], host);
+        migrate([uuids], node_id);
     }
 
     function reset_password_go() {

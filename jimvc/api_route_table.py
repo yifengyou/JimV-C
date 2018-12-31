@@ -3,7 +3,7 @@
 
 
 from jimvc.models import add_rule_api
-from jimvc.api import config, token
+from jimvc.api import config, token, misc
 from jimvc.api import ip_pool
 from jimvc.api import reserved_ip
 from jimvc.api import os_template_profile
@@ -40,6 +40,9 @@ add_rule_api(config.blueprint, '', api_func='config.r_get', methods=['GET'])
 
 # JimV 关于操作
 add_rule_api(about.blueprint, '', api_func='about.r_get', methods=['GET'])
+
+# 杂项操作
+add_rule_api(misc.blueprint, '/_join/<node_id>/<_token>', api_func='about.r_join', methods=['GET'])
 
 # IP 池操作
 add_rule_api(ip_pool.blueprint, '', api_func='ip_pool.r_create', methods=['POST'])
@@ -126,7 +129,7 @@ add_rule_api(guest.blueprints, '/_suspend/<uuids>', api_func='guest.r_suspend', 
 add_rule_api(guest.blueprints, '/_resume/<uuids>', api_func='guest.r_resume', methods=['PUT'])
 add_rule_api(guest.blueprint, '/_attach_disk/<uuid>/<disk_uuid>', api_func='guest.r_attach_disk', methods=['PUT'])
 add_rule_api(guest.blueprint, '/_detach_disk/<disk_uuid>', api_func='guest.r_detach_disk', methods=['PUT'])
-add_rule_api(guest.blueprints, '/_migrate/<uuids>/<destination_host>', api_func='guest.r_migrate', methods=['PUT'])
+add_rule_api(guest.blueprints, '/_migrate/<uuids>/<node_id>', api_func='guest.r_migrate', methods=['PUT'])
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_get', methods=['GET'])
 add_rule_api(guest.blueprints, '', api_func='guest.r_get_by_filter', methods=['GET'])
 add_rule_api(guest.blueprints, '/_search', api_func='guest.r_content_search', methods=['GET'])

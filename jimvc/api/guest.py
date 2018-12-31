@@ -774,18 +774,22 @@ def r_detach_disk(disk_uuid):
 
 
 @Utils.dumps2response
-def r_migrate(uuids, destination_host):
+def r_migrate(uuids, node_id):
 
     args_rules = [
         Rules.UUIDS.value,
-        Rules.DESTINATION_HOST.value
+        Rules.NODE_ID.value
     ]
 
     try:
-        ji.Check.previewing(args_rules, {'uuids': uuids, 'destination_host': destination_host})
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'node_id': node_id})
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
+
+        config = Config()
+        config.id = 1
+        config.get()
 
         # 取全部活着的 hosts
         available_hosts = Host.get_available_hosts(nonrandom=None)
@@ -800,14 +804,12 @@ def r_migrate(uuids, destination_host):
             if host['node_id'] not in available_hosts_mapping_by_node_id:
                 available_hosts_mapping_by_node_id[host['node_id']] = host
 
+        dst_ip = available_hosts_mapping_by_node_id[node_id]['interfaces'][config.vm_manage_network]['ip']
+
         guest = Guest()
         for uuid in uuids.split(','):
             guest.uuid = uuid
             guest.get_by('uuid')
-
-        config = Config()
-        config.id = 1
-        config.get()
 
         for uuid in uuids.split(','):
             guest.uuid = uuid
@@ -815,8 +817,7 @@ def r_migrate(uuids, destination_host):
 
             # 忽略宕机计算节点 上面的 虚拟机 迁移请求
             # 忽略目标计算节点 等于 当前所在 计算节点 的虚拟机 迁移请求
-            if guest.node_id.__str__() not in available_hosts_mapping_by_node_id or \
-                    available_hosts_mapping_by_node_id[guest.node_id.__str__()]['hostname'] == destination_host:
+            if guest.node_id.__str__() not in available_hosts_mapping_by_node_id or guest.node_id.__str__() == node_id:
                 continue
 
             message = {
@@ -825,7 +826,7 @@ def r_migrate(uuids, destination_host):
                 'uuid': uuid,
                 'node_id': guest.node_id,
                 'storage_mode': config.storage_mode,
-                'duri': 'qemu+ssh://' + destination_host + '/system'
+                'duri': 'qemu+ssh://' + dst_ip + '/system'
             }
 
             Utils.emit_instruction(message=json.dumps(message))
