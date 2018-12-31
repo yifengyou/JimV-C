@@ -32,12 +32,12 @@ def r_get():
     ret = dict()
     ret['state'] = ji.Common.exchange_state(20000)
     ret['data'] = {
-        'version': 0.7,
+        'version': 0.8,
         'desc': """
     JimV 是一套舒适的驾驭系统。通过它，您可以轻松自如地，让那匹彪悍烈马，把您带上长空云霄。
     "舒适"，是设计 JimV 的哲学理念。其中包含的意义有 "平滑、自在、敏捷、可控"。您所想、所要的，
 只需轻触鼠标，即可信手捏来。""",
-        'copyright': '版权所有2018 JamesIter. 保留所有权利。'
+        'copyright': '版权所有2019 上海正微网络科技有限公司。 保留所有权利。'
     }
 
     return ret

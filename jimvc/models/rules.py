@@ -30,6 +30,7 @@ class Rules(Enum):
 
     ID = (REG_NUMBER, 'id')
     IDS = (REG_NUMBERS, 'ids')
+    TTL = (REG_NUMBER, 'ttl')
     HOSTS_NAME = (REG_HOSTS_NAME, 'hosts_name')
 
     CONFIG_ID = (int, 'id')
@@ -125,6 +126,7 @@ class Rules(Enum):
     OPERATE_RULE_COMMAND = (basestring, 'command')
 
     TOKEN = (basestring, 'token')
+    TOKENS = (basestring, 'tokens')
 
     PROJECT_ID = (int, 'project_id')
     PROJECTS_ID = (REG_NUMBERS, 'projects_id')

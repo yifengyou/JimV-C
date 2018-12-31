@@ -114,6 +114,10 @@ from host import (
     Host
 )
 
+from token import (
+    Token
+)
+
 from host_performance import (
     HostCPUMemory,
     HostTraffic,
@@ -146,6 +150,6 @@ __all__ = [
     'OSTemplateInitializeOperate', 'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO',
     'HostCPUMemory', 'HostTraffic', 'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping', 'OSTemplateImageKind',
     'GuestMigrateInfo', 'GuestCollectionPerformanceDataKind', 'HostCollectionPerformanceDataKind', 'StorageMode',
-    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service', 'IPPool', 'ReservedIP'
+    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service', 'IPPool', 'ReservedIP', 'Token'
 ]
 

@@ -53,6 +53,7 @@
 
             register_iops_bps_event();
             refresh_ip_pools();
+            tokens_list_refresh();
 
             $('input.input-switch[name="activity"]').on('switchChange.bootstrapSwitch', function(event, state) {
                 console.log(this); // DOM element
@@ -82,13 +83,16 @@
             $(me).parent().parent().children().removeClass('active');
             $(me).parent().addClass('active');
 
-            $('#jimv_system_config, #quota, #ip_pool, #auxiliary').css('display', 'none');
+            $('#jimv_system_config, #quota, #ip_pool, #auxiliary, #token').css('display', 'none');
 
             if (me.id === 'quota_label') {
                 $('#quota').css('display', 'unset');
 
             } else if (me.id === 'ip_pool_label') {
                 $('#ip_pool').css('display', 'unset');
+
+            } else if (me.id === 'token_label') {
+                $('#token').css('display', 'unset');
 
             } else if (me.id === 'auxiliary_label') {
                 $('#auxiliary').css('display', 'unset');
@@ -600,6 +604,47 @@
                 }
             });
         }
+
+        function tokens_list_refresh() {
+            $.ajax({
+                url : '/api/tokens',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                async: false,
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    var html = NaN;
+                    $('#tokens_list_table tbody').empty();
+                    $.each(data.data, function(k, v) {
+                        html = '<tr role="row" class="odd">\n' +
+                            '    <td class="text-center">' + v['token'] + '</td>\n' +
+                            '    <td class="text-center">' + v['ttl'] + '</td>\n' +
+                            '    <td class="text-center">' + v['expire'] + '</td>\n' +
+                            '</tr>';
+                        $('#tokens_list_table tbody').append(html);
+                    });
+                }
+            });
+        }
+
+        function add_token() {
+            $.ajax({
+                url : '/api/token',
+                type : 'POST',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('添加 Token 失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    tokens_list_refresh();
+                    alter_success('添加 Token 成功！');
+                }
+            });
+        }
     </script>
     <div class="panel">
         <div class="panel-body">
@@ -607,6 +652,7 @@
                 <li class="active"><a href="javascript:;" onclick="select_this(this);" id="jimv_system_config_label">JimV 系统配置</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="ip_pool_label">IP 池</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="quota_label">性能配额</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="token_label">Token</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="auxiliary_label">辅助</a></li>
             </ul>
             <div id="jimv_system_config" class="example-box-wrapper">
@@ -739,6 +785,27 @@
                 </form>
             </div>
             <div id="ip_pool" class="example-box-wrapper" style="display: none;">
+            </div>
+            <div id="token" class="example-box-wrapper" style="display: none;">
+                <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                    <div class="col-sm-12" style="padding-right: 0;">
+                        <div class="pull-right">
+                            <button class="btn btn-default" onclick="window.location.reload();" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                            <a class="btn btn-info" href="javascript:;" onclick="add_token();" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加 Token</a>
+                        </div>
+                    </div>
+                </div>
+                <table id="tokens_list_table" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid" style="width: 100%;">
+                    <thead>
+                    <tr role="row">
+                        <th class="text-center">Token</th>
+                        <th class="text-center">TTL</th>
+                        <th class="text-center">逾期时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
             <div id="auxiliary" class="example-box-wrapper" style="display: none;">
                 <form class="form-horizontal bordered-row" style="padding-left: 8%;">

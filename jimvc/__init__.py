@@ -60,6 +60,8 @@ from jimvc.api.log import blueprint as log_blueprint
 from jimvc.api.log import blueprints as log_blueprints
 from jimvc.api.host import blueprint as host_blueprint
 from jimvc.api.host import blueprints as host_blueprints
+from jimvc.api.token import blueprint as token_blueprint
+from jimvc.api.token import blueprints as token_blueprints
 from jimvc.api.ssh_key import blueprint as ssh_key_blueprint
 from jimvc.api.ssh_key import blueprints as ssh_key_blueprints
 from jimvc.api.snapshot import blueprint as snapshot_blueprint
@@ -273,6 +275,8 @@ try:
     app.register_blueprint(log_blueprints)
     app.register_blueprint(host_blueprint)
     app.register_blueprint(host_blueprints)
+    app.register_blueprint(token_blueprint)
+    app.register_blueprint(token_blueprints)
     app.register_blueprint(ssh_key_blueprint)
     app.register_blueprint(ssh_key_blueprints)
     app.register_blueprint(snapshot_blueprint)

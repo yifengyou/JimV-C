@@ -3,7 +3,7 @@
 
 
 from jimvc.models import add_rule_api
-from jimvc.api import config
+from jimvc.api import config, token
 from jimvc.api import ip_pool
 from jimvc.api import reserved_ip
 from jimvc.api import os_template_profile
@@ -178,6 +178,11 @@ add_rule_api(host.blueprints, '/_search', api_func='host.r_content_search', meth
 add_rule_api(host.blueprints, '/<nodes_id>', api_func='host.r_delete', methods=['DELETE'])
 add_rule_api(host.blueprints, '/<hosts_name>/<random>', api_func='host.r_nonrandom', methods=['PUT'])
 add_rule_api(host.blueprints, '/_show', api_func='host.r_show', methods=['GET'])
+
+# Token 操作
+add_rule_api(token.blueprint, '', api_func='token.r_create', methods=['POST'])
+add_rule_api(token.blueprints, '', api_func='token.r_get_by_filter', methods=['GET'])
+add_rule_api(token.blueprints, '/<tokens>', api_func='token.r_delete', methods=['DELETE'])
 
 # SSH Key 操作
 add_rule_api(ssh_key.blueprint, '', api_func='ssh_key.r_create', methods=['POST'])
