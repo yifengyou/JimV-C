@@ -33,6 +33,8 @@
 {% endblock head %}
 {% block content %}
     <script>
+        var sheet_tag = window.location.hash;
+
         $(document).ready(function() {
             $('body').addClass('add-transition');
             $('.add-page-transition').on('click', function(){
@@ -73,6 +75,8 @@
                     add_reserved_ip($('#reserved_ip_input').val())
                 }
             });
+
+            nav_to_sheet_tag();
         });
 
         function refresh() {
@@ -83,22 +87,63 @@
             $(me).parent().parent().children().removeClass('active');
             $(me).parent().addClass('active');
 
-            $('#jimv_system_config, #quota, #ip_pool, #auxiliary, #token').css('display', 'none');
+            $('#view_by_jimv_system_config, #view_by_quota, #view_by_ip_pool, #view_by_auxiliary, #view_by_token').css('display', 'none');
 
-            if (me.id === 'quota_label') {
-                $('#quota').css('display', 'unset');
+            if (me.id === 'view_by_quota_label') {
+                $('#view_by_quota').css('display', 'unset');
+                history.replaceState(null, null, window.location.pathname);
+                window.location.hash = "quota";
 
-            } else if (me.id === 'ip_pool_label') {
-                $('#ip_pool').css('display', 'unset');
+            } else if (me.id === 'view_by_ip_pool_label') {
+                $('#view_by_ip_pool').css('display', 'unset');
+                history.replaceState(null, null, window.location.pathname);
+                window.location.hash = "ip_pool";
 
-            } else if (me.id === 'token_label') {
-                $('#token').css('display', 'unset');
+            } else if (me.id === 'view_by_token_label') {
+                $('#view_by_token').css('display', 'unset');
+                history.replaceState(null, null, window.location.pathname);
+                window.location.hash = "token";
 
-            } else if (me.id === 'auxiliary_label') {
-                $('#auxiliary').css('display', 'unset');
+            } else if (me.id === 'view_by_auxiliary_label') {
+                $('#view_by_auxiliary').css('display', 'unset');
+                history.replaceState(null, null, window.location.pathname);
+                window.location.hash = "auxiliary";
 
             } else {
-                $('#jimv_system_config').css('display', 'unset');
+                $('#view_by_jimv_system_config').css('display', 'unset');
+                history.replaceState(null, null, ' ');
+            }
+        }
+
+        function nav_to_sheet_tag() {
+            var view_by_jimv_system_config_label = $('#view_by_jimv_system_config_label');
+            var view_by_quota_label = $('#view_by_quota_label');
+            var view_by_ip_pool_label = $('#view_by_ip_pool_label');
+            var view_by_token_label = $('#view_by_token_label');
+            var view_by_auxiliary_label = $('#view_by_auxiliary_label');
+
+            view_by_jimv_system_config_label.parent().parent().children().removeClass('active');
+            $('#view_by_jimv_system_config, #view_by_quota, #view_by_ip_pool, #view_by_auxiliary, #view_by_token').css('display', 'none');
+
+            if (sheet_tag.indexOf('#quota') != -1) {
+                view_by_quota_label.parent().addClass('active');
+                $('#view_by_quota').css('display', 'unset');
+
+            } else if (sheet_tag.indexOf('#ip_pool') != -1) {
+                view_by_ip_pool_label.parent().addClass('active');
+                $('#view_by_ip_pool').css('display', 'unset');
+
+            } else if (sheet_tag.indexOf('#token') != -1) {
+                view_by_token_label.parent().addClass('active');
+                $('#view_by_token').css('display', 'unset');
+
+            } else if (sheet_tag.indexOf('#auxiliary') != -1) {
+                view_by_auxiliary_label.parent().addClass('active');
+                $('#view_by_auxiliary').css('display', 'unset');
+
+            } else {
+                view_by_jimv_system_config_label.parent().addClass('active');
+                $('#view_by_jimv_system_config').css('display', 'unset');
             }
         }
 
@@ -381,7 +426,7 @@
 
         function refresh_ip_pools() {
             var html = get_ip_pools_html();
-            $('#ip_pool').append(html);
+            $('#view_by_ip_pool').append(html);
         }
 
         function get_ip_pool_field_value(me, name) {
@@ -649,13 +694,13 @@
     <div class="panel">
         <div class="panel-body">
             <ul class="nav nav-tabs mrg25B">
-                <li class="active"><a href="javascript:;" onclick="select_this(this);" id="jimv_system_config_label">JimV 系统配置</a></li>
-                <li><a href="javascript:;" onclick="select_this(this);" id="ip_pool_label">IP 池</a></li>
-                <li><a href="javascript:;" onclick="select_this(this);" id="quota_label">性能配额</a></li>
-                <li><a href="javascript:;" onclick="select_this(this);" id="token_label">Token</a></li>
-                <li><a href="javascript:;" onclick="select_this(this);" id="auxiliary_label">辅助</a></li>
+                <li class="active"><a href="javascript:;" onclick="select_this(this);" id="view_by_jimv_system_config_label">JimV 系统配置</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="view_by_ip_pool_label">IP 池</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="view_by_quota_label">性能配额</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="view_by_token_label">Token</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="view_by_auxiliary_label">辅助</a></li>
             </ul>
-            <div id="jimv_system_config" class="example-box-wrapper">
+            <div id="view_by_jimv_system_config" class="example-box-wrapper">
                 <form class="form-horizontal bordered-row" style="padding-left: 8%;">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">网桥(业务网络)</label>
@@ -690,7 +735,7 @@
                     </div>
                 </form>
             </div>
-            <div id="quota" class="example-box-wrapper" style="display: none;">
+            <div id="view_by_quota" class="example-box-wrapper" style="display: none;">
                 <form class="form-horizontal bordered-row" style="padding-left: 8%;">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label class="col-sm-2 control-label">
@@ -784,9 +829,9 @@
                     </div>
                 </form>
             </div>
-            <div id="ip_pool" class="example-box-wrapper" style="display: none;">
+            <div id="view_by_ip_pool" class="example-box-wrapper" style="display: none;">
             </div>
-            <div id="token" class="example-box-wrapper" style="display: none;">
+            <div id="view_by_token" class="example-box-wrapper" style="display: none;">
                 <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
                     <div class="col-sm-12" style="padding-right: 0;">
                         <div class="pull-right">
@@ -807,7 +852,7 @@
                     </tbody>
                 </table>
             </div>
-            <div id="auxiliary" class="example-box-wrapper" style="display: none;">
+            <div id="view_by_auxiliary" class="example-box-wrapper" style="display: none;">
                 <form class="form-horizontal bordered-row" style="padding-left: 8%;">
                     <div class="form-group" style="margin-bottom: 0;">
                         <div class="col-sm-3">
