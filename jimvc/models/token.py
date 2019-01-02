@@ -33,7 +33,7 @@ class Token(object):
 
     @staticmethod
     def get_all():
-        return db.r.zrange('Z:Token', start=0, end=-1, withscores=True, score_cast_func=int)
+        return db.r.zrange('Z:Token', start=0, end=-1, withscores=True, desc=True, score_cast_func=int)
 
     def valid(self):
         score = db.r.zscore('Z:Token', self.token)
