@@ -663,9 +663,17 @@
                     var html = NaN;
                     $('#tokens_list_table tbody').empty();
                     $.each(data.data, function(k, v) {
+                        var color = 'forestgreen';
+                        var ttl = v['ttl'];
+
+                        if (ttl < 1) {
+                            ttl = '已过期';
+                            color = 'indianred';
+                        }
+
                         html = '<tr role="row" class="odd">\n' +
                             '    <td class="text-center">' + v['token'] + '</td>\n' +
-                            '    <td class="text-center">' + v['ttl'] + '</td>\n' +
+                            '    <td class="text-center" style="color: ' + color + ';">' + ttl + '</td>\n' +
                             '    <td class="text-center">' + v['expire'] + '</td>\n' +
                             '</tr>';
                         $('#tokens_list_table tbody').append(html);
