@@ -67,6 +67,10 @@ JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门
 |从快照磁盘创建模板镜像|✓|
 |网络流量限额|✓|
 |Guest 配置变更|✓|
+|YUM 包管理工具安装|✓|
+|基于项目的视图管理|✓|
+|多 IP 池特色|✓|
+|保留 IP 功能|✓|
 
 
 ## 未来计划
@@ -75,12 +79,10 @@ JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门
 >* 增加过期 Guest 自动回收机制
 >* 增加模板上传功能
 >* 增加 tag 功能
->* 增加替换 IP 功能
 >* 增加对 Ceph 的支持
 >* 多租户
 >* 用户操作轨迹
 >* 用户管理功能
->* 参照 gitlab，打包出 CentOS yum 一语安装仓库
 >* 国际化
 >* 加入移动端的支持
 >* 指定 Guest 是否随计算节点自动启动
@@ -162,7 +164,8 @@ E-Mail: james.iter.cn@gmail.com
 
 ## Demo
 
+[demo.jimv.cn](https://demo.jimv.cn) <br>
 [demo.jimv.io](https://demo.jimv.io) <br>
 [jimv.iit.im](https://jimv.iit.im) <br>
-管理员账密 `admin`:`jimv.pswd.com`
+管理员账密 `admin`:`pswd.jimv.cn`
 

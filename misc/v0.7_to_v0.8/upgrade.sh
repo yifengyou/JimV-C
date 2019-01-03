@@ -30,3 +30,4 @@ rm -rf /usr/local/JimV-C
 
 yum install jimv-controller -y
 systemctl daemon-reload
+systemctl restart jimvc
