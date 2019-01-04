@@ -237,7 +237,7 @@
                     error : function(data, textStatus, xhr) {
                     },
                     success : function(data, textStatus, xhr) {
-                        var page_size = 10;
+                        var page_size = 20;
                         var last_page = Math.ceil(data['paging']['total'] / page_size);
                         go_back_url = "/guests?page_size=" + page_size + "&page=" + last_page;
                     }
