@@ -1646,6 +1646,7 @@
                     <th><input class="all_selector" title="选取所有" type="checkbox"></th>
                     <th width="180px;">名称</th>
                     <th></th>
+                    <th></th>
                     <th>状态</th>
                     <th>计算节点</th>
                     <th>配置</th>
@@ -1677,6 +1678,10 @@
                         {% else %}
                             <span class="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].logo }}" title="{{ os_templates_image_mapping_by_id[item.os_template_image_id | string].label }}"></span>
                         {% endif %}
+                    </td>
+                    <td>
+                        <span class="icon-os icon-autostart" title="随机启动"></span>
+                        <!--<img width="16px" height="16px" src="{{ theme_static('images/icons/onboot.png') }}"></img>-->
                     </td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
                     <td>{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</td>
