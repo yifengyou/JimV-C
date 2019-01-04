@@ -25,6 +25,7 @@ class Guest(ORM):
         self.id = 0
         self.uuid = None
         self.label = None
+        self.autostart = False
         self.password = None
         self.remark = ''
         self.os_template_image_id = None
@@ -49,6 +50,7 @@ class Guest(ORM):
             'id': FilterFieldType.INT.value,
             'uuid': FilterFieldType.STR.value,
             'label': FilterFieldType.STR.value,
+            'autostart': FilterFieldType.BOOL.value,
             'status': FilterFieldType.INT.value,
             'remark': FilterFieldType.STR.value,
             'node_id': FilterFieldType.INT.value,
@@ -59,11 +61,12 @@ class Guest(ORM):
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['remark', 'cpu', 'memory', 'bandwidth', 'network', 'manage_network', 'vnc_password', 'service_id']
+        return ['autostart','remark', 'cpu', 'memory', 'bandwidth', 'network', 'manage_network', 'vnc_password',
+                'service_id']
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['label', 'remark', 'node_id', 'ip']
+        return ['label', 'autostart', 'remark', 'node_id', 'ip']
 
 
 class Disk(ORM):

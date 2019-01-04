@@ -611,6 +611,23 @@
         shortcut_bar_enable();
     }
 
+    function autostart(uuids, autostart) {
+        $.ajax({
+            url : '/api/guests/_autostart/' + uuids.join(',') + '/' + autostart,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例变更启动方式指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例变更启动方式指令发送成功！');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            }
+        });
+    }
+
     function boot(uuids) {
         $.ajax({
             url : '/api/guests/_boot/' + uuids.join(','),
@@ -918,6 +935,16 @@
         $('#resume_modal').modal('hide');
     }
 
+    function autostart_at(me) {
+        var _autostart = 0;
+
+        if ($(me).data('autostart') === 0) {
+            _autostart = 1;
+        }
+        var uuid = $(me).parent().parent().children()[0].textContent;
+        autostart([uuid], _autostart);
+    }
+
     function allocate_bandwidth_at(me) {
         var uuid = $('#instance_uuid').val();
         allocate_bandwidth([uuid], $('#bandwidth').val(), $('#bandwidth_unit').val());
@@ -1085,6 +1112,22 @@
             resume(uuids);
         }
         $('#batch_resume_modal').modal('hide');
+    }
+
+    function batch_autostart() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            autostart(uuids, 1);
+        }
+        $('#batch_autostart_modal').modal('hide');
+    }
+
+    function batch_disable_autostart() {
+        var uuids = get_checked_uuids();
+        if (uuids) {
+            autostart(uuids, 0);
+        }
+        $('#batch_disable_autostart_modal').modal('hide');
     }
 
     function batch_allocate_bandwidth() {
@@ -1286,6 +1329,7 @@
                 '<td width="40px" style="padding-left: 12px;">' +
                     '<span class="' + guest.html.logo + '" title="' + guest.html.os_template_label + '"></span>' +
                 '</td>' +
+                '<td><a data-autostart="' + guest.autostart + '" class="icon-os icon-autostart" title="' + (function () { if (guest.autostart !== 0) { return '切至手动启动'; } else { return '切至开机启动';}})() + '" href="javascript:;" onclick="autostart_at(this);" style="' + (function () { if (guest.autostart === 0) { return 'filter: grayscale(100%);'; } else { return '';}})() + '"></a></td>' +
                 '<td>' + guest.html.status + '</td>' +
                 '<td>' + guest.hostname + '</td>' +
                 '<td>' +
@@ -1680,8 +1724,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <span class="icon-os icon-autostart" title="随机启动"></span>
-                        <!--<img width="16px" height="16px" src="{{ theme_static('images/icons/onboot.png') }}"></img>-->
+                        <a data-autostart="{{ item.autostart }}" class="icon-os icon-autostart" title="{% if item.autostart != 0 %}切至手动启动{% else %}切至开机启动{% endif %}" href="javascript:;" onclick="autostart_at(this);" style="{% if item.autostart == 0 %}filter: grayscale(100%);{% endif %}"></a>
                     </td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
                     <td>{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</td>
@@ -1883,6 +1926,12 @@
                                                 </ul>
                                             </li>
                                             <li class="divider"></li>
+                                            <li>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#batch_autostart_modal">开机启动</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#batch_disable_autostart_modal">手动启动</a>
+                                            </li>
                                             <li>
                                                 <a href="javascript:;" data-toggle="modal" data-target="#batch_allocate_bandwidth_modal">分配带宽</a>
                                             </li>
@@ -2743,6 +2792,44 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="delete_project_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_autostart_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量使虚拟机开机启动：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要使选定的虚拟机开机启动吗？</p>
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_autostart();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_disable_autostart_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量取消虚拟机开机启动：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要使选定的虚拟机取消开机启动吗？</p>
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_disable_autostart();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

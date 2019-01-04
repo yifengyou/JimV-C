@@ -208,6 +208,13 @@ class EventProcessor(object):
                     cls.guest.password = cls.message['message']['passback_parameters']['password']
                     cls.guest.update()
 
+            elif action == 'autostart':
+                if state == ResponseState.success.value:
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+                    cls.guest.autostart = cls.message['message']['passback_parameters']['autostart']
+                    cls.guest.update()
+
             elif action == 'attach_disk':
                 cls.disk.uuid = cls.message['message']['passback_parameters']['disk_uuid']
                 cls.disk.get_by('uuid')

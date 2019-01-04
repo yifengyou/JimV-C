@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS guest(
     label VARCHAR(64) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     remark VARCHAR(255) NOT NULL DEFAULT '',
+    autostart BOOLEAN NOT NULL DEFAULT FALSE,
     os_template_image_id BIGINT UNSIGNED NOT NULL,
     create_time BIGINT UNSIGNED NOT NULL,
     -- 运行时的状态用 status;
@@ -56,6 +57,7 @@ CREATE TABLE IF NOT EXISTS guest(
 
 ALTER TABLE guest ADD INDEX (uuid);
 ALTER TABLE guest ADD INDEX (label);
+ALTER TABLE guest ADD INDEX (autostart);
 ALTER TABLE guest ADD INDEX (node_id);
 ALTER TABLE guest ADD INDEX (service_id);
 ALTER TABLE guest ADD INDEX (ip);

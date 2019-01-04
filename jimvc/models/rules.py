@@ -71,6 +71,7 @@ class Rules(Enum):
     UUID = (basestring, 'uuid', (36, 36))
     NODE_ID = (basestring, 'node_id', (16, 16))
     UUIDS = (REG_UUIDS, 'uuids')
+    AUTOSTART = (int, 'autostart')
     CPU = (int, 'cpu')
     MEMORY = (int, 'memory')
     OS_TEMPLATE_IMAGE_ID = (int, 'os_template_image_id')

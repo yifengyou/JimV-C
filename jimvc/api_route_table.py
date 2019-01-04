@@ -120,6 +120,7 @@ add_rule_api(os_template_initialize_operate.blueprints, '/_search',
 # Guest操作
 # 创建虚拟机
 add_rule_api(guest.blueprint, '', api_func='guest.r_create', methods=['POST'])
+add_rule_api(guest.blueprints, '/_autostart/<uuids>/<autostart>', api_func='guest.r_autostart', methods=['PUT'])
 add_rule_api(guest.blueprints, '/_reboot/<uuids>', api_func='guest.r_reboot', methods=['PUT'])
 add_rule_api(guest.blueprints, '/_force_reboot/<uuids>', api_func='guest.r_force_reboot', methods=['PUT'])
 add_rule_api(guest.blueprints, '/_shutdown/<uuids>', api_func='guest.r_shutdown', methods=['PUT'])

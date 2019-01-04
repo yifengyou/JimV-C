@@ -92,6 +92,11 @@ def r_create():
             Rules.SERVICE_ID.value
         )
 
+    if 'autostart' in request.json:
+        args_rules.append(
+            Rules.AUTOSTART.value
+        )
+
     try:
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -220,6 +225,7 @@ def r_create():
             guest.os_template_image_id = request.json.get('os_template_image_id')
             guest.label = ji.Common.generate_random_code(length=8)
             guest.remark = request.json.get('remark', '')
+            guest.autostart = request.json.get('autostart', False)
 
             guest.password = request.json.get('password')
             if guest.password is None or guest.password.__len__() < 1:
@@ -300,6 +306,7 @@ def r_create():
                 'storage_mode': config.storage_mode,
                 'dfs_volume': config.dfs_volume,
                 'node_id': guest.node_id,
+                'autostart': guest.autostart,
                 'name': guest.label,
                 'template_path': os_template_image.path,
                 'os_type': os_template_profile.os_type,
@@ -311,6 +318,51 @@ def r_create():
 
             Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
+@Utils.dumps2response
+def r_autostart(uuids, autostart):
+
+    args_rules = [
+        Rules.UUIDS.value,
+        Rules.AUTOSTART.value
+    ]
+
+    if str(autostart).lower() in ['false', '0']:
+        autostart = False
+
+    else:
+        autostart = True
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'autostart': autostart})
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'autostart',
+                'uuid': uuid,
+                'node_id': guest.node_id,
+                'autostart': autostart,
+                'passback_parameters': {'autostart': autostart}
+            }
+
+            Utils.emit_instruction(message=json.dumps(message))
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
     except ji.PreviewingError, e:

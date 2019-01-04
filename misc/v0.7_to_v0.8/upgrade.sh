@@ -4,6 +4,8 @@ systemctl stop jimvn
 systemctl stop jimvc
 
 deactivate
+sed -i '/\/usr\/local\/venv-jimv\/bin\/activate/d' ~/.bashrc
+
 mysql -u jimv -p < update.sql
 
 DEL S:IP:Used
