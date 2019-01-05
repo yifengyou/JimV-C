@@ -185,6 +185,13 @@ class EventProcessor(object):
             elif action == 'migrate':
                 pass
 
+            elif action == 'sync_data':
+                if state == ResponseState.success.value:
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+                    cls.guest.autostart = bool(data['autostart'])
+                    cls.guest.update()
+
             elif action == 'delete':
                 if state == ResponseState.success.value:
                     cls.config.get()
