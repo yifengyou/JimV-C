@@ -95,10 +95,10 @@ JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门
 1. [配置 `/etc/hosts` 文件](docs/install.md#配置-etchosts-文件)
 2. 通过在线脚本自动安装 JimV-C
     ``` bash
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/jamesiter/JimV-C/master/INSTALL.sh)"
+    bash -c "$(curl -fsSL http://repo.jimv.cn/jimvc.install.sh)"
     ```
-3. [安装部署 JimV-N](https://github.com/jamesiter/JimV-N#%E5%AE%89%E8%A3%85)
-4. [获取系统镜像模板](http://template.iit.im)
+3. 根据 JimV-C 安装过程的提示，安装部署 JimV-N
+4. [获取系统镜像模板](http://template.jimv.cn)
 5. 上传系统镜像模板
    > 存放系统镜像模板，到所有计算节点可以访问到的路径(如果是单个计算节点，可以存放到 /opt/template_images 目录下。如果是多个计算节点，可以通过 NFS 共享该目录。)。
 

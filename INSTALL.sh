@@ -298,7 +298,7 @@ function display_summary_information() {
     echo
     echo "--->"
     echo "2: 到 [计算节点] 执行如下命令，进行 JimV-N 的部署。"
-    echo "curl https://raw.githubusercontent.com/jamesiter/JimV-N/master/INSTALL.sh | bash -s -- --host `hostname -I` --token ${TOKEN}"
+    echo "curl http://repo.jimv.cn/jimvn.install.sh | bash -s -- --host `hostname -I` --token ${TOKEN}"
     echo
     echo "--->"
     echo "3: 享受 JimV 给您带来的 '简单、快速、灵活' 开创虚拟机实例的快乐。。。。。"
