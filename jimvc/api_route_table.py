@@ -60,7 +60,7 @@ add_rule_api(reserved_ip.blueprints, '/<ids>', api_func='reserved_ip.r_get', met
 add_rule_api(reserved_ip.blueprints, '', api_func='reserved_ip.r_get_by_filter', methods=['GET'])
 add_rule_api(reserved_ip.blueprints, '/_search', api_func='reserved_ip.r_content_search', methods=['GET'])
 
-# JimV 配置操作
+# JimV Dashboard
 add_rule_api(dashboard.blueprint, '/_show', api_func='dashboard.r_show', methods=['GET'])
 
 # 用户管理
