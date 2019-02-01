@@ -1741,7 +1741,14 @@ def r_vnc(uuid):
 
         port = random.randrange(50000, 60000)
 
-    payload = {'listen_port': port, 'target_host': hosts_mapping_by_node_id[guest_ret['data']['node_id']]['hostname'],
+    config = Config()
+    config.id = 1
+    config.get()
+
+    dst_ip = hosts_mapping_by_node_id[guest_ret['data']['node_id']]['interfaces'][config.vm_manage_network]['ip']
+
+    payload = {'listen_port': port,
+               'target_host': dst_ip,
                'target_port': guest_ret['data']['vnc_port']}
 
     db.r.rpush(app_config['ipc_queue'], json.dumps(payload, ensure_ascii=False))
