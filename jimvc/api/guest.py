@@ -889,6 +889,49 @@ def r_migrate(uuids, node_id):
         return json.loads(e.message)
 
 
+def r_change_vlan(uuids, vlan_id):
+    args_rules = [
+        Rules.UUIDS.value,
+        Rules.VLAN_ID_IN_URL.value
+    ]
+
+    try:
+        ji.Check.previewing(args_rules, {'uuids': uuids, 'vlan_id': vlan_id})
+
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        config = Config()
+        config.id = 1
+        config.get()
+
+        guest = Guest()
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+        for uuid in uuids.split(','):
+            guest.uuid = uuid
+            guest.get_by('uuid')
+
+            message = {
+                '_object': 'guest',
+                'action': 'change_vlan',
+                'uuid': uuid,
+                'node_id': guest.node_id,
+                'vlan_id': guest.vlan_id,
+                'vm_network': config.vm_network,
+                'passback_parameters': {'vlan_id': guest.vlan_id}
+            }
+
+            Utils.emit_instruction(message=json.dumps(message))
+
+        return ret
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+
 @Utils.dumps2response
 def r_get(uuids):
     ret = guest_base.get(ids=uuids, ids_rule=Rules.UUIDS.value, by_field='uuid')

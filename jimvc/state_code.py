@@ -66,6 +66,10 @@ own_state_branch = {
         'code': '41261',
         'zh-cn': u'Guest 状态不符合预期，期望 Guest 为关闭状态'
     },
+    '41262': {
+        'code': '41262',
+        'zh-cn': u'仍有 Guest 在此 Vlan 中，期望该 Vlan 中不存在任何 Guest'
+    },
     '50050': {
         'code': '50050',
         'zh-cn': u'MySQL 链接或执行出错'

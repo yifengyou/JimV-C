@@ -260,6 +260,13 @@ class EventProcessor(object):
                     cls.guest.memory = cls.message['message']['passback_parameters']['memory']
                     cls.guest.update()
 
+            elif action == 'change_vlan':
+                if state == ResponseState.success.value:
+                    cls.guest.uuid = uuid
+                    cls.guest.get_by('uuid')
+                    cls.guest.vlan_id = cls.message['message']['passback_parameters']['vlan_id']
+                    cls.guest.update()
+
         elif _object == 'disk':
             if action == 'create':
                 cls.disk.uuid = uuid

@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS guest(
     manage_network VARCHAR(64) NOT NULL,
     vnc_port INT UNSIGNED NOT NULL,
     vnc_password VARCHAR(255) NOT NULL,
+    vlan_id INT NOT NULL DEFAULT -1,
     xml TEXT NOT NULL,
     PRIMARY KEY (id))
     ENGINE=InnoDB
@@ -61,6 +62,7 @@ ALTER TABLE guest ADD INDEX (autostart);
 ALTER TABLE guest ADD INDEX (node_id);
 ALTER TABLE guest ADD INDEX (service_id);
 ALTER TABLE guest ADD INDEX (ip);
+ALTER TABLE guest ADD INDEX (vlan_id);
 ALTER TABLE guest ADD INDEX (remark);
 
 
@@ -471,6 +473,20 @@ CREATE TABLE IF NOT EXISTS reserved_ip(
     DEFAULT CHARSET=utf8;
 
 ALTER TABLE reserved_ip ADD INDEX (ip);
+
+
+CREATE TABLE IF NOT EXISTS vlan(
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    vlan_id INT NOT NULL UNIQUE,
+    label VARCHAR(255) NOT NULL,
+    description TEXT,
+    create_time BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (id))
+    ENGINE=Innodb
+    DEFAULT CHARSET=utf8;
+
+ALTER TABLE vlan ADD INDEX (vlan_id);
+ALTER TABLE vlan ADD INDEX (label);
 
 
 INSERT INTO project (name, description, create_time) VALUES ('我的项目', '由 JimV 创建的默认项目。', UNIX_TIMESTAMP(NOW()) * 1000000);

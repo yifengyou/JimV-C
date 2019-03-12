@@ -113,8 +113,8 @@ class GuestXML(object):
 
     def get_interface(self):
         return """
-            <interface type='network'>
-                <source network='{0}'/>
+            <interface type='bridge'>
+                <source bridge='{0}'/>
                 <model type='virtio'/>
                 <bandwidth>
                     <inbound average='{1}'/>

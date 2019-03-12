@@ -136,6 +136,10 @@ from event_processor import (
     EventProcessor
 )
 
+from vlan import (
+    VLAN
+)
+
 
 __author__ = 'James Iter'
 __date__ = '2017/3/21'
@@ -150,6 +154,6 @@ __all__ = [
     'OSTemplateInitializeOperate', 'EventProcessor', 'ResponseState', 'GuestCPUMemory', 'GuestTraffic', 'GuestDiskIO',
     'HostCPUMemory', 'HostTraffic', 'HostDiskUsageIO', 'Host', 'Snapshot', 'SnapshotDiskMapping', 'OSTemplateImageKind',
     'GuestMigrateInfo', 'GuestCollectionPerformanceDataKind', 'HostCollectionPerformanceDataKind', 'StorageMode',
-    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service', 'IPPool', 'ReservedIP', 'Token'
+    'OSTemplateInitializeOperateKind', 'dev_table', 'Project', 'Service', 'IPPool', 'ReservedIP', 'Token', 'VLAN'
 ]
 

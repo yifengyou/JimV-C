@@ -134,3 +134,7 @@ class Rules(Enum):
     SERVICE_ID = (int, 'service_id')
     SERVICE_ID_IN_URL = (REG_NUMBER, 'service_id')
     SERVICES_ID = (REG_NUMBERS, 'services_id')
+
+    VLAN_ID = (int, 'vlan_id')
+    VLAN_ID_IN_URL = (REG_NUMBER, 'vlan_id')
+    VLANS_ID = (REG_NUMBERS, 'vlans_id')

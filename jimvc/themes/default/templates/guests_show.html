@@ -1694,7 +1694,7 @@
                     <th>状态</th>
                     <th>计算节点</th>
                     <th>配置</th>
-                    <th>IP</th>
+                    <th>网络</th>
                     <th width="150px;">密码&nbsp;&nbsp;<a href="#" class="glyph-icon icon-elusive-eye-off" onclick="change_display_password(this);" style="color: #014c8c;"></a></th>
                     <th>创建时间</th>
                     <th>操作</th>
@@ -1756,7 +1756,7 @@
                                 Gbps
                             {% endif %}
                     </td>
-                    <td>{{ item.ip }}</td>
+                    <td>{{ item.ip }}<br><a href="#">vlan: 2010</a></td>
                     <td><span class="unreal_password">*********</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
                     <td>

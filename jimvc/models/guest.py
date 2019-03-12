@@ -42,6 +42,7 @@ class Guest(ORM):
         self.manage_network = None
         self.vnc_port = None
         self.vnc_password = None
+        self.vlan_id = -1
         self.xml = None
 
     @staticmethod
@@ -56,17 +57,18 @@ class Guest(ORM):
             'node_id': FilterFieldType.INT.value,
             'service_id': FilterFieldType.INT.value,
             'ip': FilterFieldType.STR.value,
-            'bandwidth': FilterFieldType.INT.value
+            'bandwidth': FilterFieldType.INT.value,
+            'vlan_id': FilterFieldType.INT.value
         }
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['autostart','remark', 'cpu', 'memory', 'bandwidth', 'network', 'manage_network', 'vnc_password',
-                'service_id']
+        return ['autostart', 'remark', 'cpu', 'memory', 'bandwidth', 'network', 'manage_network', 'vnc_password',
+                'service_id', 'vlan_id']
 
     @staticmethod
     def get_allow_content_search_keywords():
-        return ['label', 'autostart', 'remark', 'node_id', 'ip']
+        return ['label', 'autostart', 'remark', 'node_id', 'ip', 'vlan_id']
 
 
 class Disk(ORM):
