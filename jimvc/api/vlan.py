@@ -56,6 +56,11 @@ def r_create():
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
+        if vlan.exist_by('vlan_id'):
+            ret['state'] = ji.Common.exchange_state(40901)
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': Vlan ID: ', vlan.vlan_id])
+            return ret
+
         vlan.create()
         vlan.get()
 

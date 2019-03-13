@@ -334,6 +334,7 @@ def r_create():
                 'name': guest.label,
                 'template_path': os_template_image.path,
                 'os_type': os_template_profile.os_type,
+                'vlan_id': guest.vlan_id,
                 'disks': [disk.__dict__],
                 'xml': guest_xml.get_domain(),
                 'os_template_initialize_operates': _os_template_initialize_operates,

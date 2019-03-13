@@ -23,6 +23,7 @@ from jimvc.api import host_performance
 from jimvc.api import about
 from jimvc.api import project
 from jimvc.api import service
+from jimvc.api import vlan
 
 
 __author__ = 'James Iter'
@@ -137,6 +138,7 @@ add_rule_api(guest.blueprints, '/_search', api_func='guest.r_content_search', me
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_update', methods=['PATCH'])
 add_rule_api(guest.blueprint, '/_revise_ip/<uuid>/<ip>', api_func='guest.r_revise_ip', methods=['PUT'])
 add_rule_api(guest.blueprints, '/<uuids>', api_func='guest.r_delete', methods=['DELETE'])
+add_rule_api(guest.blueprints, '/_change_vlan/<uuids>/<vlan_id>', api_func='guest.r_change_vlan', methods=['PUT'])
 add_rule_api(guest.blueprints, '/_reset_password/<uuids>/<password>', api_func='guest.r_reset_password',
              methods=['PUT'])
 
@@ -231,6 +233,14 @@ add_rule_api(service.blueprints, '/<ids>', api_func='service.r_delete', methods=
 add_rule_api(service.blueprints, '/<ids>', api_func='service.r_get', methods=['GET'])
 add_rule_api(service.blueprints, '', api_func='service.r_get_by_filter', methods=['GET'])
 add_rule_api(service.blueprints, '/_search', api_func='service.r_content_search', methods=['GET'])
+
+# VLAN 操作
+add_rule_api(vlan.blueprint, '', api_func='vlan.r_create', methods=['POST'])
+add_rule_api(vlan.blueprints, '/<ids>', api_func='vlan.r_update', methods=['PATCH'])
+add_rule_api(vlan.blueprints, '/<ids>', api_func='vlan.r_delete', methods=['DELETE'])
+add_rule_api(vlan.blueprints, '/<ids>', api_func='vlan.r_get', methods=['GET'])
+add_rule_api(vlan.blueprints, '', api_func='vlan.r_get_by_filter', methods=['GET'])
+add_rule_api(vlan.blueprints, '/_search', api_func='vlan.r_content_search', methods=['GET'])
 
 # Guest 性能查询
 add_rule_api(guest_performance.blueprint, '/cpu_memory',
