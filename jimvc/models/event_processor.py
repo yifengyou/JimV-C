@@ -265,6 +265,7 @@ class EventProcessor(object):
                     cls.guest.uuid = uuid
                     cls.guest.get_by('uuid')
                     cls.guest.vlan_id = cls.message['message']['passback_parameters']['vlan_id']
+                    cls.guest.network = 'vlan' + cls.guest.vlan_id.__str__()
                     cls.guest.update()
 
         elif _object == 'disk':

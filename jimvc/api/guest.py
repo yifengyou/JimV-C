@@ -36,6 +36,7 @@ from jimvc.models import SSHKeyGuestMapping
 from jimvc.models import SSHKey
 from jimvc.models import Snapshot
 from jimvc.models import status
+from jimvc.models import VLAN
 
 
 __author__ = 'James Iter'
@@ -95,6 +96,11 @@ def r_create():
     if 'autostart' in request.json:
         args_rules.append(
             Rules.AUTOSTART.value
+        )
+
+    if 'vlan_id' in request.json:
+        args_rules.append(
+            Rules.VLAN_ID.value
         )
 
     try:
@@ -214,6 +220,18 @@ def r_create():
         guest_ip_generator = ip_pool.ip_generator(occupied_ips=occupied_ips)
         guest_vnc_port_generator = ip_pool.vnc_port_generator(occupied_vnc_ports=occupied_vnc_ports)
 
+        vlans, _ = VLAN.get_all()
+        vlans_id = [-1]
+        vlan_id = request.json.get('vlan_id', -1)
+
+        for vlan in vlans:
+            vlans_id.append(vlan['vlan_id'])
+
+        if vlan_id not in vlans_id:
+            ret['state'] = ji.Common.exchange_state(41263)
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': vlan_id: ', vlan_id.__str__()])
+            return ret
+
         while quantity:
             quantity -= 1
             guest = Guest()
@@ -233,8 +251,14 @@ def r_create():
 
             guest.ip = guest_ip_generator.next()
             guest.vnc_port = guest_vnc_port_generator.next()
+            guest.vlan_id = vlan_id
 
-            guest.network = config.vm_network
+            if guest.vlan_id == -1:
+                guest.network = config.vm_network
+
+            else:
+                guest.network = 'vlan' + guest.vlan_id.__str__()
+
             guest.manage_network = config.vm_manage_network
             guest.vnc_password = ji.Common.generate_random_code(length=16)
 
@@ -898,6 +922,8 @@ def r_change_vlan(uuids, vlan_id):
     try:
         ji.Check.previewing(args_rules, {'uuids': uuids, 'vlan_id': vlan_id})
 
+        vlan_id = int(vlan_id)
+
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
 
@@ -919,9 +945,9 @@ def r_change_vlan(uuids, vlan_id):
                 'action': 'change_vlan',
                 'uuid': uuid,
                 'node_id': guest.node_id,
-                'vlan_id': guest.vlan_id,
+                'vlan_id': vlan_id,
                 'vm_network': config.vm_network,
-                'passback_parameters': {'vlan_id': guest.vlan_id}
+                'passback_parameters': {'vlan_id': vlan_id}
             }
 
             Utils.emit_instruction(message=json.dumps(message))
