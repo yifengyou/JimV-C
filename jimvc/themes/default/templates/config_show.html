@@ -87,7 +87,7 @@
             $(me).parent().parent().children().removeClass('active');
             $(me).parent().addClass('active');
 
-            $('#view_by_jimv_system_config, #view_by_quota, #view_by_ip_pool, #view_by_auxiliary, #view_by_token').css('display', 'none');
+            $('#view_by_jimv_system_config, #view_by_quota, #view_by_ip_pool, #view_by_vlan, #view_by_auxiliary, #view_by_token').css('display', 'none');
 
             if (me.id === 'view_by_quota_label') {
                 $('#view_by_quota').css('display', 'unset');
@@ -98,6 +98,11 @@
                 $('#view_by_ip_pool').css('display', 'unset');
                 history.replaceState(null, null, window.location.pathname);
                 window.location.hash = "ip_pool";
+
+            } else if (me.id === 'view_by_vlan_label') {
+                $('#view_by_vlan').css('display', 'unset');
+                history.replaceState(null, null, window.location.pathname);
+                window.location.hash = "vlan";
 
             } else if (me.id === 'view_by_token_label') {
                 $('#view_by_token').css('display', 'unset');
@@ -119,11 +124,12 @@
             var view_by_jimv_system_config_label = $('#view_by_jimv_system_config_label');
             var view_by_quota_label = $('#view_by_quota_label');
             var view_by_ip_pool_label = $('#view_by_ip_pool_label');
+            var view_by_vlan_label = $('#view_by_vlan_label');
             var view_by_token_label = $('#view_by_token_label');
             var view_by_auxiliary_label = $('#view_by_auxiliary_label');
 
             view_by_jimv_system_config_label.parent().parent().children().removeClass('active');
-            $('#view_by_jimv_system_config, #view_by_quota, #view_by_ip_pool, #view_by_auxiliary, #view_by_token').css('display', 'none');
+            $('#view_by_jimv_system_config, #view_by_quota, #view_by_ip_pool, #view_by_vlan, #view_by_auxiliary, #view_by_token').css('display', 'none');
 
             if (sheet_tag.indexOf('#quota') != -1) {
                 view_by_quota_label.parent().addClass('active');
@@ -132,6 +138,10 @@
             } else if (sheet_tag.indexOf('#ip_pool') != -1) {
                 view_by_ip_pool_label.parent().addClass('active');
                 $('#view_by_ip_pool').css('display', 'unset');
+
+            } else if (sheet_tag.indexOf('#vlan') != -1) {
+                view_by_vlan_label.parent().addClass('active');
+                $('#view_by_vlan').css('display', 'unset');
 
             } else if (sheet_tag.indexOf('#token') != -1) {
                 view_by_token_label.parent().addClass('active');
@@ -698,12 +708,51 @@
                 }
             });
         }
+
+        function add_vlan() {
+            $('#add_vlan_modal').modal('hide');
+
+            $.ajax({
+                url : '/api/vlan',
+                type : 'POST',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                dataType: "json",
+                data : JSON.stringify({
+                    vlan_name: $('#vlan_name').val(),
+                    vlan_id: parseInt($('#vlan_id').val()),
+                    vlan_description: $('#vlan_description').val()
+                }),
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('添加 VLAN 失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    var html = '<tr role="row" data-id="' + data['data']['id'] + '" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">\n' +
+                        '    <td class="text-center">\n' +
+                        data['data']['vlan_name'] +
+                        '        <div style="display: inline;">\n' +
+                        '            <a href="javascript:;" class="delete_reserved_ip_trigger" style="display: none; float: right;">\n' +
+                        '                <span onclick="reserved_ip_delete(this);" class="glyph-icon icon-iconic-cancel" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; color: indianred;"></span>\n' +
+                        '            </a>\n' +
+                        '        </div>\n' +
+                        '    </td>\n' +
+                        '    <td class="text-center">' + data['data']['vlan_id'] + '</td>\n' +
+                        '    <td class="text-center">' + data['data']['vlan_description'] + '</td>\n' +
+                        '    <td class="text-center">' + data['data']['create_time'] + '</td>\n' +
+                        '</tr>';
+                    $('#vlans_list_table tbody').append(html);
+                    alter_success('添加 VLAN 成功！');
+                }
+            });
+        }
     </script>
     <div class="panel">
         <div class="panel-body">
             <ul class="nav nav-tabs mrg25B">
                 <li class="active"><a href="javascript:;" onclick="select_this(this);" id="view_by_jimv_system_config_label">JimV 系统配置</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="view_by_ip_pool_label">IP 池</a></li>
+                <li><a href="javascript:;" onclick="select_this(this);" id="view_by_vlan_label">VLAN</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="view_by_quota_label">性能配额</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="view_by_token_label">Token</a></li>
                 <li><a href="javascript:;" onclick="select_this(this);" id="view_by_auxiliary_label">辅助</a></li>
@@ -838,6 +887,28 @@
                 </form>
             </div>
             <div id="view_by_ip_pool" class="example-box-wrapper" style="display: none;">
+            </div>
+            <div id="view_by_vlan" class="example-box-wrapper" style="display: none;">
+                <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
+                    <div class="col-sm-12" style="padding-right: 0;">
+                        <div class="pull-right">
+                            <button class="btn btn-default" onclick="window.location.reload();" style="border-radius: 0;"><span class="glyph-icon icon-elusive-arrows-cw"></span></button>
+                            <a class="btn btn-info" href="javascript:;" data-toggle="modal" data-target="#add_vlan_modal" style="border-radius: 0; padding-left: 40px; padding-right: 40px;">添加 VLAN</a>
+                        </div>
+                    </div>
+                </div>
+                <table id="vlans_list_table" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid" style="width: 100%;">
+                    <thead>
+                    <tr role="row">
+                        <th class="text-center">名称</th>
+                        <th class="text-center">VLAN ID</th>
+                        <th class="text-center">备注</th>
+                        <th class="text-center">创建时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
             <div id="view_by_token" class="example-box-wrapper" style="display: none;">
                 <div class="row" style="padding: 10px 10px 10px 0; width: 100%;">
@@ -992,6 +1063,50 @@
                                 <input id="reserved_ip_input" class="form-control" style="text-align: center;" type="text" placeholder="将要保留的 IP">
                             </div>
                             <div class="col-sm-1"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="add_vlan_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">添加 VLAN：</h4>
+            </div>
+            <div class="panel">
+                <div class="panel-body">
+                    <form class="form-horizontal bordered-row" style="padding-left: 16%;">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" style="padding-right: 0;">名称</label>
+                            <div class="col-sm-8">
+                                <input title="VLAN 名称" class="form-control" name="vlan_name" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" style="padding-right: 0;">VLAN ID</label>
+                            <div class="col-sm-8">
+                                <input title="VLAN ID" class="form-control" name="vlan_id" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" style="padding-right: 0;">备注</label>
+                            <div class="col-sm-8">
+                                <textarea title="备注" class="form-control" name="vlan_description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <div class="col-sm-6">
+                            </div>
+                            <div class="col-sm-6">
+                                <div style="padding: 0; text-align: right;">
+                                    <button type="button" class="btn btn-sm btn-primary" style="right: 20%;" onclick="add_vlan(this);">创建</button>
+                                    <button type="button" class="btn btn-sm btn-default" style="right: 10%;" data-dismiss="modal">取消</button>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
