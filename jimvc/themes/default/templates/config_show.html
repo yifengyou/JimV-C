@@ -719,9 +719,9 @@
                 async: false,
                 dataType: "json",
                 data : JSON.stringify({
-                    vlan_name: $('#vlan_name').val(),
+                    label: $('#vlan_label').val(),
                     vlan_id: parseInt($('#vlan_id').val()),
-                    vlan_description: $('#vlan_description').val()
+                    description: $('#vlan_description').val()
                 }),
                 error : function(data, textStatus, xhr) {
                     alter_danger(data.responseText);
@@ -1083,19 +1083,19 @@
                         <div class="form-group">
                             <label class="col-sm-3 control-label" style="padding-right: 0;">名称</label>
                             <div class="col-sm-8">
-                                <input title="VLAN 名称" class="form-control" name="vlan_name" type="text">
+                                <input title="VLAN 名称" class="form-control" id="vlan_label" name="vlan_label" type="text">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-3 control-label" style="padding-right: 0;">VLAN ID</label>
                             <div class="col-sm-8">
-                                <input title="VLAN ID" class="form-control" name="vlan_id" type="text">
+                                <input title="VLAN ID" class="form-control" id="vlan_id" name="vlan_id" type="text">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-3 control-label" style="padding-right: 0;">备注</label>
                             <div class="col-sm-8">
-                                <textarea title="备注" class="form-control" name="vlan_description"></textarea>
+                                <textarea title="备注" class="form-control" id="vlan_description" name="vlan_description"></textarea>
                             </div>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
