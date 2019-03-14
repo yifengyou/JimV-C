@@ -730,15 +730,10 @@
                 success : function(data, textStatus, xhr) {
                     var html = '<tr role="row" data-id="' + data['data']['id'] + '" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">\n' +
                         '    <td class="text-center">\n' +
-                        data['data']['vlan_name'] +
-                        '        <div style="display: inline;">\n' +
-                        '            <a href="javascript:;" class="delete_reserved_ip_trigger" style="display: none; float: right;">\n' +
-                        '                <span onclick="reserved_ip_delete(this);" class="glyph-icon icon-iconic-cancel" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; color: indianred;"></span>\n' +
-                        '            </a>\n' +
-                        '        </div>\n' +
+                        data['data']['label'] +
                         '    </td>\n' +
                         '    <td class="text-center">' + data['data']['vlan_id'] + '</td>\n' +
-                        '    <td class="text-center">' + data['data']['vlan_description'] + '</td>\n' +
+                        '    <td class="text-center">' + data['data']['description'] + '</td>\n' +
                         '    <td class="text-center">' + data['data']['create_time'] + '</td>\n' +
                         '</tr>';
                     $('#vlans_list_table tbody').append(html);
