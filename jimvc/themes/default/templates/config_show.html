@@ -14,6 +14,38 @@
             color: deepskyblue;
         }
 
+        .table {
+            font-size: 12px;
+            border-width: 1px;
+            line-height: 20px;
+        }
+        .table > thead > tr > th,
+        .table > tfoot > tr > th {
+            color: #999999;
+            font-weight: normal;
+            border-bottom: 0 solid #e1e6eb;
+            background-color: #F5F6FA;
+        }
+
+        .table > tbody > tr > td {
+            color: #424547;
+        }
+
+        .table-bordered > tbody > tr {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .table-bordered > thead > tr > th,
+        .table-bordered > tbody > tr > th,
+        .table-bordered > tfoot > tr > th,
+        .table-bordered > thead > tr > td,
+        .table-bordered > tbody > tr > td,
+        .table-bordered > tfoot > tr > td {
+            border-style: solid;
+            border-width: 1px 0 0 0;
+        }
+
         #batch_change_disk_quota_form label {
             padding-left: 0;
             padding-right: 0;
@@ -56,6 +88,7 @@
             register_iops_bps_event();
             refresh_ip_pools();
             tokens_list_refresh();
+            vlans_list_refresh();
 
             $('input.input-switch[name="activity"]').on('switchChange.bootstrapSwitch', function(event, state) {
                 console.log(this); // DOM element
@@ -259,6 +292,16 @@
                 max: 600,
                 min: 0,
                 postfix: '秒',
+                verticalbuttons: true,
+                verticalupclass: 'glyph-icon icon-plus',
+                verticaldownclass: 'glyph-icon icon-minus'
+            });
+        });
+
+        $(function() { "use strict";
+            $("#vlan_id").TouchSpin({
+                max: 4094,
+                min: 1,
                 verticalbuttons: true,
                 verticalupclass: 'glyph-icon icon-plus',
                 verticaldownclass: 'glyph-icon icon-minus'
@@ -584,6 +627,14 @@
             $(me).find(".delete_reserved_ip_trigger").css('display','none');
         }
 
+        function vlan_row_onmouseover(me) {
+            $(me).find(".edit_vlan_label_trigger, .edit_vlan_description_trigger").css('display','inline-flex');
+        }
+
+        function vlan_row_onmouseout(me) {
+            $(me).find(".edit_vlan_label_trigger, .edit_vlan_description_trigger").css('display','none');
+        }
+
         function add_reserved_ip(ip) {
             $.ajax({
                 url : '/api/reserved_ip',
@@ -729,15 +780,127 @@
                 },
                 success : function(data, textStatus, xhr) {
                     var html = '<tr role="row" data-id="' + data['data']['id'] + '" class="odd" onmouseover="row_onmouseover(this);" onmouseout="row_onmouseout(this);">\n' +
-                        '    <td class="text-center">\n' +
-                        data['data']['label'] +
+                        '    <td>\n' +
+                        '       <div>\n' +
+                        '           <p style="display: inline-block;">' + data['data']['label'] + '</p>\n' +
+                        '               <a href="javascript:;" class="edit_vlan_label_trigger" data-toggle="modal" data-target="#edit_vlan_label_modal" style="display: none; float: right;" onclick="$(\'#vlan_index_id\').val($(this).parent().parent().parent().data(\'id\'));$(\'#edit_vlan_label\').val($(this).prev().text())">\n' +
+                        '                   <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>\n' +
+                        '               </a>\n' +
+                        '       </div>\n' +
                         '    </td>\n' +
                         '    <td class="text-center">' + data['data']['vlan_id'] + '</td>\n' +
-                        '    <td class="text-center">' + data['data']['description'] + '</td>\n' +
-                        '    <td class="text-center">' + data['data']['create_time'] + '</td>\n' +
+                        '    <td>' +
+                        '       <div>\n' +
+                        '           <p style="display: inline-block;">' + data['data']['description'] + '</p>\n' +
+                        '               <a href="javascript:;" class="edit_vlan_description_trigger" data-toggle="modal" data-target="#edit_vlan_description_modal" style="display: none; float: right;" onclick="$(\'#vlan_index_id\').val($(this).parent().parent().parent().data(\'id\'));$(\'#edit_vlan_description\').val($(this).prev().text())">\n' +
+                        '                   <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>\n' +
+                        '               </a>\n' +
+                        '       </div>\n' +
+                        '    <td class="text-center"><span style="color: #009cc5;">' + '创建中...' + '</span></td>\n' +
+                        '    <td class="text-center">' + new Date(data['data']['create_time'] / 1000).format('yy-mm-dd HH:MM:ss') + '</td>\n' +
+                        '    <td class="text-center">\n' +
+                        '       <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#delete_modal"\n'+
+                        '          onclick="$(\'#os_template_image_id\').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);\n'+
+                        '      $(\'#delete_instance_desc\').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">\n'+
+                        '           删除\n'+
+                        '       </a>\n'+
+                        '    </td>\n' +
                         '</tr>';
                     $('#vlans_list_table tbody').append(html);
                     alter_success('添加 VLAN 成功！');
+                }
+            });
+        }
+
+        function vlans_list_refresh() {
+            $.ajax({
+                url : '/api/vlans',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                async: false,
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    var html = NaN;
+                    $('#vlans_list_table tbody').empty();
+                    $.each(data.data, function(k, v) {
+                        html = '<tr role="row" data-id="' + v['id'] + '" class="odd" onmouseover="vlan_row_onmouseover(this);" onmouseout="vlan_row_onmouseout(this);">\n' +
+                            '    <td>\n' +
+                            '       <div>\n' +
+                            '           <p style="display: inline-block;">' + v['label'] + '</p>\n' +
+                            '               <a href="javascript:;" class="edit_vlan_label_trigger" data-toggle="modal" data-target="#edit_vlan_label_modal" style="display: none; float: right;" onclick="$(\'#vlan_index_id\').val($(this).parent().parent().parent().data(\'id\'));$(\'#edit_vlan_label\').val($(this).prev().text())">\n' +
+                            '                   <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>\n' +
+                            '               </a>\n' +
+                            '       </div>\n' +
+                            '    </td>\n' +
+                            '    <td class="text-center">' + v['vlan_id'] + '</td>\n' +
+                            '    <td>' +
+                            '       <div>\n' +
+                            '           <p style="display: inline-block;">' + v['description'] + '</p>\n' +
+                            '               <a href="javascript:;" class="edit_vlan_description_trigger" data-toggle="modal" data-target="#edit_vlan_description_modal" style="display: none; float: right;" onclick="$(\'#vlan_index_id\').val($(this).parent().parent().parent().data(\'id\'));$(\'#edit_vlan_description\').val($(this).prev().text())">\n' +
+                            '                   <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>\n' +
+                            '               </a>\n' +
+                            '       </div>\n' +
+                            '    </td>\n' +
+                            '    <td class="text-center"><span style="color: #00BB00;">' + '100%' + '</span></td>\n' +
+                            '    <td class="text-center">' + new Date(v['create_time'] / 1000).format('yy-mm-dd HH:MM:ss') + '</td>\n' +
+                            '    <td class="text-center">\n' +
+                            '        <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#delete_modal"\n'+
+                            '           onclick="$(\'#os_template_image_id\').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);\n'+
+                            '       $(\'#delete_instance_desc\').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">\n'+
+                            '            删除\n'+
+                            '        </a>\n'+
+                            '    </td>\n' +
+                            '</tr>';
+                        $('#vlans_list_table tbody').append(html);
+                    });
+                }
+            });
+        }
+
+        function vlan_label_update(me) {
+            var vlan_index_id = $('#vlan_index_id').val();
+            var label = $('#edit_vlan_label').val();
+            $('#edit_vlan_label_modal').modal('hide');
+            $.ajax({
+                url : '/api/vlans/' + vlan_index_id,
+                type : 'PATCH',
+                contentType: "application/json; charset=utf-8",
+                data : JSON.stringify({
+                    label: label
+                }),
+                error : function() {
+                    alter_danger('VLAN 名称更新失败！');
+                },
+                success : function() {
+                    alter_success('VLAN 名称更新成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+
+        function vlan_description_update(me) {
+            var vlan_index_id = $('#vlan_index_id').val();
+            var description = $('#edit_vlan_description').val();
+            $('#edit_vlan_description_modal').modal('hide');
+            $.ajax({
+                url : '/api/vlans/' + vlan_index_id,
+                type : 'PATCH',
+                contentType: "application/json; charset=utf-8",
+                data : JSON.stringify({
+                    description: description
+                }),
+                error : function() {
+                    alter_danger('VLAN 备注更新失败！');
+                },
+                success : function() {
+                    alter_success('VLAN 备注更新成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
                 }
             });
         }
@@ -892,13 +1055,15 @@
                         </div>
                     </div>
                 </div>
-                <table id="vlans_list_table" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid" style="width: 100%;">
+                <table id="vlans_list_table" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid" style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
                     <thead>
                     <tr role="row">
-                        <th class="text-center">名称</th>
-                        <th class="text-center">VLAN ID</th>
-                        <th class="text-center">备注</th>
-                        <th class="text-center">创建时间</th>
+                        <th width="180px">名称</th>
+                        <th class="text-center" width="120px">VLAN ID</th>
+                        <th>描述</th>
+                        <th class="text-center" width="100px">完整度</th>
+                        <th class="text-center" width="160px">创建时间</th>
+                        <th class="text-center" width="100px">操作</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -938,7 +1103,8 @@
         </div>
     </div>
 
-<input id="ip_pool_id" title="IP Pool ID" class="form-control" name="ip_pool_id" hidden>
+<input id="ip_pool_id" title="IP Pool ID" name="ip_pool_id" hidden>
+<input id="vlan_index_id" title="VLAN Index ID" name="vlan_index_id" hidden>
 
 <div class="modal" id="add_ip_pool_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
     <div class="modal-dialog modal-lg">
@@ -1105,6 +1271,40 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="edit_vlan_label_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑 VLAN 名称：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_vlan_label" title="VLAN 名称" class="form-control" name="vlan_label">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="vlan_label_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="edit_vlan_description_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑 VLAN 备注：</h4>
+            </div>
+            <div class="modal-body">
+                <textarea id="edit_vlan_description" rows="6" title="VLAN 备注" class="form-control" name="vlan_description"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="vlan_description_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
     </div>

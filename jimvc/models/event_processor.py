@@ -140,6 +140,7 @@ class EventProcessor(object):
             'memory_available': cls.message['message']['memory_available'],
             'dmidecode': cls.message['message']['dmidecode'],
             'interfaces': cls.message['message']['interfaces'],
+            'vlans': cls.message['message']['vlans'],
             'disks': cls.message['message']['disks'],
             'boot_time': cls.message['message']['boot_time'],
             'nonrandom': False,
