@@ -3,7 +3,7 @@
 
 
 import json
-from flask import g
+import jimit as ji
 
 from jimvc.models import app_config
 from jimvc.models import Database as db
@@ -27,12 +27,13 @@ class Host(object):
         """
 
         coupler_length = 60
+        ts = ji.Common.ts()
 
         if 'timestamp' not in v:
             return v
 
         v['alive'] = False
-        if v['timestamp'] + coupler_length >= g.ts:
+        if v['timestamp'] + coupler_length >= ts:
             v['alive'] = True
 
         if 'threads_status' not in v:
@@ -55,23 +56,23 @@ class Host(object):
             }
 
         v['threads_status']['instruction_process_engine']['alive'] = False
-        if v['threads_status']['instruction_process_engine']['timestamp'] + coupler_length >= g.ts:
+        if v['threads_status']['instruction_process_engine']['timestamp'] + coupler_length >= ts:
             v['threads_status']['instruction_process_engine']['alive'] = True
 
         v['threads_status']['host_state_report_engine']['alive'] = False
-        if v['threads_status']['host_state_report_engine']['timestamp'] + coupler_length >= g.ts:
+        if v['threads_status']['host_state_report_engine']['timestamp'] + coupler_length >= ts:
             v['threads_status']['host_state_report_engine']['alive'] = True
 
         v['threads_status']['guest_creating_progress_report_engine']['alive'] = False
-        if v['threads_status']['guest_creating_progress_report_engine']['timestamp'] + coupler_length >= g.ts:
+        if v['threads_status']['guest_creating_progress_report_engine']['timestamp'] + coupler_length >= ts:
             v['threads_status']['guest_creating_progress_report_engine']['alive'] = True
 
         v['threads_status']['guest_performance_collection_engine']['alive'] = False
-        if v['threads_status']['guest_performance_collection_engine']['timestamp'] + coupler_length >= g.ts:
+        if v['threads_status']['guest_performance_collection_engine']['timestamp'] + coupler_length >= ts:
             v['threads_status']['guest_performance_collection_engine']['alive'] = True
 
         v['threads_status']['host_performance_collection_engine']['alive'] = False
-        if v['threads_status']['host_performance_collection_engine']['timestamp'] + coupler_length >= g.ts:
+        if v['threads_status']['host_performance_collection_engine']['timestamp'] + coupler_length >= ts:
             v['threads_status']['host_performance_collection_engine']['alive'] = True
 
         return v

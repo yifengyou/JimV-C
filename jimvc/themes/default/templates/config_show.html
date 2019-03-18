@@ -760,6 +760,14 @@
             });
         }
 
+        function exchange_arrival_rate_for_tr(arrival, posts) {
+            if (arrival === posts) {
+                return '<span style="color: #00BB00;">' + '100%' + '</span>';
+            } else {
+                return '<span style="color: #BB0000;">' + arrival + '/' + posts + '</span>';
+            }
+        }
+
         function add_vlan() {
             $('#add_vlan_modal').modal('hide');
 
@@ -843,14 +851,28 @@
                             '               </a>\n' +
                             '       </div>\n' +
                             '    </td>\n' +
-                            '    <td class="text-center"><span style="color: #00BB00;">' + '100%' + '</span></td>\n' +
+                            '    <td class="text-center">' + exchange_arrival_rate_for_tr(v['arrival'], v['posts']) + '</td>\n' +
                             '    <td class="text-center">' + new Date(v['create_time'] / 1000).format('yy-mm-dd HH:MM:ss') + '</td>\n' +
                             '    <td class="text-center">\n' +
-                            '        <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#delete_modal"\n'+
-                            '           onclick="$(\'#os_template_image_id\').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);\n'+
-                            '       $(\'#delete_instance_desc\').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">\n'+
-                            '            删除\n'+
-                            '        </a>\n'+
+                            '        <div class="dropdown inline-block">\n' +
+                            '            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">更多</a>\n' +
+                            '            <ul class="dropdown-menu">\n' +
+                            '                <li>\n' +
+                            '                    <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#vlan_delete_modal"\n'+
+                            '                       onclick="$(\'#vlan_index_id\').val($(this).parent().parent().parent().parent().parent().data(\'id\'));' +
+                            '                       $(\'#delete_vlan_instance_desc\').text(\'VLAN ID: \' + $(this).parent().parent().parent().parent().parent().data(\'id\') + \' / \' + $(this).parent().parent().parent().parent().parent().children()[0].textContent)">\n'+
+                            '                        删除\n'+
+                            '                    </a>\n'+
+                            '                </li>\n' +
+                            '                <li>\n' +
+                            '                    <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#delete_modal"\n'+
+                            '                       onclick="$(\'#os_template_image_id\').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);\n'+
+                            '                       $(\'#delete_instance_desc\').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">\n'+
+                            '                        强制删除\n'+
+                            '                    </a>\n'+
+                            '                </li>\n' +
+                            '            </ul>\n' +
+                            '        </div>\n' +
                             '    </td>\n' +
                             '</tr>';
                         $('#vlans_list_table tbody').append(html);
@@ -898,6 +920,50 @@
                 },
                 success : function() {
                     alter_success('VLAN 备注更新成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+
+        function vlan_delete_at() {
+            $('#vlan_delete_modal').modal('hide');
+
+            var vlan_index_id = $('#vlan_index_id').val();
+
+            $.ajax({
+                url : '/api/vlans/' + vlan_index_id,
+                type : 'DELETE',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('删除 VLAN 失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    alter_success('删除 VLAN 成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+
+        function vlan_force_delete_at() {
+            var vlan_index_id = $('#vlan_index_id').val();
+
+            $.ajax({
+                url : '/api/vlans/_force/' + vlan_index_id,
+                type : 'DELETE',
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                error : function(data, textStatus, xhr) {
+                    alter_danger(data.responseText);
+                    alter_warning('强制删除 VLAN 失败！');
+                },
+                success : function(data, textStatus, xhr) {
+                    alter_success('强制删除 VLAN 成功！');
                     setTimeout(function() {
                         refresh();
                     }, 1000);
@@ -1055,7 +1121,7 @@
                         </div>
                     </div>
                 </div>
-                <table id="vlans_list_table" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid" style="width: 100%; margin-bottom: 0; border-bottom-width: 0;">
+                <table id="vlans_list_table" class="table table-bordered table-hover" cellspacing="0" width="100%" role="grid" style="width: 100%; margin-bottom: 0;">
                     <thead>
                     <tr role="row">
                         <th width="180px">名称</th>
@@ -1304,6 +1370,42 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="vlan_description_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="vlan_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">删除 VLAN：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要删除该 VLAN 吗？</p>
+                <h3 style="color: orangered;" id="delete_vlan_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="vlan_delete_at();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="vlan_force_delete_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">强制删除 VLAN：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要强制删除该 VLAN 吗？</p>
+                <h3 style="color: orangered;" id="delete_force_instance_desc"></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="vlan_force_delete_at();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

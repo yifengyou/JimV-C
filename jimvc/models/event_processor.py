@@ -19,6 +19,8 @@ from jimvc.models import ResponseState, GuestState, DiskState
 from jimvc.models import GuestMigrateInfo
 from jimvc.models import GuestCollectionPerformanceDataKind, HostCollectionPerformanceDataKind
 from jimvc.models import HostCPUMemory, HostTraffic, HostDiskUsageIO
+from jimvc.models import Host
+from jimvc.models import VLAN
 
 
 __author__ = 'James Iter'
@@ -33,6 +35,7 @@ class EventProcessor(object):
     guest = Guest()
     guest_migrate_info = GuestMigrateInfo()
     disk = Disk()
+    vlan = VLAN()
     snapshot = Snapshot()
     snapshot_disk_mapping = SnapshotDiskMapping()
     os_template_image = OSTemplateImage()
@@ -367,6 +370,27 @@ class EventProcessor(object):
 
                 if state == ResponseState.success.value:
                     cls.os_template_image.delete()
+
+                else:
+                    pass
+
+        elif _object == 'vlan':
+            if action == 'delete':
+                cls.vlan.id = cls.message['message']['passback_parameters']['id']
+                cls.vlan.get()
+
+                vlan_bridge_name = 'vlan' + cls.vlan.vlan_id.__str__()
+
+                if state == ResponseState.success.value:
+                    hosts = Host.get_all()
+
+                    for host in hosts:
+                        # 如果 vlan 网桥存在于任何一个 计算节点 中（包容离线的计算节点），则拒绝在数据库中删除该 vlan 信息。
+                        # 用户可通过强制删除，避开该逻辑。
+                        if vlan_bridge_name in host['vlans']:
+                            return
+
+                    cls.vlan.delete()
 
                 else:
                     pass

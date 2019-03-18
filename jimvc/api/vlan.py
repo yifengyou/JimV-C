@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import Blueprint, request
+import requests
+from flask import Blueprint, request, url_for
 import json
 import jimit as ji
 
@@ -138,29 +139,117 @@ def r_update(ids):
 
 @Utils.dumps2response
 def r_get(ids):
-    return vlan_base.get(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+    ret = vlan_base.get(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+
+    if '200' != ret['state']['code']:
+        return ret
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_vlan_bridge = dict()
+    for vlan in ret['data']:
+        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+        vlan_bond_name = 'bond0.' + vlan['vlan_id'].__str__()
+
+        if vlan_bridge_name not in hosts_mapping_by_vlan_bridge:
+            hosts_mapping_by_vlan_bridge[vlan_bridge_name] = list()
+
+        for host in hosts_ret['data']:
+            if vlan_bridge_name in host['vlans'] and vlan_bond_name in host['vlans']:
+                hosts_mapping_by_vlan_bridge[vlan_bridge_name].append(host)
+
+    hosts = hosts_ret['data']
+    posts = hosts.__len__()
+
+    for i, vlan in enumerate(ret['data']):
+        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+        ret['data'][i]['posts'] = posts
+        ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
+
+    return ret
 
 
 @Utils.dumps2response
 def r_get_by_filter():
-    return vlan_base.get_by_filter()
+    ret = vlan_base.get_by_filter()
+    if '200' != ret['state']['code']:
+        return ret
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_vlan_bridge = dict()
+    for vlan in ret['data']:
+        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+        vlan_bond_name = 'bond0.' + vlan['vlan_id'].__str__()
+
+        if vlan_bridge_name not in hosts_mapping_by_vlan_bridge:
+            hosts_mapping_by_vlan_bridge[vlan_bridge_name] = list()
+
+        for host in hosts_ret['data']:
+            if vlan_bridge_name in host['vlans'] and vlan_bond_name in host['vlans']:
+                hosts_mapping_by_vlan_bridge[vlan_bridge_name].append(host)
+
+    hosts = hosts_ret['data']
+    posts = hosts.__len__()
+
+    for i, vlan in enumerate(ret['data']):
+        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+        ret['data'][i]['posts'] = posts
+        ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
+
+    return ret
 
 
 @Utils.dumps2response
 def r_content_search():
-    return vlan_base.content_search()
+    ret = vlan_base.content_search()
+
+    if '200' != ret['state']['code']:
+        return ret
+
+    hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = json.loads(hosts_ret.content)
+
+    hosts_mapping_by_vlan_bridge = dict()
+    for vlan in ret['data']:
+        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+        vlan_bond_name = 'bond0.' + vlan['vlan_id'].__str__()
+
+        if vlan_bridge_name not in hosts_mapping_by_vlan_bridge:
+            hosts_mapping_by_vlan_bridge[vlan_bridge_name] = list()
+
+        for host in hosts_ret['data']:
+            if vlan_bridge_name in host['vlans'] and vlan_bond_name in host['vlans']:
+                hosts_mapping_by_vlan_bridge[vlan_bridge_name].append(host)
+
+    hosts = hosts_ret['data']
+    posts = hosts.__len__()
+
+    for i, vlan in enumerate(ret['data']):
+        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+        ret['data'][i]['posts'] = posts
+        ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
+
+    return ret
 
 
 @Utils.dumps2response
 def r_delete(ids):
+    ret = dict()
+    ret['state'] = ji.Common.exchange_state(20000)
+
     args_rules = [
         Rules.IDS.value
     ]
 
-    request.json['ids'] = ids
-
     try:
-        ji.Check.previewing(args_rules, request.json)
+
+        ji.Check.previewing(args_rules, {'ids': ids})
 
         vlan = VLAN()
 
@@ -169,15 +258,15 @@ def r_delete(ids):
             vlan.id = _id
             vlan.get()
 
-            guests, _ = Guest.get_by_filter(filter_str=':'.join(['vlan_id', 'eq', vlan.vlan_id]))
+            guests, _ = Guest.get_by_filter(filter_str=':'.join(['vlan_id', 'eq', vlan.vlan_id.__str__()]))
 
+            # 检测 vlan 中是否存在 虚拟机，若存在，则拒绝删除操作。
             if guests.__len__() > 0:
 
                 guests_info = ''
                 for guest in guests:
                     guests_info += guest['label'] + ',' + guest['uuid'] + '.'
 
-                ret = dict()
                 ret['state'] = ji.Common.exchange_state(41262)
                 ret['state']['sub']['zh-cn'] = ''.join([
                     ret['state']['sub']['zh-cn'], u': Vlan ID: ', vlan.vlan_id, u': Guests: ', guests_info])
@@ -197,14 +286,16 @@ def r_delete(ids):
                     'uuid': None,
                     'node_id': host['node_id'],
                     'vlan_id': vlan.vlan_id,
-                    'passback_parameters': {'vlan_id': vlan.vlan_id}
+                    'passback_parameters': {'id': vlan.id, 'vlan_id': vlan.vlan_id}
                 }
 
                 Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
+        return ret
+
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
-    return vlan_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+    # return vlan_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 

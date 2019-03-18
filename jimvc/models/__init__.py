@@ -132,12 +132,12 @@ from snapshot_disk_mapping import (
     SnapshotDiskMapping
 )
 
-from event_processor import (
-    EventProcessor
-)
-
 from vlan import (
     VLAN
+)
+
+from event_processor import (
+    EventProcessor
 )
 
 
