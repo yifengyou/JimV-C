@@ -806,16 +806,13 @@
                         '       </div>\n' +
                         '    <td class="text-center"><span style="color: #009cc5;">' + '创建中...' + '</span></td>\n' +
                         '    <td class="text-center">' + new Date(data['data']['create_time'] / 1000).format('yy-mm-dd HH:MM:ss') + '</td>\n' +
-                        '    <td class="text-center">\n' +
-                        '       <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#delete_modal"\n'+
-                        '          onclick="$(\'#os_template_image_id\').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);\n'+
-                        '      $(\'#delete_instance_desc\').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">\n'+
-                        '           删除\n'+
-                        '       </a>\n'+
-                        '    </td>\n' +
+                        '    <td class="text-center">-</td>\n' +
                         '</tr>';
                     $('#vlans_list_table tbody').append(html);
                     alter_success('添加 VLAN 成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 3000);
                 }
             });
         }
@@ -860,14 +857,14 @@
                             '                <li>\n' +
                             '                    <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#vlan_delete_modal"\n'+
                             '                       onclick="$(\'#vlan_index_id\').val($(this).parent().parent().parent().parent().parent().data(\'id\'));' +
-                            '                       $(\'#delete_vlan_instance_desc\').text(\'VLAN ID: \' + $(this).parent().parent().parent().parent().parent().data(\'id\') + \' / \' + $(this).parent().parent().parent().parent().parent().children()[0].textContent)">\n'+
+                            '                       $(\'#delete_vlan_instance_desc\').text(\'VLAN ID: \' + $(this).parent().parent().parent().parent().parent().children()[1].textContent + \' / \' + $(this).parent().parent().parent().parent().parent().children()[0].textContent)">\n'+
                             '                        删除\n'+
                             '                    </a>\n'+
                             '                </li>\n' +
                             '                <li>\n' +
-                            '                    <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#delete_modal"\n'+
-                            '                       onclick="$(\'#os_template_image_id\').val($(this).parent().parent().parent().parent().parent().children()[0].textContent);\n'+
-                            '                       $(\'#delete_instance_desc\').text($(this).parent().parent().parent().parent().parent().children()[2].textContent)">\n'+
+                            '                    <a href="javascript:;" style="color: indianred;" data-toggle="modal" data-target="#vlan_force_delete_modal"\n'+
+                            '                       onclick="$(\'#vlan_index_id\').val($(this).parent().parent().parent().parent().parent().data(\'id\'));' +
+                            '                       $(\'#force_delete_vlan_instance_desc\').text(\'VLAN ID: \' + $(this).parent().parent().parent().parent().parent().children()[1].textContent + \' / \' + $(this).parent().parent().parent().parent().parent().children()[0].textContent)">\n'+
                             '                        强制删除\n'+
                             '                    </a>\n'+
                             '                </li>\n' +
@@ -951,6 +948,8 @@
         }
 
         function vlan_force_delete_at() {
+            $('#vlan_force_delete_modal').modal('hide');
+
             var vlan_index_id = $('#vlan_index_id').val();
 
             $.ajax({
@@ -1402,7 +1401,7 @@
             </div>
             <div class="modal-body">
                 <p>您确定要强制删除该 VLAN 吗？</p>
-                <h3 style="color: orangered;" id="delete_force_instance_desc"></h3>
+                <h3 style="color: orangered;" id="force_delete_vlan_instance_desc"></h3>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="vlan_force_delete_at();">确定</button>

@@ -238,6 +238,7 @@ add_rule_api(service.blueprints, '/_search', api_func='service.r_content_search'
 add_rule_api(vlan.blueprint, '', api_func='vlan.r_create', methods=['POST'])
 add_rule_api(vlan.blueprints, '/<ids>', api_func='vlan.r_update', methods=['PATCH'])
 add_rule_api(vlan.blueprints, '/<ids>', api_func='vlan.r_delete', methods=['DELETE'])
+add_rule_api(vlan.blueprints, '/_force/<ids>', api_func='vlan.r_force_delete', methods=['DELETE'])
 add_rule_api(vlan.blueprints, '/<ids>', api_func='vlan.r_get', methods=['GET'])
 add_rule_api(vlan.blueprints, '', api_func='vlan.r_get_by_filter', methods=['GET'])
 add_rule_api(vlan.blueprints, '/_search', api_func='vlan.r_content_search', methods=['GET'])

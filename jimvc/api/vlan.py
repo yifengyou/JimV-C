@@ -296,6 +296,61 @@ def r_delete(ids):
     except ji.PreviewingError, e:
         return json.loads(e.message)
 
-    # return vlan_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
+
+@Utils.dumps2response
+def r_force_delete(ids):
+    args_rules = [
+        Rules.IDS.value
+    ]
+
+    try:
+
+        ji.Check.previewing(args_rules, {'ids': ids})
+
+        vlan = VLAN()
+
+        # 检测所指定的 vlan 都存在
+        for _id in ids.split(','):
+            vlan.id = _id
+            vlan.get()
+
+            guests, _ = Guest.get_by_filter(filter_str=':'.join(['vlan_id', 'eq', vlan.vlan_id.__str__()]))
+
+            # 检测 vlan 中是否存在 虚拟机，若存在，则拒绝删除操作。
+            if guests.__len__() > 0:
+
+                guests_info = ''
+                for guest in guests:
+                    guests_info += guest['label'] + ',' + guest['uuid'] + '.'
+
+                ret = dict()
+                ret['state'] = ji.Common.exchange_state(41262)
+                ret['state']['sub']['zh-cn'] = ''.join([
+                    ret['state']['sub']['zh-cn'], u': Vlan ID: ', vlan.vlan_id, u': Guests: ', guests_info])
+
+                return ret
+
+        for _id in ids.split(','):
+            vlan.id = _id
+            vlan.get()
+
+            # 取全部活着的 hosts
+            available_hosts = Host.get_available_hosts(nonrandom=None)
+            for host in available_hosts:
+                message = {
+                    '_object': 'vlan',
+                    'action': 'delete',
+                    'uuid': None,
+                    'node_id': host['node_id'],
+                    'vlan_id': vlan.vlan_id,
+                    'passback_parameters': {'id': vlan.id, 'vlan_id': vlan.vlan_id}
+                }
+
+                Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+
+    return vlan_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 
