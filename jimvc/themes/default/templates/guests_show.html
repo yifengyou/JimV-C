@@ -283,6 +283,26 @@
             });
         });
 
+        $('#batch_change_vlan_modal').on('show.bs.modal', function (me) {
+            $.ajax({
+                url : '/api/vlans',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    $('#batch_change_to_vlan').empty();
+                    $.each(data.data, function(k, v) {
+                        $('#batch_change_to_vlan').append(
+                            $('<option>', {value: v['vlan_id'], text: 'VLAN ID: ' + v['vlan_id'], 'data-subtext': v['label']})
+                        );
+                    });
+                    $('#batch_change_to_vlan').selectpicker('refresh');
+                }
+            });
+        });
+
         $('#reset_password_modal').on('show.bs.modal', function (me) {
             $('#reset_password_instance_uuid').val(
                 $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
@@ -1214,6 +1234,17 @@
         $('#batch_delete_modal').modal('hide');
     }
 
+    function batch_change_vlan() {
+        $('#batch_change_vlan_modal').modal('hide');
+
+        var vlan_id = $('#batch_change_to_vlan').val();
+        var uuids = get_checked_uuids();
+
+        if (uuids) {
+            change_vlan(uuids, vlan_id);
+        }
+    }
+
     var show_real_password = false;
     function change_display_password(me) {
         if (show_real_password) {
@@ -1993,6 +2024,9 @@
                                             </li>
                                             <li>
                                                 <a href="javascript:;" data-toggle="modal" data-target="#batch_adjust_ability_modal">变更配置</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:;" data-toggle="modal" data-target="#batch_change_vlan_modal">变更 VLAN</a>
                                             </li>
                                             <li class="divider"></li>
                                             <li>
@@ -2907,6 +2941,27 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="change_vlan_at(this);">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batch_change_vlan_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">批量变更 VLAN：</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <p>您确定要使选定的虚拟机变更 VLAN 吗？</p>
+                <p></p>
+                <select id="batch_change_to_vlan" data-show-subtext="true" name="batch_change_to_vlan" title="可变更的 VLAN" class="selectpicker" data-width="100%">
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="batch_change_vlan();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>
