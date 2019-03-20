@@ -828,9 +828,17 @@
                 },
                 success : function(data, textStatus, xhr) {
                     var html = NaN;
+                    var disabled = '';
+
                     $('#vlans_list_table tbody').empty();
                     $.each(data.data, function(k, v) {
-                        html = '<tr role="row" data-id="' + v['id'] + '" class="odd" onmouseover="vlan_row_onmouseover(this);" onmouseout="vlan_row_onmouseout(this);">\n' +
+                        if (v['vlan_id'] === -1) {
+                            disabled = ' disabled';
+                        } else {
+                            disabled = '';
+                        }
+
+                        html = '<tr role="row" data-id="' + v['id'] + '" class="odd' + disabled + '" onmouseover="vlan_row_onmouseover(this);" onmouseout="vlan_row_onmouseout(this);">\n' +
                             '    <td>\n' +
                             '       <div>\n' +
                             '           <p style="display: inline-block;">' + v['label'] + '</p>\n' +

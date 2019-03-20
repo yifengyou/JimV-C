@@ -263,6 +263,26 @@
             });
         });
 
+        $('#change_vlan_modal').on('show.bs.modal', function (me) {
+            $.ajax({
+                url : '/api/vlans',
+                type : 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                error : function() {
+                },
+                success : function(data, textStatus, xhr) {
+                    $('#change_to_vlan').empty();
+                    $.each(data.data, function(k, v) {
+                        $('#change_to_vlan').append(
+                            $('<option>', {value: v['vlan_id'], text: 'VLAN ID: ' + v['vlan_id'], 'data-subtext': v['label']})
+                        );
+                    });
+                    $('#change_to_vlan').selectpicker('refresh');
+                }
+            });
+        });
+
         $('#reset_password_modal').on('show.bs.modal', function (me) {
             $('#reset_password_instance_uuid').val(
                 $(me.relatedTarget).parent().parent().parent().parent().parent().children()[0].textContent);
@@ -886,6 +906,24 @@
         }, 1000);
     }
 
+    function change_vlan(uuids, vlan_id) {
+        $.ajax({
+            url : '/api/guests/_change_vlan/' + uuids.join(',') + '/' + vlan_id,
+            type : 'PUT',
+            contentType: "application/json; charset=utf-8",
+            error : function() {
+                alter_danger('实例变更 VLAN 指令发送失败！');
+            },
+            success : function() {
+                alter_success('实例变更 VLAN 指令发送成功！');
+            }
+        });
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 3000);
+    }
+
     function boot_at(me) {
         var uuid = $('#instance_uuid').val();
         boot([uuid]);
@@ -1033,6 +1071,14 @@
         }
 
         change_prepared_by([uuids], service_id);
+    }
+
+    function change_vlan_at(me) {
+        $('#change_vlan_modal').modal('hide');
+
+        var uuid = $('#instance_uuid').val();
+        var vlan_id = $('#change_to_vlan').val();
+        change_vlan([uuid], vlan_id);
     }
 
     function get_selected_uuids() {
@@ -1756,7 +1802,10 @@
                                 Gbps
                             {% endif %}
                     </td>
-                    <td>{{ item.ip }}<br><a href="#">vlan: 2010</a></td>
+                    <td>
+                        {{ item.ip }}<br>
+                        <a href="/config#vlan">{{ item.vlan.label }}</a>
+                    </td>
                     <td><span class="unreal_password">*********</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
                     <td>
@@ -1855,6 +1904,13 @@
                                                 $('#revise_ip_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent);
                                                 $('#revisional_ip').val($($(this).parent().parent().parent().parent().parent().children()[8]).text());">
                                        修正 IP
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#change_vlan_modal"
+                                       onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
+                                                $('#change_vlan_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent);">
+                                        变更 VLAN
                                     </a>
                                 </li>
                                 <li class="divider"></li>
@@ -2830,6 +2886,27 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="batch_disable_autostart();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="change_vlan_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">变更 VLAN：</h4>
+            </div>
+            <div class="modal-body">
+                <p>您确定要为该虚拟机变更 VLAN 吗？</p>
+                <h3 style="color: orangered;" id="change_vlan_instance_desc"></h3>
+                <p></p>
+                <select id="change_to_vlan" data-show-subtext="true" name="change_to_vlan" title="可变更的 VLAN" class="selectpicker" data-width="100%">
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="change_vlan_at(this);">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

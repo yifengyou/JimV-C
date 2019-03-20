@@ -914,6 +914,7 @@ def r_migrate(uuids, node_id):
         return json.loads(e.message)
 
 
+@Utils.dumps2response
 def r_change_vlan(uuids, vlan_id):
     args_rules = [
         Rules.UUIDS.value,
@@ -996,6 +997,14 @@ def r_get(uuids):
     for host in hosts_ret['data']:
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
+    vlans_url = url_for('api_vlans.r_get_by_filter', _external=True)
+    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies)
+    vlans_ret = json.loads(vlans_ret.content)
+
+    vlans_mapping_by_vlan_id = dict()
+    for vlan in vlans_ret['data']:
+        vlans_mapping_by_vlan_id[int(vlan['vlan_id'])] = vlan
+
     if -1 == uuids.find(','):
         if 'ssh_keys' not in ret['data']:
             ret['data']['ssh_keys'] = list()
@@ -1010,6 +1019,8 @@ def r_get(uuids):
 
             if not hosts_mapping_by_node_id[ret['data']['node_id']]['alive']:
                 ret['data']['status'] = GuestState.no_state.value
+
+        ret['data']['vlan'] = vlans_mapping_by_vlan_id[ret['data']['vlan_id']]
 
     else:
         for i, guest in enumerate(ret['data']):
@@ -1026,6 +1037,8 @@ def r_get(uuids):
 
             if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
                 ret['data'][i]['status'] = GuestState.no_state.value
+
+            ret['data'][i]['vlan'] = vlans_mapping_by_vlan_id[ret['data'][i]['vlan_id']]
 
     return ret
 
@@ -1181,6 +1194,14 @@ def r_get_by_filter():
     for host in hosts_ret['data']:
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
+    vlans_url = url_for('api_vlans.r_get_by_filter', _external=True)
+    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies)
+    vlans_ret = json.loads(vlans_ret.content)
+
+    vlans_mapping_by_vlan_id = dict()
+    for vlan in vlans_ret['data']:
+        vlans_mapping_by_vlan_id[int(vlan['vlan_id'])] = vlan
+
     os_templates_image, _ = OSTemplateImage.get_by_filter()
     os_templates_image_mapping_by_id = dict()
     for os_template_image in os_templates_image:
@@ -1226,6 +1247,7 @@ def r_get_by_filter():
             ret['data'][i]['status'] = GuestState.no_state.value
 
         ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname']
+        ret['data'][i]['vlan'] = vlans_mapping_by_vlan_id[guest['vlan_id']]
 
         ret['data'][i]['html'] = dict()
         ret['data'][i]['html']['logo'], ret['data'][i]['html']['os_template_label'] = exchange_guest_os_templates_logo(
@@ -1288,6 +1310,14 @@ def r_content_search():
     for host in hosts_ret['data']:
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
+    vlans_url = url_for('api_vlans.r_get_by_filter', _external=True)
+    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies)
+    vlans_ret = json.loads(vlans_ret.content)
+
+    vlans_mapping_by_vlan_id = dict()
+    for vlan in vlans_ret['data']:
+        vlans_mapping_by_vlan_id[int(vlan['vlan_id'])] = vlan
+
     os_templates_image, _ = OSTemplateImage.get_by_filter()
     os_templates_image_mapping_by_id = dict()
     for os_template_image in os_templates_image:
@@ -1333,6 +1363,7 @@ def r_content_search():
             ret['data'][i]['status'] = GuestState.no_state.value
 
         ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname']
+        ret['data'][i]['vlan'] = vlans_mapping_by_vlan_id[guest['vlan_id']]
 
         ret['data'][i]['html'] = dict()
         ret['data'][i]['html']['logo'], ret['data'][i]['html']['os_template_label'] = exchange_guest_os_templates_logo(

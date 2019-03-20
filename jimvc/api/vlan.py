@@ -7,6 +7,7 @@ from flask import Blueprint, request, url_for
 import json
 import jimit as ji
 
+from jimvc.models import Config
 from jimvc.models import Utils, Guest
 from jimvc.models import Rules
 from jimvc.models import VLAN
@@ -144,6 +145,19 @@ def r_get(ids):
     if '200' != ret['state']['code']:
         return ret
 
+    config = Config()
+    config.id = 1
+    config.get()
+
+    default_bridge = VLAN()
+    default_bridge.id = 0
+    default_bridge.vlan_id = -1
+    default_bridge.label = u'默认网桥'
+    default_bridge.description = u'系统初始化时的默认网桥。在系统中可见为：' + config.vm_network + u'。'
+    default_bridge.create_time = 0
+
+    ret['data'].insert(0, default_bridge.__dict__)
+
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
     hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
     hosts_ret = json.loads(hosts_ret.content)
@@ -164,9 +178,14 @@ def r_get(ids):
     posts = hosts.__len__()
 
     for i, vlan in enumerate(ret['data']):
-        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
-        ret['data'][i]['posts'] = posts
-        ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
+        if ret['data'][i]['vlan_id'] == -1:
+            ret['data'][i]['posts'] = posts
+            ret['data'][i]['arrival'] = posts
+
+        else:
+            vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+            ret['data'][i]['posts'] = posts
+            ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
 
     return ret
 
@@ -174,8 +193,22 @@ def r_get(ids):
 @Utils.dumps2response
 def r_get_by_filter():
     ret = vlan_base.get_by_filter()
+
     if '200' != ret['state']['code']:
         return ret
+
+    config = Config()
+    config.id = 1
+    config.get()
+
+    default_bridge = VLAN()
+    default_bridge.id = 0
+    default_bridge.vlan_id = -1
+    default_bridge.label = u'默认网桥'
+    default_bridge.description = u'系统初始化时的默认网桥。在系统中可见为：' + config.vm_network + u'。'
+    default_bridge.create_time = 0
+
+    ret['data'].insert(0, default_bridge.__dict__)
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
     hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
@@ -197,9 +230,14 @@ def r_get_by_filter():
     posts = hosts.__len__()
 
     for i, vlan in enumerate(ret['data']):
-        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
-        ret['data'][i]['posts'] = posts
-        ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
+        if ret['data'][i]['vlan_id'] == -1:
+            ret['data'][i]['posts'] = posts
+            ret['data'][i]['arrival'] = posts
+
+        else:
+            vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+            ret['data'][i]['posts'] = posts
+            ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
 
     return ret
 
@@ -211,6 +249,19 @@ def r_content_search():
     if '200' != ret['state']['code']:
         return ret
 
+    config = Config()
+    config.id = 1
+    config.get()
+
+    default_bridge = VLAN()
+    default_bridge.id = 0
+    default_bridge.vlan_id = -1
+    default_bridge.label = u'默认网桥'
+    default_bridge.description = u'系统初始化时的默认网桥。在系统中可见为：' + config.vm_network + u'。'
+    default_bridge.create_time = 0
+
+    ret['data'].insert(0, default_bridge.__dict__)
+
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
     hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
     hosts_ret = json.loads(hosts_ret.content)
@@ -231,9 +282,14 @@ def r_content_search():
     posts = hosts.__len__()
 
     for i, vlan in enumerate(ret['data']):
-        vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
-        ret['data'][i]['posts'] = posts
-        ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
+        if ret['data'][i]['vlan_id'] == -1:
+            ret['data'][i]['posts'] = posts
+            ret['data'][i]['arrival'] = posts
+
+        else:
+            vlan_bridge_name = 'vlan' + vlan['vlan_id'].__str__()
+            ret['data'][i]['posts'] = posts
+            ret['data'][i]['arrival'] = hosts_mapping_by_vlan_bridge[vlan_bridge_name].__len__()
 
     return ret
 

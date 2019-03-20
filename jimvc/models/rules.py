@@ -14,8 +14,8 @@ __copyright__ = '(c) 2017 by James Iter.'
 # TODO: 考虑按视角归类，比如自身视角名称(uuid)，外部视角名称(guest_uuid)
 class Rules(Enum):
     # 正则表达式方便校验其来自URL的参数
-    REG_NUMBER = 'regex:^\d{1,17}$'
-    REG_NUMBERS = 'regex:^(\d{1,17})(,\d{1,17})*$'
+    REG_NUMBER = 'regex:^-?\d{1,17}$'
+    REG_NUMBERS = 'regex:^-?(\d{1,17})(,-?\d{1,17})*$'
     REG_UUIDS = 'regex:^([\w-]{36})(,[\w-]{36})*$'
     REG_HOSTS_NAME = 'regex:^([\S-]{1,128})(,[\S-]{1,128})*$'
     REG_IP = 'regex:^((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))$'
