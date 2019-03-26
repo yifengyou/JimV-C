@@ -131,6 +131,22 @@
                                 <span>{{(((item.memory - item.memory_available) / item.memory) * 100) | int}}%</span>
                                 <i>内存使用率</i>
                             </div>
+                            <div class="bg-green host-specs">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <span style="font-size: x-large; color: #97e6b7;">20 </span><span style="font-size: x-large">13</span>
+                                        <i>虚拟机实例</i>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span style="font-size: x-large; color: #97e6b7;">200 </span><span style="font-size: x-large">88</span>
+                                        <i>vCPU</i>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <span style="font-size: x-large; color: #97e6b7;">230 </span><span style="font-size: x-large">196</span>
+                                        <i>内存</i>
+                                    </div>
+                                </div>
+                            </div>
                             <ul {% if not item.alive %}class="bg-gray"{% endif %}>
                                 <li>CPU: {{ item.cpu }} 核</li>
                                 <li>内存: {{ (item.memory / 1024 / 1024 / 1024)|int }} GB</li>

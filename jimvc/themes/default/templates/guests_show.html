@@ -1804,7 +1804,7 @@
                         <a data-autostart="{{ item.autostart }}" class="icon-os icon-autostart" title="{% if item.autostart != 0 %}切至手动启动{% else %}切至开机启动{% endif %}" href="javascript:;" onclick="autostart_at(this);" style="{% if item.autostart == 0 %}filter: grayscale(100%);{% endif %}"></a>
                     </td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
-                    <td>{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</td>
+                    <td><a href="/guests?keyword={{ item.node_id | string }}">{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</a></td>
                     <td>
                         CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />
                         内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB<br />
@@ -1835,7 +1835,7 @@
                     </td>
                     <td>
                         {{ item.ip }}<br>
-                        <a href="/config#vlan">{{ item.vlan.label }}</a>
+                        <a href="/config#vlan" title="{{ item.vlan.description }}">{{ item.vlan.label }}</a>
                     </td>
                     <td><span class="unreal_password">*********</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>
                     <td>{{ format_datetime_by_tus(item.create_time) }}</td>
