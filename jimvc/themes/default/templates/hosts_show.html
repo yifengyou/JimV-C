@@ -134,15 +134,15 @@
                             <div class="bg-green host-specs">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <span style="font-size: x-large; color: #97e6b7;">20 </span><span style="font-size: x-large">13</span>
+                                        <span style="font-size: x-large; color: #C9DD22;">{{ item.analysis.all_instance }} </span><span style="font-size: x-large">{{ item.analysis.running_instance }}</span>
                                         <i>虚拟机实例</i>
                                     </div>
                                     <div class="col-md-4">
-                                        <span style="font-size: x-large; color: #97e6b7;">200 </span><span style="font-size: x-large">88</span>
+                                        <span style="font-size: x-large; color: #C9DD22;">{{ item.analysis.all_vcpu }} </span><span style="font-size: x-large">{{ item.analysis.using_vcpu }}</span>
                                         <i>vCPU</i>
                                     </div>
                                     <div class="col-md-4">
-                                        <span style="font-size: x-large; color: #97e6b7;">230 </span><span style="font-size: x-large">196</span>
+                                        <span style="font-size: x-large; color: #C9DD22;">{{ item.analysis.all_memory }} </span><span style="font-size: x-large">{{ item.analysis.using_memory }}</span>
                                         <i>内存</i>
                                     </div>
                                 </div>

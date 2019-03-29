@@ -410,3 +410,31 @@ def r_force_delete(ids):
     return vlan_base.delete(ids=ids, ids_rule=Rules.IDS.value, by_field='id')
 
 
+@Utils.dumps2response
+def r_sync():
+    try:
+        ret = dict()
+        ret['state'] = ji.Common.exchange_state(20000)
+
+        vlans, _ = VLAN.get_all()
+
+        # 取全部活着的 hosts
+        available_hosts = Host.get_available_hosts(nonrandom=None)
+
+        for vlan in vlans:
+            for host in available_hosts:
+                message = {
+                    '_object': 'vlan',
+                    'action': 'create',
+                    'uuid': None,
+                    'node_id': host['node_id'],
+                    'vlan_id': vlan['vlan_id'],
+                    'passback_parameters': {'vlan_id': vlan['vlan_id']}
+                }
+
+                Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
+
+        return ret
+    except ji.PreviewingError, e:
+        return json.loads(e.message)
+

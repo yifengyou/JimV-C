@@ -382,6 +382,22 @@
             });
         }
 
+        function sync_vlans() {
+            $.ajax({
+                url : '/api/vlans/_sync',
+                type : 'PUT',
+                error : function() {
+                    alter_danger('同步 VLAN 状态失败！');
+                },
+                success : function() {
+                    alter_success('同步 VLAN 状态成功！');
+                    setTimeout(function() {
+                        refresh();
+                    }, 1000);
+                }
+            });
+        }
+
         function exchange_ip_pool_for_panel(ip_pool) {
             var activity_checked = '';
             if (ip_pool.activity > 0) {
@@ -1169,6 +1185,9 @@
                     <div class="form-group" style="margin-bottom: 0;">
                         <div class="col-sm-3">
                             <button type="button" class="btn btn-primary" onclick="refresh_guest_state();">刷新虚拟机状态</button>
+                        </div>
+                        <div class="col-sm-3">
+                            <button type="button" class="btn btn-primary" onclick="sync_vlans();">同步计算节点 VLAN</button>
                         </div>
                     </div>
                 </form>

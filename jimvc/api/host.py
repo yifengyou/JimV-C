@@ -8,9 +8,10 @@ import requests
 from flask import Blueprint, request, url_for
 import jimit as ji
 
-from jimvc.models import app_config
+from jimvc.models import app_config, Guest
 from jimvc.models import Database as db
 from jimvc.models import Utils, Rules, Host
+from jimvc.models import GuestState
 
 
 __author__ = 'James Iter'
@@ -219,6 +220,44 @@ def r_show():
 
     hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
     hosts_ret = json.loads(hosts_ret.content)
+
+    node_id_amd_state_with_guests_count = dict()
+    rows, _ = Guest.get_all()
+
+    for i, host in enumerate(hosts_ret['data']):
+        hosts_ret['data'][i]['analysis'] = {
+            'all_instance': 0,
+            'running_instance': 0,
+            'all_vcpu': 0,
+            'using_vcpu': 0,
+            'all_memory': 0,
+            'using_memory': 0
+        }
+
+    for row in rows:
+        node_id = row['node_id'].__str__()
+        if node_id not in node_id_amd_state_with_guests_count:
+            node_id_amd_state_with_guests_count[node_id] = {
+                'all_instance': 0,
+                'running_instance': 0,
+                'all_vcpu': 0,
+                'using_vcpu': 0,
+                'all_memory': 0,
+                'using_memory': 0
+            }
+
+        node_id_amd_state_with_guests_count[node_id]['all_instance'] += 1
+        node_id_amd_state_with_guests_count[node_id]['all_vcpu'] += row['cpu']
+        node_id_amd_state_with_guests_count[node_id]['all_memory'] += row['memory']
+
+        if row['status'] in [GuestState.running.value, GuestState.booting.value, GuestState.migrating.value]:
+            node_id_amd_state_with_guests_count[node_id]['running_instance'] += 1
+            node_id_amd_state_with_guests_count[node_id]['using_vcpu'] += row['cpu']
+            node_id_amd_state_with_guests_count[node_id]['using_memory'] += row['memory']
+
+    for i, host in enumerate(hosts_ret['data']):
+        if host['node_id'] in node_id_amd_state_with_guests_count:
+            hosts_ret['data'][i]['analysis'] = node_id_amd_state_with_guests_count[host['node_id']]
 
     ret = dict()
     ret['state'] = ji.Common.exchange_state(20000)

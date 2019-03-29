@@ -242,6 +242,7 @@ add_rule_api(vlan.blueprints, '/_force/<ids>', api_func='vlan.r_force_delete', m
 add_rule_api(vlan.blueprints, '/<ids>', api_func='vlan.r_get', methods=['GET'])
 add_rule_api(vlan.blueprints, '', api_func='vlan.r_get_by_filter', methods=['GET'])
 add_rule_api(vlan.blueprints, '/_search', api_func='vlan.r_content_search', methods=['GET'])
+add_rule_api(vlan.blueprints, '/_sync', api_func='vlan.r_sync', methods=['PUT'])
 
 # Guest 性能查询
 add_rule_api(guest_performance.blueprint, '/cpu_memory',
