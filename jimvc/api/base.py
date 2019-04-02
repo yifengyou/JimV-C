@@ -149,6 +149,7 @@ class Base(object):
         order_by = request.args.get('order_by', 'id')
         order = request.args.get('order', 'asc')
         keyword = request.args.get('keyword', '')
+        filter_str = request.args.get('filter', '')
 
         args_rules = [
             Rules.OFFSET.value,
@@ -169,7 +170,7 @@ class Base(object):
             ret['paging'] = {'total': 0, 'offset': offset, 'limit': limit, 'page': page, 'page_size': page_size}
 
             ret['data'], ret['paging']['total'] = self.the_class.content_search(
-                offset=offset, limit=limit, order_by=order_by, order=order, keyword=keyword)
+                offset=offset, limit=limit, order_by=order_by, order=order, filter_str=filter_str, keyword=keyword)
 
             host_url = request.host_url.rstrip('/')
             other_str = '&keyword=' + keyword + '&order=' + order + '&order_by=' + order_by

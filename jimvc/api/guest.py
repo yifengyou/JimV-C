@@ -1050,7 +1050,8 @@ def exchange_guest_os_templates_logo(os_templates_image_mapping_by_id=None, os_t
     assert isinstance(os_template_image_id, int)
 
     if os_templates_image_mapping_by_id[os_template_image_id]['logo'] == "":
-        logo = os_templates_profile_mapping_by_id[os_templates_image_mapping_by_id[os_template_image_id]['os_template_profile_id']]['icon']
+        logo = os_templates_profile_mapping_by_id[os_templates_image_mapping_by_id[os_template_image_id][
+            'os_template_profile_id']]['icon']
     else:
         logo = os_templates_image_mapping_by_id[os_template_image_id]['logo']
 
@@ -1740,6 +1741,7 @@ def r_show():
     args = list()
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('page_size', 20))
+    _filter = request.args.get('filter', None)
     keyword = request.args.get('keyword', None)
 
     if page is not None:
@@ -1747,6 +1749,9 @@ def r_show():
 
     if page_size is not None:
         args.append('page_size=' + page_size.__str__())
+
+    if _filter is not None:
+        args.append('filter=' + _filter.__str__())
 
     if keyword is not None:
         args.append('keyword=' + keyword.__str__())

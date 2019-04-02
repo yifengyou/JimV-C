@@ -285,13 +285,20 @@ class ORM(object):
         raise NotImplementedError()
 
     @classmethod
-    def content_search(cls, offset=0, limit=1000, order_by=None, order='asc', keyword=''):
+    def content_search(cls, offset=0, limit=1000, order_by=None, order='asc', filter_str='', keyword=''):
         if order_by is None:
             order_by = cls._primary_key
 
         _kv = dict()
         _kv = _kv.fromkeys(cls.get_allow_content_search_keywords(), '%{0}%'.format(keyword))
+
         where_str = ' OR '.join([k + ' LIKE %(' + k + ')s' for k in _kv.keys()])
+
+        filter_str = Filter.filter_str_to_sql(allow_keywords=cls.get_filter_keywords(), filter_str=filter_str)
+
+        if filter_str != '':
+            where_str = filter_str + ' AND (' + where_str + ')'
+
         sql_stmt = ("SELECT * FROM " + cls._table_name + " WHERE " + where_str + " ORDER BY " + order_by + " " + order +
                     " LIMIT %(offset)s, %(limit)s")
         sql_stmt_count = ("SELECT count(" + cls._primary_key + ") FROM " + cls._table_name + " WHERE " + where_str)
