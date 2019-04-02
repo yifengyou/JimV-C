@@ -1741,6 +1741,8 @@ def r_show():
     args = list()
     page = int(request.args.get('page', 1))
     page_size = int(request.args.get('page_size', 20))
+    order_by = request.args.get('order_by', 'id')
+    order = request.args.get('order', 'asc')
     _filter = request.args.get('filter', None)
     keyword = request.args.get('keyword', None)
 
@@ -1749,6 +1751,12 @@ def r_show():
 
     if page_size is not None:
         args.append('page_size=' + page_size.__str__())
+
+    if order_by is not None:
+        args.append('order_by=' + order_by.__str__())
+
+    if order is not None:
+        args.append('order=' + order.__str__())
 
     if _filter is not None:
         args.append('filter=' + _filter.__str__())
