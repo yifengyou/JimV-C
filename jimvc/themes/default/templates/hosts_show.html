@@ -147,15 +147,15 @@
                             <div class="bg-green host-specs">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <span style="font-size: x-large; color: #C9DD22;"><a class="hawkeye_count_left" href="/guests?keyword={{ item.node_id }}">{{ item.analysis.all_instance }}</a> </span><span style="font-size: x-large"><a class="hawkeye_count_right" href="/guests?keyword={{ item.node_id }}">{{ item.analysis.running_instance }}</a></span>
+                                        <span style="font-size: x-large; color: #C9DD22;"><a class="hawkeye_count_left" href="/guests?filter=node_id:eq:{{ item.node_id }}">{{ item.analysis.all_instance }}</a> </span><span style="font-size: x-large"><a class="hawkeye_count_right" href="/guests?filter=status:eq:2;node_id:eq:{{ item.node_id }}">{{ item.analysis.running_instance }}</a></span>
                                         <i>虚拟机实例</i>
                                     </div>
                                     <div class="col-md-4">
-                                        <span style="font-size: x-large; color: #C9DD22;"><a class="hawkeye_count_left" href="/guests?keyword={{ item.node_id }}">{{ item.analysis.all_vcpu }}</a> </span><span style="font-size: x-large"><a class="hawkeye_count_right" href="/guests?keyword={{ item.node_id }}">{{ item.analysis.using_vcpu }}</a></span>
+                                        <span style="font-size: x-large; color: #C9DD22;"><a class="hawkeye_count_left" href="/guests?filter=node_id:eq:{{ item.node_id }}&order_by=cpu&order=desc">{{ item.analysis.all_vcpu }}</a> </span><span style="font-size: x-large"><a class="hawkeye_count_right" href="/guests?filter=status:eq:2;node_id:eq:{{ item.node_id }}&order_by=cpu&order=desc">{{ item.analysis.using_vcpu }}</a></span>
                                         <i>vCPU</i>
                                     </div>
                                     <div class="col-md-4">
-                                        <span style="font-size: x-large; color: #C9DD22;"><a class="hawkeye_count_left" href="/guests?keyword={{ item.node_id }}">{{ item.analysis.all_memory }}</a> </span><span style="font-size: x-large"><a class="hawkeye_count_right" href="/guests?keyword={{ item.node_id }}">{{ item.analysis.using_memory }}</a></span>
+                                        <span style="font-size: x-large; color: #C9DD22;"><a class="hawkeye_count_left" href="/guests?filter=node_id:eq:{{ item.node_id }}&order_by=memory&order=desc">{{ item.analysis.all_memory }}</a> </span><span style="font-size: x-large"><a class="hawkeye_count_right" href="/guests?filter=status:eq:2;node_id:eq:{{ item.node_id }}&order_by=memory&order=desc">{{ item.analysis.using_memory }}</a></span>
                                         <i>内存</i>
                                     </div>
                                 </div>

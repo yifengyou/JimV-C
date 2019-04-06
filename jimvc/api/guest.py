@@ -1824,6 +1824,9 @@ def r_show():
         'paging': guests_ret['paging'],
         'page': page,
         'page_size': page_size,
+        'order_by': order_by,
+        'order': order,
+        'filter': _filter,
         'keyword': keyword,
         'pages': pages,
         'last_page': last_page
