@@ -39,7 +39,7 @@ def r_show():
     guests_current_top_10_url = url_for('api_guest_performance.r_current_top_10', _external=True)
     hosts_current_top_10_url = url_for('api_host_performance.r_current_top_10', _external=True)
 
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     # Host node_id 与 Host 的映射
@@ -47,13 +47,13 @@ def r_show():
     for host in hosts_ret['data']:
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
-    guests_distribute_count_ret = requests.get(url=guests_distribute_count_url, cookies=request.cookies)
+    guests_distribute_count_ret = requests.get(url=guests_distribute_count_url, cookies=request.cookies, verify=False)
     guests_distribute_count_ret = json.loads(guests_distribute_count_ret.content)
 
-    disks_distribute_count_ret = requests.get(url=disks_distribute_count_url, cookies=request.cookies)
+    disks_distribute_count_ret = requests.get(url=disks_distribute_count_url, cookies=request.cookies, verify=False)
     disks_distribute_count_ret = json.loads(disks_distribute_count_ret.content)
 
-    guests_current_top_10_ret = requests.get(url=guests_current_top_10_url, cookies=request.cookies)
+    guests_current_top_10_ret = requests.get(url=guests_current_top_10_url, cookies=request.cookies, verify=False)
     guests_current_top_10_ret = json.loads(guests_current_top_10_ret.content)
 
     guests_uuid = list()
@@ -68,7 +68,7 @@ def r_show():
 
     guests_url = url_for('api_guests.r_get_by_filter', _external=True, filter='uuid:in:' + ','.join(guests_uuid))
 
-    guests_ret = requests.get(url=guests_url, cookies=request.cookies)
+    guests_ret = requests.get(url=guests_url, cookies=request.cookies, verify=False)
     guests_ret = json.loads(guests_ret.content)
 
     # Guest uuid 与 Guest 的映射
@@ -87,7 +87,7 @@ def r_show():
 
     disks_url = url_for('api_disks.r_get_by_filter', _external=True, filter='uuid:in:' + ','.join(disks_uuid))
 
-    disks_ret = requests.get(url=disks_url, cookies=request.cookies)
+    disks_ret = requests.get(url=disks_url, cookies=request.cookies, verify=False)
     disks_ret = json.loads(disks_ret.content)
 
     # Disk uuid 与 Disk 的映射
@@ -95,7 +95,7 @@ def r_show():
     for disk in disks_ret['data']:
         disks_mapping_by_uuid[disk['uuid']] = disk
 
-    hosts_current_top_10_ret = requests.get(url=hosts_current_top_10_url, cookies=request.cookies)
+    hosts_current_top_10_ret = requests.get(url=hosts_current_top_10_url, cookies=request.cookies, verify=False)
     hosts_current_top_10_ret = json.loads(hosts_current_top_10_ret.content)
     hosts_current_top_10_ret['data']['memory_rate'] = copy.copy(hosts_current_top_10_ret['data']['cpu_load'])
 

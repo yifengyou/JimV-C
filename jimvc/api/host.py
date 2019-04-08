@@ -218,7 +218,7 @@ def r_show():
     if args.__len__() > 0:
         hosts_url = hosts_url + '?' + '&'.join(args)
 
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     node_id_amd_state_with_guests_count = dict()

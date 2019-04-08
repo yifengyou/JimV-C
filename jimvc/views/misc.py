@@ -38,7 +38,7 @@ def recover_password():
 
         url = host_url + '/api/user/_send_reset_password_email/' + login_name
 
-        r = requests.put(url)
+        r = requests.put(url, verify=False)
         j_r = json.loads(r.content)
 
         return render('success.html',
@@ -63,7 +63,7 @@ def reset_password(token):
         url = host_url + '/api/user/_reset_password/' + token
 
         headers = {'content-type': 'application/json'}
-        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        r = requests.post(url, data=json.dumps(payload), headers=headers, verify=False)
         j_r = json.loads(r.content)
 
         if j_r['state']['code'] == '200':

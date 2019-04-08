@@ -990,7 +990,7 @@ def r_get(uuids):
         ssh_key_id_mapping[row['id']] = row
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_node_id = dict()
@@ -998,7 +998,7 @@ def r_get(uuids):
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     vlans_url = url_for('api_vlans.r_get_by_filter', _external=True)
-    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies)
+    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies, verify=False)
     vlans_ret = json.loads(vlans_ret.content)
 
     vlans_mapping_by_vlan_id = dict()
@@ -1188,7 +1188,7 @@ def r_get_by_filter():
         snapshots_guest_uuid_mapping[guest_uuid].append(row)
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_node_id = dict()
@@ -1196,7 +1196,7 @@ def r_get_by_filter():
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     vlans_url = url_for('api_vlans.r_get_by_filter', _external=True)
-    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies)
+    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies, verify=False)
     vlans_ret = json.loads(vlans_ret.content)
 
     vlans_mapping_by_vlan_id = dict()
@@ -1304,7 +1304,7 @@ def r_content_search():
         snapshots_guest_uuid_mapping[guest_uuid].append(row)
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_node_id = dict()
@@ -1312,7 +1312,7 @@ def r_content_search():
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
     vlans_url = url_for('api_vlans.r_get_by_filter', _external=True)
-    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies)
+    vlans_ret = requests.get(url=vlans_url, cookies=request.cookies, verify=False)
     vlans_ret = json.loads(vlans_ret.content)
 
     vlans_mapping_by_vlan_id = dict()
@@ -1772,14 +1772,14 @@ def r_show():
     if args.__len__() > 0:
         guests_url = guests_url + '?' + '&'.join(args)
 
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_node_id = dict()
     for host in hosts_ret['data']:
         hosts_mapping_by_node_id[int(host['node_id'])] = host
 
-    guests_ret = requests.get(url=guests_url, cookies=request.cookies)
+    guests_ret = requests.get(url=guests_url, cookies=request.cookies, verify=False)
     guests_ret = json.loads(guests_ret.content)
 
     os_templates_image, _ = OSTemplateImage.get_by_filter()
@@ -1844,7 +1844,7 @@ def r_vnc(uuid):
         return guest_ret
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_node_id = dict()
@@ -1886,7 +1886,7 @@ def r_vnc(uuid):
 def r_detail(uuid):
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_node_id = dict()
@@ -1927,7 +1927,7 @@ def r_detail(uuid):
         os_templates_profile_mapping_by_id[os_template_profile['id']] = os_template_profile
 
     disks_url = url_for('api_disks.r_get_by_filter', filter='guest_uuid:in:' + guest.uuid, _external=True)
-    disks_ret = requests.get(url=disks_url, cookies=request.cookies)
+    disks_ret = requests.get(url=disks_url, cookies=request.cookies, verify=False)
     disks = json.loads(disks_ret.content)['data']
 
     if not hosts_mapping_by_node_id[guest.node_id]['alive']:

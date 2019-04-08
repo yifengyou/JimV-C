@@ -393,7 +393,7 @@ def r_show():
     if args.__len__() > 0:
         ssh_keys_url = ssh_keys_url + '?' + '&'.join(args)
 
-    ssh_keys_ret = requests.get(url=ssh_keys_url, cookies=request.cookies)
+    ssh_keys_ret = requests.get(url=ssh_keys_url, cookies=request.cookies, verify=False)
     ssh_keys_ret = json.loads(ssh_keys_ret.content)
 
     last_page = int(ceil(ssh_keys_ret['paging']['total'] / float(page_size)))

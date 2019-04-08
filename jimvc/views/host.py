@@ -37,7 +37,7 @@ def show():
 
         url += '?' + '&'.join(args)
 
-    ret = requests.get(url=url, cookies=request.cookies)
+    ret = requests.get(url=url, cookies=request.cookies, verify=False)
     ret = json.loads(ret.content)
 
     return render('hosts_show.html', hosts=ret['data']['hosts'], resource_path=request.path,
@@ -47,7 +47,7 @@ def show():
 def detail(node_id):
     host_url = url_for('api_hosts.r_get', nodes_id=node_id, _external=True)
 
-    host_ret = requests.get(url=host_url, cookies=request.cookies)
+    host_ret = requests.get(url=host_url, cookies=request.cookies, verify=False)
     host_ret = json.loads(host_ret.content)
 
     return render('host_detail.html', node_id=node_id, host=host_ret['data'])

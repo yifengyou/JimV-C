@@ -23,7 +23,7 @@ blueprint = Blueprint(
 
 def show():
     url = url_for('api_dashboard.r_show', _external=True)
-    ret = requests.get(url=url, cookies=request.cookies)
+    ret = requests.get(url=url, cookies=request.cookies, verify=False)
     ret = json.loads(ret.content)
 
     return render('dashboard.html', hosts_sum=ret['data']['hosts_sum'],

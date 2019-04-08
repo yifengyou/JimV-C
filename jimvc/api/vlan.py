@@ -159,7 +159,7 @@ def r_get(ids):
     ret['data'].insert(0, default_bridge.__dict__)
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_vlan_bridge = dict()
@@ -211,7 +211,7 @@ def r_get_by_filter():
     ret['data'].insert(0, default_bridge.__dict__)
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_vlan_bridge = dict()
@@ -263,7 +263,7 @@ def r_content_search():
     ret['data'].insert(0, default_bridge.__dict__)
 
     hosts_url = url_for('api_hosts.r_get_by_filter', _external=True)
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_vlan_bridge = dict()

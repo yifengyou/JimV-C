@@ -37,7 +37,7 @@ def show():
 
         url += '?' + '&'.join(args)
 
-    ret = requests.get(url=url, cookies=request.cookies)
+    ret = requests.get(url=url, cookies=request.cookies, verify=False)
     ret = json.loads(ret.content)
 
     return render('logs.html', logs=ret['data']['logs'],

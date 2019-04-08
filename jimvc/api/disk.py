@@ -507,7 +507,7 @@ def r_show():
         # 关键字检索，不支持显示域过滤
         show_area = 'all'
 
-    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+    hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
     hosts_ret = json.loads(hosts_ret.content)
 
     hosts_mapping_by_node_id = dict()
@@ -517,7 +517,7 @@ def r_show():
     if args.__len__() > 0:
         disks_url = disks_url + '?' + '&'.join(args)
 
-    disks_ret = requests.get(url=disks_url, cookies=request.cookies)
+    disks_ret = requests.get(url=disks_url, cookies=request.cookies, verify=False)
     disks_ret = json.loads(disks_ret.content)
 
     guests_uuid = list()
@@ -544,7 +544,7 @@ def r_show():
         snapshots_id_mapping_by_disks_uuid_url = url_for('api_snapshots.r_get_snapshots_by_disks_uuid',
                                                          disks_uuid=','.join(disks_uuid), _external=True)
         snapshots_id_mapping_by_disks_uuid_ret = requests.get(url=snapshots_id_mapping_by_disks_uuid_url,
-                                                              cookies=request.cookies)
+                                                              cookies=request.cookies, verify=False)
         snapshots_id_mapping_by_disks_uuid_ret = json.loads(snapshots_id_mapping_by_disks_uuid_ret.content)
 
         snapshots_id_mapping_by_disk_uuid = dict()

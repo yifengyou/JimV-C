@@ -37,7 +37,7 @@ def show():
 
         url += '?' + '&'.join(args)
 
-    ret = requests.get(url=url, cookies=request.cookies)
+    ret = requests.get(url=url, cookies=request.cookies, verify=False)
     ret = json.loads(ret.content)
 
     return render('os_templates_image_show.html', os_templates_image=ret['data']['os_templates_image'],

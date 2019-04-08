@@ -37,7 +37,7 @@ def show():
 
         url += '?' + '&'.join(args)
 
-    ret = requests.get(url=url, cookies=request.cookies)
+    ret = requests.get(url=url, cookies=request.cookies, verify=False)
     ret = json.loads(ret.content)
 
     return render('guests_show.html', guests=ret['data']['guests'],
@@ -51,7 +51,7 @@ def show():
 
 def vnc(uuid):
     vnc_url = url_for('api_guest.r_vnc', uuid=uuid, _external=True)
-    vnc_ret = requests.get(url=vnc_url, cookies=request.cookies)
+    vnc_ret = requests.get(url=vnc_url, cookies=request.cookies, verify=False)
     vnc_ret = json.loads(vnc_ret.content)
 
     return render('vnc_lite.html', port=vnc_ret['data']['port'], password=vnc_ret['data']['vnc_password'])
@@ -59,7 +59,7 @@ def vnc(uuid):
 
 def detail(uuid):
     guest_detail_url = url_for('api_guest.r_detail', uuid=uuid, _external=True)
-    guest_detail_ret = requests.get(url=guest_detail_url, cookies=request.cookies)
+    guest_detail_ret = requests.get(url=guest_detail_url, cookies=request.cookies, verify=False)
     guest_detail_ret = json.loads(guest_detail_ret.content)
 
     return render('guest_detail.html', uuid=uuid, guest=guest_detail_ret['data']['guest'],
@@ -72,7 +72,7 @@ def detail(uuid):
 
 def create():
         hosts_url = url_for('api_hosts.r_get_by_filter', alive=True, _external=True)
-        hosts_ret = requests.get(url=hosts_url, cookies=request.cookies)
+        hosts_ret = requests.get(url=hosts_url, cookies=request.cookies, verify=False)
         hosts_ret = json.loads(hosts_ret.content)
 
         return render('guest_create.html', hosts_ret=hosts_ret)

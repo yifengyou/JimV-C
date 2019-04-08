@@ -37,7 +37,7 @@ def show():
 
         url += '?' + '&'.join(args)
 
-    ret = requests.get(url=url, cookies=request.cookies)
+    ret = requests.get(url=url, cookies=request.cookies, verify=False)
     ret = json.loads(ret.content)
 
     return render('disks_show.html', disks=ret['data']['disks'],
@@ -56,7 +56,7 @@ def create():
 
 def detail(uuid):
     disk_detail_url = url_for('api_disk.r_detail', uuid=uuid, _external=True)
-    disk_detail_ret = requests.get(url=disk_detail_url, cookies=request.cookies)
+    disk_detail_ret = requests.get(url=disk_detail_url, cookies=request.cookies, verify=False)
     disk_detail_ret = json.loads(disk_detail_ret.content)
 
     return render('disk_detail.html', uuid=uuid, guest=disk_detail_ret['data']['guest'],

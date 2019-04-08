@@ -331,7 +331,7 @@ def r_show():
     if args.__len__() > 0:
         os_templates_image_url = os_templates_image_url + '?' + '&'.join(args)
 
-    os_templates_image_ret = requests.get(url=os_templates_image_url, cookies=request.cookies)
+    os_templates_image_ret = requests.get(url=os_templates_image_url, cookies=request.cookies, verify=False)
     os_templates_image_ret = json.loads(os_templates_image_ret.content)
 
     public_count = 0

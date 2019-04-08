@@ -418,7 +418,7 @@ def r_show():
     if args.__len__() > 0:
         snapshots_url = snapshots_url + '?' + '&'.join(args)
 
-    snapshots_ret = requests.get(url=snapshots_url, cookies=request.cookies)
+    snapshots_ret = requests.get(url=snapshots_url, cookies=request.cookies, verify=False)
     snapshots_ret = json.loads(snapshots_ret.content)
 
     guests_uuid = list()

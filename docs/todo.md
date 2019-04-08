@@ -103,4 +103,5 @@
 - [ ] 企业版分叉
 - [ ] 加入邮件、短信报警功能
 - [ ] 参照公有云，设计、实现资源搜索过滤功能
+- [ ] 加入自定义主题颜色供。具体的颜色参考(http://ylbook.com/cms/web/chuantongsecai/chuantongsecai.htm)
 
