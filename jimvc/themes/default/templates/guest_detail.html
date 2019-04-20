@@ -1138,7 +1138,7 @@
                             <td>
                                 <span class="guest-label">计算节点:&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                 <span class="guest-desc">
-                                {{ hosts_mapping_by_node_id[guest.node_id | string].hostname }}
+                                {% if guest.node_id | string in hosts_mapping_by_node_id %}{{ hosts_mapping_by_node_id[guest.node_id | string].hostname }}{% else %}<span style="color: #FF645B;">Unknown</span>{% endif %}
                                 </span>
                             </td>
                         </tr>

@@ -1820,7 +1820,7 @@
                         <a data-autostart="{{ item.autostart }}" class="icon-os icon-autostart" title="{% if item.autostart != 0 %}切至手动启动{% else %}切至开机启动{% endif %}" href="javascript:;" onclick="autostart_at(this);" style="{% if item.autostart == 0 %}filter: grayscale(100%);{% endif %}"></a>
                     </td>
                     <td>{{ format_guest_status(item.status, item.progress)|safe }}</td>
-                    <td><a href="/guests?filter=node_id:eq:{{ item.node_id | string }}">{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}</a></td>
+                    <td><a href="/guests?filter=node_id:eq:{{ item.node_id | string }}">{% if item.node_id | string in hosts_mapping_by_node_id %}{{ hosts_mapping_by_node_id[item.node_id | string].hostname }}{% else %}<span style="color: #FF645B;">Unknown</span>{% endif %}</a></td>
                     <td>
                         CPU :&nbsp;&nbsp;{{ item.cpu }}&nbsp;核<br />
                         内存 :&nbsp;&nbsp;{{ item.memory }}&nbsp;GB<br />
@@ -2687,7 +2687,7 @@
                                         <input title="4 CPU 32GB Memory" name="ability" type="radio" value="4c32g">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
                                     </label>
                                     <label class="btn btn-default btn-ability">
-                                        <input title="4 CPU 64GB Memory" name="ability" type="radio" value="4c64g">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                        <input title="8 CPU 32GB Memory" name="ability" type="radio" value="8c32g">8&nbsp;&nbsp;核&nbsp;&nbsp;32GB
                                     </label>
                                     <label class="btn btn-default btn-ability">
                                         <input title="8 CPU 64GB Memory" name="ability" type="radio" value="8c64g">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB
@@ -2766,7 +2766,7 @@
                                         <input title="4 CPU 32GB Memory" name="ability" type="radio" value="4c32g">4&nbsp;&nbsp;核&nbsp;&nbsp;32GB
                                     </label>
                                     <label class="btn btn-default btn-ability">
-                                        <input title="4 CPU 64GB Memory" name="ability" type="radio" value="4c64g">4&nbsp;&nbsp;核&nbsp;&nbsp;64GB
+                                        <input title="8 CPU 32GB Memory" name="ability" type="radio" value="8c32g">8&nbsp;&nbsp;核&nbsp;&nbsp;32GB
                                     </label>
                                     <label class="btn btn-default btn-ability">
                                         <input title="8 CPU 64GB Memory" name="ability" type="radio" value="8c64g">8&nbsp;&nbsp;核&nbsp;&nbsp;64GB

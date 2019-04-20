@@ -2,6 +2,7 @@
 [![Format](https://img.shields.io/badge/Format-JSON-blue.svg)](http://www.json.org/json-zh.html)
 [![Python versions](https://img.shields.io/badge/Python-2.7.10-blue.svg)](https://www.python.org)
 [![API](https://img.shields.io/badge/API-RESTful-blue.svg)](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
 
 [TOC]: # "目录"

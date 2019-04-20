@@ -1017,7 +1017,8 @@ def r_get(uuids):
 
                 ret['data']['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
 
-            if not hosts_mapping_by_node_id[ret['data']['node_id']]['alive']:
+            if ret['data']['node_id'] not in hosts_mapping_by_node_id or \
+                    not hosts_mapping_by_node_id[ret['data']['node_id']]['alive']:
                 ret['data']['status'] = GuestState.no_state.value
 
         ret['data']['vlan'] = vlans_mapping_by_vlan_id[ret['data']['vlan_id']]
@@ -1035,7 +1036,8 @@ def r_get(uuids):
 
                     ret['data'][i]['ssh_keys'].append(ssh_key_id_mapping[ssh_key_id])
 
-            if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
+            if ret['data'][i]['node_id'] not in hosts_mapping_by_node_id or \
+                    not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
                 ret['data'][i]['status'] = GuestState.no_state.value
 
             ret['data'][i]['vlan'] = vlans_mapping_by_vlan_id[ret['data'][i]['vlan_id']]
@@ -1244,10 +1246,13 @@ def r_get_by_filter():
                 else:
                     ret['data'][i]['snapshot']['creatable'] = False
 
-        if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
+        if ret['data'][i]['node_id'] not in hosts_mapping_by_node_id or \
+                not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
             ret['data'][i]['status'] = GuestState.no_state.value
 
-        ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname']
+        ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname'] \
+            if guest['node_id'] in hosts_mapping_by_node_id else 'Unknown'
+
         ret['data'][i]['vlan'] = vlans_mapping_by_vlan_id[guest['vlan_id']]
 
         ret['data'][i]['html'] = dict()
@@ -1360,10 +1365,12 @@ def r_content_search():
                 else:
                     ret['data'][i]['snapshot']['creatable'] = False
 
-        if not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
+        if ret['data'][i]['node_id'] not in hosts_mapping_by_node_id or \
+                not hosts_mapping_by_node_id[ret['data'][i]['node_id']]['alive']:
             ret['data'][i]['status'] = GuestState.no_state.value
 
-        ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname']
+        ret['data'][i]['hostname'] = hosts_mapping_by_node_id[guest['node_id']]['hostname'] \
+            if guest['node_id'] in hosts_mapping_by_node_id else 'Unknown'
         ret['data'][i]['vlan'] = vlans_mapping_by_vlan_id[guest['vlan_id']]
 
         ret['data'][i]['html'] = dict()
@@ -1930,7 +1937,7 @@ def r_detail(uuid):
     disks_ret = requests.get(url=disks_url, cookies=request.cookies, verify=False)
     disks = json.loads(disks_ret.content)['data']
 
-    if not hosts_mapping_by_node_id[guest.node_id]['alive']:
+    if guest.node_id not in hosts_mapping_by_node_id or not hosts_mapping_by_node_id[guest.node_id]['alive']:
         guest.status = GuestState.no_state.value
 
     config = Config()
