@@ -1451,7 +1451,13 @@
                     'CPU :&nbsp;&nbsp;' + guest.cpu + '&nbsp;核<br />' +
                     '内存 :&nbsp;&nbsp;' + guest.memory + '&nbsp;GB<br />' +
                     '带宽 :&nbsp;' + guest.html.bandwidth + '</td>' +
-                '<td>' + guest.ip + '<br><a href="/guests?filter=vlan_id:eq:' + guest.vlan_id + '" title="' + guest.vlan.description + '">' + guest.vlan.label + '</a></td>' +
+                '<td>' +
+                     '<div><p style="display: inline-block;">' + (function () { if (guest.link !== '') { return '<a class="link" target="_blank" href="' + guest.link + '">' + guest.ip + '</a>'; } else { return guest.ip;}})() + '</p>' +
+                         '<a href="javascript:;" class="edit_link_trigger" data-toggle="modal" data-target="#edit_link_modal" style="display: none; float: right;">' +
+                             '<span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>' +
+                         '</a>' +
+                     '</div>' +
+                     '<a href="/guests?filter=vlan_id:eq:' + guest.vlan_id + '" title="' + guest.vlan.description + '">' + guest.vlan.label + '</a></td>' +
                 '<td width="150px;"><a href="javascript:;" class="glyph-icon icon-elusive-eye-off" onclick="change_display_password_for_row(this);" style="color: #014c8c;"></a><span class="unreal_password">******</span><span class="real_password" style="display: none;">' + guest.password + '</span></td>' +
                 '<td>' +
                     '<div class="dropdown inline-block">' +
@@ -1545,7 +1551,7 @@
                         '<a href="javascript:;" data-toggle="modal" data-target="#revise_ip_modal"' +
                             'onclick="$(\'#instance_uuid\').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());\n' +
                             '$(\'#revise_ip_instance_desc\').text($($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div a\')[0].textContent + \'/\' + $($(this).parent().parent().parent().parent().parent().children()[2]).find(\'div p\')[0].textContent);\n' +
-                            '$(\'#revisional_ip\').val($($(this).parent().parent().parent().parent().parent().children()[8]).text().trim().replace(/ .*$/g, \'\'));">' +
+                            '$(\'#revisional_ip\').val($($(this).parent().parent().parent().parent().parent().children()[8]).find(\'p\').text().trim().replace(/ .*$/g, \'\'));">' +
                             '修正 IP' +
                         '</a>' +
                     '</li>' +
@@ -1992,7 +1998,7 @@
                                     <a href="javascript:;" data-toggle="modal" data-target="#revise_ip_modal"
                                        onclick="$('#instance_uuid').val($($(this).parent().parent().parent().parent().parent().children()[0]).text());
                                                 $('#revise_ip_instance_desc').text($($(this).parent().parent().parent().parent().parent().children()[2]).find('div a')[0].textContent + '/' + $($(this).parent().parent().parent().parent().parent().children()[2]).find('div p')[0].textContent);
-                                                $('#revisional_ip').val($($(this).parent().parent().parent().parent().parent().children()[8]).text().trim().replace(/ .*$/g, ''));">
+                                                $('#revisional_ip').val($($(this).parent().parent().parent().parent().parent().children()[8]).find('p').text().trim().replace(/ .*$/g, ''));">
                                        修正 IP
                                     </a>
                                 </li>
