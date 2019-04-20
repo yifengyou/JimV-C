@@ -103,6 +103,11 @@ def r_create():
             Rules.VLAN_ID.value
         )
 
+    if 'link' in request.json:
+        args_rules.append(
+            Rules.LINK.value
+        )
+
     try:
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -250,6 +255,7 @@ def r_create():
                 guest.password = ji.Common.generate_random_code(length=16)
 
             guest.ip = guest_ip_generator.next()
+            guest.link = request.json.get('link', 'http://' + guest.ip)
             guest.vnc_port = guest_vnc_port_generator.next()
             guest.vlan_id = vlan_id
 
@@ -1444,6 +1450,11 @@ def r_update(uuids):
             Rules.REMARK.value,
         )
 
+    if 'link' in request.json:
+        args_rules.append(
+            Rules.LINK.value,
+        )
+
     if args_rules.__len__() < 2:
         return ret
 
@@ -1461,6 +1472,7 @@ def r_update(uuids):
             guest.uuid = uuid
             guest.get_by('uuid')
             guest.remark = request.json.get('remark', guest.remark)
+            guest.link = request.json.get('link', guest.link)
 
             guest.update()
             guest.get()

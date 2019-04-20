@@ -226,6 +226,17 @@
             $('#edit_remark').val($(me.relatedTarget).prev().text());
         });
 
+        $('#edit_link_modal').on('show.bs.modal', function (me) {
+            $('#edit_link_instance_uuid').val($(me.relatedTarget).parent().parent().parent().children()[0].textContent);
+
+            if ($(me.relatedTarget).prev().find('a').hasAttr('href')) {
+                $('#edit_link').val($(me.relatedTarget).prev().find('a').attr('href'));
+            } else {
+                $(me.relatedTarget).prev().html('<a href="" target="_blank" class="link">' + $(me.relatedTarget).prev().text() + '</a>');
+                $('#edit_link').val('');
+            }
+        });
+
         $('#service_label_edit_name_modal').on('show.bs.modal', function (me) {
             $('#service_id').val($(me.relatedTarget).parent().data('service_id'));
             $('#service_label_edit_name').val($(me.relatedTarget).parent().text().trim());
@@ -479,10 +490,12 @@
 
     function row_onmouseover(me) {
         $(me).find(".edit_remark_trigger").css('display','inline-flex');
+        $(me).find(".edit_link_trigger").css('display','inline-flex');
     }
 
     function row_onmouseout(me) {
         $(me).find(".edit_remark_trigger").css('display','none');
+        $(me).find(".edit_link_trigger").css('display','none');
     }
 
     function service_label_onmouseover(me) {
@@ -534,6 +547,31 @@
             success : function() {
                 $('.guest_list tbody').find('td:contains(' + uuid + ')').next().next().find('p').text(remark);
                 alter_success('实例备注更新成功！');
+            }
+        });
+    }
+
+    function link_update(me) {
+        var uuid = $('#edit_link_instance_uuid').val();
+        var link = $('#edit_link').val();
+        $('#edit_link_modal').modal('hide');
+        $.ajax({
+            url : '/api/guests/' + uuid,
+            type : 'PATCH',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify({
+                link: link
+            }),
+            error : function() {
+                alter_danger('实例快速链接更新失败！');
+            },
+            success : function() {
+                if ($('.guest_list tbody').find('td:contains(' + uuid + ')').parent().find('.link').hasAttr('href')) {
+                    $('.guest_list tbody').find('td:contains(' + uuid + ')').parent().find('.link').attr('href', link);
+                } else {
+                    $('.guest_list tbody').find('td:contains(' + uuid + ')').parent().find('.link').attr('href', link);
+                }
+                alter_success('实例快速链接更新成功！');
             }
         });
     }
@@ -1787,8 +1825,8 @@
                     <th>状态</th>
                     <th>计算节点</th>
                     <th>配置</th>
-                    <th>网络</th>
-                    <th width="150px;">密码&nbsp;&nbsp;<a href="#" class="glyph-icon icon-elusive-eye-off" onclick="change_display_password(this);" style="color: #014c8c;"></a></th>
+                    <th width="140px;">网络</th>
+                    <th width="140px;">密码&nbsp;&nbsp;<a href="#" class="glyph-icon icon-elusive-eye-off" onclick="change_display_password(this);" style="color: #014c8c;"></a></th>
                     <th>创建时间</th>
                     <th>操作</th>
                 </tr>
@@ -1850,7 +1888,12 @@
                             {% endif %}
                     </td>
                     <td>
-                        {{ item.ip }}<br>
+                        <div>
+                            <p style="display: inline-block;">{% if item.link != '' %}<a class="link" target="_blank" href="{{ item.link }}">{{ item.ip }}</a>{% else %}{{ item.ip }}{% endif %}</p>
+                            <a href="javascript:;" class="edit_link_trigger" data-toggle="modal" data-target="#edit_link_modal" style="display: none; float: right;">
+                                <span class="glyph-icon icon-elusive-pencil" style="width: 20px; height: 20px; margin-left: 10px; border-radius: 0; border: 1px solid rgb(220, 233, 255); background-color: #ffffff;"></span>
+                            </a>
+                        </div>
                         <a href="/guests?filter=vlan_id:eq:{{ item.vlan_id }}" title="{{ item.vlan.description }}">{{ item.vlan.label }}</a>
                     </td>
                     <td><span class="unreal_password">*********</span><span class="real_password" style="display: none;">{{ item.password }}</span></td>
@@ -2190,6 +2233,24 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-primary" onclick="remark_update();">确定</button>
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="edit_link_modal" tabindex="-1" role="dialog" style="margin-top: 100px;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑实例快速链接：</h4>
+            </div>
+            <div class="modal-body">
+                <input id="edit_link_instance_uuid" title="实例 UUID" class="form-control" name="uuid" hidden>
+                <input id="edit_link" title="实例快速链接 URL" class="form-control" name="link">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" onclick="link_update();">确定</button>
                 <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">取消</button>
             </div>
         </div>

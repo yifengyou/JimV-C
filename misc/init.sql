@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS guest(
     -- bps
     bandwidth INT UNSIGNED NOT NULL DEFAULT 0,
     ip CHAR(15) NOT NULL,
+    link VARCHAR(255) NOT NULL DEFAULT '',
     network VARCHAR(64) NOT NULL,
     manage_network VARCHAR(64) NOT NULL,
     vnc_port INT UNSIGNED NOT NULL,

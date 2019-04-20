@@ -38,6 +38,7 @@ class Guest(ORM):
         self.memory = None
         self.bandwidth = 0
         self.ip = None
+        self.link = ''
         self.network = None
         self.manage_network = None
         self.vnc_port = None
@@ -63,8 +64,8 @@ class Guest(ORM):
 
     @staticmethod
     def get_allow_update_keywords():
-        return ['autostart', 'remark', 'cpu', 'memory', 'bandwidth', 'network', 'manage_network', 'vnc_password',
-                'service_id', 'vlan_id']
+        return ['autostart', 'remark', 'cpu', 'memory', 'bandwidth', 'link', 'network', 'manage_network',
+                'vnc_password', 'service_id', 'vlan_id']
 
     @staticmethod
     def get_allow_content_search_keywords():
