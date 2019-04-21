@@ -88,6 +88,11 @@ def r_create():
             Rules.SSH_KEYS_ID.value
         )
 
+    if 'ip_pool_id' in request.json:
+        args_rules.append(
+            Rules.IP_POOL_ID.value
+        )
+
     if 'service_id' in request.json:
         args_rules.append(
             Rules.SERVICE_ID.value
@@ -213,13 +218,17 @@ def r_create():
         for row in rows:
             occupied_ips.append(row['ip'])
 
-        rows, count = IPPool.get_by_filter(filter_str=':'.join(['activity', 'eq', '1']))
-        if count < 1:
-            ret['state'] = ji.Common.exchange_state(50350)
-            return ret
-
         ip_pool = IPPool()
-        ip_pool.id = rows[0]['id']
+        ip_pool.id = request.json.get('ip_pool_id', None)
+
+        if ip_pool.id is None:
+            rows, count = IPPool.get_by_filter(filter_str=':'.join(['activity', 'eq', '1']))
+            if count < 1:
+                ret['state'] = ji.Common.exchange_state(50350)
+                return ret
+
+            ip_pool.id = rows[0]['id']
+
         ip_pool.get()
 
         guest_ip_generator = ip_pool.ip_generator(occupied_ips=occupied_ips)

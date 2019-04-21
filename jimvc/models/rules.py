@@ -63,6 +63,7 @@ class Rules(Enum):
     DNS1 = (REG_IP, 'dns1')
     DNS2 = (REG_IP, 'dns2')
     ACTIVITY = (int, 'activity')
+    IP_POOL_ID = (int, 'ip_pool_id')
 
     SSH_KEY_ID_EXT = (REG_NUMBER, 'ssh_key_id')
     SSH_KEYS_ID = (list, 'ssh_keys_id')
