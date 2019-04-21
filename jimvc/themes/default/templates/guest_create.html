@@ -110,12 +110,20 @@
 
         refresh_os_template_image_id_selectpicker($('#os_template_image_id'));
         refresh_ssh_keys_checkboxer($('#ssh_keys_id_div'));
+        refresh_ip_pool_id_selectpicker($('#ip_pool_id'));
+        refresh_vlan_id_selectpicker($('#vlan_id'));
+        refresh_project_id_selectpicker($('#project_id'));
+        refresh_service_id_selectpicker($('#service_id'), 1);
 
         $('#bandwidth_unit').on('changed.bs.select', function (me) {
             render_bandwidth_slider($("#bandwidth"), 'update', $('#bandwidth_unit').val())
         });
 
         render_bandwidth_slider($("#bandwidth"), 'create', 'm');
+
+        $('#project_id').on('changed.bs.select', function (me) {
+            refresh_service_id_selectpicker($('#service_id'), $('#project_id').val());
+        });
     });
 
     function get_os_templates_profile_mapping_by_id() {
@@ -160,6 +168,101 @@
                     );
                 });
                 selectpicker.selectpicker('refresh');
+            }
+        });
+    }
+
+    function refresh_ip_pool_id_selectpicker(selectpicker) {
+        $.ajax({
+            url : '/api/ip_pools',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                selectpicker.empty();
+                var selected = '';
+                $.each(data.data, function(k, v) {
+                    selectpicker.append(
+                        $('<option>', {value: v['id'], text: '\xa0\xa0' + v['name']})
+                    );
+                    if (v['activity']) {
+                        selected = v['id'];
+                    }
+                });
+                selectpicker.selectpicker('refresh');
+                selectpicker.val(selected).change();
+            }
+        });
+    }
+
+    function refresh_vlan_id_selectpicker(selectpicker) {
+        $.ajax({
+            url : '/api/vlans',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    selectpicker.append(
+                        $('<option>', {value: v['vlan_id'], text: '\xa0\xa0' + v['label'], 'data-subtext': v['description']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+                selectpicker.val('-1').change();
+            }
+        });
+    }
+
+    function refresh_project_id_selectpicker(selectpicker) {
+        $.ajax({
+            url : '/api/projects',
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                selectpicker.empty();
+                $.each(data.data, function(k, v) {
+                    selectpicker.append(
+                        $('<option>', {value: v['id'], text: '\xa0\xa0' + v['name'], 'data-subtext': v['description']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+                selectpicker.val('1').change();
+            }
+        });
+    }
+
+    function refresh_service_id_selectpicker(selectpicker, project_id) {
+        $.ajax({
+            url : '/api/projects/' + project_id,
+            type : 'GET',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            error : function() {
+            },
+            success : function(data, textStatus, xhr) {
+                selectpicker.empty();
+                $.each(data.data['services'], function(k, v) {
+                    selectpicker.append(
+                        $('<option>', {value: v['id'], text: '\xa0\xa0' + v['name'], 'data-subtext': v['description']})
+                    );
+                });
+                selectpicker.selectpicker('refresh');
+
+                if (project_id === 1) {
+                    selectpicker.val('1').change();
+                }
             }
         });
     }
@@ -424,6 +527,31 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;IP 池</label>
+                        <div class="col-sm-6">
+                            <select id="ip_pool_id" name="ip_pool_id" title="请选 IP 池..." class="selectpicker" data-width="100%">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;VLAN</label>
+                        <div class="col-sm-6">
+                            <select id="vlan_id" name="vlan_id" title="请选所属网络..." class="selectpicker" data-width="100%">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span class="glyph-icon icon-elusive-inbox-alt"></span>&nbsp;&nbsp;项目编制</label>
+                        <div class="col-sm-3">
+                            <select id="project_id" name="project_id" title="请选所属项目..." class="selectpicker" data-width="100%">
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            <select id="service_id" name="service_id" title="请选所属服务..." class="selectpicker" data-width="100%">
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
