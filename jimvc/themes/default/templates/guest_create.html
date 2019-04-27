@@ -349,6 +349,9 @@
             remark: $('#remark').val(),
             password: $('#password').val(),
             ssh_keys_id: $("input[name=ssh_keys_id]:checked").map(function () {return this.value}).get(),
+            ip_pool_id: parseInt($('#ip_pool_id').val()),
+            service_id: parseInt($('#service_id').val()),
+            vlan_id: parseInt($('#vlan_id').val()),
             lease_term: 100
         };
 

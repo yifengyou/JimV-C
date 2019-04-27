@@ -106,3 +106,4 @@
 - [ ] 虚拟机锁，使被锁定的虚拟机，无法被操作
 - [ ] 加入自定义主题颜色供。具体的颜色参考(http://ylbook.com/cms/web/chuantongsecai/chuantongsecai.htm)
 - [ ] 独立出 JimV 专有的 Nginx 配置文件
+- [ ] 加入警句水印
