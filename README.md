@@ -90,45 +90,8 @@ JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门
 
 ## 安装
 
-### JimV-C 快速安装
-> 在一台服务器上仅部署 JimV-C。与其它部署 JimV-N 的计算节点一起协同工作。
-
-1. [配置 `/etc/hosts` 文件](docs/install.md#配置-etchosts-文件)
-2. 通过在线脚本自动安装 JimV-C
-    ``` bash
-    bash -c "$(curl -fsSL http://repo.jimv.cn/jimvc.install.sh)"
-    ```
-3. 根据 JimV-C 安装过程的提示，安装部署 JimV-N
-4. [获取系统镜像模板](http://template.jimv.cn)
-5. 上传系统镜像模板
-   > 存放系统镜像模板，到所有计算节点可以访问到的路径(如果是单个计算节点，可以存放到 /opt/template_images 目录下。如果是多个计算节点，可以通过 NFS 共享该目录。)。
-
-   `NFS 参考配置`
-   ``` bash
-   # NFS 服务端
-   yum install nfs-utils -y
-   mkdir /srv/nfs_template_images
-   cat > /etc/exports << EOF
-   /srv/nfs_template_images    *(rw,no_root_squash,sync,no_wdelay)
-   EOF
-   systemctl start nfs
-   systemctl enable nfs
-   
-   # NFS 客户端
-   yum install nfs-utils -y
-   mkdir /opt/template_images
-   echo "x.x.x.x:/srv/nfs_template_images       /opt/template_images      nfs4    soft  0 0" >> /etc/fstab
-   mount -a
-   ```
-
-6. 创建虚拟机模板
-   > 在 JimV-C 控制面板中，添加虚拟机模板。
-7. 享受"简单、快速开"创虚拟机实例的快乐。。。。。
-
-
-## 架构图
-* [JimV 简单应用架构](./topology/JimVSimpleArchitecture.png)
-* [JimV 典型应用架构](./topology/JimVRecommendArchitecture.png)
+### 快速安装
+[JimV 文档中心](https://jimv.cn/docs.html)
 
 
 ## [规划与建议](docs/suggest.md)
