@@ -1,7 +1,8 @@
 [![License](https://img.shields.io/badge/License-GPL3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 [![Format](https://img.shields.io/badge/Format-JSON-blue.svg)](http://www.json.org/json-zh.html)
 [![Python versions](https://img.shields.io/badge/Python-2.7.10-blue.svg)](https://www.python.org)
-[![API](https://img.shields.io/badge/API-RESTful-blue.svg)](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)
+[![API](https://img.shields.io/badge/API-RESTful-blue.svg)]
+[![996icu](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm)]
 
 
 [TOC]: # "目录"
