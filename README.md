@@ -1,3 +1,35 @@
+# Jimv 开源项目学习
+
+![20201107_205833_56](image/20201107_205833_56.png) 
+
+```
+Something I hope you know before go into the coding~
+First, please watch or star this repo, I'll be more happy if you follow me.
+Bug report, questions and discussion are welcome, you can post an issue or pull a request.
+```
+
+## 学习笔记
+
+
+* [JimV部署文档](docs/JimV部署文档.md)
+* [iPXE分析](docs/iPXE分析.md)
+
+
+
+
+
+
+
+
+---
+
+
+
+## 原仓库仓库README
+
+
+
+
 [![License](https://img.shields.io/badge/License-GPL3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 [![Format](https://img.shields.io/badge/Format-JSON-blue.svg)](http://www.json.org/json-zh.html)
 [![Python versions](https://img.shields.io/badge/Python-2.7.10-blue.svg)](https://www.python.org)
@@ -104,6 +136,7 @@ JimV 是一个，结构清晰简单，易于部署、维护、使用的，低门
 
 
 ## FAQ
+
 Q1: 出现如下错误该如何解决
 > could not find capabilities for arch=x86_64 domaintype=kvm
 
@@ -125,8 +158,9 @@ E-Mail: james.iter.cn@gmail.com
 
 ## Demo
 
-[demo.jimv.cn](https://demo.jimv.cn) <br>
-[demo.jimv.io](https://demo.jimv.io) <br>
-[jimv.iit.im](https://jimv.iit.im) <br>
-管理员账密 `admin`:`pswd.jimv.cn`
+* [demo.jimv.cn](https://demo.jimv.cn)
+* [demo.jimv.io](https://demo.jimv.io)
+* [jimv.iit.im](https://jimv.iit.im)
 
+管理员账号 ：`admin`:
+管理员密码 ：`pswd.jimv.cn`

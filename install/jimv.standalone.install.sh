@@ -87,9 +87,9 @@ function custom_repository_origin() {
     cat > /etc/yum.repos.d/JimV.repo << EOF
 [JimV]
 name=JimV - \$basearch
-baseurl=http://repo.jimv.cn/centos/7/os/\$basearch
+baseurl=http://repo.cdn.jimv.cn/centos/7/os/\$basearch
+        http://repo.jimv.cn/centos/7/os/\$basearch
         http://repo.jimv.io/centos/7/os/\$basearch
-        http://repo.iit.im/centos/7/os/\$basearch
 failovermethod=priority
 enabled=1
 gpgcheck=0
@@ -97,12 +97,7 @@ gpgkey=https://repo.jimv.cn/RPM-GPG-KEY-JIMV-114EA591
 EOF
 
     yum install epel-release -y
-    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-    mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
-    mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.backup
-    curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
-    curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo
-    sed -i '/aliyuncs/d' /etc/yum.repos.d/*.repo
+    yum install dstat htop iotop net-tools lsof nmap-ncat jq bind-utils bridge-utils psutils -y
     yum clean all
     yum makecache
 }
@@ -116,14 +111,30 @@ function clear_up_environment() {
     sed -i 's@SELINUX=enforcing@SELINUX=disabled@g' /etc/sysconfig/selinux
     sed -i 's@SELINUX=enforcing@SELINUX=disabled@g' /etc/selinux/config
     setenforce 0
+
+    sed -i '/\/tmp\/jimv.*/d' /usr/lib/tmpfiles.d/tmp.conf
+    echo 'x /tmp/jimv*' >> /usr/lib/tmpfiles.d/tmp.conf
 }
 
 function create_web_user() {
     useradd -M www
 }
 
+function generate_ssh_key_pair() {
+    sed -i 's@.*StrictHostKeyChecking.*@StrictHostKeyChecking no@' /etc/ssh/ssh_config
+
+    rm -f ~/.ssh/id_rsa ~/.ssh/id_rsa.pub; echo -e "\n\n\n" | ssh-keygen -N ""
+    echo >> ~/.ssh/authorized_keys
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+    chmod 0600 ~/.ssh/authorized_keys
+}
+
 function install_JimVC() {
     yum install jimv-controller -y
+}
+
+function install_JimVConsole() {
+    yum install jimv-console -y
 }
 
 function generate_passwords() {
@@ -184,6 +195,7 @@ EOF
 
     # 测试是否部署成功
     mysql -u root -p${RDB_ROOT_PSWD} -e 'show databases'
+    echo 'root:'${RDB_ROOT_PSWD} > /var/log/mariadb/mariadb.secret
 }
 
 function install_Redis() {
@@ -209,9 +221,8 @@ function install_Nginx() {
     # 配置 Nginx
     mkdir -p /etc/jimv/keys
     chown -R www.www /var/lib/nginx
-    sed -i 's@user nginx.*$@user www;@' /etc/nginx/nginx.conf
-    sed -i '/^.*server {/,$d' /etc/nginx/nginx.conf
-    cat /usr/share/jimv/controller/misc/nginx_jimv.conf >> /etc/nginx/nginx.conf
+    cp -vf /usr/share/jimv/controller/misc/jimv.nginx /etc/nginx/nginx.conf
+    sed -i 's@user .*nginx.*$@user www;@' /etc/nginx/nginx.conf
 
     # 启动并使其随机启动
     systemctl enable nginx.service
@@ -246,7 +257,7 @@ function generate_JimVC_config_file() {
 function start_JimVC() {
     systemctl start jimvc.service
     systemctl enable jimvc.service
-    sleep 2
+    sleep 5
 }
 
 function Init_JimVC() {
@@ -281,11 +292,13 @@ function install_libvirt_and_libguestfish() {
     yum install centos-release-qemu-ev -y
     yum install jimv-node -y
     yum install librbd1-10.2.5 -y
+    chmod 666 /dev/kvm
+    chown root.kvm /dev/kvm
 }
 
 function tune_linux_kernel_parameters() {
     sed -i '/^net.ipv4.ip_local_port_range/d' /etc/sysctl.conf
-    echo 'net.ipv4.ip_local_port_range = 15900 20000' >> /etc/sysctl.conf
+    echo 'net.ipv4.ip_local_port_range = 15800 20000' >> /etc/sysctl.conf
     sysctl -p
 }
 
@@ -363,6 +376,27 @@ function start_libvirtd() {
     systemctl start libvirtd
 }
 
+function install_NFS() {
+    yum install nfs-utils -y
+    mkdir -p /srv/nfs_template_images
+    chown -R www.www /srv/nfs_template_images
+    WWW_UID=$(id -u www)
+    WWW_GID=$(id -g www)
+    cat > /etc/exports << EOF
+/srv/nfs_template_images    *(rw,insecure,all_squash,anonuid=${WWW_UID},anongid=${WWW_GID},sync,no_wdelay)
+EOF
+    systemctl start nfs
+    systemctl enable nfs
+}
+
+function install_and_set_NFS_client() {
+    yum install nfs-utils -y
+    mkdir /opt/template_images
+    sed -i "/${SERVER_IP}:\/srv\/nfs_template_images/d" /etc/fstab
+    echo "${SERVER_IP}:/srv/nfs_template_images       /opt/template_images      nfs4    soft  0 0" >> /etc/fstab
+    mount -a
+}
+
 function generate_JimVN_config_file() {
     sed -i "s/\"redis_host\".*$/\"redis_host\": \"${REDIS_HOST}\",/" /etc/jimvn.conf
     sed -i "s/\"redis_password\".*$/\"redis_password\": \"${REDIS_PSWD}\",/" /etc/jimvn.conf
@@ -411,8 +445,10 @@ function deploy() {
     check_precondition
     custom_repository_origin
     clear_up_environment
+    generate_ssh_key_pair
     create_web_user
     install_JimVC
+    install_JimVConsole
     generate_passwords
     install_MariaDB
     install_Redis
@@ -430,6 +466,8 @@ function deploy() {
     handle_net_bonding_bridge
     create_network_bridge_in_libvirt
     start_libvirtd
+    install_NFS
+    install_and_set_NFS_client
     generate_JimVN_config_file
     start_JimVN
 
