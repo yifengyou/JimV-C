@@ -171,6 +171,10 @@ systemctl restart jimvc
 
 * 耍起来~~
 
+![20201107_213702_70](image/20201107_213702_70.png)
+
+![20201107_213749_34](image/20201107_213749_34.png) 
+
 ## 使用从git拉取源码运行
 
 * 拉取地址：<http://github.com/yifengyou/Jimv-C>
