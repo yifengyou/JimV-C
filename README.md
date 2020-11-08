@@ -1,6 +1,6 @@
 # Jimv 开源项目学习
 
-![20201107_205833_56](image/20201107_205833_56.png) 
+![20201107_205833_56](image/20201107_205833_56.png)
 
 ```
 Something I hope you know before go into the coding~
@@ -13,7 +13,9 @@ Bug report, questions and discussion are welcome, you can post an issue or pull 
 
 * [JimV部署文档](docs/JimV部署文档.md)
 * [iPXE分析](docs/iPXE分析.md)
-
+* [搭建pycharm开发环境](docs/搭建pycharm开发环境.md)
+* [搭建vscode开发环境](docs/搭建vscode开发环境.md)
+* [将jimv项目从python2转为python3](docs/将jimv项目从python2转为python3.md)
 
 
 
