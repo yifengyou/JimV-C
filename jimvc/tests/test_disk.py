@@ -36,7 +36,7 @@ class TestDisk(unittest.TestCase):
         headers = {'content-type': 'application/json'}
         r = requests.post(url, data=json.dumps(payload), headers=headers)
         j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
+        print(json.dumps(j_r, ensure_ascii=False))
         self.assertEqual('200', j_r['state']['code'])
 
     def test_12_get_list(self):
@@ -44,7 +44,7 @@ class TestDisk(unittest.TestCase):
         headers = {'content-type': 'application/json'}
         r = requests.get(url, headers=headers)
         j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
+        print(json.dumps(j_r, ensure_ascii=False))
         TestDisk.uuid = j_r['data'][-1]['uuid']
         self.assertEqual('200', j_r['state']['code'])
         for disk in j_r['data']:
@@ -56,7 +56,7 @@ class TestDisk(unittest.TestCase):
         headers = {'content-type': 'application/json'}
         r = requests.put(url, headers=headers)
         j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
+        print(json.dumps(j_r, ensure_ascii=False))
         self.assertEqual('200', j_r['state']['code'])
 
     # @unittest.skip('skip update disk')
@@ -69,7 +69,7 @@ class TestDisk(unittest.TestCase):
         headers = {'content-type': 'application/json'}
         r = requests.patch(url, data=json.dumps(payload), headers=headers)
         j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
+        print(json.dumps(j_r, ensure_ascii=False))
         self.assertEqual('200', j_r['state']['code'])
 
     # 校验更新结果

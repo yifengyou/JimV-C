@@ -10,7 +10,7 @@ from jimvc.models import Utils
 from jimvc.models import Rules
 from jimvc.models import IPPool
 
-from base import Base
+from .base import Base
 
 
 __author__ = 'James Iter'
@@ -78,8 +78,8 @@ def r_create():
         ip_pool.get()
         ret['data'] = ip_pool.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -178,8 +178,8 @@ def r_update(ids):
             ret['data'].append(ip_pool.__dict__)
 
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -214,8 +214,8 @@ def r_activity(_id):
         ret['data'].append(ip_pool.__dict__)
 
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

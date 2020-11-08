@@ -88,7 +88,7 @@ class EventProcessor(object):
                 cls.guest_migrate_info.update()
 
             except ji.PreviewingError as e:
-                ret = json.loads(e.message)
+                ret = json.loads(str(e))
                 if ret['state']['code'] == '404':
                     cls.guest_migrate_info.type = cls.message['message']['migrating_info']['type']
                     cls.guest_migrate_info.time_elapsed = cls.message['message']['migrating_info']['time_elapsed']
@@ -459,7 +459,7 @@ class EventProcessor(object):
         while True:
             if Utils.exit_flag:
                 msg = 'Thread EventProcessor say bye-bye'
-                print msg
+                print(msg)
                 logger.info(msg=msg)
 
                 return

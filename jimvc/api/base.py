@@ -45,8 +45,8 @@ class Base(object):
                     limit=100, order_by=by_field, filter_str=':'.join([by_field, 'in', ids]))
 
             return ret
-        except ji.PreviewingError, e:
-            return json.loads(e.message)
+        except ji.PreviewingError as e:
+            return json.loads(str(e))
 
     def get_by_filter(self):
         page = str(request.args.get('page', 1))
@@ -59,8 +59,8 @@ class Base(object):
 
         try:
             ji.Check.previewing(args_rules, {'page': page, 'page_size': page_size})
-        except ji.PreviewingError, e:
-            return json.loads(e.message)
+        except ji.PreviewingError as e:
+            return json.loads(str(e))
 
         page = int(page)
         page_size = int(page_size)
@@ -120,8 +120,8 @@ class Base(object):
                 page_size.__str__() + other_str
 
             return ret
-        except ji.PreviewingError, e:
-            return json.loads(e.message)
+        except ji.PreviewingError as e:
+            return json.loads(str(e))
 
     def content_search(self):
         page = str(request.args.get('page', 1))
@@ -134,8 +134,8 @@ class Base(object):
 
         try:
             ji.Check.previewing(args_rules, {'page': page, 'page_size': page_size})
-        except ji.PreviewingError, e:
-            return json.loads(e.message)
+        except ji.PreviewingError as e:
+            return json.loads(str(e))
 
         page = int(page)
         page_size = int(page_size)
@@ -197,8 +197,8 @@ class Base(object):
                 '&page_size=' + page_size.__str__() + other_str
 
             return ret
-        except ji.PreviewingError, e:
-            return json.loads(e.message)
+        except ji.PreviewingError as e:
+            return json.loads(str(e))
 
     def delete(self, ids=None, ids_rule=None, by_field=None):
         the_instance = self.the_class()
@@ -216,6 +216,6 @@ class Base(object):
             the_instance.delete_by_filter(filter_str=':'.join([by_field, 'in', ids]))
 
             return ret
-        except ji.PreviewingError, e:
-            return json.loads(e.message)
+        except ji.PreviewingError as e:
+            return json.loads(str(e))
 

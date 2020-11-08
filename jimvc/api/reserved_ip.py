@@ -10,7 +10,7 @@ from jimvc.models import Utils
 from jimvc.models import Rules
 from jimvc.models import ReservedIP
 
-from base import Base
+from .base import Base
 
 
 __author__ = 'James Iter'
@@ -61,8 +61,8 @@ def r_create():
         ret['data'] = reserved_ip.__dict__
 
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

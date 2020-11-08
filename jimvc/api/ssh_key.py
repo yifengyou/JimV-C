@@ -70,8 +70,8 @@ def r_create():
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -115,8 +115,8 @@ def r_update(_id):
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = ssh_key.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -221,8 +221,8 @@ def r_bound(ssh_key_id):
         ]))
 
         return guest_base.get_by_filter()
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -250,8 +250,8 @@ def r_unbound(ssh_key_id):
         ]))
 
         return guest_base.get_by_filter()
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -311,8 +311,8 @@ def r_bind(ssh_key_id, uuids):
         ]))
 
         return guest_base.get_by_filter()
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -358,8 +358,8 @@ def r_unbind(ssh_key_id, uuids):
         ]))
 
         return guest_base.get_by_filter()
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

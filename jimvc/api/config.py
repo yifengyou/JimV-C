@@ -86,8 +86,8 @@ def r_create():
         config.get()
         ret['data'] = config.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -152,8 +152,8 @@ def r_update():
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = config.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -270,8 +270,8 @@ def r_update_quota():
         ret['data'] = config.__dict__
 
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -287,6 +287,6 @@ def r_get():
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = config.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 

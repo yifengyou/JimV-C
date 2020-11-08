@@ -231,8 +231,8 @@ def r_create():
             if guest.password is None or guest.password.__len__() < 1:
                 guest.password = ji.Common.generate_random_code(length=16)
 
-            guest.ip = guest_ip_generator.next()
-            guest.vnc_port = guest_vnc_port_generator.next()
+            guest.ip = next(guest_ip_generator)
+            guest.vnc_port = next(guest_vnc_port_generator)
 
             guest.network = config.vm_network
             guest.manage_network = config.vm_manage_network
@@ -320,8 +320,8 @@ def r_create():
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -365,8 +365,8 @@ def r_autostart(uuids, autostart):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -401,8 +401,8 @@ def r_reboot(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -439,8 +439,8 @@ def r_force_reboot(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -475,8 +475,8 @@ def r_shutdown(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -511,8 +511,8 @@ def r_force_shutdown(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -556,8 +556,8 @@ def r_boot(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -592,8 +592,8 @@ def r_suspend(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -628,8 +628,8 @@ def r_resume(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -684,8 +684,8 @@ def r_delete(uuids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -763,8 +763,8 @@ def r_attach_disk(uuid, disk_uuid):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -821,8 +821,8 @@ def r_detach_disk(disk_uuid):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -885,8 +885,8 @@ def r_migrate(uuids, node_id):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -1359,8 +1359,8 @@ def r_update(uuids):
             ret['data'].append(guest.__dict__)
 
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -1385,8 +1385,8 @@ def r_revise_ip(uuid, ip):
         ret['data'] = guest.__dict__
 
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -1443,8 +1443,8 @@ def r_reset_password(uuids, password):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -1508,8 +1508,8 @@ def r_allocate_bandwidth(uuids, bandwidth, bandwidth_unit):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -1566,8 +1566,8 @@ def r_adjust_ability(uuids, cpu, memory):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -1604,8 +1604,8 @@ def r_change_prepared_by(uuids, service_id):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -1630,8 +1630,8 @@ def r_refresh_guest_state():
 
             Utils.emit_instruction(message=json.dumps(message, ensure_ascii=False))
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

@@ -295,7 +295,7 @@ class TestGuest(unittest.TestCase):
         headers = {'content-type': 'application/json'}
         r = requests.put(url, headers=headers)
         j_r = json.loads(r.content)
-        print json.dumps(j_r, ensure_ascii=False)
+        print(json.dumps(j_r, ensure_ascii=False))
         self.assertEqual('200', j_r['state']['code'])
 
 if __name__ == '__main__':

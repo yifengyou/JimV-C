@@ -80,6 +80,6 @@ def r_join(node_id, _token):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 

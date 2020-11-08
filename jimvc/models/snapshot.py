@@ -4,8 +4,8 @@
 
 import jimit as ji
 
-from filter import FilterFieldType
-from orm import ORM
+from .filter import FilterFieldType
+from .orm import ORM
 
 
 __author__ = 'James Iter'

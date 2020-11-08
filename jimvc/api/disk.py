@@ -19,7 +19,7 @@ from jimvc.models import Utils
 from jimvc.models import OSTemplateImage
 from jimvc.models import StorageMode
 
-from base import Base
+from .base import Base
 
 
 __author__ = 'James Iter'
@@ -122,8 +122,8 @@ def r_create():
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -181,8 +181,8 @@ def r_resize(uuid, size):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -237,8 +237,8 @@ def r_delete(uuids):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 def add_device(func):
@@ -250,16 +250,16 @@ def add_device(func):
         if ret['data'].__len__() > 0:
             if isinstance(ret['data'], list):
                 for i, item in enumerate(ret['data']):
-                    ret['data'][i][u'device'] = u'/dev/' + dev_table[item['sequence']]
+                    ret['data'][i]['device'] = '/dev/' + dev_table[item['sequence']]
 
                     if item['sequence'] < 0:
-                        ret['data'][i][u'device'] = None
+                        ret['data'][i]['device'] = None
 
             elif isinstance(ret['data'], dict):
-                ret['data'][u'device'] = u'/dev/' + dev_table[ret['data']['sequence']]
+                ret['data']['device'] = '/dev/' + dev_table[ret['data']['sequence']]
 
                 if ret['data']['sequence'] < 0:
-                    ret['data'][u'device'] = None
+                    ret['data']['device'] = None
 
             else:
                 raise json.dumps(ret)
@@ -408,8 +408,8 @@ def r_update(uuids):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

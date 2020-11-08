@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 
-from filter import FilterFieldType
-from orm import ORM
+from .filter import FilterFieldType
+from .orm import ORM
 
 
 __author__ = 'James Iter'

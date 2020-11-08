@@ -138,8 +138,8 @@ def get_performance_data(uuid, uuid_field, the_class=None, granularity='hour'):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -341,7 +341,7 @@ def r_last_the_range_minutes_top_10(_range):
         guests_uuid_mapping[row['guest_uuid']]['count'] += 1.0
 
     rows = list()
-    for k, v in guests_uuid_mapping.items():
+    for k, v in list(guests_uuid_mapping.items()):
 
         # 忽略除数为 0 的情况
         if v['cpu_load'] == 0:
@@ -368,7 +368,7 @@ def r_last_the_range_minutes_top_10(_range):
         guests_uuid_mapping[row['disk_uuid']]['rw_req'] += row['rd_req'] + row['wr_req']
 
     rows = list()
-    for k, v in guests_uuid_mapping.items():
+    for k, v in list(guests_uuid_mapping.items()):
 
         # 过滤掉无操作的数据
         if v['rw_req'] == 0:
@@ -397,7 +397,7 @@ def r_last_the_range_minutes_top_10(_range):
         guests_uuid_mapping[row['guest_uuid']]['rt_packets'] += row['rx_packets'] + row['tx_packets']
 
     rows = list()
-    for k, v in guests_uuid_mapping.items():
+    for k, v in list(guests_uuid_mapping.items()):
 
         # 过滤掉无流量的数据
         if v['rt_packets'] == 0:

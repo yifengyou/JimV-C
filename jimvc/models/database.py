@@ -44,9 +44,9 @@ class Database(object):
             )
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                e_msg = u'用户名或密码错误'
+                e_msg = '用户名或密码错误'
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                e_msg = u'数据库不存在'
+                e_msg = '数据库不存在'
             else:
                 e_msg = err.msg
 
@@ -101,7 +101,7 @@ class Database(object):
         try:
             cls.r.ping()
         except redis.exceptions.ResponseError as e:
-            logger.warn(e.message)
+            logger.warn(str(e))
             cls.r = redis.StrictRedis(host=app_config.get('redis_host', '127.0.0.1'),
                                       port=app_config.get('redis_port', 6379),
                                       db=app_config.get('redis_dbid', 0), password=app_config.get('redis_password', ''),
@@ -121,7 +121,7 @@ class Database(object):
                 cls.r.ping()
 
             except redis.exceptions.ConnectionError as e:
-                logger.error(e.message)
+                logger.errorstr(e)
                 cls.init_conn_redis()
 
             except:

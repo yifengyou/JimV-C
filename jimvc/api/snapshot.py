@@ -88,8 +88,8 @@ def r_create():
         ret['data'] = snapshot.__dict__
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -127,8 +127,8 @@ def r_update(snapshot_id):
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = snapshot.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -199,8 +199,8 @@ def r_delete(snapshots_id):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -242,8 +242,8 @@ def r_revert(snapshot_id):
         ret['data'] = snapshot.__dict__
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -267,8 +267,8 @@ def r_get_disks(snapshot_id):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -291,8 +291,8 @@ def r_get_snapshots_by_disks_uuid(disks_uuid):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -320,8 +320,8 @@ def r_convert_to_os_template_image(snapshot_id, disk_uuid):
 
         if disk_uuid not in disks_uuid:
             ret['state'] = ji.Common.exchange_state(40401)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': 未在快照: ',
-                                                    snapshot_id, u' 中找到磁盘：', disk_uuid])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': 未在快照: ',
+                                                    snapshot_id, ' 中找到磁盘：', disk_uuid])
             return ret
 
         config = Config()
@@ -383,8 +383,8 @@ def r_convert_to_os_template_image(snapshot_id, disk_uuid):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

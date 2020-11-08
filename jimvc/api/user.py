@@ -57,7 +57,7 @@ def r_sign_in():
         if not ji.Security.ji_pbkdf2_check(password=plain_password, password_hash=user.password):
             ret = dict()
             ret['state'] = ji.Common.exchange_state(40101)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': 鉴权失败'])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': 鉴权失败'])
             raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
 
         token = Utils.generate_token(user.id)
@@ -66,13 +66,13 @@ def r_sign_in():
         rep.data = json.dumps({'state': ji.Common.exchange_state(20000)}, ensure_ascii=False)
         return rep
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
 def r_sign_out():
-    for key in session.keys():
+    for key in list(session.keys()):
         session.pop(key=key)
 
 
@@ -95,7 +95,7 @@ def r_change_password():
         if not ji.Security.ji_pbkdf2_check(password=old_password, password_hash=user.password):
             ret = dict()
             ret['state'] = ji.Common.exchange_state(40101)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': 鉴权失败'])
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': 鉴权失败'])
             raise ji.PreviewingError(json.dumps(ret, ensure_ascii=False))
 
         args_rules = [
@@ -107,8 +107,8 @@ def r_change_password():
         ji.Check.previewing(args_rules, user.__dict__)
         user.password = ji.Security.ji_pbkdf2(user.password)
         user.update()
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -136,8 +136,8 @@ def r_reset_password(token):
         ji.Check.previewing(args_rules, user.__dict__)
         user.password = ji.Security.ji_pbkdf2(user.password)
         user.update()
-    except (ji.PreviewingError, ji.JITError), e:
-        return json.loads(e.message)
+    except (ji.PreviewingError, ji.JITError) as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -155,7 +155,7 @@ def r_send_reset_password_email(login_name):
             user.login_name = login_name
             user.get_by('login_name')
 
-        except ji.PreviewingError, e:
+        except ji.PreviewingError as e:
             # 如果 login_name 没有找到，则尝试从email里面查找
             # 因为用户可能会把登录名理解成email
             user.email = login_name
@@ -172,8 +172,8 @@ def r_send_reset_password_email(login_name):
                                             tls=app_config['smtp_starttls'])
 
         ji.NetUtils.send_mail(smtp_server=smtp_server, sender=app_config['smtp_user'],
-                              receivers=[user.email], title=u'重置登录密码',
-                              message=u'请复制以下地址到浏览器中打开：' + reset_password_url)
+                              receivers=[user.email], title='重置登录密码',
+                              message='请复制以下地址到浏览器中打开：' + reset_password_url)
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -181,6 +181,6 @@ def r_send_reset_password_email(login_name):
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 

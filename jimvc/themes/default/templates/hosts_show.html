@@ -135,10 +135,10 @@
                                 <li>CPU: {{ item.cpu }} 核</li>
                                 <li>内存: {{ (item.memory / 1024 / 1024 / 1024)|int }} GB</li>
                                 <!--<li><i class="glyph-icon icon-circle font-size-23 {% if item.alive == true %}font-green{% else %}font-red{% endif %}"></i></li>-->
-                                {% for nic_name, nic in item.interfaces.iteritems() %}
+                                {% for nic_name, nic in item.interfaces.items() %}
                                     <li>网卡: {{ nic_name }} | IP: {{ nic.ip }}</li>
                                 {% endfor %}
-                                {% for mountpoint, disk in item.disks.iteritems() %}
+                                {% for mountpoint, disk in item.disks.items() %}
                                     <li>挂载点: {{ mountpoint }} | {{ (disk.total / 1024 / 1024 / 1024) | int }} GB | 使用率: {{ disk.percent }}%</li>
                                 {% endfor %}
                                 <li>版本: {{ item.version }}</li>

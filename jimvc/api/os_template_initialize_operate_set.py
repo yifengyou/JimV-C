@@ -67,8 +67,8 @@ def r_create():
         os_template_initialize_operate_set.get_by('label')
         ret['data'] = os_template_initialize_operate_set.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -119,8 +119,8 @@ def r_update(_id):
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = os_template_initialize_operate_set.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

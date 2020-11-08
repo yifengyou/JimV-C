@@ -65,10 +65,10 @@ def get_performance_data(node_id, the_class=None, nic_name=None, mountpoint=None
         filters.append(node_ids_str)
 
         if nic_name is not None:
-            filters.append('name:eq:' + nic_name)
+            filters.append('name:eq:' + str(nic_name))
 
         if mountpoint is not None:
-            filters.append('mountpoint:eq:' + mountpoint)
+            filters.append('mountpoint:eq:' + str(mountpoint))
 
         ret = dict()
         ret['state'] = ji.Common.exchange_state(20000)
@@ -151,8 +151,8 @@ def get_performance_data(node_id, the_class=None, nic_name=None, mountpoint=None
 
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -351,7 +351,7 @@ def r_last_the_range_minutes_top_10(_range):
         hosts_node_id_mapping[row['node_id']]['count'] += 1.0
 
     rows = list()
-    for k, v in hosts_node_id_mapping.items():
+    for k, v in list(hosts_node_id_mapping.items()):
 
         # 忽略除数为 0 的情况
         if v['cpu_load'] == 0:
@@ -380,7 +380,7 @@ def r_last_the_range_minutes_top_10(_range):
         hosts_node_id_mapping[disk_uuid]['rw_req'] += row['rd_req'] + row['wr_req']
 
     rows = list()
-    for k, v in hosts_node_id_mapping.items():
+    for k, v in list(hosts_node_id_mapping.items()):
 
         # 过滤掉无操作的数据
         if v['rw_req'] == 0:
@@ -412,7 +412,7 @@ def r_last_the_range_minutes_top_10(_range):
         hosts_node_id_mapping[nic_uuid]['rt_packets'] += row['rx_packets'] + row['tx_packets']
 
     rows = list()
-    for k, v in hosts_node_id_mapping.items():
+    for k, v in list(hosts_node_id_mapping.items()):
 
         # 过滤掉无流量的数据
         if v['rt_packets'] == 0:

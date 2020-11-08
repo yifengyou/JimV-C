@@ -7,7 +7,6 @@ __date__ = '2018/9/30'
 __contact__ = 'james.iter.cn@gmail.com'
 __copyright__ = '(c) 2018 by James Iter.'
 
-
 import traceback
 import signal
 import time
@@ -19,7 +18,6 @@ from jimvc.models import EventProcessor, Init
 from jimvc.models import Utils
 from jimvc import app
 from jimvc import ws_engine_for_vnc
-
 
 threads = []
 # noinspection PyBroadException
@@ -58,7 +56,6 @@ except:
     logger.error(traceback.format_exc())
     exit(-1)
 
-
 if __name__ == '__main__':
     # noinspection PyBroadException
     try:
@@ -75,9 +72,8 @@ if __name__ == '__main__':
         for t in threads:
             t.join()
 
-        print 'Main say bye-bye!'
+        print('Main say bye-bye!')
 
     except:
         logger.error(traceback.format_exc())
         exit(-1)
-

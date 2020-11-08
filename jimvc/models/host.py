@@ -94,7 +94,7 @@ class Host(object):
         compute_nodes_of_allocation_by_nonrandom = \
             list(db.r.smembers(app_config['compute_nodes_of_allocation_by_nonrandom']))
 
-        for k, v in db.r.hgetall(app_config['hosts_info']).items():
+        for k, v in list(db.r.hgetall(app_config['hosts_info']).items()):
             v = json.loads(v)
             v = cls.alive_check(v)
             v['node_id'] = k
@@ -142,7 +142,7 @@ class Host(object):
     def get_lightest_host():
         # 负载最小的宿主机
         lightest_host = None
-        for k, v in db.r.hgetall(app_config['hosts_info']).items():
+        for k, v in list(db.r.hgetall(app_config['hosts_info']).items()):
             v = json.loads(v)
 
             if lightest_host is None:

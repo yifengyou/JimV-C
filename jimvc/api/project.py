@@ -65,8 +65,8 @@ def r_create():
         ret['data'] = project.__dict__
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -110,8 +110,8 @@ def r_update(_id):
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = project.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -263,6 +263,6 @@ def r_delete(ids):
         ret['state'] = ji.Common.exchange_state(20000)
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 

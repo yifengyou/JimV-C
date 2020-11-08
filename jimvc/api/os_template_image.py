@@ -77,7 +77,7 @@ def r_create():
         os_template_profile.id = os_template_image.os_template_profile_id
         if not os_template_profile.exist():
             ret['state'] = ji.Common.exchange_state(40401)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': 操作系统模板描述文件ID: ',
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': 操作系统模板描述文件ID: ',
                                                     os_template_image.os_template_profile_id.__str__()])
             return ret
 
@@ -85,8 +85,8 @@ def r_create():
         os_template_image.get_by('path')
         ret['data'] = os_template_image.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -161,8 +161,8 @@ def r_update(_id):
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = os_template_image.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

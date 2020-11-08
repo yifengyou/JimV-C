@@ -58,7 +58,7 @@ def r_show():
 
     guests_uuid = list()
 
-    for k, v in guests_current_top_10_ret['data'].items():
+    for k, v in list(guests_current_top_10_ret['data'].items()):
         for item in v:
             if 'guest_uuid' not in item:
                 break
@@ -77,7 +77,7 @@ def r_show():
         guests_mapping_by_uuid[guest['uuid']] = guest
 
     disks_uuid = list()
-    for k, v in guests_current_top_10_ret['data'].items():
+    for k, v in list(guests_current_top_10_ret['data'].items()):
         for item in v:
             if 'disk_uuid' not in item:
                 break

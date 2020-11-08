@@ -125,7 +125,7 @@ class GuestXML(object):
 
     def get_disk(self):
 
-        from initialize import dev_table
+        from .initialize import dev_table
 
         if self.config.storage_mode in [status.StorageMode.local.value, status.StorageMode.shared_mount.value]:
             disk_xml = """

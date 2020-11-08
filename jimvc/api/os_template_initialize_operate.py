@@ -78,7 +78,7 @@ def r_create():
         os_template_initialize_operate_set.id = os_template_initialize_operate.os_template_initialize_operate_set_id
         if not os_template_initialize_operate_set.exist():
             ret['state'] = ji.Common.exchange_state(40401)
-            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], u': 操作系统初始化操作集ID: ',
+            ret['state']['sub']['zh-cn'] = ''.join([ret['state']['sub']['zh-cn'], ': 操作系统初始化操作集ID: ',
                                                     os_template_initialize_operate_set.id.__str__()])
             return ret
 
@@ -99,15 +99,15 @@ def r_create():
 
             if os_template_initialize_operate.kind == OSTemplateInitializeOperateKind.cmd.value:
                 ret['state']['sub']['zh-cn'] = ''.join(
-                    [ret['state']['sub']['zh-cn'], u', 命令: ', os_template_initialize_operate.command,
-                     u', 已存在于操作集ID ',
-                     os_template_initialize_operate.os_template_initialize_operate_set_id.__str__(), u' 中。'])
+                    [ret['state']['sub']['zh-cn'], ', 命令: ', os_template_initialize_operate.command,
+                     ', 已存在于操作集ID ',
+                     os_template_initialize_operate.os_template_initialize_operate_set_id.__str__(), ' 中。'])
 
             else:
                 ret['state']['sub']['zh-cn'] = ''.join([
-                    ret['state']['sub']['zh-cn'], u', 路径: ', os_template_initialize_operate.path,
-                    u', 已存在于操作集ID ',
-                    os_template_initialize_operate.os_template_initialize_operate_set_id.__str__(), u' 中。'])
+                    ret['state']['sub']['zh-cn'], ', 路径: ', os_template_initialize_operate.path,
+                    ', 已存在于操作集ID ',
+                    os_template_initialize_operate.os_template_initialize_operate_set_id.__str__(), ' 中。'])
             return ret
 
         os_template_initialize_operate.create()
@@ -118,8 +118,8 @@ def r_create():
         ret['data'] = data[0]
         return ret
 
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response
@@ -188,8 +188,8 @@ def r_update(_id):
         ret['state'] = ji.Common.exchange_state(20000)
         ret['data'] = os_template_initialize_operate.__dict__
         return ret
-    except ji.PreviewingError, e:
-        return json.loads(e.message)
+    except ji.PreviewingError as e:
+        return json.loads(str(e))
 
 
 @Utils.dumps2response

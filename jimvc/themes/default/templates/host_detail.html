@@ -998,7 +998,7 @@
                             </td>
                         </tr>
 
-                        {% for nic_name, nic in host.interfaces.iteritems() %}
+                        {% for nic_name, nic in host.interfaces.items() %}
                             <tr>
                                 <td style="padding: 0;">
                                     <table style="width: 100%;">
@@ -1008,7 +1008,7 @@
                                 </td>
                             </tr>
                         {% endfor %}
-                        {% for mountpoint, disk in host.disks.iteritems() %}
+                        {% for mountpoint, disk in host.disks.items() %}
                             <tr>
                                 <td style="padding: 0;">
                                     <table style="width: 100%;">

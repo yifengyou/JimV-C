@@ -32,7 +32,7 @@ def show():
     if request.args.__len__() >= 1:
         args = list()
 
-        for k, v in request.args.items():
+        for k, v in list(request.args.items()):
             args.append('='.join([k, v]))
 
         url += '?' + '&'.join(args)

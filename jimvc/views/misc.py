@@ -43,9 +43,9 @@ def recover_password():
 
         return render('success.html',
                       go_back_url='/login',
-                      timeout=10000, title=u'提交成功',
-                      message_title=u'恢复密码的请求已被接受',
-                      message=u'恢复密码的URL已发送至您的邮箱，请查看您预留的邮箱：' + j_r['data']['email'] + u'。页面将在10秒钟后自动跳转到登录页面！')
+                      timeout=10000, title='提交成功',
+                      message_title='恢复密码的请求已被接受',
+                      message='恢复密码的URL已发送至您的邮箱，请查看您预留的邮箱：' + j_r['data']['email'] + '。页面将在10秒钟后自动跳转到登录页面！')
 
     else:
         return render('recover_password.html')
@@ -69,16 +69,16 @@ def reset_password(token):
         if j_r['state']['code'] == '200':
             return render('success.html',
                           go_back_url='/login',
-                          timeout=10000, title=u'提交成功',
-                          message_title=u'重置密码成功',
-                          message=u'页面将在10秒钟后自动跳转到登录页面！')
+                          timeout=10000, title='提交成功',
+                          message_title='重置密码成功',
+                          message='页面将在10秒钟后自动跳转到登录页面！')
 
         else:
             return render('failure.html',
                           go_back_url='/login',
-                          timeout=10000, title=u'提交失败',
-                          message_title=u'重置密码失败',
-                          message=j_r['state']['sub']['zh-cn'] + u'，页面将在10秒钟后自动跳转到登录页面！')
+                          timeout=10000, title='提交失败',
+                          message_title='重置密码失败',
+                          message=j_r['state']['sub']['zh-cn'] + '，页面将在10秒钟后自动跳转到登录页面！')
 
     else:
         return render('reset_password.html', token=token)

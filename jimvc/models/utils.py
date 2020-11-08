@@ -4,7 +4,7 @@
 
 from functools import wraps
 import socket
-import commands
+import subprocess
 import jimit as ji
 import json
 import time
@@ -15,7 +15,7 @@ from werkzeug.utils import import_string, cached_property
 import jwt
 
 from jimvc.models import app_config, logger, dev_table
-from database import Database as db
+from .database import Database as db
 
 from jimvc import app
 
@@ -34,7 +34,7 @@ class Utils(object):
     @staticmethod
     def shell_cmd(cmd):
         try:
-            exit_status, output = commands.getstatusoutput(cmd)
+            exit_status, output = subprocess.getstatusoutput(cmd)
 
             return exit_status, str(output)
 
@@ -56,7 +56,7 @@ class Utils(object):
         def _dumps2response(*args, **kwargs):
             ret = func(*args, **kwargs)
 
-            if func.func_name != 'r_before_request' and ret is None:
+            if func.__name__ != 'r_before_request' and ret is None:
                 ret = dict()
                 ret['state'] = ji.Common.exchange_state(20000)
 
@@ -117,8 +117,8 @@ class Utils(object):
                                      audience=audience)
 
             return payload
-        except jwt.InvalidTokenError, e:
-            logger.error(e.message)
+        except jwt.InvalidTokenError as e:
+            logger.error(e)
         ret['state'] = ji.Common.exchange_state(41208)
         raise ji.JITError(json.dumps(ret))
 
@@ -164,8 +164,8 @@ def add_rule_views(blueprint, rule, views_func=None, **options):
 
 @app.context_processor
 def utility_processor():
-    def format_price(amount, currency=u'￥'):
-        return u'{0:.2f}{1}'.format(amount, currency)
+    def format_price(amount, currency='￥'):
+        return '{0:.2f}{1}'.format(amount, currency)
 
     def format_datetime_by_ts(ts, fmt='%Y-%m-%d %H:%M'):
         return time.strftime(fmt, time.localtime(ts))
@@ -244,7 +244,7 @@ def utility_processor():
     def format_sequence_to_device_name(sequence):
         # sequence 不能大于 25。dev_table 序数从 0 开始。
         if sequence == -1:
-            return u'无'
+            return '无'
 
         if sequence >= dev_table.__len__():
             return 'Unknown'

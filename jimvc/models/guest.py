@@ -4,9 +4,9 @@
 
 import jimit as ji
 
-from filter import FilterFieldType
-from orm import ORM
-from status import GuestState, DiskState
+from .filter import FilterFieldType
+from .orm import ORM
+from .status import GuestState, DiskState
 
 
 __author__ = 'James Iter'
@@ -135,7 +135,7 @@ class Disk(ORM):
         self.device = None
 
         if self.sequence >= 0:
-            self.device = u'/dev/' + dev_table[self.sequence]
+            self.device = '/dev/' + dev_table[self.sequence]
 
     @staticmethod
     def get_filter_keywords():

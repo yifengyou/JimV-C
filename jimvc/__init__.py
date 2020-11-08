@@ -29,8 +29,8 @@ app = Flask(__name__)
 
 from jimvc.models.initialize import logger, Init, app_config, dev_table
 
-import api_route_table
-import views_route_table
+from . import api_route_table
+from . import views_route_table
 
 from jimvc.models import Utils
 from jimvc.models import EventProcessor
@@ -189,14 +189,14 @@ def r_before_request():
 
             try:
                 user.get()
-            except ji.PreviewingError, e:
+            except ji.PreviewingError as e:
                 # 如果该用户获取失败，则清除该用户对应的session。因为该用户可能已经被删除。
-                for key in session.keys():
+                for key in list(session.keys()):
                     session.pop(key=key)
-                return json.loads(e.message)
+                return json.loads(str(e))
 
-    except ji.JITError, e:
-        ret = json.loads(e.message)
+    except ji.JITError as e:
+        ret = json.loads(str(e))
 
         if ret['state']['code'] == '404':
             return redirect(location=url_for('v_config.create'), Response=Response)
@@ -235,12 +235,12 @@ def r_after_request(response):
                 g.token['exp'] < (ji.Common.ts() + (app_config['token_ttl'] / 2)):
             token = Utils.generate_token(g.token['uid'])
             # 清除原有session，由新session代替
-            for key in session.keys():
+            for key in list(session.keys()):
                 session.pop(key=key)
             session['token'] = token
         return response
-    except ji.JITError, e:
-        return json.loads(e.message)
+    except ji.JITError as e:
+        return json.loads(str(e))
 
 
 @app.teardown_request
